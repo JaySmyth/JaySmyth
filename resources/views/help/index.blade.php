@@ -6,7 +6,7 @@
     <div class="col-sm-7">
 
         <h2>Help</h2>
-        
+
         <hr>
 
         <p class="text-large">Please take the time to read through the user guide provided. A PDF download is available below. If you are still having difficulties please do not hesitate to contact via the appropriate contact.</p>
@@ -30,7 +30,7 @@
         <h2>Contacts</h2>
 
         <hr>
-        
+
         <div class="row mb-3">
             <div class="col-sm-6"><strong>Courier Department</strong></div>
             <div class="col-sm-6"><a href="mailto:it@antrim.ifsgroup.com">courier@antrim.ifsgroup.com</a></div>
@@ -65,9 +65,9 @@
             <div class="col-sm-6"><strong>Sales</strong></div>
             <div class="col-sm-6"><a href="mailto:sales@antrim.ifsgroup.com">sales@antrim.ifsgroup.com</a></div>
         </div>
-        
+
         <hr>
-        
+
         <div class="row mb-3">
             <div class="col-sm-6"><span class="fas fa-lg fa-phone" aria-hidden="true"></span> <strong class="ml-sm-3">Telephone</strong></div>
             <div class="col-sm-6">+44 28 9446 4211</div>
@@ -78,5 +78,5 @@
             <div class="col-sm-6"><a href="http://www.ifsgroup.com" target="_blank">http://www.ifsgroup.com</a></div>
         </div>
     </div>    
-</div>
+</div>..
 @endsection
