@@ -78,5 +78,5 @@
             <div class="col-sm-6"><a href="http://www.ifsgroup.com" target="_blank">http://www.ifsgroup.com</a></div>
         </div>
     </div>    
-</div>
+</div>.....
 @endsection
