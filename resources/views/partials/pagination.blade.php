@@ -1,0 +1,1 @@
+{!! $results->appends(Request::except('page'))->links('vendor.pagination.bootstrap-4') !!}

@@ -1,0 +1,644 @@
+// Fonts
+@import url(https://fonts.googleapis.com/css?family=Roboto:100,200,300,400,700,100italic,200italic,400italic,700italic);
+
+// Sweet Alert 2
+@import "node_modules/sweetalert2/dist/sweetalert2.min";
+
+// jQuery-UI datepicker
+@import "node_modules/jquery-ui/themes/base/theme";
+@import "node_modules/jquery-ui/themes/base/datepicker";
+@import "node_modules/jquery-ui/themes/base/autocomplete";
+
+// Variables
+@import "variables";
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+
+body {
+    padding-top: 6.5rem;
+    color: $gray-800;
+    font-size: 15px;
+}
+
+h1 {
+    font-weight:300;
+}
+
+a, a:hover, a:active, a:focus{
+    outline: 0;
+}
+
+textarea {
+    resize: none;
+}
+
+label {
+    font-weight: bold;
+}
+
+h1 .badge, h2 .badge, h3 .badge, h4 .badge{
+    font-weight:300;
+    -webkit-box-shadow: 2px 2px 9px 0px $gray-300;
+    -moz-box-shadow: 2px 2px 9px 0px $gray-300;
+    box-shadow: 2px 2px 9px 0px $gray-300;
+}
+
+h1 .badge.badge-sm, h2 .badge.badge-sm {
+    font-size: 40%;
+    padding: .2em;
+    padding-top: .1em;
+    margin-left: .5rem;
+    margin-top: -20px;
+}
+
+h4 .badge.badge-sm {
+    font-size: 60%;
+    margin-left: .3rem;
+}
+
+.container-fluid {
+    min-width:1000px;
+    max-width: 1660px;
+    margin: 0 auto;
+}
+
+body .container-fluid a .fas, body .container-fluid a .far {
+    color:$gray-700;
+}
+
+body .container-fluid a .fas:hover, body .container-fluid a .far:hover{
+    color:$black;
+}
+
+.fa-info-circle {
+    color:$gray-600;
+    font-size: 85%;
+    display:inline-body;
+    padding-left: 3px;
+    cursor:help;
+}
+
+.datepicker {
+    background-color: $white;
+    cursor: pointer;
+}
+.card-header {
+    color: $black;
+    font-size: 115%;
+}
+
+.example {
+    font-style: italic;
+    color:$gray-700;
+}
+
+.cursor-pointer:hover{
+    cursor:pointer;
+}
+
+.bg-dark {
+    background-color: $navy !important;
+}
+
+// ================================================================================ //
+// =================================== SIDE BAR =================================== //
+// ================================================================================ //
+
+.sidebar {
+    position: fixed;
+    top: 51px;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    padding: 20px;
+    overflow-x: hidden;
+    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+    border-right: 1px solid #eee;
+    padding-top: 4.2rem;
+}
+
+// ================================================================================ //
+// ============================= STATUS COLOURS =================================== //
+// ================================================================================ //
+
+.badge-delivered, .badge-enabled, .badge-completed {
+    color: $white;
+    background-color: $bright-green;
+}
+
+.badge-cancelled, .badge-disabled, .badge-failure, .badge-unknown {
+    color: $white;
+    background-color: $red;
+}
+
+.badge-on_hold, .badge-new, .badge-booking, .badge-booked, .badge-return_to_sender, .badge-unmanifested {
+    color: $white;
+    background-color: $orange;
+}
+
+.badge-in_transit, .badge-received, .badge-pre_transit, .badge-collected {
+    color: $white;
+    background-color: $gray-600;
+}
+
+.badge-on_feeder_vessel, .badge-on_deep_sea_vessel, .badge-in_customs, .badge-customs_cleared, .badge-out_for_delivery, .badge-arrival_port_discharge, .badge-vgm, .badge-manifested, .badge-available_for_pickup {
+    color: $white;
+    background-color: $dark-blue;
+}
+
+.cancelled, .cancel,.failure, .unknown{
+    color: $red;
+}
+
+.text-caution, .on_hold, .saved, .new, .booking, .booked, .passed, .return_to_sender, .unmanifested {
+    color: $orange;
+}
+
+.on_feeder_vessel, .on_deep_sea_vessel, .in_customs, .customs_cleared, .out_for_delivery, .arrival_port_discharge, .vgm, .manifested, .available_for_pickup {
+    color:$dark-blue;
+}
+
+.delivered, .completed {
+    color: $green;
+}
+
+// ================================================================================ //
+// ==================================== BUTTONS ==================================== //
+// ================================================================================ //
+
+.btn {
+    cursor:pointer;
+}
+
+.btn-xs{
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
+    font-size: 88%;
+}
+
+.btn-shadow {
+    -webkit-box-shadow: 2px 2px 9px 0px $gray-600;
+    -moz-box-shadow: 2px 2px 9px 0px $gray-600;
+    box-shadow: 2px 2px 9px 0px $gray-600;
+}
+
+.buttons-main {
+    clear: both;
+}
+
+.buttons-main button,.buttons-main input {
+    margin: 15px;
+}
+
+.btn-outline-secondary {
+    background-color: $white;
+}
+
+// ================================================================================ //
+// =================================== MISC ======================================= //
+// ================================================================================ //
+
+.has-danger .form-control {
+    border-color: $red;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+}
+
+.has-danger .input-group-addon {
+    color: $red;
+    background-color: #f2dede;
+    border-color: $red;
+}
+
+.has-danger .form-text {
+    color: $red;
+}
+
+.border-bottom {
+    border-bottom: solid 1px $gray-300;
+}
+
+.no-results {
+    font-size: 300%;
+    font-weight: 100;
+    text-align: center;
+    margin-top: 200px;
+    color:$gray-600;
+}
+
+.chevron {
+    font-size: 250%;
+    color: $gray-400;
+}
+
+.text-small {
+    font-size:75%;
+}
+
+.text-medium {
+    font-size:85%;
+}
+
+.text-large {
+    font-size:115%;
+}
+
+.form-compact .form-group {
+    margin-bottom: .5rem;
+}
+
+.form-compact-xs .form-group {
+    margin-bottom: .36rem;
+}
+
+.neutral {
+    color:$dark-blue;
+}
+
+.hours {
+    text-transform: uppercase;
+    font-size: 70%;
+    padding-left: 2px;
+}
+
+.faded {
+    color: $gray-400;
+}
+
+#to_top {
+    position: fixed;
+    bottom: 35px;
+    right: 50px;
+    z-index: 99999;
+    display: none;
+    width: 36px;
+    height: 36px;
+    background: $gray-700;
+    opacity: 0.8;
+    text-align: center;
+    border-radius: 8px;
+}
+
+.roles li {
+    list-style: none;
+    margin-bottom: 15px;
+}
+
+#loading, .modal-loading{
+    display: none;
+    width:86px;
+    height: 86px;
+    position:fixed;
+    top: 45%;
+    left: 50%;
+    overflow: hidden;
+    z-index: 1104;
+}
+
+.pod-image {
+    max-width: 260px;
+}
+
+
+// ================================================================================ //
+// ==================================== MODALS ==================================== //
+// ================================================================================ //
+
+.modal-lg {
+    max-width: 850px;
+}
+
+.modal label {
+    font-weight:normal;
+    color: $black;
+}
+
+.modal-overflow {
+    height:420px;
+    overflow:auto;
+}
+
+.modal-form-title {
+    border-bottom: solid 2px $gray-400;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    font-size:180%;
+}
+
+// ================================================================================ //
+// ==================================== NAV BAR =================================== //
+// ================================================================================ //
+
+.navbar {
+    font-size: 16px;
+    background:#232F52;     /* fallback for old browsers */
+    background: -webkit-linear-gradient(to top, #415474, #141C40);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to top, #415474, #141C40); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    border-top: solid 4px $red;
+    border-bottom: solid 1px #354566;
+    height: 78px;
+    -webkit-box-shadow: 0px 4px 4px 0px rgba(50, 50, 50, 0.32);
+    -moz-box-shadow:    0px 4px 4px 0px rgba(50, 50, 50, 0.32);
+    box-shadow:         0px 4px 4px 0px rgba(50, 50, 50, 0.32);
+}
+
+.navbar-brand {
+    margin-top: -5px;
+}
+
+.navbar-nav .dropdown-menu {
+    margin-top: 16px;
+    border-radius: 0 0 5px 5px;
+    -webkit-box-shadow: 0px 4px 4px 0px rgba(50, 50, 50, 0.32);
+    -moz-box-shadow: 0px 4px 4px 0px rgba(50, 50, 50, 0.32);
+    box-shadow: 0px 4px 4px 0px rgba(50, 50, 50, 0.32);
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: $white;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+    color:red;
+}
+
+.navbar .dropdown-toggle::after {
+    content:none;
+}
+
+#nav-search {
+    display: none;
+
+    .form-control {
+        border-color: $navy;
+    }
+
+    .form-control::placeholder {
+        opacity: .4;
+        font-style: italic;
+    }
+
+    .btn {
+        color: $white;
+        background: $red;
+        background: -webkit-linear-gradient(to top, $red, $dark-red);  /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to top, $red, $dark-red); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+        border-color: $navy;
+    }
+
+    .btn:hover{
+        background-color:$dark-red;
+        cursor: pointer;
+    }
+
+    #filter {
+        min-width: 80px;
+    }
+}
+
+.advanced-search {
+    display: none;
+    color: $white;
+    font-size: 75%;
+    outline: none;
+}
+
+.advanced-search:hover{
+    color: $white;
+}
+
+
+// ================================================================================ //
+// ======================== CREATE SHIPMENT PAGE SPECIFIC ========================= //
+// ================================================================================ //
+
+#create-shipment {
+
+    font-size:14px;
+
+    .card {
+        border-color:$gray-600;
+        -webkit-box-shadow: 2px 2px 9px 0px $gray-500;
+        -moz-box-shadow: 2px 2px 9px 0px $gray-500;
+        box-shadow: 2px 2px 9px 0px $gray-500;
+    }
+
+    .card-header {
+        font-size: 100%;
+    }
+}
+
+#shipment {
+
+    #panel-details .form-group, #panel-invoice .form-group {
+        margin-bottom: .7rem;
+    }
+
+    #panel-sender, #panel-alerts, #panel-billing, #panel-broker, #panel-invoice, #panel-options, #panel-docs-only, #panel-goods-description {
+        display:none;
+    }
+
+    #panel-details, #panel-alerts, #panel-billing, #panel-broker, #panel-invoice, #panel-options, #panel-goods-description, #panel-docs-only, #panel-packages, #panel-contents {
+        height: 220px;
+    }
+
+    #container-packages, #container-contents {
+        height:180px;
+        overflow:auto;
+    }
+
+    #dry-ice-fieldset {
+        max-height:134px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+}
+
+#summary {
+
+    display:none;
+
+    #select-service-body{
+        height: 299px;
+        overflow:auto;
+    }
+
+    #panel-select-service .service {
+        font-size: 170%;
+        cursor:pointer;
+        border-bottom: solid 1px $gray-300;
+    }
+
+    #panel-select-service .service .fa {
+        width: 40px;
+    }
+
+    #panel-select-service .service .checkbox-container {
+        width: 40px;
+        display: inline-block;
+    }
+
+    .cost-breakdown {
+        color: $gray-700;
+        font-size: 50%;
+        font-style: underline;
+        padding: 8px;
+        text-decoration: underline;
+    }
+
+}
+
+#commodity-form {
+    display: none;
+}
+
+
+// ================================================================================ //
+// ============================= SWEET ALERT SPECIFIC ============================= //
+// ================================================================================ //
+
+.swal2-overlay {
+    z-index: 99999999999998;
+}
+
+.swal2-modal {
+    z-index: 99999999999999;
+}
+
+
+// ================================================================================ //
+// ================================== LOGIN PAGE ================================== //
+// ================================================================================ //
+
+.form-signin, .form-track {
+    max-width: 370px;
+    margin: 0 auto;
+}
+
+.form-signin .checkbox {
+    font-weight: normal;
+}
+
+.form-signin .form-control {
+    position: relative;
+    height: auto;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.form-signin .form-control:focus {
+    z-index: 2;
+}
+
+.form-signin .login-error, .form-track .login-error {
+    font-weight: bold;
+    margin-top: 30px;
+    text-align: center;
+    color: $red;
+}
+
+// ================================================================================ //
+// ============================ TRACKING PAGE SPECIFIC ============================ //
+// ================================================================================ //
+
+.negative-marging-top {
+    margin-top: -60px;
+}
+
+.progress-bar-success, .tracker-progress-bar .progress-bar-green {
+    background-color: $green;
+}
+
+.progress-bar-success, .tracker-progress-bar .progress-bar-orange {
+    background-color: $orange;
+}
+
+.tracker-progress-bar {
+    margin-left: 12%;
+    margin-right: 12%;
+    margin-bottom: 80px;
+    position: relative;
+}
+
+
+.tracker-progress-bar .progress {
+    margin-bottom: 19px;
+    height: 12px;
+    border-radius: 6px; }
+
+.tracker-progress-bar .progress .progress-bar, .tracker-progress-bar .progress .progress-bar-blue {
+    -webkit-box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.15);
+    box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.15); }
+
+.tracker-progress-bar .state-0 {
+    position: absolute;
+    left: 0; }
+
+.tracker-progress-bar .state-1 {
+    position: absolute;
+    left: 33%; }
+
+.tracker-progress-bar .state-2 {
+    position: absolute;
+    left: 66%; }
+
+.tracker-progress-bar .state-3 {
+    position: absolute;
+    left: 100%; }
+
+.tracker-progress-bar .state-label {
+    width: 140px;
+    margin-left: -70px;
+    text-align: center; }
+
+.tracker-progress-bar .blue .dot {
+    border-color: $blue; }
+.tracker-progress-bar .green .dot {
+    border-color: $green; }
+.tracker-progress-bar .yellow .dot {
+    border-color: $yellow; }
+.tracker-progress-bar .orange .dot {
+    border-color: $orange; }
+.tracker-progress-bar .red .dot {
+    border-color: $red; }
+.tracker-progress-bar .dot {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    background-color: $white;
+    border-width: 9px;
+    border-style: solid;
+    -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+    top: 0;
+    margin-left: -20px;
+    margin-top: -14px; }
+.tracker-progress-bar .past-state {
+    color: $gray-600; }
+.tracker-progress-bar .current-state {
+    font-weight: bold; }
+.tracker-progress-bar .future-state {
+    color: $gray-200; }
+
+
+
+.ui-helper-hidden-accessible { display:none; }
+
+.ui-autocomplete {
+    padding: 4px;
+    list-style: none;
+}
+
+
+
+.log-text {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 95%;
+}
