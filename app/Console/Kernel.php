@@ -56,6 +56,7 @@ class Kernel extends ConsoleKernel
         Commands\PerformRateIncrease::class,
         Commands\UpdateShopify::class,
         Commands\BulkCreateTrackers::class,
+        Commands\SendScanningReportEmail::class,
     ];
 
     /**
