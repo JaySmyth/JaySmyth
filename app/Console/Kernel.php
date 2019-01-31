@@ -125,7 +125,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:notify-transport-department-pod-required')->weekdays()->dailyAt('09:30');
         $schedule->command('ifs:close-stagnant-transport-jobs')->dailyAt('04:35');
         $schedule->command('ifs:correct-status-on-transport-jobs')->dailyAt('04:38');
-
+        $schedule->command('ifs:send-scanning-report-email')->weekdays()->dailyAt('21:30');
+        $schedule->command('ifs:send-scanning-report-email --last-weekday')->weekdays()->dailyAt('09:30');
+        
         /*
          * Multifreight
          */
