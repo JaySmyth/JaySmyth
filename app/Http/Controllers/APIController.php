@@ -485,6 +485,13 @@ class APIController extends Controller
         } else {
             
         }
+        
+        // Temporary Patch for Twinings
+        if (in_array($this->input['data']['company_id'], ["608","807"])) {
+            $this->input['data']['sender_address3'] = 'Mallusk';
+            $this->input['data']['sender_city'] = 'Newtownabbey';
+            $this->input['data']['sender_county'] = 'Antrim';
+        }
 
         // Temporary Patch for Twinings
         if (in_array($this->input['data']['company_id'], ["608","807"])) {
