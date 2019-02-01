@@ -17,6 +17,7 @@ class CreateEasypostTracker implements ShouldQueue
 
     protected $trackingCode;
     protected $carrier;
+    protected $key;
 
     /**
      * Create a new job instance.
@@ -27,6 +28,8 @@ class CreateEasypostTracker implements ShouldQueue
     {
         $this->trackingCode = $trackingCode;
         $this->carrier = $carrier;
+        $this->key = 'mmJ7I06Yq6Ogg2soH5RncQ';
+        //$this->key = env('EASYPOST_KEY');
     }
 
     /**
@@ -41,12 +44,11 @@ class CreateEasypostTracker implements ShouldQueue
         }
 
         try {
-            \EasyPost\EasyPost::setApiKey(env('EASYPOST_KEY'));
+            \EasyPost\EasyPost::setApiKey($this->key);
             \EasyPost\Tracker::create(array('tracking_code' => $this->trackingCode, 'carrier' => $this->carrier));
         } catch (\EasyPost\Error $ex) {
             Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Create Easypost Tracker (' . $this->trackingCode . ' - ' . $this->carrier . ')', $ex));
         }
-        
     }
 
     /**
