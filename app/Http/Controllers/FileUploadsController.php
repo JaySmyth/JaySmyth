@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\FileUpload;
+use Illuminate\Http\Request;
 
 class FileUploadsController extends Controller
 {
@@ -28,7 +28,9 @@ class FileUploadsController extends Controller
     {
         $this->authorize('view', new FileUpload);
 
-        $fileUploads = FileUpload::orderBy('type', 'ASC')->paginate(50);
+        $fileUploads = FileUpload::orderBy('company_name')->orderBy('type', 'ASC')
+                ->join('companies', 'companies.id', '=', 'file_uploads.company_id')
+                ->paginate(50);
 
         return view('file_uploads.index', compact('fileUploads'));
     }
@@ -57,13 +59,13 @@ class FileUploadsController extends Controller
     public function retry($id)
     {
         $fileUpload = FileUpload::findOrFail($id);
-        
+
         $this->authorize($fileUpload);
-         
+
         $fileUpload->retry();
 
         flash()->info('File Upload', 'File upload has been scheduled to run in 2 minutes time.', true);
-        
+
         return back();
     }
 
