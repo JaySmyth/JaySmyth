@@ -64,7 +64,7 @@ class SendScanningReportEmail extends Command
         }
 
         $period = [Carbon::today()->startOfDay(), Carbon::today()->endOfDay()];
-        $date = date('d-m-y', strtotime('last weekday'));
+        $date = date('d-m-y', time());
 
         if ($this->option('last-weekday')) {
             $period = [Carbon::today()->modify("last weekday")->startOfDay(), Carbon::today()->modify("last weekday")->endOfDay()];
