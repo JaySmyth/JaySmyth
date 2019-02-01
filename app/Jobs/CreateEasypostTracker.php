@@ -40,10 +40,13 @@ class CreateEasypostTracker implements ShouldQueue
             return null;
         }
 
-        if (env('APP_ENV') == "production") {
+        try {
             \EasyPost\EasyPost::setApiKey(env('EASYPOST_KEY'));
             \EasyPost\Tracker::create(array('tracking_code' => $this->trackingCode, 'carrier' => $this->carrier));
+        } catch (\EasyPost\Error $ex) {
+            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Create Easypost Tracker (' . $this->trackingCode . ' - ' . $this->carrier . ')', $ex));
         }
+        
     }
 
     /**
