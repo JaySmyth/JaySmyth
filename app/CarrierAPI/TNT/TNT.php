@@ -418,6 +418,8 @@ class TNT
         $activityNode = $xml->addChild('ACTIVITY');
         $createNode = $activityNode->addChild('CREATE');
         $createNode->addChild('CONREF', $this->conref);
+        $shipNode = $activityNode->addChild('SHIP');
+        $shipNode->addChild('CONREF', $this->conref);
         $printNode = $activityNode->addChild('PRINT');
         $labelNode = $printNode->addChild('LABEL');
         $labelNode->addChild('CONREF', $this->conref);
