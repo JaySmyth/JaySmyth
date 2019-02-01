@@ -123,9 +123,9 @@
 
                 <!-- Cancel shipment - only enable if active shipment and not yet received -->
                 @if($shipment->isCancellable())
-                <a href="{{ url('/sea-freight/' . $shipment->id . '/cancel') }}" title="Cancel Shipment" class="cancel-sea-freight-shipment"><span class="fas fa-times ml-sm-2" aria-hidden="true"></span></a>
+                <a href="{{ url('/sea-freight/' . $shipment->id . '/cancel') }}" title="Cancel Shipment" class="cancel-sea-freight-shipment"><span class="fas fa-times" aria-hidden="true"></span></a>
                 @else
-                <span class="fas fa-times ml-sm-2 faded" aria-hidden="true" title="Cancel Shipment"></span>
+                <span class="fas fa-times faded" aria-hidden="true" title="Cancel Shipment"></span>
                 @endif
 
                 @if (!$shipment->processed && $shipment->seaFreightStatus->code != 'cancelled')
