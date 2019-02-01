@@ -335,6 +335,27 @@ class UploadFiles extends Command
     }
 
     /**
+     * Shipments created (ignore saved/cancelled shipments).
+     *
+     * @param type $criteria
+     * @return array
+     */
+    protected function createdFile($companyId)
+    {
+        // Load the shipments using the defined criteria
+        $shipments = \App\Shipment::whereNotIn('status_id', [1, 7])->whereCreatedSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
+
+        if (!$shipments->isEmpty()) {
+
+            // Build a list of ids we are going to send
+            $this->idsSent = $shipments->pluck('id')->toArray();
+
+            // Return the results as export array
+            return $this->getShipmentExportArray($shipments);
+        }
+    }
+
+    /**
      * Get a shipment array for excel export.
      *
      * @param type $shipments
