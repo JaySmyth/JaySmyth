@@ -744,6 +744,11 @@ class ImportShipments implements ShouldQueue
                 $this->errors[] = 'Product code required for this destination';
                 return;
             }
+
+            if (empty($this->row['product_quantity'])) {
+                $this->errors[] = 'Product quantity required for this destination';
+                return;
+            }
         }
 
         if (!empty($this->row['product_code'])) {
