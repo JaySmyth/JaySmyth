@@ -28,7 +28,7 @@ class FileUploadsController extends Controller
     {
         $this->authorize('view', new FileUpload);
 
-        $fileUploads = FileUpload::orderBy('company_name')->orderBy('type', 'ASC')
+        $fileUploads = FileUpload::select('file_uploads.*', 'companies.company_name')->orderBy('company_name')->orderBy('type', 'ASC')
                 ->join('companies', 'companies.id', '=', 'file_uploads.company_id')
                 ->paginate(50);
 
