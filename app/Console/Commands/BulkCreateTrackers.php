@@ -14,7 +14,7 @@ class BulkCreateTrackers extends Command
      *
      * @var string
      */
-    protected $signature = 'ifs:bulk-create-trackers {--start-date=} {--finish-date=}';
+    protected $signature = 'ifs:bulk-create-trackers {--start-date=} {--finish-date=} {--received}';
 
     /**
      * The console command description.
@@ -43,7 +43,11 @@ class BulkCreateTrackers extends Command
         $startDate = $this->option('start-date');
         $finishDate = $this->option('finish-date');
 
-        $shipments = Shipment::whereBetween('ship_date', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($finishDate)->endOfDay()])->isActive()->get();
+        if ($this->option('received')) {
+            $shipments = Shipment::whereBetween('ship_date', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($finishDate)->endOfDay()])->isActive()->hasStatus('received')->get();
+        } else {
+            $shipments = Shipment::whereBetween('ship_date', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($finishDate)->endOfDay()])->isActive()->get();
+        }
 
         $count = $shipments->count();
 
