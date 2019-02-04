@@ -44,4 +44,7 @@ return [
         'path_to_node' => env('PATH_TO_NODE'),
         'host' => env('APP_HOST'),
     ],
+    'easypost' => [
+        'key' => env('EASYPOST_KEY'),
+    ],
 ];
