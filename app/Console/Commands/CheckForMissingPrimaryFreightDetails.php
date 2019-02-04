@@ -55,13 +55,9 @@ class CheckForMissingPrimaryFreightDetails extends Command
 
         if ($shipments->count() > 0) {
 
-            $bodyText = 'The following shipments have not received shipping details from Primary Freight. Please Investigate.<br><br>';
+            $bodyText = 'We do not appear to have received shipment details for the following shipments. Could you please Investigate.';
 
-            foreach ($shipments as $shipment) {
-                $bodyText .= "Consignment " . $shipment->consignment_number . " Ship Date : " . $shipment->ship_date->format('Y-m-d') . "\n";
-            }
-
-            Mail::to('gmcbroom@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Primary Freight Shipments not Shipped', $bodyText));
+            Mail::to('gmcbroom@antrim.ifsgroup.com')->send(new \App\Mail\MissingPrimaryFreightDetails($shipments));
 
             dd('Mail Sent');
         }
