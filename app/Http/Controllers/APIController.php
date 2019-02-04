@@ -493,13 +493,6 @@ class APIController extends Controller
             $this->input['data']['sender_county'] = 'Antrim';
         }
 
-        // Temporary Patch for Twinings
-        if (in_array($this->input['data']['company_id'], ["608","807"])) {
-            $this->input['data']['sender_address3'] = 'Mallusk';
-            $this->input['data']['sender_city'] = 'Newtownabbey';
-            $this->input['data']['sender_county'] = 'Antrim';
-        }
-
         // Shipment Depot
         $this->input['data']['depot_id'] = Company::find($this->input['data']['company_id'])->depot_id;
 
