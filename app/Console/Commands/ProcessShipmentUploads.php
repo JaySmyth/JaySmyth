@@ -71,7 +71,7 @@ class ProcessShipmentUploads extends Command
                             unlink($originalFile);
 
                             // Dispatch the job
-                            dispatch(new \App\Jobs\ImportShipments($tempFile, $shipmentUpload->importConfig->id, $shipmentUpload->importConfig->user));
+                            dispatch(new \App\Jobs\ImportShipments($tempFile, $shipmentUpload->importConfig->id, $shipmentUpload->importConfig->user))->onQueue('import');
 
                             // Update the last upload time on the shipment upload record
                             $shipmentUpload->last_upload = time();

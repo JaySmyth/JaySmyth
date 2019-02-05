@@ -35,30 +35,22 @@ return [
             'driver' => 'sync',
         ],
 
-        'database' => [
+        'import' => [
+            'driver' => 'database',
+            'table'  => 'jobs',
+            'queue'  => 'import',
+            'expire' => 300,
+            'retry_after' => 450,
+        ],
+        
+        'default' => [
             'driver' => 'database',
             'table'  => 'jobs',
             'queue'  => 'default',
             'expire' => 300,
             'retry_after' => 450,
         ],
-
-        'beanstalkd' => [
-            'driver' => 'beanstalkd',
-            'host'   => 'localhost',
-            'queue'  => 'default',
-            'ttr'    => 60,
-        ],
-
-        'sqs' => [
-            'driver' => 'sqs',
-            'key'    => 'your-public-key',
-            'secret' => 'your-secret-key',
-            'prefix' => 'https://sqs.us-east-1.amazonaws.com/your-account-id',
-            'queue'  => 'your-queue-name',
-            'region' => 'us-east-1',
-        ],
-
+                
         'redis' => [
             'driver'     => 'redis',
             'connection' => 'default',

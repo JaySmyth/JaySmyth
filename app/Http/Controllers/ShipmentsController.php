@@ -568,7 +568,7 @@ class ShipmentsController extends Controller
 
         $importConfig = \App\ImportConfig::find($request->import_config_id);
 
-        dispatch(new \App\Jobs\ImportShipments(storage_path('app/' . $path), $request->import_config_id, $request->user()));
+        dispatch(new \App\Jobs\ImportShipments(storage_path('app/' . $path), $request->import_config_id, $request->user()))->onQueue('import');
 
         // Notify user and redirect
         flash()->info('File Uploaded!', 'Please check your email for results.', true);
