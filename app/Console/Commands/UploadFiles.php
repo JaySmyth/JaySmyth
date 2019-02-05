@@ -125,14 +125,26 @@ class UploadFiles extends Command
      */
     protected function writeFile($fileUpload)
     {
-        $method = $fileUpload->type . 'File';
+        $data = false;
+        $method = 'get' . ucfirst($fileUpload->type) . 'Shipments';
 
         if (!method_exists($this, $method)) {
             $this->log('Invalid type - ' . $fileUpload->type, 'error');
             return false;
         }
 
-        $data = $this->$method($fileUpload->company_id);
+        // Retreive the shipment records
+        $shipments = $this->$method($fileUpload->company_id);
+
+
+        if (!$shipments->isEmpty()) {
+
+            // Build a list of ids we are going to send
+            $this->idsSent = $shipments->pluck('id')->toArray();
+
+            // The results as export array
+            $data = $this->getShipmentExportArray($shipments, $fileUpload->verbose);
+        }
 
         if (is_array($data) && count($data) > 0) {
             $this->log(count($data) . " records to upload");
@@ -298,19 +310,9 @@ class UploadFiles extends Command
      * @param type $criteria
      * @return array
      */
-    protected function podFile($companyId)
+    protected function getPodShipments($companyId)
     {
-        // Load the shipments using the defined criteria
-        $shipments = \App\Shipment::whereDelivered(1)->wherePodSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
-
-        if (!$shipments->isEmpty()) {
-
-            // Build a list of ids we are going to send
-            $this->idsSent = $shipments->pluck('id')->toArray();
-
-            // Return the results as export array
-            return $this->getShipmentExportArray($shipments);
-        }
+        return \App\Shipment::whereDelivered(1)->wherePodSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
     }
 
     /**
@@ -319,19 +321,9 @@ class UploadFiles extends Command
      * @param type $criteria
      * @return array
      */
-    protected function receivedFile($companyId)
+    protected function getReceivedShipments($companyId)
     {
-        // Load the shipments using the defined criteria
-        $shipments = \App\Shipment::whereReceived(1)->whereReceivedSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
-
-        if (!$shipments->isEmpty()) {
-
-            // Build a list of ids we are going to send
-            $this->idsSent = $shipments->pluck('id')->toArray();
-
-            // Return the results as export array
-            return $this->getShipmentExportArray($shipments);
-        }
+        return \App\Shipment::whereReceived(1)->whereReceivedSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
     }
 
     /**
@@ -340,19 +332,9 @@ class UploadFiles extends Command
      * @param type $criteria
      * @return array
      */
-    protected function createdFile($companyId)
+    protected function getCreatedShipments($companyId)
     {
-        // Load the shipments using the defined criteria
-        $shipments = \App\Shipment::whereNotIn('status_id', [1, 7])->whereCreatedSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
-
-        if (!$shipments->isEmpty()) {
-
-            // Build a list of ids we are going to send
-            $this->idsSent = $shipments->pluck('id')->toArray();
-
-            // Return the results as export array
-            return $this->getShipmentExportArray($shipments);
-        }
+        return \App\Shipment::whereNotIn('status_id', [1, 7])->whereCreatedSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
     }
 
     /**
@@ -361,49 +343,72 @@ class UploadFiles extends Command
      * @param type $shipments
      * @return type
      */
-    protected function getShipmentExportArray($shipments, $timezone = 'Europe/London')
+    protected function getShipmentExportArray($shipments, $timezone = 'Europe/London', $verbose = true)
     {
         $data = array();
 
         foreach ($shipments as $shipment) :
-            $data[] = [
-                'Consignment Number' => $shipment->consignment_number,
-                'Carrier Consignment Number' => $shipment->carrier_consignment_number,
-                'Shipment Reference' => $shipment->shipment_reference,
-                'Pieces' => $shipment->pieces,
-                'Weight' => $shipment->weight . strtoupper($shipment->weight_uom),
-                'Volume' => $shipment->volumetric_weight,
-                'Sender Name' => $shipment->sender_name,
-                'Sender Company Name' => $shipment->sender_company_name,
-                'Sender Address 1' => $shipment->sender_address1,
-                'Sender Address 2' => $shipment->sender_address2,
-                'Sender Address 3' => $shipment->sender_address3,
-                'Sender City' => $shipment->sender_city,
-                'Sender State' => $shipment->sender_state,
-                'Sender Postcode' => $shipment->sender_postcode,
-                'Sender Country' => $shipment->sender_country_code,
-                'Sender Telephone' => $shipment->sender_telephone,
-                'Sender Email' => $shipment->sender_email,
-                'Recipient Name' => $shipment->recipient_name,
-                'Recipient Company_name' => $shipment->recipient_company_name,
-                'Recipient Address 1' => $shipment->recipient_address1,
-                'Recipient Address 2' => $shipment->recipient_address2,
-                'Recipient Address 3' => $shipment->recipient_address3,
-                'Recipient City' => $shipment->recipient_city,
-                'Recipient State' => $shipment->recipient_state,
-                'Recipient Postcode' => $shipment->recipient_postcode,
-                'Recipient Country' => $shipment->recipient_country_code,
-                'Recipient Telephone' => $shipment->recipient_telephone,
-                'Recipient Email' => $shipment->recipient_email,
-                'Date Created' => $shipment->created_at->timezone($timezone)->format('d-m-Y'),
-                'Ship Date' => $shipment->ship_date->timezone($timezone)->format('d-m-Y'),
-                'Service' => $shipment->service->code,
-                'Time In Transit' => $shipment->timeInTransit,
-                'Status' => $shipment->status->name,
-                'POD Signature' => $shipment->pod_signature,
-                'Delivery Date' => $shipment->getDeliveryDate('d-m-Y H:i'),
-                'Tracking' => url('/tracking/' . $shipment->token),
-            ];
+
+            if ($verbose) {
+
+                $data[] = [
+                    'Consignment Number' => $shipment->consignment_number,
+                    'Carrier Consignment Number' => $shipment->carrier_consignment_number,
+                    'Shipment Reference' => $shipment->shipment_reference,
+                    'Pieces' => $shipment->pieces,
+                    'Weight' => $shipment->weight . strtoupper($shipment->weight_uom),
+                    'Volume' => $shipment->volumetric_weight,
+                    'Sender Name' => $shipment->sender_name,
+                    'Sender Company Name' => $shipment->sender_company_name,
+                    'Sender Address 1' => $shipment->sender_address1,
+                    'Sender Address 2' => $shipment->sender_address2,
+                    'Sender Address 3' => $shipment->sender_address3,
+                    'Sender City' => $shipment->sender_city,
+                    'Sender State' => $shipment->sender_state,
+                    'Sender Postcode' => $shipment->sender_postcode,
+                    'Sender Country' => $shipment->sender_country_code,
+                    'Sender Telephone' => $shipment->sender_telephone,
+                    'Sender Email' => $shipment->sender_email,
+                    'Recipient Name' => $shipment->recipient_name,
+                    'Recipient Company_name' => $shipment->recipient_company_name,
+                    'Recipient Address 1' => $shipment->recipient_address1,
+                    'Recipient Address 2' => $shipment->recipient_address2,
+                    'Recipient Address 3' => $shipment->recipient_address3,
+                    'Recipient City' => $shipment->recipient_city,
+                    'Recipient State' => $shipment->recipient_state,
+                    'Recipient Postcode' => $shipment->recipient_postcode,
+                    'Recipient Country' => $shipment->recipient_country_code,
+                    'Recipient Telephone' => $shipment->recipient_telephone,
+                    'Recipient Email' => $shipment->recipient_email,
+                    'Date Created' => $shipment->created_at->timezone($timezone)->format('d-m-Y'),
+                    'Ship Date' => $shipment->ship_date->timezone($timezone)->format('d-m-Y'),
+                    'Service' => $shipment->service->code,
+                    'Time In Transit' => $shipment->timeInTransit,
+                    'Status' => $shipment->status->name,
+                    'POD Signature' => $shipment->pod_signature,
+                    'Delivery Date' => $shipment->getDeliveryDate('d-m-Y H:i'),
+                    'Tracking' => url('/tracking/' . $shipment->token),
+                ];
+            } else {
+
+                $data[] = [
+                    'Consignment Number' => $shipment->consignment_number,
+                    'Carrier Consignment Number' => $shipment->carrier_consignment_number,
+                    'Shipment Reference' => $shipment->shipment_reference,
+                    'Pieces' => $shipment->pieces,
+                    'Weight' => $shipment->weight . strtoupper($shipment->weight_uom),
+                    'Volume' => $shipment->volumetric_weight,
+                    'Date Created' => $shipment->created_at->timezone($timezone)->format('d-m-Y'),
+                    'Ship Date' => $shipment->ship_date->timezone($timezone)->format('d-m-Y'),
+                    'Service' => $shipment->service->code,
+                    'Time In Transit' => $shipment->timeInTransit,
+                    'Status' => $shipment->status->name,
+                    'POD Signature' => $shipment->pod_signature,
+                    'Delivery Date' => $shipment->getDeliveryDate('d-m-Y H:i'),
+                    'Tracking' => url('/tracking/' . $shipment->token),
+                ];
+            }
+
         endforeach;
 
         return $data;
