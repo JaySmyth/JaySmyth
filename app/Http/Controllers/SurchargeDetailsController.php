@@ -134,14 +134,10 @@ class SurchargeDetailsController extends Controller
 
         $surcharge->update($request->all());
         flash()->success('Updated!', 'Surcharge updated successfully.');
-        $url = 'surchargedetails/index';
-        if (isset($request->surcharge)) {
-            $url .= '/' . $request->surcharge_id;
-
-            if (isset($request->company_id)) {
-                $url .= '/' . $request->company_id;
-            }
-        }
+        
+        $surchargeId = (isset($request->surcharge_id)) ? $request->surcharge_id : 0;
+        $companyId = (isset($request->company_id)) ? $request->company_id : 0;
+        $url = 'surchargedetails' . '/' . $surchargeId . '/' . $companyId . '/index';
 
         return redirect($url);
     }
@@ -152,7 +148,7 @@ class SurchargeDetailsController extends Controller
      * @param
      * @return
      */
-    public function destroy(Surcharge $surcharge)
+    public function destroy(SurchargeDetail $surcharge)
     {
         $this->authorize('index', new Surcharge);
 

@@ -485,12 +485,12 @@ Route::get('company-rate/{company}/{service}/{discount?}/{date?}', 'RateControll
 Route::get('surcharges', 'SurchargesController@index');
 
 Route::get('surchargedetails', 'SurchargeDetailsController@index');
-Route::get('surchargedetails/index/{surcharge?}/{company?}', 'SurchargeDetailsController@index');
-Route::get('surchargedetails/create', 'SurchargeDetailsController@create');
+Route::get('surchargedetails/{surcharge}/{company}/index', 'SurchargeDetailsController@index');
+Route::get('surchargedetails/{surcharge}/{company}/create', 'SurchargeDetailsController@create');
 Route::post('surchargedetails', 'SurchargeDetailsController@store');
-Route::get('surchargedetails/{surcharge}/edit/{company_id?}', 'SurchargeDetailsController@edit');
+Route::get('surchargedetails/{surcharge}/{company}/edit', 'SurchargeDetailsController@edit');
 Route::patch('surchargedetails/{surcharge}', 'SurchargeDetailsController@update');
-Route::delete('surchargedetails/{surcharge}/delete/{company_id?}', 'SurchargeDetailsController@destroy');
+Route::delete('surchargedetails/{surcharge}/{company}/delete', 'SurchargeDetailsController@destroy');
 
 
 /*

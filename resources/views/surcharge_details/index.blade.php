@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-@include('partials.title', ['title' => $title, 'create' => 'surchargedetails', 'url' => 'surchargedetails'])
 
+@include('partials.title', ['title' => $title, 'create' => '','url' => 'surchargedetails/'. $surcharges[0]->id . '/' . $companyId])
 <div class="table table-striped-responsive">
     <table class="table table-striped">        
         <thead>
@@ -30,9 +30,9 @@
                 <td class="text-right">{{$surcharge->from_date}}</td>
                 <td class="text-right">{{$surcharge->to_date}}</td>
                 <td class="text-left text-nowrap">
-                    @can('view_surcharges')<a href="{{ url('/surchargedetails/' . $surcharge->id . '/edit/' . $companyId) }}" title="Edit Company Specific SurCharge"><span class="fas fa-edit" aria-hidden="true"></span></a>@endcan
+                    @can('view_surcharges')<a href="{{ url('/surchargedetails/' . $surcharge->id . '/' . $companyId . '/edit/') }}" title="Edit Company Specific SurCharge"><span class="fas fa-edit" aria-hidden="true"></span></a>@endcan
                     @if($surcharge->company_id > 0)
-                    @can('view_surcharges')<a href="{{ url('/surchargedetails/' . $surcharge->id . '/delete/' . $companyId) }}" title="Delete Company Specific SurCharge"><span class="fas fa-times ml-sm-2" aria-hidden="true"></span></a>@endcan
+                    @can('view_surcharges')<a href="{{ url('/surchargedetails/' . $surcharge->id . '/' . $companyId . '/delete/') }}" title="Delete Company Specific SurCharge"><span class="fas fa-times ml-sm-2 delete mr-2" data-record-name="entry" aria-hidden="true"></span></a>@endcan
                     @endif
                 </td>
             </tr>

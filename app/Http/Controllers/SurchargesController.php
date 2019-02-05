@@ -30,10 +30,11 @@ class SurchargesController extends Controller
     public function index(Request $request)
     {
         $this->authorize(new Surcharge);
-        
-        $surcharges = $this->search($request);
 
-        return view('surcharges.index', compact('surcharges'));
+        $surcharges = $this->search($request);
+        $companyId = 0;
+
+        return view('surcharges.index', compact('surcharges', 'companyId'));
     }
 
     /**
@@ -44,7 +45,7 @@ class SurchargesController extends Controller
      */
     public function create()
     {
-        
+
         $this->authorize('index', new Surcharge);
 
         return view('surcharges.create');
@@ -58,7 +59,7 @@ class SurchargesController extends Controller
      */
     public function store(SurchargeRequest $request)
     {
-        
+
         $this->authorize('index', new Surcharge);
 
         // Check to see if record already exists

@@ -15,11 +15,7 @@
             @foreach($surcharges as $surcharge)
             @if($surcharge->type == 'c')
             <tr>
-                @if(isset($companyId))
-                <td><a href="{{url('/surchargedetails/index/'. $surcharge->id .'/'.$companyId)}}" title="View Additional Charges">{{$surcharge->name}}</a></td>
-                @else
-                <td><a href="{{url('/surchargedetails/index/'. $surcharge->id).'/'}}" title="View Additional Charges">{{$surcharge->name}}</a></td>
-                @endif
+                <td><a href="{{url('/surchargedetails/'. $surcharge->id .'/'.$companyId.'/index')}}" title="View Additional Charges">{{$surcharge->name}}</a></td>
             </tr>
             @endif
             @endforeach
@@ -38,7 +34,7 @@
             @foreach($surcharges as $surcharge)
             @if($surcharge->type == 's')
             <tr>
-                <td><a href="{{url('/surchargedetails/index/' . $surcharge->id)}}" title="View Additional Charges">{{$surcharge->name}}</a></td>
+                <td><a href="{{url('/surchargedetails/' . $surcharge->id.'/' . $companyId .'/index/')}}" title="View Additional Charges">{{$surcharge->name}}</a></td>
             </tr>
             @endif
             @endforeach
