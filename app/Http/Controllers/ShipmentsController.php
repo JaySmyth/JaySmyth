@@ -794,7 +794,6 @@ class ShipmentsController extends Controller
                 ->hasRecipientType($request->recipient_type)
                 ->hasPieces($request->pieces)
                 ->hasService($request->service)
-                ->hasLegacyCompany($request->legacy)
                 ->traffic($request->traffic)
                 ->hasCarrier($request->carrier)
                 ->shipDateBetween($request->date_from, $request->date_to)

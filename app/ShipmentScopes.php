@@ -541,22 +541,6 @@ trait ShipmentScopes
     }
 
     /*
-     * Scope - company legacy status.
-     */
-
-    public function scopeHasLegacyCompany($query, $legacy)
-    {
-        if ($legacy) {
-
-            if (!isJoined($query, 'companies')) {
-                $query->join('companies', 'shipments.company_id', '=', 'companies.id');
-            }
-
-            return $query->where('companies.legacy', $legacy);
-        }
-    }
-
-    /*
      * Scope FedEx intl collect.
      *
      */
