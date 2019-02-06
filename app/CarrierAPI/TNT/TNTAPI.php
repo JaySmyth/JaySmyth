@@ -71,8 +71,9 @@ class TNTAPI extends \App\CarrierAPI\CarrierBase
             return $this->generateErrorResponse($response, $reply['errors']);
         }
 
+        // Ensure we catch invalid carrier consignment number
         if (!isset($reply['carrier_consignment_number']) || !is_numeric($reply['carrier_consignment_number'])) {
-            $arr['errors'][] = 'Unable to obtain a consignment number from carrier.';
+            $arr['errors'][] = 'Unable to obtain a consignment number from carrier. Please check shipment details.';
             return $this->generateErrorResponse($response, $arr);
         }
 
