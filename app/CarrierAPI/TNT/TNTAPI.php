@@ -67,8 +67,13 @@ class TNTAPI extends \App\CarrierAPI\CarrierBase
         $reply = $tnt->sendMessage();
 
         // Request unsuccessful - return errors
-        if (isset($reply['errors']) && $reply['errors'] > '') {
+        if (isset($reply['errors']) && count($reply['errors']) > 0) {
             return $this->generateErrorResponse($response, $reply['errors']);
+        }
+
+        if (!isset($reply['carrier_consignment_number']) || !is_numeric($reply['carrier_consignment_number'])) {
+            $arr['errors'][] = 'Unable to obtain a consignment number from carrier.';
+            return $this->generateErrorResponse($response, $arr);
         }
 
         // Request successful -  Calc Routing
