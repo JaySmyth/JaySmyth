@@ -14,7 +14,7 @@ class TNTAPI extends \App\CarrierAPI\CarrierBase
 {
 
     /**
-     * 
+     *
      * @param type $shipment
      * @return type
      */
@@ -30,7 +30,7 @@ class TNTAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     * 
+     *
      * @param type $shipment
      * @return type
      */
@@ -48,7 +48,7 @@ class TNTAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     * 
+     *
      * @param type $shipment
      * @return type
      */
@@ -83,14 +83,14 @@ class TNTAPI extends \App\CarrierAPI\CarrierBase
         // Prepare Response
         $response = $this->createShipmentResponse($reply, $shipment['service_code'], $route_id, $shipment);
 
-        // Create an easypost tracker                
+        // Create an easypost tracker
         dispatch(new \App\Jobs\CreateEasypostTracker($response['consignment_number'], $this->getEasypostCarrier($shipment)));
 
         return $response;
     }
 
     /**
-     * 
+     *
      * @param type $shipment
      * @return int
      */
@@ -100,7 +100,7 @@ class TNTAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     * 
+     *
      * @param type $reply
      */
     private function generatePdf($shipment, $serviceCode, $labelData)
@@ -110,7 +110,7 @@ class TNTAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     * 
+     *
      * @param type $reply
      * @param type $serviceCode
      * @param type $route_id
@@ -146,7 +146,7 @@ class TNTAPI extends \App\CarrierAPI\CarrierBase
 
     /**
      * Get carrier identifier for easypost.
-     * 
+     *
      * @return string
      */
     private function getEasypostCarrier($shipment)
