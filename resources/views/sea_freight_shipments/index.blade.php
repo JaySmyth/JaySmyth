@@ -128,7 +128,7 @@
                 <span class="fas fa-times faded" aria-hidden="true" title="Cancel Shipment"></span>
                 @endif
 
-                @if (!$shipment->processed && $shipment->seaFreightStatus->code != 'cancelled')
+                @if (!$shipment->processed && $shipment->seaFreightStatus->code != 'cancelled' || Auth::user()->hasIfsRole())
                 <a href="{{ url('/sea-freight/' .  $shipment->id . '/edit') }}" title="Edit Shipment" class="edit-shipment"><span class="fas fa-edit ml-sm-2" aria-hidden="true"></span></a>
                 @else
                 <span class="fas fa-edit ml-sm-2 faded" aria-hidden="true" title="Edit Shipment"></span>
