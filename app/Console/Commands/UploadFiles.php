@@ -143,7 +143,7 @@ class UploadFiles extends Command
             $this->idsSent = $shipments->pluck('id')->toArray();
 
             // The results as export array
-            $data = $this->getShipmentExportArray($shipments, $fileUpload->verbose);
+            $data = $this->getShipmentExportArray($shipments, 'Europe/London', $fileUpload->verbose);
         }
 
         if (is_array($data) && count($data) > 0) {
