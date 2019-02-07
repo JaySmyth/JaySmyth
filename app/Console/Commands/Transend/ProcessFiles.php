@@ -46,8 +46,8 @@ class ProcessFiles extends Command
 
     /**
      * Transend code.
-     * 
-     * @var type 
+     *
+     * @var type
      */
     protected $transendCode;
 
@@ -287,7 +287,7 @@ class ProcessFiles extends Command
 
     /**
      * Determine if a package can be marked as collected.
-     * 
+     *
      * @param type $package
      * @return boolean
      */
@@ -328,7 +328,7 @@ class ProcessFiles extends Command
 
     /**
      * Determine if a transport job can be closed.
-     * 
+     *
      * @param type $row
      * @return boolean
      */
@@ -377,6 +377,10 @@ class ProcessFiles extends Command
 
         if ($this->transendCode) {
 
+            // Notify relevant department that an exception has been received
+            $subject = 'Possible issue with ' . verboseCollectionDelivery($this->transportJob->type) . ' ' . $this->transportJob->number . ' (' . $this->transportJob->from_company_name . ' > ' . $this->transportJob->to_company_name . ')';
+            Mail::to($this->transportJob->department->email)->send(new \App\Mail\GenericError($subject, 'The IFS driver allocated job ' . $this->transportJob->number . ' has reported: ' . $this->transendCode->description . '. Please investigate further.'));
+
             // Update the transport job to "not sent"
             if ($this->transendCode->resend) {
 
@@ -417,7 +421,7 @@ class ProcessFiles extends Command
 
     /**
      * Parse the datetime string to carbon UTC.
-     * 
+     *
      * @param type $datetime
      * @return type
      */
@@ -551,7 +555,7 @@ class ProcessFiles extends Command
 
     /**
      * Image url.
-     * 
+     *
      * @param type $signature
      * @return type
      */
