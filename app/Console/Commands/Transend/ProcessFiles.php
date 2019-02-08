@@ -377,9 +377,11 @@ class ProcessFiles extends Command
 
         if ($this->transendCode) {
 
-            // Notify relevant department that an exception has been received
-            $subject = 'Possible issue with ' . verboseCollectionDelivery($this->transportJob->type) . ' ' . $this->transportJob->number . ' (' . $this->transportJob->from_company_name . ' > ' . $this->transportJob->to_company_name . ')';
-            Mail::to($this->transportJob->department->email)->send(new \App\Mail\GenericError($subject, 'The IFS driver allocated job ' . $this->transportJob->number . ' has reported: ' . $this->transendCode->description . '. Please investigate further.'));
+            if ($this->transendCode->notify_department) {
+                // Notify relevant department that an exception has been received
+                $subject = 'Possible issue with ' . verboseCollectionDelivery($this->transportJob->type) . ' ' . $this->transportJob->number . ' (' . $this->transportJob->from_company_name . ' > ' . $this->transportJob->to_company_name . ')';
+                Mail::to($this->transportJob->department->email)->send(new \App\Mail\GenericError($subject, 'The IFS driver allocated job ' . $this->transportJob->number . ' has reported: ' . $this->transendCode->description . '. Please investigate further.'));
+            }
 
             // Update the transport job to "not sent"
             if ($this->transendCode->resend) {
