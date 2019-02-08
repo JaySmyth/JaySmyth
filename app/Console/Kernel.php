@@ -57,6 +57,7 @@ class Kernel extends ConsoleKernel
         Commands\UpdateShopify::class,
         Commands\BulkCreateTrackers::class,
         Commands\SendScanningReportEmail::class,
+        Commands\CreatePrimaryLogisticsOrders::class,
     ];
 
     /**
@@ -97,12 +98,22 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:cancel-old-shipments')->dailyAt('08:00');
         $schedule->command('ifs:update-stagnant-shipments')->dailyAt('08:05');
         $schedule->command('ifs:process-shipment-uploads')->everyMinute()->withoutOverlapping();
+        $schedule->command('ifs:check-for-duplicate-shipments')->twiceDaily(13, 17);
+        $schedule->command('ifs:update-shopify')->twiceDaily(11, 19);        
+        
+        /*
+         * Primary Freight
+         */
         $schedule->command('ifs:update-primary-freight-shipments')->hourly();
         $schedule->command('ifs:upload-shipments-to-primary-freight')->dailyAt(14, 00);
-        $schedule->command('ifs:upload-shipments-to-primary-freight')->twiceDaily(17, 20);
+        $schedule->command('ifs:upload-shipments-to-primary-freight')->twiceDaily(17, 20);        
         $schedule->command('ifs:check-for-missing-primary-freight-details')->dailyAt(9, 00);
-        $schedule->command('ifs:check-for-duplicate-shipments')->twiceDaily(13, 17);
-        $schedule->command('ifs:update-shopify')->twiceDaily(11, 19);
+        
+        /*
+         * Primary Logistics
+         */
+        //$schedule->command('ifs:create-primary-logistics-orders')->hourly();
+        //$schedule->command('ifs:cancel-primary-logistics-orders')->hourly();
 
         /*
          * RF server
@@ -120,13 +131,11 @@ class Kernel extends ConsoleKernel
          * Transport
          */
         $schedule->command('ifs:close-driver-manifests')->dailyAt('21:00');
-        $schedule->command('ifs:open-driver-manifests')->dailyAt('07:00');
-        $schedule->command('ifs:notify-transport-department-of-unmanifested-jobs')->weekdays()->twiceDaily(12, 14);
-        $schedule->command('ifs:notify-transport-department-pod-required')->weekdays()->dailyAt('09:30');
+        $schedule->command('ifs:open-driver-manifests')->dailyAt('07:00');        
         $schedule->command('ifs:close-stagnant-transport-jobs')->dailyAt('04:35');
         $schedule->command('ifs:correct-status-on-transport-jobs')->dailyAt('04:38');
+        $schedule->command('ifs:notify-transport-department-pod-required')->weekdays()->dailyAt('09:30');
         $schedule->command('ifs:send-scanning-report-email')->weekdays()->dailyAt('21:30');
-        $schedule->command('ifs:send-scanning-report-email --last-weekday')->weekdays()->dailyAt('09:30');
         
         /*
          * Multifreight
