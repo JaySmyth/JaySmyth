@@ -900,7 +900,7 @@ class ShipmentsController extends Controller
      */
     public function test()
     {
-        
+        dispatch(new \App\Jobs\LogScanningKpis('18-01-2019'));
     }
 
 }
