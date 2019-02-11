@@ -38,7 +38,6 @@ class Kernel extends ConsoleKernel
         Commands\UploadFiles::class,
         Commands\CloseDriverManifests::class,
         Commands\OpenDriverManifests::class,
-        Commands\NotifyTransportDepartmentOfUnmanifestedJobs::class,
         Commands\NotifyTransportDepartmentPodRequired::class,
         Commands\UpdateScsJobNumbersOnPurchaseInvoiceLines::class,
         Commands\ProcessShipmentUploads::class,
@@ -58,6 +57,7 @@ class Kernel extends ConsoleKernel
         Commands\BulkCreateTrackers::class,
         Commands\SendScanningReportEmail::class,
         Commands\CreatePrimaryLogisticsOrders::class,
+        Commands\LogScanningKpis::class,
     ];
 
     /**

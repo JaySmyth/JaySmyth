@@ -34,6 +34,11 @@ class LogScanningKpis implements ShouldQueue
      */
     public function handle()
     {
+        // Ignore weekends
+        if($this->date->isWeekend()){
+            return true;
+        }
+        
         // Load package records for date specified
         $packages = \App\Package::select('packages.*')
                 ->join('shipments', 'packages.shipment_id', '=', 'shipments.id')
