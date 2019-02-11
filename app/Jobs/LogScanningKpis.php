@@ -41,7 +41,7 @@ class LogScanningKpis implements ShouldQueue
                 ->where('shipments.depot_id', 1)
                 ->whereNotIn('shipments.status_id', [1, 7])
                 ->whereNotIn('shipments.service_id', [7, 18, 20, 39, 44, 45, 48, 50])
-                ->where('sender_postcodes', 'LIKE', 'BT%')
+                ->where('sender_postcode', 'LIKE', 'BT%')
                 ->with('shipment')
                 ->get();
 
