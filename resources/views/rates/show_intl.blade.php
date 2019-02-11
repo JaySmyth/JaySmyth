@@ -53,16 +53,16 @@
             @foreach($zones as $zone)
 
             @if(isset($tableRow[$zone]))
-            <td class='text-right'>{{$tableRow[$zone]['value']}}</td>
+            <td class='text-right'>{{$tableRow[$zone]['value'] ?? 'Uknown'}}</td>
             @else
             <td>&nbsp;</td>
             @endif
 
             @endforeach
 
-            <td>{{$tableRow[$zones[0]]['weight_units']}}</td>
-            <td>{{$tableRow[$zones[0]]['from_date']}}</td>
-            <td>{{$tableRow[$zones[0]]['to_date']}}</td>
+            <td>{{$tableRow[$zones[0]]['weight_units'] ?? 'Uknown'}}</td>
+            <td>{{$tableRow[$zones[0]]['from_date'] ?? 'Uknown'}}</td>
+            <td>{{$tableRow[$zones[0]]['to_date'] ?? 'Uknown'}}</td>
 
         </tr>
 
