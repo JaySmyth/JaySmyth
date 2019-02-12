@@ -250,4 +250,16 @@ class ReportPolicy
         }
     }
 
+    /**
+     * View report.
+     * 
+     * @return boolean
+     */
+    public function scanningKpis(User $user)
+    {
+        if ($user->hasIfsRole() && $user->hasPermission('view_scanning_kpis_report')) {
+            return true;
+        }
+    }
+
 }
