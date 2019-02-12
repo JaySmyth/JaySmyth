@@ -73,8 +73,8 @@
                     <td class="text-right"><strong>{{ $collectionPercentageForMonth }}%</strong></td>
                     <td class="text-right"><strong>{{ $receiptPercentageForMonth }}%</strong></td>
                     <td class="text-right"><strong>{{ $routePercentageForMonth }}%</strong></td>                    
-                    <td class="text-right"><strong>{{ $totalReceiptMissed }}</strong></td>
-                    <td class="text-right"><strong>{{ $totalRouteMissed }}</strong></td>
+                    <td class="text-right"><strong>Av. {{ $averageReceiptMissed }} / Tot. {{ $totalReceiptMissed }}</strong></td>
+                    <td class="text-right"><strong>Av. {{ $averageRouteMissed }} / Tot. {{ $totalRouteMissed }}</strong></td>
                     <td class="text-center">&nbsp;</td>
                 </tr>
             </tbody>
