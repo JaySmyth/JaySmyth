@@ -725,4 +725,38 @@ class ReportsController extends Controller
         return view('reports.collection_settings', compact('report', 'collectionSettings'));
     }
 
+    /**
+     * Exceptions report.
+     *
+     * @param Request $request
+     * @param type $id
+     * @return type
+     */
+    public function scanningKpis(Request $request, $id)
+    {
+        $report = Report::findOrFail($id);
+
+        $this->authorize(new Report);
+
+        $date = Carbon::parse('this month');
+
+        if ($request->month) {
+            $date = Carbon::parse($request->month);
+        }
+
+        $start = Carbon::parse($date)->startOfMonth();
+        $finish = Carbon::parse($date)->endOfMonth();
+
+        $kpis = \App\ScanningKpi::whereBetween('date', [$start, $finish])->get();
+        
+        $collectionPercentageForMonth =  ($kpis->sum('expected') > 0 && $kpis->sum('collection') > 0) ? round((100 / $kpis->sum('expected')) * $kpis->sum('collection'), 1) : 0;
+        $receiptPercentageForMonth =  ($kpis->sum('expected') > 0 && $kpis->sum('receipt') > 0) ? round((100 / $kpis->sum('expected')) * $kpis->sum('receipt'), 1) : 0;
+        $routePercentageForMonth =  ($kpis->sum('expected') > 0 && $kpis->sum('route') > 0) ? round((100 / $kpis->sum('expected')) * $kpis->sum('route'), 1) : 0;
+        
+        $totalReceiptMissed = $kpis->sum('receipt_missed');
+        $totalRouteMissed = $kpis->sum('route_missed');
+
+        return view('reports.scanning_kpis', compact('report', 'kpis', 'collectionPercentageForMonth', 'receiptPercentageForMonth', 'routePercentageForMonth', 'totalReceiptMissed', 'totalRouteMissed'));
+    }
+
 }

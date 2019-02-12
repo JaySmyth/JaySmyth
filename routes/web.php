@@ -298,6 +298,7 @@ Route::get('reports/pre-transit/{id}', 'ReportsController@preTransit');
 Route::get('reports/haz-dry-ice/{id}', 'ReportsController@hazardous');
 Route::get('reports/collection-settings/{id}', 'ReportsController@collectionSettings');
 Route::get('reports/shipments-by-carrier/{id}', 'ReportsController@shipmentsByCarrier');
+Route::get('reports/scanning-kpis/{id}', 'ReportsController@scanningKpis');
 
 /*
   |--------------------------------------------------------------------------

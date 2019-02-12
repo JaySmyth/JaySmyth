@@ -42,6 +42,8 @@ class LogScanningKpis extends Command
         $startDate = ($this->option('start-date')) ? Carbon::parse($this->option('start-date')) : Carbon::today();
         $finishDate = ($this->option('finish-date')) ? Carbon::parse($this->option('start-date')) : Carbon::today();
 
+        $this->info('** Logging Scanning KPIs **');
+        
         while ($startDate->lessThanOrEqualTo($finishDate)) {
             
             $this->info('Logging KPIs for ' . $startDate);

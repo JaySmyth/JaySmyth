@@ -35,10 +35,10 @@ class LogScanningKpis implements ShouldQueue
     public function handle()
     {
         // Ignore weekends
-        if($this->date->isWeekend()){
+        if ($this->date->isWeekend()) {
             return true;
         }
-        
+
         // Load package records for date specified
         $packages = \App\Package::select('packages.*')
                 ->join('shipments', 'packages.shipment_id', '=', 'shipments.id')
@@ -58,12 +58,17 @@ class LogScanningKpis implements ShouldQueue
             inc($totals['receipt'], $package->true_receipt_scan);
             inc($totals['route'], $package->loaded);
 
-            if (!$package->true_receipt_scan) {
-                inc($totals['receipt_missed'], 1);
-            }
+            if ($package->collected || $package->received || $package->loaded) {
 
-            if (!$package->loaded) {
-                inc($totals['route_missed'], 1);
+                if (!$package->true_receipt_scan) {
+                    inc($totals['receipt_missed'], 1);
+                    $receipt_missed[] = $package->id;
+                }
+
+                if (!$package->loaded) {
+                    inc($totals['route_missed'], 1);
+                    $route_missed[] = $package->id;
+                }
             }
         }
 
@@ -71,11 +76,14 @@ class LogScanningKpis implements ShouldQueue
         \App\ScanningKpi::firstOrCreate(['date' => $this->date])->update([
             'expected' => $totals['expected'],
             'collection' => $totals['collection'],
+            'collection_percentage' => ($totals['expected'] > 0 && $totals['collection'] > 0) ? round((100 / $totals['expected']) * $totals['collection'], 1) : 0,
             'receipt' => $totals['receipt'],
+            'receipt_percentage' => ($totals['expected'] > 0 && $totals['receipt'] > 0) ? round((100 / $totals['expected']) * $totals['receipt'], 1) : 0,
             'route' => $totals['route'],
+            'route_percentage' => ($totals['expected'] > 0 && $totals['route'] > 0) ? round((100 / $totals['expected']) * $totals['route'], 1) : 0,
             'receipt_missed' => $totals['receipt_missed'],
-            'route_missed' => $totals['route_missed']]
-        );
+            'route_missed' => $totals['route_missed'],
+        ]);
     }
 
 }
