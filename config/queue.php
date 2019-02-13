@@ -34,7 +34,15 @@ return [
         'sync' => [
             'driver' => 'sync',
         ],
-
+        
+        'database' => [
+            'driver' => 'database',
+            'table'  => 'jobs',
+            'queue'  => 'default',
+            'expire' => 300,
+            'retry_after' => 450,
+        ],
+        
         'import' => [
             'driver' => 'database',
             'table'  => 'jobs',
