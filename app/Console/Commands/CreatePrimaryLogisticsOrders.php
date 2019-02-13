@@ -24,8 +24,8 @@ class CreatePrimaryLogisticsOrders extends Command
      * @var string
      */
     protected $description = 'Sends "new order" requests to Primary Logistics (CartRover API)';
-    protected $username = '';
-    protected $password = '';
+    protected $user;
+    protected $key;
     protected $uri = 'https://api.cartrover.com/v1/cart/orders/cartrover';
 
     /**
@@ -36,6 +36,9 @@ class CreatePrimaryLogisticsOrders extends Command
     public function __construct()
     {
         parent::__construct();
+
+        $this->user = config('services.cartrover.api_user');
+        $this->key = config('services.cartrover.api_key');
     }
 
     /**
@@ -45,12 +48,7 @@ class CreatePrimaryLogisticsOrders extends Command
      */
     public function handle()
     {
-        $client = new Client([
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-            ]
-        ]);
+        $client = new Client(['auth' => [$this->user, $this->key]]);
 
         // Retreive the shipments to be uploaded
         $shipments = \App\Shipment::whereCarrierId(12)->whereReceivedSent(0)->whereNotIn('status_id', [1, 7])->get();
@@ -71,7 +69,7 @@ class CreatePrimaryLogisticsOrders extends Command
             try {
 
                 // Send the json to cart rover
-                $response = $client->post($this->uri, $json);
+                $response = $client->post($this->uri, ['body' => $json]);
 
                 // Get cart rover response
                 $reply = json_decode($response->getBody()->getContents(), true);
@@ -94,7 +92,7 @@ class CreatePrimaryLogisticsOrders extends Command
 
     /**
      * Return json.
-     * 
+     *
      * @param type $shipment
      * @return type
      */
@@ -104,7 +102,8 @@ class CreatePrimaryLogisticsOrders extends Command
 
         foreach ($shipment->contents as $item) {
             $items[] = [
-                'item' => $item->product_code,
+                //'item' => $item->product_code,
+                'item' => 'BABOCUSH',
                 'quantity' => $item->quantity,
                 'description' => $item->description,
             ];
@@ -114,6 +113,7 @@ class CreatePrimaryLogisticsOrders extends Command
             'cust_ref' => $shipment->consignment_number,
             'cust_po_no' => $shipment->shipment_reference . '/' . $shipment->consignment_number,
             'ship_company' => $shipment->recipient_company_name,
+            'ship_first_name' => $shipment->recipient_name,
             'ship_address_1' => $shipment->recipient_address1,
             'ship_address_2' => $shipment->recipient_address2,
             'ship_city' => $shipment->recipient_city,
@@ -124,7 +124,17 @@ class CreatePrimaryLogisticsOrders extends Command
             'ship_phone' => $shipment->recipient_telephone,
             'ship_address_type' => $shipment->recipient_type,
             'ship_is_billing' => false,
-            'items' => $items
+            'items' => $items,
+            'cust_company' => $shipment->sender_company_name,
+            'cust_address_1' => $shipment->sender_address1,
+            'cust_address_2' => $shipment->sender_address2,
+            'cust_city' => $shipment->sender_city,
+            'cust_state' => $shipment->sender_county,
+            'cust_zip' => $shipment->sender_postcode,
+            'cust_country' => $shipment->sender_country_code,
+            'cust_phone' => $shipment->sender_telephone,
+            'cust_e_mail' => $shipment->sender_email,
+            'shipping_instructions' => $shipment->special_instructions
         ];
 
         return json_encode($json, JSON_HEX_AMP | JSON_HEX_APOS);
