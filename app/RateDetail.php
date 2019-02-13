@@ -369,9 +369,6 @@ class RateDetail extends Model
                 }
             }
             
-            $rate = Rate::find($rateId);
-            $rate->discount = 0;
-            $rate->save();
         } else {
             return "Tables do not match";
         }
