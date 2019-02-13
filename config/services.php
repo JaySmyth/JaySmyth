@@ -47,8 +47,4 @@ return [
     'easypost' => [
         'key' => env('EASYPOST_KEY'),
     ],
-    'cartrover' => [
-        'api_user' => env('CARTROVER_API_USER'),
-        'api_key' => env('CARTROVER_API_KEY'),
-    ],
 ];

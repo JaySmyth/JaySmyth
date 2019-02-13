@@ -56,9 +56,7 @@ class Kernel extends ConsoleKernel
         Commands\UpdateShopify::class,
         Commands\BulkCreateTrackers::class,
         Commands\SendScanningReportEmail::class,
-        Commands\PrimaryLogistics\CreateOrders::class,
-        Commands\PrimaryLogistics\CancelOrders::class,
-        Commands\PrimaryLogistics\GetTrackingNumbers::class,
+        Commands\CreatePrimaryLogisticsOrders::class,
         Commands\LogScanningKpis::class,
     ];
 
@@ -114,9 +112,8 @@ class Kernel extends ConsoleKernel
         /*
          * Primary Logistics
          */
-        //$schedule->command('primary-logistics:create-orders')->hourly();
-        //$schedule->command('primary-logistics:cancel-orders')->hourly();
-        //$schedule->command('primary-logistics:get-tracking-numbers')->hourly();
+        //$schedule->command('ifs:create-primary-logistics-orders')->hourly();
+        //$schedule->command('ifs:cancel-primary-logistics-orders')->hourly();
 
         /*
          * RF server
