@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\PrimaryLogistics;
 
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Client;
@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 use GuzzleHttp\Exception\GuzzleException;
 
-class CreatePrimaryLogisticsOrders extends Command
+class CreateOrders extends Command
 {
 
     /**
@@ -16,14 +16,14 @@ class CreatePrimaryLogisticsOrders extends Command
      *
      * @var string
      */
-    protected $signature = 'ifs:create-primary-logistics-orders';
+    protected $signature = 'primary-logistics:create-orders';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Sends "new order" requests to Primary Logistics (CartRover API)';
+    protected $description = 'Sends "new order" requests to Primary Logistics (via CartRover API)';
     protected $user;
     protected $key;
     protected $uri = 'https://api.cartrover.com/v1/cart/orders/cartrover';
@@ -36,7 +36,6 @@ class CreatePrimaryLogisticsOrders extends Command
     public function __construct()
     {
         parent::__construct();
-
         $this->user = config('services.cartrover.api_user');
         $this->key = config('services.cartrover.api_key');
     }
@@ -50,14 +49,10 @@ class CreatePrimaryLogisticsOrders extends Command
     {
         $client = new Client(['auth' => [$this->user, $this->key]]);
 
-        // Retreive the shipments to be uploaded
-        $shipments = \App\Shipment::whereCarrierId(12)->whereReceivedSent(0)->whereNotIn('status_id', [1, 7])->get();
+        // Retreive the shipments to be created on cartrover (Babocush US only)
+        $shipments = \App\Shipment::whereCarrierId(12)->whereCompanyId(874)->whereReceivedSent(0)->whereNotIn('status_id', [1, 7])->whereIn('recipient_country_code', ['US', 'CA'])->get();
 
         foreach ($shipments as $shipment) {
-
-            if (!$this->isValid($shipment)) {
-                continue;
-            }
 
             $json = $this->buildJson($shipment);
 
@@ -77,6 +72,7 @@ class CreatePrimaryLogisticsOrders extends Command
                 // Order created successfully
                 if (isset($reply['success_code']) && $reply['success_code']) {
                     $shipment->received_sent = 1;
+                    $shipment->source = 'cartrover';
                     $shipment->save();
                 } else {
                     Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Create Primary Logistics Order Failed (' . $shipment->consignment_number . ')', $reply['message']));
@@ -138,26 +134,6 @@ class CreatePrimaryLogisticsOrders extends Command
         ];
 
         return json_encode($json, JSON_HEX_AMP | JSON_HEX_APOS);
-    }
-
-    /**
-     * Check that a shipment is valid for Primary Logistics upload.
-     *
-     * @return boolean
-     */
-    private function isValid($shipment)
-    {
-        // Not babocush
-        if ($shipment->company_id != 874) {
-            return false;
-        }
-
-        // Not US or Canada
-        if (!in_array(strtoupper($shipment->recipient_country_code), ['US', 'CA'])) {
-            return false;
-        }
-
-        return true;
     }
 
 }
