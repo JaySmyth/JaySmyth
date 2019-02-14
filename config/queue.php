@@ -42,7 +42,7 @@ return [
             'expire' => 300,
             'retry_after' => 450,
         ],
-        
+
         'import' => [
             'driver' => 'database',
             'table'  => 'jobs',

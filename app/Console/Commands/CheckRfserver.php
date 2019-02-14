@@ -40,7 +40,7 @@ class CheckRfserver extends Command
     {
         try {
 
-            $fp = fsockopen(env('APP_HOST'), 23, $errno, $errstr, 10);
+            $fp = fsockopen(config('app.host'), 23, $errno, $errstr, 10);
 
             if (!$fp) {
                 $this->error("RF Server not running: $errstr ($errno)");
@@ -73,7 +73,7 @@ class CheckRfserver extends Command
      */
     private function sendMail($error)
     {
-        mail(env('APP_MAIL'), 'RF Server DOWN (' . env('APP_URL') . ')', "The RF Server is not currently running. It will be checked in another 5 minutes time.\n\nIf you do not receive another of these emails, the server is running successfully.\n\n**$error**");
+        mail(config('app.mail'), 'RF Server DOWN (' . config('app.url') . ')', "The RF Server is not currently running. It will be checked in another 5 minutes time.\n\nIf you do not receive another of these emails, the server is running successfully.\n\n**$error**");
     }
 
 }
