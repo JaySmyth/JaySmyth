@@ -65,7 +65,7 @@ class GetTrackingNumbers extends Command
 
                 // Get cart rover response
                 $reply = json_decode($response->getBody()->getContents(), true);
-
+                
                 if (isset($reply['response']['order_status']) && $reply['response']['order_status'] == 'shipped') {
 
                     $shipment->carrier_consignment_number = $reply['response']['shipments'][0]['tracking_no'];
@@ -84,7 +84,7 @@ class GetTrackingNumbers extends Command
             } catch (GuzzleException $exc) {
 
                 if ($exc->hasResponse()) {
-                    Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Get Primary Logistics Tracking Numbers (' . $shipment->consignment_number . ')', Psr7\str($exc->getResponse())));
+                    Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Get Primary Logistics Tracking Numbers (' . $shipment->company->company_name . '/' . $shipment->consignment_number . ')', Psr7\str($exc->getResponse())));
                 }
             }
         }

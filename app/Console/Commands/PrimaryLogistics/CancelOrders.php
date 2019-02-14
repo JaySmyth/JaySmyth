@@ -68,12 +68,12 @@ class CancelOrders extends Command
                     $shipment->source = 'cartrover_cancelled';
                     $shipment->save();
                 } else {
-                    Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Cancel Primary Logistics Order Failed (' . $shipment->consignment_number . ')', $reply['message']));
+                    Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Cancel Primary Logistics Order Failed (' . $shipment->company->company_name . '/' . $shipment->consignment_number . ')', $reply['message']));
                 }
             } catch (GuzzleException $exc) {
 
                 if ($exc->hasResponse()) {
-                    Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Cancel Primary Logistics Order (' . $shipment->consignment_number . ')', Psr7\str($exc->getResponse())));
+                    Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Cancel Primary Logistics Order (' . $shipment->company->company_name . '/' . $shipment->consignment_number . ')', Psr7\str($exc->getResponse())));
                 }
             }
         }
