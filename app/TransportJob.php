@@ -441,7 +441,7 @@ class TransportJob extends Model
     {
         if ($this->type == 'c') {
             if ($this->shipment) {
-                return $this->shipment->company->getCollectionSettingsForDay(Carbon::now()->dayOfWeekIso);
+                return $this->shipment->company->getCollectionSettingsForDay(Carbon::now()->dayOfWeekIso, $this->from_postcode);
             }
 
             return getRouting($this->from_postcode, Carbon::now()->dayOfWeekIso);

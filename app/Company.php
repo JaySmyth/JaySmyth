@@ -184,14 +184,17 @@ class Company extends Model
      * 
      * @return mixed array/boolean
      */
-    public function getCollectionSettingsForDay($day)
+    public function getCollectionSettingsForDay($day, $postcode = false)
     {
         // Company has collection settings defined
         if ($this->collectionSettings->count() > 0) {
             return $this->collectionSettings->where('day', $day)->first();
         }
 
-        return getRouting($this->postcode, $day);
+        // Use postcode passed via param or default to compay's postcode
+        $postcode = ($postcode) ? $postcode : $this->postcode;
+        
+        return getRouting($postcode, $day);
     }
 
     /**
