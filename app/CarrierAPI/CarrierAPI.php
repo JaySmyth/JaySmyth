@@ -965,6 +965,11 @@ class CarrierAPI
                 $shipment['volumetric_weight'] = $volumetric_weight;
             }
 
+            // Round volumetric in lbs UP to the nearest lb
+            if ($shipment['weight_uom'] == 'lb') {
+                $shipment['volumetric_weight'] = ceil($shipment['volumetric_weight']);
+            }
+
             $shipment['dry_ice_total_weight'] = $dryIceTotalWeight;
             $shipment['max_dimension'] = max($dims);
         }
