@@ -806,7 +806,11 @@ class ImportShipments implements ShouldQueue
      */
     public function failed($exception)
     {
+        // Mail exception to IT
         Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed("Shipment Import ($this->source)", $exception, $this->path));
+
+        // Mail end user to notify thenm of an issue
+        Mail::to($this->user->email)->cc($this->importConfig->cc_import_results_email ?: [])->bcc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Shipment Upload Failed', 'There was a problem with the file uploaded. Please check the values in the CSV file and try again.', $this->path));
     }
 
 }
