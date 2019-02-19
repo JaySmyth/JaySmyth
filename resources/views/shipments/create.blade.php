@@ -557,26 +557,26 @@
                         <div class="col-md-2">
                             <div class="input-group input-group-sm">
                                 {!! Form::Text('packages['.$key.'][weight]', (isset($val['weight'])) ? $val['weight']: null, ['id' => 'packages-'.$key.'-weight', 'class' => 'form-control form-control-sm decimal-only-required', 'maxlength' => 6]) !!}
-                                <div class="input-group-append localisation-weight"><span class="input-group-text">{{$arrays['localisation']['weight_uom'] ?? 'kg'}}</span></div>
+                                <div class="input-group-append"><span class="input-group-text localisation-weight">{{$arrays['localisation']['weight_uom'] ?? 'kg'}}</span></div>
                             </div>
                         </div>
 
                         <div class="col-md-2">
                             <div class="input-group input-group-sm">
                                 {!! Form::Text('packages['.$key.'][length]', (isset($val['length'])) ? $val['length']: null, ['id' => 'packages-'.$key.'-length', 'class' => 'form-control form-control-sm numeric-only-required dim-input', 'maxlength' => 3]) !!}
-                                <div class="input-group-append localisation-dims"><span class="input-group-text">{{$arrays['localisation']['dims_uom'] ?? 'cm'}}</span></div>
+                                <div class="input-group-append"><span class="input-group-text localisation-dims">{{$arrays['localisation']['dims_uom'] ?? 'cm'}}</span></div>
                             </div>
                         </div>
                         <div class="col-md-2">
                             <div class="input-group input-group-sm">
                                 {!! Form::Text('packages['.$key.'][width]', (isset($val['width'])) ? $val['width']: null, ['id' => 'packages-'.$key.'-width', 'class' => 'form-control form-control-sm numeric-only-required dim-input', 'maxlength' => 3]) !!}
-                                <div class="input-group-append localisation-dims"><span class="input-group-text">{{$arrays['localisation']['dims_uom'] ?? 'cm'}}</span></div>
+                                <div class="input-group-append"><span class="input-group-text localisation-dims">{{$arrays['localisation']['dims_uom'] ?? 'cm'}}</span></div>
                             </div>
                         </div>
                         <div class="col-md-2">
                             <div class="input-group input-group-sm">
                                 {!! Form::Text('packages['.$key.'][height]', (isset($val['height'])) ? $val['height']: null, ['id' => 'packages-'.$key.'-height', 'class' => 'form-control form-control-sm numeric-only-required dim-input', 'maxlength' => 3]) !!}
-                                <div class="input-group-append addonlocalisation-dims"><span class="input-group-text">{{$arrays['localisation']['dims_uom'] ?? 'cm'}}</span></div>
+                                <div class="input-group-append"><span class="input-group-text localisation-dims">{{$arrays['localisation']['dims_uom'] ?? 'cm'}}</span></div>
                             </div>
                         </div>
                     </div>

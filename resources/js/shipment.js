@@ -141,7 +141,7 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
 
     // Set the options on the collection date picker
     $("#collection_date").datepicker({
-        dateFormat: "dd-mm-yy",
+        dateFormat: 'dd-mm-yy',
         beforeShowDay: $.datepicker.noWeekends,
         minDate: 0,
         maxDate: "+2w",
@@ -1030,6 +1030,7 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
             });
 
         }, "json");
+
     }
 
     /**
@@ -1686,7 +1687,7 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
                         } else {
                             var html = '<div id="' + item.id + '" class="service row"><div class="col-sm-7"><input id="' + item.id + '-volumetric-divisor" value="' + item.volumetric_divisor + '" type="hidden"><div class="checkbox-container">&nbsp;</div><span class="service-name">' + item.name + '</span></div><div class="col-sm-5 text-right"><span class="price">Call for Price</div></div>';
                         }
-                        
+
                         if ($('#insurance_value').val() > 0) {
                             html += '<div id="insurance-charge-warning" class="lead text-center pt-3"><i class="fas fa-info-circle text-warning"></i> Price does not include additional charge for shipment insurance</div>';
                         }
