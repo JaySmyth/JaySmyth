@@ -59,6 +59,7 @@ class Kernel extends ConsoleKernel
         Commands\PrimaryLogistics\CreateOrders::class,
         Commands\PrimaryLogistics\CancelOrders::class,
         Commands\PrimaryLogistics\GetTrackingNumbers::class,
+        Commands\PrimaryLogistics\GetInventory::class,
         Commands\LogScanningKpis::class,
     ];
 
@@ -117,6 +118,7 @@ class Kernel extends ConsoleKernel
         //$schedule->command('primary-logistics:create-orders')->hourly();
         //$schedule->command('primary-logistics:cancel-orders')->hourly();
         //$schedule->command('primary-logistics:get-tracking-numbers')->hourly();
+        //$schedule->command('primary-logistics:get-inventory')->weekdays()->dailyAt('09:30');
 
         /*
          * RF server
