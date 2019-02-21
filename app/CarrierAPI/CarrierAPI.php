@@ -1080,7 +1080,7 @@ class CarrierAPI
          */
         $response = [];
         $this->setEnvironment($mode);
-        // $data= trimData($data);                                                 // Remove any leading/ trailing spaces etc.
+        $data = trimData($data);                                                 // Remove any leading/ trailing spaces etc.        
         $data = fixShipmentCase($data);                                         // Ensure all fields use correct case and Flags are boolean
         $data = $this->preProcess($data);                                       // Complete any missing fields where possible
         $apiShipment = new APIShipment();                                       // Shipment object with validation rules etc.

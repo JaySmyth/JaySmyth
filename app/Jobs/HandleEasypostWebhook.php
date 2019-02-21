@@ -116,7 +116,7 @@ class HandleEasypostWebhook implements ShouldQueue
 
             // Add shipment to last manifest closed out.
             if (!is_numeric($this->shipment->manifest_id)) {
-                $this->shipment->addToLastManifest();
+                //$this->shipment->addToLastManifest();
             }
         }
     }
