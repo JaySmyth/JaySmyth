@@ -264,7 +264,7 @@ class TransendOrderImport implements ShouldQueue
         $details[] = [
             'LineNumber' => 1,
             'Barcode' => 1,
-            'Description' => substr($this->transportJob->goods_description, 0, 40),
+            'Description' => substr(trim($this->transportJob->goods_description), 0, 40),
             'OrderedQty' => $this->transportJob->pieces,
             'OriginalDespatchQty' => $this->transportJob->pieces,
             'SkuWeight' => $this->transportJob->weight,
