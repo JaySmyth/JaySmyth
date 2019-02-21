@@ -55,11 +55,7 @@ class CheckForMissingPrimaryFreightDetails extends Command
 
         if ($shipments->count() > 0) {
 
-            $bodyText = 'We do not appear to have received shipment details for the following shipments. Could you please Investigate.';
-
-            Mail::to('gmcbroom@antrim.ifsgroup.com')->send(new \App\Mail\MissingPrimaryFreightDetails($shipments));
-
-            dd('Mail Sent');
+            Mail::to(['njwhse@primaryfreight.com', 'kkaralekas@primaryfreight.com'])->cc(['aplatt@antrim.ifsgroup.com', 'epalframan@antrim.ifsgroup.com'])->bcc(['gmcbroom@antrim.ifsgroup.com'])->send(new \App\Mail\MissingPrimaryFreightDetails($shipments));
         }
     }
 
