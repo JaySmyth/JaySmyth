@@ -45,6 +45,8 @@ class PricingModel
     //
     public $maxStdDimension;                                                    // Largest package dimension not to have a surcharge applied
     public $maxStdWeight;                                                       // Largest package weight not to have a surcharge applied
+    private $weightConv = [];
+    private $dimConv = [];
 
     /*
      * *************************************
@@ -117,6 +119,28 @@ class PricingModel
         $this->maxStdWeight = 69.50;
         $this->lowerMaxGirth = 330;         // LPS & MAX
         $this->upperMaxGirth = 419;         // LPS & MAX
+
+        $this->weightConv = [
+            'lb' => [
+                'kg' => 0.453592,
+                'lb' => 1
+            ],
+            'kg' => [
+                'lb' => 2.20462,
+                'kg' => 1
+            ]
+        ];
+
+        $this->dimConv = [
+            'in' => [
+                'lb' => 1,
+                'kg' => 0.45359237
+            ],
+            'cm' => [
+                'lb' => 2.2046333,
+                'kg' => 1
+            ]
+        ];
     }
 
     /**
@@ -271,14 +295,23 @@ class PricingModel
             if (isset($package['length']) && isset($package['width']) && isset($package['height'])) {
 
                 // If LPS shipment weight & vol must be least 40kgs otherwise no minimum
+                $wgRate = $this->weightConv[$this->shipment['weight_uom']][$this->rate['weight_units']];
+                $dimRate = $this->dimConv[$this->shipment['dims_uom']][$this->rate['weight_units']];
+
                 if ($this->isLPSPackage($package)) {
-                    $minPkgWeight = 40;
+                    $minPkgWeight = 40 * $wgRate;
                 } else {
                     $minPkgWeight = 0;
                 }
 
-                $pkgVolWt = calcVolume($package['length'], $package['width'], $package['height'], $this->rate["volumetric_divisor"]);
-                $this->shipment['weight'] += max($minPkgWeight, $package['weight']);
+                $pkgVolWt = calcVolume(
+                        $package['length'], $package['width'], $package['height'], $this->rate["volumetric_divisor"]
+                );
+
+                $pkgVolWt = $pkgVolWt * $dimRate;
+
+                // Convert weight into same unite as the rate sheet
+                $this->shipment['weight'] += max($minPkgWeight, $package['weight'] * $wgRate);
                 $this->shipment['volumetric_weight'] += max($minPkgWeight, $pkgVolWt);
             } else {
 
