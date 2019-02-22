@@ -176,7 +176,7 @@ class ImportShipments implements ShouldQueue
             'shipment_reference' => 'required|string',
             'service_code' => "sometimes|exists:services,code",
             'product_quantity' => 'sometimes|min:1|max:999999',
-            'customs_value' => 'sometimes|min:0|max:9999999'
+            'customs_value' => 'sometimes|numeric'
         ];
 
         $validator = Validator::make($this->row, $rules);
