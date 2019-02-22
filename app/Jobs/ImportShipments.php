@@ -176,7 +176,7 @@ class ImportShipments implements ShouldQueue
             'shipment_reference' => 'required|string',
             'service_code' => "sometimes|exists:services,code",
             'product_quantity' => 'sometimes|min:1|max:999999',
-            'customs_value' => 'sometimes|numeric'
+            'customs_value' => 'sometimes|min:1|max:9999999'
         ];
 
         $validator = Validator::make($this->row, $rules);
@@ -445,7 +445,7 @@ class ImportShipments implements ShouldQueue
         $this->row['terms_of_sale'] = (empty($this->row['terms_of_sale'])) ? $this->importConfig->default_terms : $this->row['terms_of_sale'];
         $this->row['bill_shipping'] = (empty($this->row['bill_shipping'])) ? 'sender' : $this->row['bill_shipping'];
         $this->row['bill_tax_duty'] = (empty($this->row['bill_tax_duty'])) ? whoPaysDuty($this->row['terms_of_sale']) : $this->row['bill_tax_duty'];
-        $this->row['customs_value'] = (empty($this->row['customs_value']) || $this->row['customs_value'] < 1) ? $this->importConfig->default_customs_value : $this->row['customs_value'];
+        $this->row['customs_value'] = (empty($this->row['customs_value']) || $this->row['customs_value'] < 1 || $this->row['customs_value'] == '') ? $this->importConfig->default_customs_value : $this->row['customs_value'];
         $this->row['goods_description'] = (empty($this->row['goods_description'])) ? $this->importConfig->default_goods_description : $this->row['goods_description'];
         $this->row['packaging_code'] = (empty($this->row['packaging_code'])) ? $this->company->getPackagingTypes(1)->first()->code : $this->row['packaging_code'];
         $this->row['documents_flag'] = (empty($this->row['documents_flag'])) ? false : $this->row['documents_flag'];
