@@ -1201,11 +1201,11 @@ function nextAvailable($sequenceType)
  * @param type $data
  * @param type $mode
  */
-function writeCsv($path, $data, $mode = 'w')
+function writeCsv($path, $data, $mode = 'w', $delimiter=',')
 {
     $handle = fopen($path, $mode);
     foreach ($data as $row) {
-        fputcsv($handle, $row);
+        fputcsv($handle, $row, $delimiter);
     }
     fclose($handle);
 

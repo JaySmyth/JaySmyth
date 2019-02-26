@@ -148,7 +148,7 @@ class UploadFiles extends Command
 
         if (is_array($data) && count($data) > 0) {
             $this->log(count($data) . " records to upload");
-            return writeCsv(storage_path() . '/app/temp/' . time() . str_random(3) . '.csv', $data);
+            return writeCsv(storage_path() . '/app/temp/' . time() . str_random(3) . '.csv', $data, 'w', $fileUpload->fileUploadHost->csv_delimiter);
         }
 
         $this->log("No data to transfer", 'error');
