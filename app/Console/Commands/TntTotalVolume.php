@@ -43,7 +43,7 @@ class TntTotalVolume extends Command
         $startDate = $this->option('start-date');
         $finishDate = $this->option('finish-date');
 
-        $shipments = Shipment::whereBetween('ship_date', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($finishDate)->endOfDay()])->whereNotIn('status_id', [1, 7])->get();
+        $shipments = Shipment::whereCarrierId(4)->whereBetween('ship_date', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($finishDate)->endOfDay()])->whereNotIn('status_id', [1, 7])->get();
 
         $count = $shipments->count();
 
