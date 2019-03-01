@@ -61,6 +61,7 @@ class Kernel extends ConsoleKernel
         Commands\PrimaryLogistics\GetTrackingNumbers::class,
         Commands\PrimaryLogistics\GetInventory::class,
         Commands\LogScanningKpis::class,
+        Commands\TntTotalVolume::class,
     ];
 
     /**
