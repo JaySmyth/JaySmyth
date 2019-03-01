@@ -745,19 +745,28 @@ class ReportsController extends Controller
         }
 
         $start = Carbon::parse($date)->startOfMonth();
-        $finish = Carbon::parse($date)->endOfMonth();
+        $finish = Carbon::parse($date)->endOfMonth();        
+        $collectionPercentageForMonth = 0;
+        $receiptPercentageForMonth = 0;
+        $routePercentageForMonth = 0;
+        $totalReceiptMissed = 0;
+        $totalRouteMissed = 0;
+        $averageReceiptMissed = 0;
+        $averageRouteMissed = 0;
 
         $kpis = \App\ScanningKpi::whereBetween('date', [$start, $finish])->get();
 
-        $collectionPercentageForMonth = ($kpis->sum('expected') > 0 && $kpis->sum('collection') > 0) ? round((100 / $kpis->sum('expected')) * $kpis->sum('collection'), 1) : 0;
-        $receiptPercentageForMonth = ($kpis->sum('expected') > 0 && $kpis->sum('receipt') > 0) ? round((100 / $kpis->sum('expected')) * $kpis->sum('receipt'), 1) : 0;
-        $routePercentageForMonth = ($kpis->sum('expected') > 0 && $kpis->sum('route') > 0) ? round((100 / $kpis->sum('expected')) * $kpis->sum('route'), 1) : 0;
+        if ($kpis->count() > 0) {
+            $collectionPercentageForMonth = ($kpis->sum('expected') > 0 && $kpis->sum('collection') > 0) ? round((100 / $kpis->sum('expected')) * $kpis->sum('collection'), 1) : 0;
+            $receiptPercentageForMonth = ($kpis->sum('expected') > 0 && $kpis->sum('receipt') > 0) ? round((100 / $kpis->sum('expected')) * $kpis->sum('receipt'), 1) : 0;
+            $routePercentageForMonth = ($kpis->sum('expected') > 0 && $kpis->sum('route') > 0) ? round((100 / $kpis->sum('expected')) * $kpis->sum('route'), 1) : 0;
 
-        $totalReceiptMissed = $kpis->sum('receipt_missed');
-        $totalRouteMissed = $kpis->sum('route_missed');
+            $totalReceiptMissed = $kpis->sum('receipt_missed');
+            $totalRouteMissed = $kpis->sum('route_missed');
 
-        $averageReceiptMissed = round(($totalReceiptMissed / $kpis->count()), 0, PHP_ROUND_HALF_UP);
-        $averageRouteMissed = round(($totalRouteMissed / $kpis->count()), 0, PHP_ROUND_HALF_UP);
+            $averageReceiptMissed = round(($totalReceiptMissed / $kpis->count()), 0, PHP_ROUND_HALF_UP);
+            $averageRouteMissed = round(($totalRouteMissed / $kpis->count()), 0, PHP_ROUND_HALF_UP);
+        }
 
         return view('reports.scanning_kpis', compact('report', 'kpis', 'collectionPercentageForMonth', 'receiptPercentageForMonth', 'routePercentageForMonth', 'totalReceiptMissed', 'totalRouteMissed', 'averageReceiptMissed', 'averageRouteMissed'));
     }

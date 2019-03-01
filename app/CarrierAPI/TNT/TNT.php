@@ -365,7 +365,7 @@ class TNT
         $detailsNode->addChild('PAYMENTIND', substr(strtoupper($this->shipment ['bill_shipping']), 0, 1));
         $detailsNode->addChild('ITEMS', $this->shipment['pieces']);
         $detailsNode->addChild('TOTALWEIGHT', $this->shipment['weight']);
-        $detailsNode->addChild('TOTALVOLUME', $this->shipment['volumetric_weight']);
+        $detailsNode->addChild('TOTALVOLUME', $this->getTotalVolume());
         $detailsNode->addChild('CURRENCY', $this->shipment['customs_value_currency_code']);
         $detailsNode->addChild('GOODSVALUE', 1);
         $detailsNode->addChild('INSURANCEVALUE', 1);
@@ -424,9 +424,9 @@ class TNT
         $labelNode = $printNode->addChild('LABEL');
         $labelNode->addChild('CONREF', $this->conref);
         //$connoteNode = $activityNode->addChild('CONNOTE');
-       // $connoteNode->addChild('CONREF', $this->conref);
-       // $manifestNode = $activityNode->addChild('MANIFEST');
-       // $manifestNode->addChild('CONREF', $this->conref);
+        // $connoteNode->addChild('CONREF', $this->conref);
+        // $manifestNode = $activityNode->addChild('MANIFEST');
+        // $manifestNode->addChild('CONREF', $this->conref);
 
         return $xml->asXML();
     }
@@ -622,6 +622,22 @@ class TNT
             return 1;
         }
         return 2;
+    }
+
+    /**
+     * Get the shipment volume.
+     * 
+     * @return int
+     */
+    protected function getTotalVolume()
+    {
+        $totalVolume = 0;
+
+        foreach ($this->shipment['packages'] as $package) {
+            $totalVolume += ($package['length'] / 100) * ($package['width'] / 100) * ($package['height'] / 100);
+        }
+
+        return $totalVolume;
     }
 
     /**
