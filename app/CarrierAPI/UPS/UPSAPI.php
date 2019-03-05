@@ -74,7 +74,7 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
     /**
      * Accepts the Shipment detail array and calcs
      * The correct Global Product code to return
-     * 
+     *
      * @param array $shipment
      * @return string Global Product Code
      */
@@ -92,7 +92,7 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
     /**
      * Accepts the Shipment detail array and calcs
      * The correct Local Product code to return
-     * 
+     *
      * @param array $shipment
      * @return string Local Product Code
      */
@@ -244,7 +244,7 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
         // UPS does not like '&' characters so replace with '+'
         $shipment = json_decode(str_replace('&', '+', json_encode($shipment)), true);
 
-        if ($shipment['recipient_company_name'] == '') {
+        if (empty($shipment['recipient_company_name'])) {
             $shipment['recipient_company_name'] = $shipment['recipient_name'];
             $shipment['recipient_name'] = '.';
         }
