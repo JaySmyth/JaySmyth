@@ -107,7 +107,7 @@ class UploadShipmentsToPrimaryFreight extends Command
                     'FedEx',
                     'Ground', // ShipService
                     'third party', // ShipBilling
-                    631510906, // ShipAccount
+                    946952095, // ShipAccount
                     $shipment->ship_date->format('m/d/Y'), // ShipDate
                     null, // CancelDate
                     null, // Notes
