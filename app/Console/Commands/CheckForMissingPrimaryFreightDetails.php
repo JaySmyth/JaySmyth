@@ -55,7 +55,7 @@ class CheckForMissingPrimaryFreightDetails extends Command
 
         if ($shipments->count() > 0) {
 
-            Mail::to(['njwhse@primaryfreight.com', 'kkaralekas@primaryfreight.com'])->cc(['aplatt@antrim.ifsgroup.com', 'epalframan@antrim.ifsgroup.com'])->bcc(['gmcbroom@antrim.ifsgroup.com'])->send(new \App\Mail\MissingPrimaryFreightDetails($shipments));
+            Mail::to(['njwhse@primaryfreight.com', 'kkaralekas@primaryfreight.com'])->cc(['aplatt@antrim.ifsgroup.com', 'babocushenquiry@antrim.ifsgroup.com'])->bcc(['gmcbroom@antrim.ifsgroup.com'])->send(new \App\Mail\MissingPrimaryFreightDetails($shipments));
         }
     }
 
