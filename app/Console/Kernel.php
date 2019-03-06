@@ -111,7 +111,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:update-primary-freight-shipments')->hourly();
         $schedule->command('ifs:upload-shipments-to-primary-freight')->dailyAt(14, 00);
         $schedule->command('ifs:upload-shipments-to-primary-freight')->twiceDaily(17, 20);
-        $schedule->command('ifs:check-for-missing-primary-freight-details')->dailyAt(9, 00);
+        $schedule->command('ifs:check-for-missing-primary-freight-details')->dailyAt(8, 00);
 
         /*
          * Primary Logistics
