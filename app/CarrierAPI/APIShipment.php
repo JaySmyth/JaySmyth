@@ -705,13 +705,16 @@ class APIShipment
     public function checkPostCodes($shipment, $errors)
     {
 
+        $senderPostcode = (!empty($shipment['sender_postcode'])) ? $shipment['sender_postcode'] : '';
+        $recipientPostcode = (!empty($shipment['recipient_postcode'])) ? $shipment['recipient_postcode'] : '';
+
         // Check Sender Postcode
-        if (!$this->checkPostCode($shipment['sender_country_code'], $shipment['sender_postcode'], $errors)) {
+        if (!$this->checkPostCode($shipment['sender_country_code'], $senderPostcode, $errors)) {
             $errors[] = 'Invalid Shipper postcode';
         }
 
         // Check Recipient Postcode
-        if (!$this->checkPostCode($shipment['recipient_country_code'], $shipment['recipient_postcode'], $errors)) {
+        if (!$this->checkPostCode($shipment['recipient_country_code'], $recipientPostcode, $errors)) {
             $errors[] = 'Invalid Recipient postcode';
         }
 
