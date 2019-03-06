@@ -25,7 +25,7 @@ class PurchaseInvoiceCharge extends Model
 
     /**
      * Charge belongs to an invoice.
-     * 
+     *
      * @return type
      */
     public function purchaseInvoice()
@@ -35,7 +35,7 @@ class PurchaseInvoiceCharge extends Model
 
     /**
      * Charge belongs to an invoice line.
-     * 
+     *
      * @return type
      */
     public function purchaseInvoiceLine()
@@ -45,7 +45,7 @@ class PurchaseInvoiceCharge extends Model
 
     /**
      * Charge belongs to a carrier charge type.
-     * 
+     *
      * @return type
      */
     public function carrierChargeCode()
@@ -56,7 +56,7 @@ class PurchaseInvoiceCharge extends Model
     /**
      * Set the carrier charge code id. If charge is not recognised, a charge will be created
      * in the carrier charge codes table. Notification email sent to advise.
-     * 
+     *
      */
     public function setCarrierChargeId()
     {
@@ -83,17 +83,21 @@ class PurchaseInvoiceCharge extends Model
 
     /**
      * Get the SCS code to use for this charge.
-     * 
+     *
      * @return string
      */
     public function getScsChargeCodeAttribute()
     {
-        return $this->carrierChargeCode->scs_code;
+        if ($this->carrierChargeCode) {
+            return $this->carrierChargeCode->scs_code;
+        }
+
+        return null;
     }
 
     /**
      * Get the amount we were actually billed by the carrier.
-     * 
+     *
      * @return decimal
      */
     public function getActualBilledAmountAttribute()
@@ -107,7 +111,7 @@ class PurchaseInvoiceCharge extends Model
 
     /**
      * Returns true/false - checks the string against the charge type description
-     * 
+     *
      * @param type $chargeType
      * @param type $string
      * @return boolean
