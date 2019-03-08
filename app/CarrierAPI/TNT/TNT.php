@@ -368,8 +368,8 @@ class TNT
         $detailsNode->addChild('TOTALVOLUME', $this->getTotalVolume());
         $detailsNode->addChild('CURRENCY', $this->shipment['customs_value_currency_code']);
         $detailsNode->addChild('GOODSVALUE', 1);
-        $detailsNode->addChild('INSURANCEVALUE', 1);
-        $detailsNode->addChild('INSURANCECURRENCY', $this->shipment['customs_value_currency_code']);
+        //$detailsNode->addChild('INSURANCEVALUE', 1);
+        //$detailsNode->addChild('INSURANCECURRENCY', $this->shipment['customs_value_currency_code']);
         $detailsNode->addChild('SERVICE', $this->shipment['service']);
         $detailsNode->addChild('OPTION');
         $detailsNode->addChild('DESCRIPTION', $this->getGoodsDescription());
