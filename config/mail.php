@@ -113,7 +113,7 @@ return [
       | the message.
       |
      */
-    'to' => ['address' => 'dshannon@antrim.ifsgroup.com', 'name' => 'Daryl Shannon'],
+    //'to' => ['address' => 'dshannon@antrim.ifsgroup.com', 'name' => 'Daryl Shannon'],
 
     /*
      *  provide support for Laravel 5.4's new Markdown mail components

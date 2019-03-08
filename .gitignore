@@ -8,8 +8,4 @@ Thumbs.db
 /phpunit.xml
 /.idea
 /.vscode
-/.svn
 .phpunit.result.cache
-project.xml
-project.properties
-.svn

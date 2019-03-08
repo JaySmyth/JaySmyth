@@ -27,7 +27,7 @@ class SurchargeDetailRequest extends Request
         return [
             'surcharge_id' => 'required|integer',
             'company_id' => 'integer',
-            'code' => 'required|min:2|max:10',
+            'code' => 'required|string|min:2|max:10',
             'from_date' => 'required|date|size:10',
             'to_date' => 'required|date|size:10',
             'weight_rate' => 'required|numeric',
