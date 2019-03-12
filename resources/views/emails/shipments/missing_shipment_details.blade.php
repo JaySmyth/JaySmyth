@@ -4,7 +4,7 @@
 
 <h1>{{$subject}}</h1>
 
-<h2 class="error">Shipping details for the following {{$shipments->count()}} shipments have not been received. Please investigate.</h2>
+<h2 class="error">Shipping details for the following {{$shipments->count()}} shipments have not been received. Please re-send ASNs.</h2>
 
 <table border="0" cellspacing="0" width="100%" class="table">
 
