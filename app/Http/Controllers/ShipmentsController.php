@@ -554,7 +554,7 @@ class ShipmentsController extends Controller
         $this->authorize('upload', new Shipment);
 
         // Validate the request        
-        $this->validate($request, ['import_config_id' => 'required|numeric', 'file' => 'required'], ['import_config_id.required' => 'Please select an upload profile.', 'file.required' => 'Please select a file to upload.']);
+        $this->validate($request, ['import_config_id' => 'required|numeric', 'file' => 'required|mimes:csv,txt'], ['import_config_id.required' => 'Please select an upload profile.', 'file.required' => 'Please select a file to upload.']);
 
         // Upload the file to the temp directory
         $path = $request->file('file')->storeAs('temp', 'original_' . str_random(12) . '.csv');
