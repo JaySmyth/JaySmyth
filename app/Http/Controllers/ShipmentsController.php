@@ -554,7 +554,7 @@ class ShipmentsController extends Controller
         $this->authorize('upload', new Shipment);
 
         // Validate the request        
-        $this->validate($request, ['import_config_id' => 'required|numeric', 'file' => 'required|mimes:csv,txt'], ['import_config_id.required' => 'Please select an upload profile.', 'file.required' => 'Please select a file to upload.']);
+        $this->validate($request, ['import_config_id' => 'required|numeric', 'file' => 'required|mimes:csv,txt'], ['import_config_id.required' => 'Please select an upload profile.', 'file.mimes' => 'Not a valid CSV file - please check for unsupported characters', 'file.required' => 'Please select a file to upload.']);
 
         // Upload the file to the temp directory
         $path = $request->file('file')->storeAs('temp', 'original_' . str_random(12) . '.csv');
@@ -564,8 +564,6 @@ class ShipmentsController extends Controller
             flash()->error('Problem Uploading!', 'Unable to upload file. Please try again.');
             return back();
         }
-
-        $importConfig = \App\ImportConfig::find($request->import_config_id);
 
         dispatch(new \App\Jobs\ImportShipments(storage_path('app/' . $path), $request->import_config_id, $request->user()))->onQueue('import');
 
