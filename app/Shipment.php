@@ -82,7 +82,7 @@ class Shipment extends Model
         'terms_of_sale',
         'invoice_type',
         'ultimate_destination_country_code',
-        'eori',
+        //'eori',
         'commercial_invoice_comments',
         'bill_shipping',
         'bill_tax_duty',
