@@ -420,6 +420,12 @@
                                     {!! Form::select('terms_of_sale', dropDown('terms', 'Please Select Terms', $mode->id), old('terms_of_sale'), array('id' => 'terms_of_sale', 'class' =>'form-control form-control-sm')) !!}
                                 </div>
                             </div>
+                            <div class="form-group row">
+                                {!! Form::Label('EORI:', null, array('class' => 'col-md-5 col-form-label')) !!}
+                                <div class="col-md-7">
+                                    {!! Form::Text('eori', old('eori'), ['id' => 'eori', 'class' =>'form-control form-control-sm', 'maxlength' => '50']) !!}
+                                </div>
+                            </div>
                         </div>
 
                         <div class="col-md-7">

@@ -82,6 +82,7 @@ class Shipment extends Model
         'terms_of_sale',
         'invoice_type',
         'ultimate_destination_country_code',
+        'eori',
         'commercial_invoice_comments',
         'bill_shipping',
         'bill_tax_duty',
@@ -128,7 +129,7 @@ class Shipment extends Model
     /**
      * Set the shipment reference.
      *
-     * @param  string  $value
+     * @param  string $value
      * @return string
      */
     public function setShipmentReferenceAttribute($value)
@@ -139,12 +140,23 @@ class Shipment extends Model
     /**
      * Set the shipment reference.
      *
-     * @param  string  $value
+     * @param  string $value
      * @return string
      */
     public function setSenderTypeAttribute($value)
     {
         $this->attributes['sender_type'] = strtolower($value);
+    }
+
+    /**
+     * Set the shipment reference.
+     *
+     * @param  string $value
+     * @return string
+     */
+    public function setEoriAttribute($value)
+    {
+        $this->attributes['eori'] = strtoupper($value);
     }
 
     /**
@@ -365,6 +377,21 @@ class Shipment extends Model
     }
 
     /**
+     * Determines if a shipment is classified as UK domestic.
+     *
+     * @param type $senderCountryCode
+     * @param type $recipientCountryCode
+     * @return boolean
+     */
+    public function isUkDomestic()
+    {
+        if (in_array($this->sender_country_code, getUkDomesticCountries()) && in_array($this->recipient_country_code, getUkDomesticCountries())) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Get source timezone.
      *
      * @return string
@@ -454,22 +481,6 @@ class Shipment extends Model
     }
 
     /**
-     * Determine if shipment originates from BT postcode.
-     * 
-     * @return boolean
-     */
-    public function originatesFromBtPostcode()
-    {
-        $prefix = strtoupper(substr($this->sender_postcode, 0, 2));
-
-        if ($prefix == 'BT' && strtoupper($this->sender_country_code) == 'GB') {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * A shipment has many packages
      *
      * @return
@@ -487,16 +498,6 @@ class Shipment extends Model
     public function contents()
     {
         return $this->hasMany('App\ShipmentContent')->orderBy('package_index');
-    }
-
-    /**
-     * A shipment has many tracking events
-     *
-     * @return
-     */
-    public function tracking()
-    {
-        return $this->hasMany('App\Tracking')->orderBy('local_datetime', 'DESC')->orderBy('id', 'DESC');
     }
 
     /**
@@ -590,16 +591,6 @@ class Shipment extends Model
     }
 
     /**
-     * A shipment has many documents
-     *
-     * @return
-     */
-    public function documents()
-    {
-        return $this->belongsToMany(Document::class)->orderBy('id', 'DESC');
-    }
-
-    /**
      * A shipment belongs to a mode of transport (courier, air, etc.)
      *
      * @return
@@ -640,30 +631,6 @@ class Shipment extends Model
     }
 
     /**
-     * A shipment has many transport jobs.
-     *
-     * @return
-     */
-    public function transportJobs()
-    {
-        return $this->hasMany(TransportJob::class);
-    }
-
-    /**
-     * Shipment active - i.e. not cancelled or delivered
-     *
-     * @return boolean
-     */
-    public function isActive()
-    {
-        if (in_array($this->status->code, ['saved', 'cancelled', 'return_to_sender', 'available_for_pickup', 'failure', 'unknown']) || $this->delivered) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * A shipment is cancellable
      *
      * @return boolean
@@ -682,18 +649,17 @@ class Shipment extends Model
     }
 
     /**
-     * Determines if a shipment is classified as UK domestic.
+     * Shipment active - i.e. not cancelled or delivered
      *
-     * @param type $senderCountryCode
-     * @param type $recipientCountryCode
      * @return boolean
      */
-    public function isUkDomestic()
+    public function isActive()
     {
-        if (in_array($this->sender_country_code, getUkDomesticCountries()) && in_array($this->recipient_country_code, getUkDomesticCountries())) {
-            return true;
+        if (in_array($this->status->code, ['saved', 'cancelled', 'return_to_sender', 'available_for_pickup', 'failure', 'unknown']) || $this->delivered) {
+            return false;
         }
-        return false;
+
+        return true;
     }
 
     /**
@@ -788,6 +754,51 @@ class Shipment extends Model
     }
 
     /**
+     * Toggles the on hold flag.
+     *
+     * @return null
+     */
+    public function toggleHold($userId)
+    {
+        if ($this->on_hold) {
+            $this->on_hold = false;
+        } else {
+            $this->on_hold = true;
+        }
+
+        $this->save();
+    }
+
+    /**
+     * Sets the shipment to delivered. Updates delivered flag, delivery date and signature.
+     *
+     * @param   string $podSignature
+     * @param   string $deliveryDate
+     *
+     * @return  void
+     */
+    public function setDelivered($deliveryDate = null, $podSignature = 'Unknown', $userId = 0, $withTrackingEvent = false, $podImage = null)
+    {
+        // If the shipment has not been received, mark as received.
+        if (!$this->received) {
+            $this->setReceived($this->ship_date, $userId);
+        }
+
+        if ($this->delivered) {
+            return false;
+        }
+
+        $this->delivered = true;
+        $this->pod_signature = $podSignature;
+        $this->pod_image = $podImage;
+        $this->delivery_date = toCarbon($deliveryDate);
+        $this->save();
+
+        // Set the shipment status to "delivered"
+        $this->setStatus('delivered', $userId, $deliveryDate, $withTrackingEvent);
+    }
+
+    /**
      * Sets the shipment to received - updates associated packages and inserts a tracking event for each package
      *
      * @return null
@@ -833,48 +844,230 @@ class Shipment extends Model
     }
 
     /**
-     * Toggles the on hold flag.
+     * Set the status of the shipment and adds a tracking event to show that
+     * the status has changed.
+     *
+     * @param string $statusCode Status that the shipment will be changed to
+     * @param integer $userId User changing the shipment status
+     * @param boolean $withTrackingEvent
      *
      * @return null
      */
-    public function toggleHold($userId)
+    public function setStatus($statusCode, $userId = 0, $datetime = false, $withTrackingEvent = true, $location = 'depot')
     {
-        if ($this->on_hold) {
-            $this->on_hold = false;
-        } else {
-            $this->on_hold = true;
-        }
+        // Look up the status
+        $status = Status::whereCode($statusCode)->first();
 
-        $this->save();
+        // Only update if we have been given a valid status and the shipment is not currently set to this status
+        // Also, dont update the status if currently RTS or Delivered - GMcNicholl 25-09-2018 17:54
+        if ($status && $this->status_id != $status->id && !in_array($this->status_id, ['6', '9'])) {
+
+            // Change the status on the shipment record
+            $this->status_id = $status->id;
+            $this->save();
+
+            // Add a tracking event for this status change
+            if ($withTrackingEvent) {
+                $this->addTracking($status->code, $datetime, $userId, false, $location);
+            }
+
+            // Send email notifications and update the alerts table
+            $this->alertGeneric($statusCode);
+
+            // Make sure collection request closed
+            if ($status->id > 3 && $status->id < 8) {
+                $this->closeCollectionRequest($datetime, $userId);
+            }
+        }
     }
 
     /**
-     * Sets the shipment to delivered. Updates delivered flag, delivery date and signature.
+     * Adds a tracking event to the shipment. Defaults the tracking location
+     * to that of the shipment's associated depot. Requires a valid status as
+     * a minimum requirement. If no message has been provided, a standard
+     * message is retreived from the statuses table.
      *
-     * @param   string  $podSignature
-     * @param   string  $deliveryDate
+     * @param string $status Status that the shipment will be changed to
+     * @param integer $userId User adding the tracking event
+     * @param string $message Tracking message
+     * @param string $datetime Date/time of the event
+     * @param string $location Location to apply to the tracking event (depot, shipper or destination)
      *
-     * @return  void
+     * @return mixed
      */
-    public function setDelivered($deliveryDate = null, $podSignature = 'Unknown', $userId = 0, $withTrackingEvent = false, $podImage = null)
+    public function addTracking($statusCode, $datetime = false, $userId = 0, $message = false, $location = 'depot')
     {
-        // If the shipment has not been received, mark as received.
-        if (!$this->received) {
-            $this->setReceived($this->ship_date, $userId);
+        // check the status if valid
+        $status = Status::whereCode($statusCode)->first();
+
+        if ($status) {
+
+            if (!$message) {
+                $message = $status->description;
+            }
+
+            if ($status->code == 'delivered') {
+                $location = 'destination';
+            }
+
+            $location = $this->getTrackingEventLocation($location);
+
+            $datetime = toCarbon($datetime);
+
+            // Save or update the  record
+            return Tracking::firstOrCreate(['message' => $message, 'status' => $statusCode, 'datetime' => $datetime, 'shipment_id' => $this->id])->update([
+                'local_datetime' => $datetime,
+                'carrier' => $this->carrier->name,
+                'tracker_id' => 'trk_' . str_random(26),
+                'city' => $location['city'],
+                'state' => $location['state'],
+                'country_code' => $location['country_code'],
+                'postcode' => $location['postcode'],
+                'source' => 'ifs',
+                'user_id' => $userId,
+            ]);
         }
 
-        if ($this->delivered) {
+        return false;
+    }
+
+    /**
+     * Get the location to apply to a tracking event.
+     *
+     * @param string $location
+     * @return array
+     */
+    private function getTrackingEventLocation($location)
+    {
+        if (!$this->company || !$this->depot) {
+            return [
+                'city' => 'Antrim',
+                'state' => 'County Antrim',
+                'country_code' => 'GB',
+                'postcode' => 'BT41 2NQ',
+                'timezone' => 'Europe/London'
+            ];
+        }
+
+        switch ($location) {
+            case 'shipper':
+                return [
+                    'city' => $this->company->city,
+                    'state' => $this->company->state,
+                    'country_code' => $this->company->country_code,
+                    'postcode' => $this->company->postcode,
+                    'timezone' => $this->company->localisation->time_zone
+                ];
+
+            case 'destination':
+                return [
+                    'city' => $this->recipient_city,
+                    'state' => $this->recipient_state,
+                    'country_code' => $this->recipient_country_code,
+                    'postcode' => $this->recipient_postcode,
+                    'timezone' => getTimezone($this->recipient_country_code, $this->recipient_state, $this->recipient_city)
+                ];
+
+            default:
+                return [
+                    'city' => $this->depot->city,
+                    'state' => $this->depot->state,
+                    'country_code' => $this->depot->country_code,
+                    'postcode' => $this->depot->postcode,
+                    'timezone' => $this->depot->localisation->time_zone
+                ];
+        }
+    }
+
+    /**
+     * Close the collection request associated with the shipment.
+     *
+     * @param type $datetime
+     * @param type $userId
+     * @return boolean
+     */
+    public function closeCollectionRequest($datetime, $userId = 2)
+    {
+        $transportJob = $this->transportJobs->where('type', 'c')->where('completed', 0)->first();
+
+        if ($transportJob) {
+            $transportJob->close($datetime, null, $userId);
+        }
+    }
+
+    /**
+     * Create a delivery request.
+     */
+    public function createDeliveryRequest()
+    {
+        // Don't create a delivery request if these conditions are met
+        if ($this->carrier_id != 1 || $this->depot_id != 1 || !$this->isActive() || $this->service->code == 'air' || $this->transportJobs->where('type', 'd')->count() > 0) {
             return false;
         }
 
-        $this->delivered = true;
-        $this->pod_signature = $podSignature;
-        $this->pod_image = $podImage;
-        $this->delivery_date = toCarbon($deliveryDate);
-        $this->save();
+        $cutOff = new Carbon('today 10:00', 'Europe/London');
 
-        // Set the shipment status to "delivered"
-        $this->setStatus('delivered', $userId, $deliveryDate, $withTrackingEvent);
+        if (Carbon::now('Europe/London') > $cutOff) {
+            $dateRequested = Carbon::now()->addWeekday();
+        } else {
+            $dateRequested = Carbon::now();
+        }
+
+        // Create Transport Job
+        $transportJob = $this->transportJobs()->create([
+            'number' => \App\Sequence::whereCode('JOB')->lockForUpdate()->first()->getNextAvailable(),
+            'reference' => $this->carrier_consignment_number,
+            'pieces' => $this->pieces,
+            'weight' => $this->weight,
+            'goods_description' => $this->goods_description,
+            'volumetric_weight' => $this->volumetric_weight,
+            'instructions' => 'Deliver to: ' . $this->recipient_name . ', ' . $this->recipient_address1 . ', ' . $this->recipient_city . ' ' . $this->recipient_postcode . ' ' . $this->instructions,
+            'scs_job_number' => $this->scs_job_number,
+            'scs_company_code' => ($this->company->group_account) ? $this->company->group_account : $this->company->scs_code,
+            'cash_on_delivery' => 0,
+            'final_destination' => $this->recipient_city . ',' . $this->recipient_country,
+            'type' => 'd',
+            'from_type' => 'c',
+            'from_company_name' => $this->company->company_name,
+            'from_address1' => $this->depot->address1,
+            'from_address2' => $this->depot->address2,
+            'from_address3' => $this->depot->address3,
+            'from_city' => $this->depot->city,
+            'from_state' => $this->depot->state,
+            'from_postcode' => $this->depot->postcode,
+            'from_country_code' => $this->depot->country_code,
+            'from_telephone' => $this->depot->telephone,
+            'from_email' => $this->depot->email,
+            'to_type' => $this->recipient_type,
+            'to_name' => $this->recipient_name,
+            'to_company_name' => $this->recipient_company_name,
+            'to_address1' => $this->recipient_address1,
+            'to_address2' => $this->recipient_address2,
+            'to_address3' => $this->recipient_address3,
+            'to_city' => $this->recipient_city,
+            'to_state' => $this->recipient_state,
+            'to_postcode' => $this->recipient_postcode,
+            'to_country_code' => $this->recipient_country_code,
+            'to_telephone' => $this->recipient_telephone,
+            'to_email' => $this->recipient_email,
+            'department_id' => $this->department_id,
+            'depot_id' => $this->depot_id,
+            'visible' => true,
+            'date_requested' => $dateRequested
+        ]);
+
+        $transportJob->setTransendRoute();
+        $transportJob->setStatus('unmanifested');
+    }
+
+    /**
+     * A shipment has many transport jobs.
+     *
+     * @return
+     */
+    public function transportJobs()
+    {
+        return $this->hasMany(TransportJob::class);
     }
 
     /**
@@ -896,6 +1089,16 @@ class Shipment extends Model
         $this->tracking()->where('status', 'delivered')->delete();
 
         $this->setStatus('in_transit', 0, false, false);
+    }
+
+    /**
+     * A shipment has many tracking events
+     *
+     * @return
+     */
+    public function tracking()
+    {
+        return $this->hasMany('App\Tracking')->orderBy('local_datetime', 'DESC')->orderBy('id', 'DESC');
     }
 
     /**
@@ -977,142 +1180,6 @@ class Shipment extends Model
     }
 
     /**
-     * Set the status of the shipment and adds a tracking event to show that
-     * the status has changed.
-     *
-     * @param string  $statusCode Status that the shipment will be changed to
-     * @param integer $userId User changing the shipment status
-     * @param boolean $withTrackingEvent
-     *
-     * @return null
-     */
-    public function setStatus($statusCode, $userId = 0, $datetime = false, $withTrackingEvent = true, $location = 'depot')
-    {
-        // Look up the status
-        $status = Status::whereCode($statusCode)->first();
-
-        // Only update if we have been given a valid status and the shipment is not currently set to this status
-        // Also, dont update the status if currently RTS or Delivered - GMcNicholl 25-09-2018 17:54
-        if ($status && $this->status_id != $status->id && !in_array($this->status_id, ['6', '9'])) {
-
-            // Change the status on the shipment record
-            $this->status_id = $status->id;
-            $this->save();
-
-            // Add a tracking event for this status change
-            if ($withTrackingEvent) {
-                $this->addTracking($status->code, $datetime, $userId, false, $location);
-            }
-
-            // Send email notifications and update the alerts table
-            $this->alertGeneric($statusCode);
-
-            // Make sure collection request closed
-            if ($status->id > 3 && $status->id < 8) {
-                $this->closeCollectionRequest($datetime, $userId);
-            }
-        }
-    }
-
-    /**
-     * Adds a tracking event to the shipment. Defaults the tracking location
-     * to that of the shipment's associated depot. Requires a valid status as
-     * a minimum requirement. If no message has been provided, a standard
-     * message is retreived from the statuses table.
-     *
-     * @param string $status Status that the shipment will be changed to
-     * @param integer $userId User adding the tracking event
-     * @param string $message Tracking message
-     * @param string $datetime Date/time of the event
-     * @param string $location Location to apply to the tracking event (depot, shipper or destination)
-     *
-     * @return mixed
-     */
-    public function addTracking($statusCode, $datetime = false, $userId = 0, $message = false, $location = 'depot')
-    {
-        // check the status if valid
-        $status = Status::whereCode($statusCode)->first();
-
-        if ($status) {
-
-            if (!$message) {
-                $message = $status->description;
-            }
-
-            if ($status->code == 'delivered') {
-                $location = 'destination';
-            }
-
-            $location = $this->getTrackingEventLocation($location);
-
-            $datetime = toCarbon($datetime);
-
-            // Save or update the  record
-            return Tracking::firstOrCreate(['message' => $message, 'status' => $statusCode, 'datetime' => $datetime, 'shipment_id' => $this->id])->update([
-                        'local_datetime' => $datetime,
-                        'carrier' => $this->carrier->name,
-                        'tracker_id' => 'trk_' . str_random(26),
-                        'city' => $location['city'],
-                        'state' => $location['state'],
-                        'country_code' => $location['country_code'],
-                        'postcode' => $location['postcode'],
-                        'source' => 'ifs',
-                        'user_id' => $userId,
-            ]);
-        }
-
-        return false;
-    }
-
-    /**
-     * Get the location to apply to a tracking event.
-     *
-     * @param string $location
-     * @return array
-     */
-    private function getTrackingEventLocation($location)
-    {
-        if (!$this->company || !$this->depot) {
-            return [
-                'city' => 'Antrim',
-                'state' => 'County Antrim',
-                'country_code' => 'GB',
-                'postcode' => 'BT41 2NQ',
-                'timezone' => 'Europe/London'
-            ];
-        }
-
-        switch ($location) {
-            case 'shipper':
-                return [
-                    'city' => $this->company->city,
-                    'state' => $this->company->state,
-                    'country_code' => $this->company->country_code,
-                    'postcode' => $this->company->postcode,
-                    'timezone' => $this->company->localisation->time_zone
-                ];
-
-            case 'destination':
-                return [
-                    'city' => $this->recipient_city,
-                    'state' => $this->recipient_state,
-                    'country_code' => $this->recipient_country_code,
-                    'postcode' => $this->recipient_postcode,
-                    'timezone' => getTimezone($this->recipient_country_code, $this->recipient_state, $this->recipient_city)
-                ];
-
-            default:
-                return [
-                    'city' => $this->depot->city,
-                    'state' => $this->depot->state,
-                    'country_code' => $this->depot->country_code,
-                    'postcode' => $this->depot->postcode,
-                    'timezone' => $this->depot->localisation->time_zone
-                ];
-        }
-    }
-
-    /**
      * Returns the number of packages scanned i.e "1 of 2"
      *
      * @return string
@@ -1186,87 +1253,6 @@ class Shipment extends Model
     }
 
     /**
-     * Create a delivery request.
-     */
-    public function createDeliveryRequest()
-    {
-        // Don't create a delivery request if these conditions are met
-        if ($this->carrier_id != 1 || $this->depot_id != 1 || !$this->isActive() || $this->service->code == 'air' || $this->transportJobs->where('type', 'd')->count() > 0) {
-            return false;
-        }
-
-        $cutOff = new Carbon('today 10:00', 'Europe/London');
-
-        if (Carbon::now('Europe/London') > $cutOff) {
-            $dateRequested = Carbon::now()->addWeekday();
-        } else {
-            $dateRequested = Carbon::now();
-        }
-
-        // Create Transport Job
-        $transportJob = $this->transportJobs()->create([
-            'number' => \App\Sequence::whereCode('JOB')->lockForUpdate()->first()->getNextAvailable(),
-            'reference' => $this->carrier_consignment_number,
-            'pieces' => $this->pieces,
-            'weight' => $this->weight,
-            'goods_description' => $this->goods_description,
-            'volumetric_weight' => $this->volumetric_weight,
-            'instructions' => 'Deliver to: ' . $this->recipient_name . ', ' . $this->recipient_address1 . ', ' . $this->recipient_city . ' ' . $this->recipient_postcode . ' ' . $this->instructions,
-            'scs_job_number' => $this->scs_job_number,
-            'scs_company_code' => ($this->company->group_account) ? $this->company->group_account : $this->company->scs_code,
-            'cash_on_delivery' => 0,
-            'final_destination' => $this->recipient_city . ',' . $this->recipient_country,
-            'type' => 'd',
-            'from_type' => 'c',
-            'from_company_name' => $this->company->company_name,
-            'from_address1' => $this->depot->address1,
-            'from_address2' => $this->depot->address2,
-            'from_address3' => $this->depot->address3,
-            'from_city' => $this->depot->city,
-            'from_state' => $this->depot->state,
-            'from_postcode' => $this->depot->postcode,
-            'from_country_code' => $this->depot->country_code,
-            'from_telephone' => $this->depot->telephone,
-            'from_email' => $this->depot->email,
-            'to_type' => $this->recipient_type,
-            'to_name' => $this->recipient_name,
-            'to_company_name' => $this->recipient_company_name,
-            'to_address1' => $this->recipient_address1,
-            'to_address2' => $this->recipient_address2,
-            'to_address3' => $this->recipient_address3,
-            'to_city' => $this->recipient_city,
-            'to_state' => $this->recipient_state,
-            'to_postcode' => $this->recipient_postcode,
-            'to_country_code' => $this->recipient_country_code,
-            'to_telephone' => $this->recipient_telephone,
-            'to_email' => $this->recipient_email,
-            'department_id' => $this->department_id,
-            'depot_id' => $this->depot_id,
-            'visible' => true,
-            'date_requested' => $dateRequested
-        ]);
-
-        $transportJob->setTransendRoute();
-        $transportJob->setStatus('unmanifested');
-    }
-
-    /**
-     * Close the collection request associated with the shipment.
-     *
-     * @param type $datetime
-     * @param type $userId
-     * @return boolean
-     */
-    public function closeCollectionRequest($datetime, $userId = 2)
-    {
-        $transportJob = $this->transportJobs->where('type', 'c')->where('completed', 0)->first();
-
-        if ($transportJob) {
-            $transportJob->close($datetime, null, $userId);
-        }
-    }
-
-    /**
      * Price shipment and if successful,
      * optionally update the Shipment record
      *
@@ -1320,6 +1306,22 @@ class Shipment extends Model
     }
 
     /**
+     * Determine if shipment originates from BT postcode.
+     *
+     * @return boolean
+     */
+    public function originatesFromBtPostcode()
+    {
+        $prefix = strtoupper(substr($this->sender_postcode, 0, 2));
+
+        if ($prefix == 'BT' && strtoupper($this->sender_country_code) == 'GB') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Highlight a shipment that may require an operators attention. Currently highlights
      * non MIA shipments that do not have a BT postcode. Can be extended for any other requirements
      * in the future.
@@ -1353,8 +1355,8 @@ class Shipment extends Model
      * Shipment has been booked with airline. Updates the carrier consignment number and adds a
      * tracking event to show shipment has been booked. Sends an email with airline tracking link.
      *
-     * @param string  $carrierConsignmentNumber
-     * @param carbon  $dateTimeBooked
+     * @param string $carrierConsignmentNumber
+     * @param carbon $dateTimeBooked
      * @param integer $userId
      */
     public function bookedWithAirline($carrierConsignmentNumber, $dateTimeBooked = false, $userId = 0)
@@ -1377,7 +1379,7 @@ class Shipment extends Model
 
     /**
      * Add shipment to last manifest closed out.
-     * 
+     *
      * @return boolean
      */
     public function addToLastManifest()
@@ -1409,7 +1411,7 @@ class Shipment extends Model
 
     /**
      * Determine if a shipment has an uploaded document.
-     * 
+     *
      * @param type $documentType
      * @return boolean
      */
@@ -1422,6 +1424,16 @@ class Shipment extends Model
         }
 
         return false;
+    }
+
+    /**
+     * A shipment has many documents
+     *
+     * @return
+     */
+    public function documents()
+    {
+        return $this->belongsToMany(Document::class)->orderBy('id', 'DESC');
     }
 
 }
