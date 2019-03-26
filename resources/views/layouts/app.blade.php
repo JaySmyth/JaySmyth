@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        @if(Session::has('token'))<meta http-equiv="refresh" content="0;url={{ url('/label/' . session('token')) }}">@endif
+        @if(Session::has('token'))<meta http-equiv="refresh" content="1;url={{ url('/label/' . session('token')) }}">@endif
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
