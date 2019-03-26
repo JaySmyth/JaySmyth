@@ -2,7 +2,8 @@
 
 namespace App\CarrierAPI\Fedex;
 
-class FedexLabel extends \App\CarrierAPI\CarrierLabel {
+class FedexLabel extends \App\CarrierAPI\CarrierLabel
+{
 
     /**
      * Accepts Shipment and Carrier Response data
@@ -15,9 +16,9 @@ class FedexLabel extends \App\CarrierAPI\CarrierLabel {
 
     /**
      * Takes stored Shipment and Carrier Response data
-     * and uses it to create a PDF containing all the 
+     * and uses it to create a PDF containing all the
      * necessary labels in the following format :-
-     * 
+     *
      * Label 1 is a Master Label, others Package Labels
      */
     public function create()
@@ -38,34 +39,31 @@ class FedexLabel extends \App\CarrierAPI\CarrierLabel {
     }
 
     /**
-     * Add Package Label
-     * 
-     * @param type $awb
-     */
-    public function addLabel($awb)
-    {
-
-        $this->addPage();
-
-        $this->pdf->Image('http://' . $this->data . '/' . $awb . '.PNG', 0, 0, 102, 153);
-        $this->customizeLabel();
-    }
-
-    /**
-     * Checks to see if Master Label exists 
+     * Checks to see if Master Label exists
      * and if so adds it
-     * 
+     *
      * @param type $awb
      */
     public function addMasterLabel($awb)
     {
-
         // If an Auxilliary label exists add as Master Label
         $auxLabelExists = strstr(current(get_headers('http://' . $this->data . '/' . $awb . 'AWB.PNG')), "200");
+
         if ($auxLabelExists) {
+
             $this->addPage();
 
-            $this->pdf->Image('http://' . $this->data . '/' . $awb . 'AWB.PNG', 0, 0, 102, 153);
+            list($width, $height) = getimagesize('http://' . $this->data . '/' . $awb . 'AWB.PNG');
+
+            // Image is landscape, rotate image 90
+            if ($width > $height) {
+                $this->pdf->Rotate(90);
+                $this->pdf->Image('http://' . $this->data . '/' . $awb . 'AWB.PNG', -153, 0, 153, 102);
+                $this->pdf->Rotate(0);
+            } else {
+                $this->pdf->Image('http://' . $this->data . '/' . $awb . 'AWB.PNG', 0, 0, 102, 153);
+            }
+
             $this->customizeLabel('MASTER');
         }
     }
@@ -73,7 +71,7 @@ class FedexLabel extends \App\CarrierAPI\CarrierLabel {
     /**
      * Customises the label with any IFS
      * specific items. eg Service box.
-     * 
+     *
      * @param type $labelType
      */
     public function customizeLabel($labelType = '')
@@ -102,6 +100,20 @@ class FedexLabel extends \App\CarrierAPI\CarrierLabel {
                     break;
             }
         }
+    }
+
+    /**
+     * Add Package Label
+     *
+     * @param type $awb
+     */
+    public function addLabel($awb)
+    {
+
+        $this->addPage();
+
+        $this->pdf->Image('http://' . $this->data . '/' . $awb . '.PNG', 0, 0, 102, 153);
+        $this->customizeLabel();
     }
 
 }
