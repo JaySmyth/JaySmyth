@@ -51,7 +51,7 @@ class APIShipment
         // Initialize Object (Base level fields)
         $this->fields = 'transaction_id,company_code,collection_date,carrier,carrier_pickup_required,service_code,country_of_destination,shipment_reference,ship_reason,special_instructions';
         $this->fields .= 'pieces,weight,volumetric_weight,weight_uom,bill_shipping,bill_tax_duty,bill_shipping_account,bill_tax_duty_account';
-        $this->fields .= 'customs_value,currency_code,goods_description,insurance_value,terms_of_sale,commercial_invoice_contents';
+        $this->fields .= 'customs_value,currency_code,goods_description,insurance_value,lithium_batteries,terms_of_sale,commercial_invoice_contents';
         $this->fields .= 'shipper,recipient,broker,packages,options,alerts,hazardous,alcohol,commodities,label_specification';
         $fieldArray = explode(',', $this->fields);
         foreach ($fieldArray as $field) {
@@ -156,6 +156,7 @@ class APIShipment
         $this->txlt["commodities.*.weight_uom"] = "weight_uom";
         $this->txlt["terms_of_sale"] = "terms_of_sale";
         $this->txlt["insurance_value"] = "insurance_value";
+        $this->txlt["lithium_batteries"] = "lithium_batteries";
         $this->txlt["label_specification.image_type"] = "image_type";
         $this->txlt["label_specification.label_size"] = "label_size";
 
@@ -514,6 +515,7 @@ class APIShipment
         $rules['customs_value'] = 'required|numeric';
         $rules['customs_value_currency_code'] = 'sometimes|exists:currencies,code';
         $rules['insurance_value'] = 'sometimes|integer';
+        $rules['lithium_batteries'] = 'sometimes|integer';
 
         $rules = $this->addPackagingRules($shipment['company_id'], $shipment['mode_id'], $rules);
 
@@ -572,6 +574,7 @@ class APIShipment
             $rules['contents.*.weight_uom'] = 'required|in:kg,lb';
             $rules['contents.*.country_of_manufacture'] = 'required|alpha|size:2';
             $rules['contents.*.unit_weight'] = 'numeric|greater_than_value:0';
+            $rules['eori'] = 'required|string|max:14';
         }
 
         $rules['label_specification.label_size'] = 'sometimes|in:6X4,A4';
@@ -815,7 +818,7 @@ class APIShipment
     public function buildValidationErrors($messages)
     {
         foreach ($messages->all() as $message) {
-            $errors[] = $message;
+            $errors[] = ucfirst($message);
         }
 
         return $errors;

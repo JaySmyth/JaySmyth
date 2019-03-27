@@ -139,7 +139,6 @@ class FedexSettings
         $this->fieldDefs[] = 'OriginID1/1084/GENERAL/0/0';
         $this->fieldDefs[] = 'TxID/1123/GENERAL/0/0'; // ??
         $this->fieldDefs[] = 'IRS_EIN/1139/IRSEIN/0/0'; // ??
-        //$this->fieldDefs[] = 'ThermLabInd/1282/GENERAL/0/0";
         $this->fieldDefs[] = 'custom_label_flag/1660/MANUAL/0/0';
         $this->fieldDefs[] = 'Barcode_2D/3064/RESPONSE/0/0'; // ??
         $this->fieldDefs[] = 'signature_required/2399/GENERAL/0/0';
@@ -207,7 +206,10 @@ class FedexSettings
         $this->fieldDefs[] = 'packages.*.dry_ice_weight/1684/MANUAL/100/100';       // Output triggered by packages.*.weight
         $this->fieldDefs[] = 'packages.*.packaging_code/1273/MANUAL/0/0';         // Output triggered by packages.*.weight
         // DryIce
-        $this->fieldDefs[] = 'dry_ice_flag/1268/MANUAL/0/0';                      // Output triggered by packages.*.weight                   
+        $this->fieldDefs[] = 'dry_ice_flag/1268/MANUAL/0/0';                      // Output triggered by packages.*.weight
+
+        $this->fieldDefs[] = 'lithium_batteries/7801/SHIPMENT/0/0';
+
         // Alcohol
         $this->fieldDefs[] = 'alcohol.quantity/52/ALCOHOL/0/0';
         $this->fieldDefs[] = 'alcohol.flag/1332/ALCOHOL/0/0';                     // Option triggered by alcohol.quantity
@@ -234,9 +236,7 @@ class FedexSettings
         $this->fieldDefs[] = 'broker.country_code/1186/BROKER/0/0';
         $this->fieldDefs[] = 'broker.account/1179/BROKER/0/0';
         $this->fieldDefs[] = 'broker.id/1187/BROKER/0/0';
-        //$this->fieldDefs[] = 'BR_Fax_No/1344/BROKER/0/0";
-        //$this->fieldDefs[] = 'BR_Pager/1345/BROKER/0/0";
-        //
+
         // Document Fields
         $this->fieldDefs[] = 'documents_description/2396/DOCUMENTS/0/0';
         $this->fieldDefs[] = 'documents_flag/190/DOCUMENTS/0/0';
@@ -265,50 +265,6 @@ class FedexSettings
         $this->fieldDefs[] = 'hazard_name_of_signatory/1918/MANUAL/0/0';          // Option triggered by hazardous
         $this->fieldDefs[] = 'hazard_place_of_signatory/1922/MANUAL/0/0';         // Option triggered by hazardous
         $this->fieldDefs[] = 'hazard_title_of_signatory/485/MANUAL/0/0';          // Option triggered by hazardous
-        // *** NONE OF THESE DANGEROUS GOODSFIELDS ARE BEING CAPTURED *** //
-        /*
-
-          $this->fieldDefs[] = 'DGTech_Name/446/DGOODS/0";
-          $this->fieldDefs[] = 'DGUN_no/451/DGOODS/0";
-          $this->fieldDefs[] = 'DGNum_of_Units/456/DGOODS/0";
-          $this->fieldDefs[] = 'DGPack_Type/461/DGOODS/0";
-          $this->fieldDefs[] = 'DGNet_Qty/466/DGOODS/10";
-          $this->fieldDefs[] = 'DGUOM/471/DGOODS/0";
-          $this->fieldDefs[] = 'DGPkg_Inst/476/DGOODS/0";
-          $this->fieldDefs[] = 'DGAuth/483/DGOODS/0";
-          $this->fieldDefs[] = 'DGEmer_Ph/484/DGOODS/0";
-          $this->fieldDefs[] = 'DGAdd_Hand/486/DGOODS/0";
-          $this->fieldDefs[] = 'DGPack_Grp/489/DGOODS/0";
-          $this->fieldDefs[] = 'DGReg_Ind/1900/DGOODS/0";
-          $this->fieldDefs[] = 'DGRep_Qty/1901/DGOODS/0";
-          $this->fieldDefs[] = 'DGProp_Name/1903/DGOODS/0";
-          $this->fieldDefs[] = 'DGAFlag/1904/DGOODS/0";
-          $this->fieldDefs[] = 'DGRadion/1905/DGOODS/0";
-          $this->fieldDefs[] = 'DGActivity/1906/DGOODS/0";
-          $this->fieldDefs[] = 'DGActivityM/1907/DGOODS/0";
-          $this->fieldDefs[] = 'DGRPack_Type/1908/DGOODS/0";
-          $this->fieldDefs[] = 'DGTran_Index/1909/DGOODS/0";
-          $this->fieldDefs[] = 'DGLabel_Type/1910/DGOODS/0";
-          $this->fieldDefs[] = 'DGSurf_Read/1911/DGOODS/0";
-          $this->fieldDefs[] = 'DGDim_Len/1912/DGOODS/0";
-          $this->fieldDefs[] = 'DGDim_Wid/1913/DGOODS/0";
-          $this->fieldDefs[] = 'DGDIM_Hgt/1914/DGOODS/0";
-          $this->fieldDefs[] = 'DGDim_Units/1915/DGOODS/0";
-          $this->fieldDefs[] = 'DGPhy_Form/1916/DGOODS/0";
-          $this->fieldDefs[] = 'DGChem_Form/1917/DGOODS/0";
-          $this->fieldDefs[] = 'DGPercent/1919/DGOODS/0";
-          $this->fieldDefs[] = 'DGResp_Party/1920/DGOODS/0";
-          $this->fieldDefs[] = 'DGInfect_Ph/1921/DGOODS/0";
-          $this->fieldDefs[] = 'DGCons_Pkg/1923/DGOODS/0";
-          $this->fieldDefs[] = 'DGOverpack/1924/DGOODS/0";
-          $this->fieldDefs[] = 'DGOverpack_No/1925/DGOODS/0";
-          $this->fieldDefs[] = 'DGOverpack_Cons/1926/DGOODS/0";
-          $this->fieldDefs[] = 'DGOuter_Type/1927/DGOODS/0";
-          $this->fieldDefs[] = 'DGCons_Flag/1928/DGOODS/0";
-          $this->fieldDefs[] = 'DGCons_Qty/1929/DGOODS/0";
-          $this->fieldDefs[] = 'DGA81_Flag/1931/DGOODS/0";
-          $this->fieldDefs[] = 'DGUndef/3253/DGOODS/0";
-         */
 
         // ********************************************** //
         $this->fieldDefs[] = 'label_specification.label_size/187/PRINTER/0/0';    // Size and type

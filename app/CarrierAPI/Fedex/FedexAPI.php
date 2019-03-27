@@ -74,106 +74,358 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
         $this->fedex = new FedexSettings();
     }
 
-    /**
-     * Function to generate rules for Max Package weight
-     *
-     * @param array Rules
-     * @param string Service_code
-     *
-     * @return array Rules
-     */
-    private function addRulesMaxWeight($rules, $serviceCode)
+    public function validateDeleteShipment($shipment)
     {
 
-        // Check Max Package Weight
-        switch ($serviceCode) {
+        /*
+         * ****************************************
+         * Carrier/ Service Specific validation
+         * ****************************************
+         */
 
-            case 'ipf':
-            case 'frt':
-                // Replace existing rule
-                $rules['packages.*.weight'] = 'required_if:Service,ip|numeric|min:60.00';
-                break;
+        $errors = [];
 
-            case 'ip':
-            case 'exp':
-                // Replace existing rule
-                $rules['packages.*.weight'] = 'required_if:Service,ip|numeric|max:49.50';
-                break;
-
-            case 'uk48':
-                // Replace existing rule
-                $rules['packages.*.weight'] = 'required_if:Service,uk48|numeric|max:49.50';
-                break;
-
-            default:
-                break;
-        }
-
-        return $rules;
+        return $errors;
     }
 
     /**
-     * Check Packaging codes are correct for carrier
-     * @param array $errors
-     * @param array $packages
      *
-     * @return array $errors
+     * @param array $data containing company_id, user_id, shipment_token
+     *
+     * @return type
      */
-    private function validatePackageTypes($errors, $packages)
+    public function deleteShipment($shipment)
+    {
+        $response = [];
+
+        $message = $this->buildDeleteShipmentMsg($shipment);
+
+        $reply = $this->sendMessageToCarrier($message, 'delete_shipment');
+
+        // Check for errors
+        if (isset($reply['3']) && $reply['3'] > '') {
+            // Request unsuccessful - return errors
+            $response = $this->generateErrorResponse($response, $reply[3]);
+        } else {
+            // Request succesful - Prepare Response
+            $response = $this->deleteShipmentResponse($reply);
+        }
+
+        return $response;
+    }
+
+    public function buildDeleteShipmentMsg($shipment)
     {
 
-        // Check each Package is valid for this Carrier
-        $cnt = 1;
-        foreach ($packages as $package) {
-            if (!isset($this->fedex->packageTypes[$package['packaging_code']])) {
-                $errors[] = "packages.$cnt.packaging_code is invalid for carrier.";
+        // Encode the Message
+        $msg = '0,"023"1,"cancel shipment"29,"' . $shipment->carrier_consignment_number . '"99,""';
+
+        return $msg;
+    }
+
+    private function sendMessageToCarrier($message, $msgType)
+    {
+
+        $this->transactionHeader = $this->getData($message, 'transaction_id');
+
+        $replyMsg = $this->transmitMessage($message);
+
+        $reply = $this->decode($replyMsg);
+
+        return $reply;
+    }
+
+    public function transmitMessage($msg)
+    {
+
+        $seconds = 5;
+        $milliseconds = 0;
+        $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        socket_set_option($socket, SOL_SOCKET, SO_SNDTIMEO, array('sec' => $seconds, 'usec' => $milliseconds));
+
+        $connected = socket_connect($socket, $this->connection['url'], $this->connection['port']);
+
+
+        if ($connected) {
+            socket_write($socket, $msg, strlen($msg));
+
+            $msgType = substr($msg, 3, 3);
+            switch ($msgType) {
+                case '020':
+                    TransactionLog::create(['carrier' => 'fedex', 'type' => 'MSG', 'direction' => 'O', 'msg' => $msg, 'mode' => $this->mode]);
+                    break;
+
+                case '120':
+                    TransactionLog::create(['carrier' => 'fedex', 'type' => 'REPLY', 'direction' => 'I', 'msg' => $msg, 'mode' => $this->mode]);
+                    break;
+
+                case '023':
+                    TransactionLog::create(['carrier' => 'fedex', 'type' => 'CANX', 'direction' => 'O', 'msg' => $msg, 'mode' => $this->mode]);
+                    break;
+
+                default:
+                    TransactionLog::create(['carrier' => 'fedex', 'type' => 'Unknown', 'direction' => 'O', 'msg' => $msg, 'mode' => $this->mode]);
+                    break;
             }
-            $cnt++;
+
+            $string = '';
+            $i = 0;
+            while (!preg_match('/"99,""/', $string)) {
+                $char = socket_read($socket, 1);
+                $string .= $char;
+            }
+
+            socket_close($socket);
+        } else {
+            // Create a dummy response with error to pass back
+            $string = '0,"120"3,"Unable to connect to Carrier System"99,""';
+
+            // Build email
+            $to = 'it@antrim.ifsgroup.com';
+            $subject = 'Courier Intl FXRS Server Error';
+            $message = 'Web Client unable to communicate with the FXRS Server';
+            $headers = 'From: noreply@antrim.ifsgroup.com' . "\r\n" .
+                'Reply-To: it@antrim.ifsgroup.com' . "\r\n" .
+                'X-Mailer: PHP/' . phpversion();
+
+            mail($to, $subject, $message, $headers);
         }
 
-        return $errors;
+        $this->reply = $string;
+        TransactionLog::create(['carrier' => 'fedex', 'type' => 'REPLY', 'direction' => 'I', 'msg' => $string, 'mode' => $this->mode]);
+
+        return $string;
     }
 
-    private function validateCargoOption($errors, $shipment)
+    public function decode($data, $log = '')
     {
-        $hazardCode = $this->getData($shipment, 'hazardous');
-        if (!($hazardCode == 'E' || ((intval($hazardCode) >= 1) && (intval($hazardCode) <= 9)))) {
-            $errors[] = "CARGO option for DG Shipments only";
+        if ($log == true) { //Log the reply to database
+            $this->logMsg('', $data, 'REPLY');
         }
 
-        return $errors;
+        $reply = [];
+        $notFinished = true;
+        $offSet = 0;
+
+        while ($notFinished) {
+            if (ord(substr($data, 0, 1)) == 0) {
+                $data = substr($data, 1, 999);                                  // Remove starting null string if it exists
+            }
+
+            if (strlen($data) > 3) {
+                $t = strpos($data, ',', $offSet);                               // Find position of comma
+                $q1 = strpos($data, '"', $offSet + 1);                          // Find Position of first Quote
+                $q2 = strpos($data, '"', $q1 + 1);                              // Find Position of Second Quote
+                $fieldNo = substr($data, $offSet, $t - $offSet);                // Extract Field No
+                $mvp = strpos($fieldNo, '-');                                   // Check to see if a multivalue field
+                $fieldNoAbs = $this->getFldNo($fieldNo);
+                $fieldData = substr($data, $q1 + 1, $q2 - $q1 - 1);             // Extract Data portion
+                $offSet = $q2 + 1;
+
+                // If Valid Field no - PreProcess Data
+                if ($fieldNoAbs > 0) {
+                    if (!isset($reply[$fieldNoAbs])) {
+                        $reply[$fieldNoAbs] = '';
+                    }
+                    $fieldData = $this->multiplier($fieldNoAbs, $fieldData, 'decode');
+                    $reply[$fieldNoAbs] = $this->addValue($reply[$fieldNoAbs], $fieldNoAbs, $fieldData);
+                }
+                /*
+                 * Finish Single/ Multivalues
+                 */
+            } else {
+                $reply = [];                                         // Invalid response - so return empty string.
+                $notFinished = true;
+            }
+            if ($fieldNo == '99') {
+                $notFinished = false;
+            }
+        }
+
+        return $reply;
     }
 
-    private function validateOption($errors, $option, $shipment)
+    private function getFldNo($fieldNo)
     {
-        if (in_array($option, $this->fedex->options)) {
-            // Supported option - now check valid for service etc.
-            switch ($option) {
-                case 'CARGO':
-                    $errors = $this->validateCargoOption($errors, $shipment);
+        $mvp = strpos($fieldNo, '-');                                          // Check to see if a multivalue field
+        if ($mvp > 0) {
+            $fieldNo = substr($fieldNo, 0, $mvp);                             // Field No minus any mv additions eg 79-1 becomes 79
+        }
+
+        return $fieldNo;
+    }
+
+    public function multiplier($key, $value, $mode)
+    {
+        #######################################################################
+        #          Fields Requiring PreProcessing of Data
+        #######################################################################
+        $mult = 0;
+
+        $key = $this->getFldNo($key);
+
+        // If Field requires preprocessing
+        if (isset($this->fedex->mult[$key]) && $this->fedex->mult[$key] > 0) {
+            switch ($mode) {
+
+                case 'decode':
+                    $value = $value / $this->fedex->mult[$uom][$key];
                     break;
 
                 default:
                     break;
             }
-        } else {
-            $errors[] = "Option : $option not supported";
         }
 
-        return $errors;
+        // Round to remove remaining dec. places
+        switch ($key) {
+            case '77':
+            case '78':
+            case '112':
+            case '119':
+            case '1030':
+            case '1086':
+            case '1670':
+            case '1684':
+                $value = round($value);
+                break;
+        }
+
+        return $value;
     }
 
-    private function validateOptions($errors, $shipment)
+    private function addValue($existing = '', $fieldNoAbs, $fieldData)
     {
-        $cnt = 1;
-        $options = $this->getData($shipment, 'options');
-        if ($options != '') {
-            foreach ($options as $option) {
-                $errors = $this->validateOption($errors, $option, $shipment);
+
+        /*
+         * Code to handle single/ multivalue values
+         */
+        if (in_array($fieldNoAbs, $this->fedex->mvfields)) {
+            // Not Single value so change to array
+            $mvArr = []; //clear
+
+            /*
+             * Values may already exist so add
+             * any existing values into the mvArr
+             */
+            if (is_array($existing)) {
+                foreach ($existing as $v) {
+                    $mvArr[] = $v;
+                }
+            }
+
+            // Now add any new values
+            $mvArr[] = $fieldData; // Store this value
+            // Replace previous values
+            $reply[$fieldNoAbs] = $mvArr;
+        } else {
+            // Single Value
+            $mvArr = $fieldData;
+        }
+
+        return $mvArr;
+    }
+
+    private function deleteShipmentResponse($reply)
+    {
+        $response = $this->generateSuccess();
+
+        // Add additional data to be returned
+        $response['carrier_code'] = 'FEDEX';
+        $response['consignment_number'] = $reply['29'];
+
+        return $response;
+    }
+
+    public function createShipment($shipment)
+    {
+
+
+        $response = [];
+        $shipment = $this->preProcess($shipment);
+
+        $errors = $this->validateShipment($shipment);
+        if ($errors != []) {
+
+            return $this->generateErrorResponse($response, $errors);
+        } else {
+
+            // Build Message
+            $message = $this->buildShipmentMsg($shipment);
+
+            $reply = $this->sendMessageToCarrier($message, 'create_shipment');
+
+            // Check for errors
+            if (isset($reply['3']) && $reply['3'] != []) {
+
+                // Request unsuccessful - return errors
+                return $this->generateErrorResponse($response, $reply[3]);
+            } else {
+
+                $fedexRoute = new \App\FedexRoute();
+                $route_id = $fedexRoute->getRouteId($shipment);
+
+                // Set splitServiceBox if Rughouse Economy UK48
+                $splitServiceBox = false;
+                if ($shipment['service_id'] == '19' && $shipment['company_id'] == '808') {
+                    $splitServiceBox = true;
+                }
+
+                // Prepare Response
+                $response = $this->createShipmentResponse($reply, $shipment['service_code'], $route_id, $splitServiceBox);
+
+                return $response;
+            }
+        }
+    }
+
+    private function preProcess($shipment)
+    {
+
+        // Find Senders Fedex Account
+        $service = Company::find($shipment['company_id'])->services()->where("code", $shipment['service_code'])->where("carrier_id", "2")->first();
+
+        if (!empty($service)) {
+
+            if ($service->pivot->account > "") {
+                $shipment['sender_account'] = $service->pivot->account;
+            } else {
+                $shipment['sender_account'] = $service->account;
             }
         }
 
-        return $errors;
+        // Catch instance where above code not setting account - needs looked at
+        if (!isset($shipment['sender_account'])) {
+            if (strtoupper($shipment['service_code']) == 'UK48') {
+                $shipment['sender_account'] = 811732648;
+            } else {
+                $shipment['sender_account'] = 205691588;
+            }
+        }
+
+        // If bill to recipient set Recipient Fedex Account
+        if (strtoupper($shipment['bill_shipping']) == "RECIPIENT") {
+            $shipment['recipient_account'] = $shipment['bill_shipping_account'];
+        }
+
+        // Fudge to set correct routing for Fedex
+        if (strtoupper($shipment['service_code']) == 'UK48') {
+            $shipment['sender_postcode'] = 'XY35';
+
+            // Don't send email address to FedEx as notificiations are 24HRS out
+            // $shipment['recipient_email'] = '';
+        }
+
+        // Fudge for Guernsey & Jersey
+        if (in_array(strtolower($shipment['recipient_country_code']), ['gg', 'je', 'im'])) {
+            $shipment['recipient_country_code'] = 'gb';
+        }
+
+        // Setup Package Types
+        $this->fedex->packageTypes = Company::find($shipment['company_id'])
+            ->buildPackageTypesArray($shipment['mode_id'], 'FEDEX');
+
+        return $shipment;
     }
 
     /**
@@ -214,16 +466,66 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
         return $errors;
     }
 
-    public function validateDeleteShipment($shipment)
+    /**
+     * Check Packaging codes are correct for carrier
+     * @param array $errors
+     * @param array $packages
+     *
+     * @return array $errors
+     */
+    private function validatePackageTypes($errors, $packages)
     {
 
-        /*
-         * ****************************************
-         * Carrier/ Service Specific validation
-         * ****************************************
-         */
+        // Check each Package is valid for this Carrier
+        $cnt = 1;
+        foreach ($packages as $package) {
+            if (!isset($this->fedex->packageTypes[$package['packaging_code']])) {
+                $errors[] = "packages.$cnt.packaging_code is invalid for carrier.";
+            }
+            $cnt++;
+        }
 
-        $errors = [];
+        return $errors;
+    }
+
+    private function validateOptions($errors, $shipment)
+    {
+        $cnt = 1;
+        $options = $this->getData($shipment, 'options');
+        if ($options != '') {
+            foreach ($options as $option) {
+                $errors = $this->validateOption($errors, $option, $shipment);
+            }
+        }
+
+        return $errors;
+    }
+
+    private function validateOption($errors, $option, $shipment)
+    {
+        if (in_array($option, $this->fedex->options)) {
+            // Supported option - now check valid for service etc.
+            switch ($option) {
+                case 'CARGO':
+                    $errors = $this->validateCargoOption($errors, $shipment);
+                    break;
+
+                default:
+                    break;
+            }
+        } else {
+            $errors[] = "Option : $option not supported";
+        }
+
+        return $errors;
+    }
+
+    private function validateCargoOption($errors, $shipment)
+    {
+        $hazardCode = $this->getData($shipment, 'hazardous');
+        if (!($hazardCode == 'E' || ((intval($hazardCode) >= 1) && (intval($hazardCode) <= 9)))) {
+            $errors[] = "CARGO option for DG Shipments only";
+        }
 
         return $errors;
     }
@@ -274,15 +576,6 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
 
         // Encode the result
         $msg = '0,"020"' . $this->encode($msgData) . '99,""';
-
-        return $msg;
-    }
-
-    public function buildDeleteShipmentMsg($shipment)
-    {
-
-        // Encode the Message
-        $msg = '0,"023"1,"cancel shipment"29,"' . $shipment->carrier_consignment_number . '"99,""';
 
         return $msg;
     }
@@ -355,6 +648,21 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
                                 $msgData[$this->fedex->fldno['hazard_place_of_signatory']] = 'DG PLACE';
                                 $msgData[$this->fedex->fldno['hazard_title_of_signatory']] = 'DG TITLE';
                             }
+                            break;
+
+                        case 'lithium_batteries':
+
+                            if (is_numeric($value)) {
+
+                                $packages = $this->getData($data, 'packages');
+                                $numberOfPackages = count($packages);
+
+                                for ($i = 1; $i <= $numberOfPackages; $i++) {
+                                    $msgData[$this->fedex->fldno['lithium_batteries'] . '-' . $i] = $value;
+                                }
+
+                            }
+
                             break;
 
                         case 'volumetric_weight':
@@ -591,141 +899,6 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
         return $msgData;
     }
 
-    public function multiplier($key, $value, $mode)
-    {
-        #######################################################################
-        #          Fields Requiring PreProcessing of Data
-        #######################################################################
-        $mult = 0;
-
-        $key = $this->getFldNo($key);
-
-        // If Field requires preprocessing
-        if (isset($this->fedex->mult[$key]) && $this->fedex->mult[$key] > 0) {
-            switch ($mode) {
-
-                case 'decode':
-                    $value = $value / $this->fedex->mult[$uom][$key];
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        // Round to remove remaining dec. places
-        switch ($key) {
-            case '77':
-            case '78':
-            case '112':
-            case '119':
-            case '1030':
-            case '1086':
-            case '1670':
-            case '1684':
-                $value = round($value);
-                break;
-        }
-
-        return $value;
-    }
-
-    public function transmitMessage($msg)
-    {
-
-        $seconds = 5;
-        $milliseconds = 0;
-        $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        socket_set_option($socket, SOL_SOCKET, SO_SNDTIMEO, array('sec' => $seconds, 'usec' => $milliseconds));
-
-        $connected = socket_connect($socket, $this->connection['url'], $this->connection['port']);
-
-
-
-        if ($connected) {
-            socket_write($socket, $msg, strlen($msg));
-
-            $msgType = substr($msg, 3, 3);
-            switch ($msgType) {
-                case '020':
-                    TransactionLog::create(['carrier' => 'fedex', 'type' => 'MSG', 'direction' => 'O', 'msg' => $msg, 'mode' => $this->mode]);
-                    break;
-
-                case '120':
-                    TransactionLog::create(['carrier' => 'fedex', 'type' => 'REPLY', 'direction' => 'I', 'msg' => $msg, 'mode' => $this->mode]);
-                    break;
-
-                case '023':
-                    TransactionLog::create(['carrier' => 'fedex', 'type' => 'CANX', 'direction' => 'O', 'msg' => $msg, 'mode' => $this->mode]);
-                    break;
-
-                default:
-                    TransactionLog::create(['carrier' => 'fedex', 'type' => 'Unknown', 'direction' => 'O', 'msg' => $msg, 'mode' => $this->mode]);
-                    break;
-            }
-
-            $string = '';
-            $i = 0;
-            while (!preg_match('/"99,""/', $string)) {
-                $char = socket_read($socket, 1);
-                $string .= $char;
-            }
-
-            socket_close($socket);
-        } else {
-            // Create a dummy response with error to pass back
-            $string = '0,"120"3,"Unable to connect to Carrier System"99,""';
-
-            // Build email
-            $to = 'it@antrim.ifsgroup.com';
-            $subject = 'Courier Intl FXRS Server Error';
-            $message = 'Web Client unable to communicate with the FXRS Server';
-            $headers = 'From: noreply@antrim.ifsgroup.com' . "\r\n" .
-                    'Reply-To: it@antrim.ifsgroup.com' . "\r\n" .
-                    'X-Mailer: PHP/' . phpversion();
-
-            mail($to, $subject, $message, $headers);
-        }
-
-        $this->reply = $string;
-        TransactionLog::create(['carrier' => 'fedex', 'type' => 'REPLY', 'direction' => 'I', 'msg' => $string, 'mode' => $this->mode]);
-
-        return $string;
-    }
-
-    private function sendMessageToCarrier($message, $msgType)
-    {
-
-        $this->transactionHeader = $this->getData($message, 'transaction_id');
-
-        $replyMsg = $this->transmitMessage($message);
-
-        $reply = $this->decode($replyMsg);
-
-        return $reply;
-    }
-
-    private function getFldNo($fieldNo)
-    {
-        $mvp = strpos($fieldNo, '-');                                          // Check to see if a multivalue field
-        if ($mvp > 0) {
-            $fieldNo = substr($fieldNo, 0, $mvp);                             // Field No minus any mv additions eg 79-1 becomes 79
-        }
-
-        return $fieldNo;
-    }
-
-    private function getFldId($fieldNo)
-    {
-        $fieldId = 1;                                                           // Set default ref to 1 (only applies to mv items)
-        $mvp = strpos($fieldNo, '-');                                           // Check to see if a multivalue field
-        if ($mvp > 0) {
-            $fieldId = substr($fieldNo, $mvp + 1, strlen($fieldNo) - $mvp);
-        }
-
-        return $fieldId;
-    }
-
     public function encode($arrData)
     {
         // Receives an array of field numbers and values
@@ -741,108 +914,6 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
         }
 
         return $msg;
-    }
-
-    public function decode($data, $log = '')
-    {
-        if ($log == true) { //Log the reply to database
-            $this->logMsg('', $data, 'REPLY');
-        }
-
-        $reply = [];
-        $notFinished = true;
-        $offSet = 0;
-
-        while ($notFinished) {
-            if (ord(substr($data, 0, 1)) == 0) {
-                $data = substr($data, 1, 999);                                  // Remove starting null string if it exists
-            }
-
-            if (strlen($data) > 3) {
-                $t = strpos($data, ',', $offSet);                               // Find position of comma
-                $q1 = strpos($data, '"', $offSet + 1);                          // Find Position of first Quote
-                $q2 = strpos($data, '"', $q1 + 1);                              // Find Position of Second Quote
-                $fieldNo = substr($data, $offSet, $t - $offSet);                // Extract Field No
-                $mvp = strpos($fieldNo, '-');                                   // Check to see if a multivalue field
-                $fieldNoAbs = $this->getFldNo($fieldNo);
-                $fieldData = substr($data, $q1 + 1, $q2 - $q1 - 1);             // Extract Data portion
-                $offSet = $q2 + 1;
-
-                // If Valid Field no - PreProcess Data
-                if ($fieldNoAbs > 0) {
-                    if (!isset($reply[$fieldNoAbs])) {
-                        $reply[$fieldNoAbs] = '';
-                    }
-                    $fieldData = $this->multiplier($fieldNoAbs, $fieldData, 'decode');
-                    $reply[$fieldNoAbs] = $this->addValue($reply[$fieldNoAbs], $fieldNoAbs, $fieldData);
-                }
-                /*
-                 * Finish Single/ Multivalues
-                 */
-            } else {
-                $reply = [];                                         // Invalid response - so return empty string.
-                $notFinished = true;
-            }
-            if ($fieldNo == '99') {
-                $notFinished = false;
-            }
-        }
-
-        return $reply;
-    }
-
-    private function addValue($existing = '', $fieldNoAbs, $fieldData)
-    {
-
-        /*
-         * Code to handle single/ multivalue values
-         */
-        if (in_array($fieldNoAbs, $this->fedex->mvfields)) {
-            // Not Single value so change to array
-            $mvArr = []; //clear
-
-            /*
-             * Values may already exist so add
-             * any existing values into the mvArr
-             */
-            if (is_array($existing)) {
-                foreach ($existing as $v) {
-                    $mvArr[] = $v;
-                }
-            }
-
-            // Now add any new values
-            $mvArr[] = $fieldData; // Store this value
-            // Replace previous values
-            $reply[$fieldNoAbs] = $mvArr;
-        } else {
-            // Single Value
-            $mvArr = $fieldData;
-        }
-
-        return $mvArr;
-    }
-
-    private function checkRemoteFile($url)
-    {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        // don't download content
-        curl_setopt($ch, CURLOPT_NOBODY, 1);
-        curl_setopt($ch, CURLOPT_FAILONERROR, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        if (curl_exec($ch) !== FALSE) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private function generatePdf($data, $serviceCode = '', $route_id, $splitServiceBox = false)
-    {
-
-        $label = new FedexLabel($data, $serviceCode, $this->connection['url'], $route_id, $splitServiceBox);
-        return $label->create();
     }
 
     private function createShipmentResponse($reply, $serviceCode, $route_id, $splitServiceBox = false)
@@ -889,64 +960,49 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
         return $response;
     }
 
-    private function deleteShipmentResponse($reply)
+    private function generatePdf($data, $serviceCode = '', $route_id, $splitServiceBox = false)
     {
-        $response = $this->generateSuccess();
 
-        // Add additional data to be returned
-        $response['carrier_code'] = 'FEDEX';
-        $response['consignment_number'] = $reply['29'];
-
-        return $response;
+        $label = new FedexLabel($data, $serviceCode, $this->connection['url'], $route_id, $splitServiceBox);
+        return $label->create();
     }
 
-    private function preProcess($shipment)
+    /**
+     * Function to generate rules for Max Package weight
+     *
+     * @param array Rules
+     * @param string Service_code
+     *
+     * @return array Rules
+     */
+    private function addRulesMaxWeight($rules, $serviceCode)
     {
 
-        // Find Senders Fedex Account
-        $service = Company::find($shipment['company_id'])->services()->where("code", $shipment['service_code'])->where("carrier_id", "2")->first();
+        // Check Max Package Weight
+        switch ($serviceCode) {
 
-        if (!empty($service)) {
+            case 'ipf':
+            case 'frt':
+                // Replace existing rule
+                $rules['packages.*.weight'] = 'required_if:Service,ip|numeric|min:60.00';
+                break;
 
-            if ($service->pivot->account > "") {
-                $shipment['sender_account'] = $service->pivot->account;
-            } else {
-                $shipment['sender_account'] = $service->account;
-            }
+            case 'ip':
+            case 'exp':
+                // Replace existing rule
+                $rules['packages.*.weight'] = 'required_if:Service,ip|numeric|max:49.50';
+                break;
+
+            case 'uk48':
+                // Replace existing rule
+                $rules['packages.*.weight'] = 'required_if:Service,uk48|numeric|max:49.50';
+                break;
+
+            default:
+                break;
         }
 
-        // Catch instance where above code not setting account - needs looked at
-        if (!isset($shipment['sender_account'])) {
-            if (strtoupper($shipment['service_code']) == 'UK48') {
-                $shipment['sender_account'] = 811732648;
-            } else {
-                $shipment['sender_account'] = 205691588;
-            }
-        }
-
-        // If bill to recipient set Recipient Fedex Account
-        if (strtoupper($shipment['bill_shipping']) == "RECIPIENT") {
-            $shipment['recipient_account'] = $shipment['bill_shipping_account'];
-        }
-
-        // Fudge to set correct routing for Fedex
-        if (strtoupper($shipment['service_code']) == 'UK48') {
-            $shipment['sender_postcode'] = 'XY35';
-
-            // Don't send email address to FedEx as notificiations are 24HRS out
-            // $shipment['recipient_email'] = '';
-        }
-
-        // Fudge for Guernsey & Jersey
-        if (in_array(strtolower($shipment['recipient_country_code']), ['gg', 'je', 'im'])) {
-            $shipment['recipient_country_code'] = 'gb';
-        }
-
-        // Setup Package Types
-        $this->fedex->packageTypes = Company::find($shipment['company_id'])
-                ->buildPackageTypesArray($shipment['mode_id'], 'FEDEX');
-
-        return $shipment;
+        return $rules;
     }
 
     /*
@@ -957,71 +1013,29 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
      * *********************************************
      */
 
-    /**
-     *
-     * @param array $data containing company_id, user_id, shipment_token
-     *
-     * @return type
-     */
-    public function deleteShipment($shipment)
+    private function getFldId($fieldNo)
     {
-        $response = [];
-
-        $message = $this->buildDeleteShipmentMsg($shipment);
-
-        $reply = $this->sendMessageToCarrier($message, 'delete_shipment');
-
-        // Check for errors
-        if (isset($reply['3']) && $reply['3'] > '') {
-            // Request unsuccessful - return errors
-            $response = $this->generateErrorResponse($response, $reply[3]);
-        } else {
-            // Request succesful - Prepare Response
-            $response = $this->deleteShipmentResponse($reply);
+        $fieldId = 1;                                                           // Set default ref to 1 (only applies to mv items)
+        $mvp = strpos($fieldNo, '-');                                           // Check to see if a multivalue field
+        if ($mvp > 0) {
+            $fieldId = substr($fieldNo, $mvp + 1, strlen($fieldNo) - $mvp);
         }
 
-        return $response;
+        return $fieldId;
     }
 
-    public function createShipment($shipment)
+    private function checkRemoteFile($url)
     {
-
-
-        $response = [];
-        $shipment = $this->preProcess($shipment);
-
-        $errors = $this->validateShipment($shipment);
-        if ($errors != []) {
-
-            return $this->generateErrorResponse($response, $errors);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        // don't download content
+        curl_setopt($ch, CURLOPT_NOBODY, 1);
+        curl_setopt($ch, CURLOPT_FAILONERROR, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        if (curl_exec($ch) !== FALSE) {
+            return true;
         } else {
-
-            // Build Message
-            $message = $this->buildShipmentMsg($shipment);
-
-            $reply = $this->sendMessageToCarrier($message, 'create_shipment');
-
-            // Check for errors
-            if (isset($reply['3']) && $reply['3'] != []) {
-
-                // Request unsuccessful - return errors
-                return $this->generateErrorResponse($response, $reply[3]);
-            } else {
-
-                $fedexRoute = new \App\FedexRoute();
-                $route_id = $fedexRoute->getRouteId($shipment);
-
-                // Set splitServiceBox if Rughouse Economy UK48
-                $splitServiceBox = false;
-                if ($shipment['service_id'] == '19' && $shipment['company_id'] == '808') {
-                    $splitServiceBox = true;
-                }
-
-                // Prepare Response
-                $response = $this->createShipmentResponse($reply, $shipment['service_code'], $route_id, $splitServiceBox);
-
-                return $response;
-            }
+            return false;
         }
     }
 

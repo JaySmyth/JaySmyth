@@ -45,6 +45,7 @@ class Shipment extends Model
         'quoted',
         'carrier_pickup_required',
         'insurance_value',
+        'lithium_batteries',
         'alcohol_type',
         'alcohol_packaging',
         'alcohol_volume',

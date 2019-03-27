@@ -49,6 +49,7 @@ class Company extends Model
     public function shipments()
     {
         return $this->hasMany(Shipment::class)->orderBy('id', 'DESC')->with('service', 'status', 'mode');
+
     }
 
     /**
