@@ -574,7 +574,7 @@ class APIShipment
             $rules['contents.*.weight_uom'] = 'required|in:kg,lb';
             $rules['contents.*.country_of_manufacture'] = 'required|alpha|size:2';
             $rules['contents.*.unit_weight'] = 'numeric|greater_than_value:0';
-            $rules['eori'] = 'required|string|max:14';
+            //$rules['eori'] = 'required|string|max:14';
         }
 
         $rules['label_specification.label_size'] = 'sometimes|in:6X4,A4';
