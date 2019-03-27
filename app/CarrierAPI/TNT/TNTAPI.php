@@ -44,6 +44,7 @@ class TNTAPI extends \App\CarrierAPI\CarrierBase
         $rules['dry_ice'] = 'not_supported';
         $rules['hazardous'] = 'not_supported';
         $rules['insurance_value'] = 'not_supported';
+        $rules['lithium_batteries'] = 'not_supported';
         return $this->applyRules($rules, $shipment);
     }
 

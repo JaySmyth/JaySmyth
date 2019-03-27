@@ -29,6 +29,8 @@ class PrimaryFreightAPI extends \App\CarrierAPI\CarrierBase
         $rules['alcohol'] = 'not_supported';
         $rules['dry_ice'] = 'not_supported';
         $rules['hazardous'] = 'not_supported';
+        $rules['lithium_batteries'] = 'not_supported';
+
         return $this->applyRules($rules, $shipment);
     }
 

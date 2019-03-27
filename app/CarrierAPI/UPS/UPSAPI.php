@@ -274,6 +274,7 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
         $rules['dry_ice'] = 'not_supported';
         $rules['hazardous'] = 'not_supported';
         $rules['insurance_value'] = 'not_supported';
+        $rules['lithium_batteries'] = 'not_supported';
 
         // Validate Shipment using the rules
         $errors = $this->applyRules($rules, $shipment);

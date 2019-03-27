@@ -359,6 +359,7 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase {
         $rules['bill_shipping_account'] = 'required|digits:9';
         $rules['bill_tax_duty_account'] = 'required|digits:9';
         $rules['insurance_value'] = 'not_supported';
+        $rules['lithium_batteries'] = 'not_supported';
 
         // Validate Shipment using the rules
         $errors = $this->applyRules($rules, $shipment);
