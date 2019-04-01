@@ -705,7 +705,7 @@ class Shipment extends Model
 
         $viableDepartments = ['IFCEX', 'IFFAX'];
 
-        if (in_array($this->department->code, $viableDepartments) && $this->status->code != 'cancelled') {
+        if ((in_array($this->department->code, $viableDepartments) || in_array($this->recipient_country_code, ['GG', 'JE'])) && $this->status->code != 'cancelled') {
             return true;
         }
         return false;
