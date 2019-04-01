@@ -25,7 +25,7 @@ class Kernel extends ConsoleKernel
         Commands\PurchaseInvoices\ImportUpsPurchaseInvoices::class,
         Commands\PurchaseInvoices\ImportDhlPurchaseInvoices::class,
         Commands\PurchaseInvoices\ImportPrimaryFreightPurchaseInvoices::class,
-        Commands\PurchaseInvoices\ImportTntPurchaseInvoices::class,
+        //Commands\PurchaseInvoices\ImportTntPurchaseInvoices::class,
         Commands\Transend\SendJobs::class,
         Commands\Transend\CancelJobs::class,
         Commands\Transend\ProcessFiles::class,
@@ -87,7 +87,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:import-ups-purchase-invoices')->weekdays()->hourly()->between('8:00', '17:00');
         $schedule->command('ifs:import-dhl-purchase-invoices')->weekdays()->hourly()->between('8:00', '17:00');
         $schedule->command('ifs:import-primary-freight-purchase-invoices')->weekdays()->hourly()->between('8:00', '17:00');
-        $schedule->command('ifs:import-tnt-purchase-invoices')->weekdays()->hourly()->between('8:00', '17:00');
+        //$schedule->command('ifs:import-tnt-purchase-invoices')->weekdays()->hourly()->between('8:00', '17:00');
         $schedule->command('ifs:update-scs-job-numbers-on-purchase-invoice-lines')->weekdays()->dailyAt('05:30');
 
         /*
