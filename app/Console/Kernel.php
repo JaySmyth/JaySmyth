@@ -76,18 +76,18 @@ class Kernel extends ConsoleKernel
         /*
          * Maintenance
          */
-        $schedule->exec('/sbin/reboot')->dailyAt('22:30');
+        $schedule->exec('/sbin/reboot')->dailyAt('21:30');
         $schedule->command('ifs:empty-temp-storage')->dailyAt('03:30');
         $schedule->command('ifs:delete-old-log-entries')->dailyAt('05:20');
 
         /*
          * Purchase Invoice imports
          */
-        $schedule->command('ifs:import-fedex-purchase-invoices')->weekdays()->hourly()->between('9:00', '18:00');
-        $schedule->command('ifs:import-ups-purchase-invoices')->weekdays()->hourly()->between('9:00', '18:00');
-        $schedule->command('ifs:import-dhl-purchase-invoices')->weekdays()->hourly()->between('9:00', '18:00');
-        $schedule->command('ifs:import-primary-freight-purchase-invoices')->weekdays()->hourly()->between('9:00', '18:00');
-        $schedule->command('ifs:import-tnt-purchase-invoices')->weekdays()->hourly()->between('9:00', '18:00');
+        $schedule->command('ifs:import-fedex-purchase-invoices')->weekdays()->hourly()->between('8:00', '17:00');
+        $schedule->command('ifs:import-ups-purchase-invoices')->weekdays()->hourly()->between('8:00', '17:00');
+        $schedule->command('ifs:import-dhl-purchase-invoices')->weekdays()->hourly()->between('8:00', '17:00');
+        $schedule->command('ifs:import-primary-freight-purchase-invoices')->weekdays()->hourly()->between('8:00', '17:00');
+        $schedule->command('ifs:import-tnt-purchase-invoices')->weekdays()->hourly()->between('8:00', '17:00');
         $schedule->command('ifs:update-scs-job-numbers-on-purchase-invoice-lines')->weekdays()->dailyAt('05:30');
 
         /*
@@ -101,19 +101,19 @@ class Kernel extends ConsoleKernel
          * Shipment related
          */
         $schedule->command('ifs:auto-manifest')->weekdays()->everyFiveMinutes()->withoutOverlapping();
-        $schedule->command('ifs:cancel-old-shipments')->dailyAt('08:00');
-        $schedule->command('ifs:update-stagnant-shipments')->dailyAt('08:05');
+        $schedule->command('ifs:cancel-old-shipments')->dailyAt('07:00');
+        $schedule->command('ifs:update-stagnant-shipments')->dailyAt('07:05');
         $schedule->command('ifs:process-shipment-uploads')->everyMinute()->withoutOverlapping();
-        $schedule->command('ifs:check-for-duplicate-shipments')->twiceDaily(13, 17);
-        $schedule->command('ifs:update-shopify')->twiceDaily(11, 20);
+        $schedule->command('ifs:check-for-duplicate-shipments')->twiceDaily(12, 16);
+        $schedule->command('ifs:update-shopify')->twiceDaily(10, 19);
 
         /*
          * Primary Freight
          */
         $schedule->command('ifs:update-primary-freight-shipments')->hourly();
-        $schedule->command('ifs:upload-shipments-to-primary-freight')->dailyAt(14, 00);
-        $schedule->command('ifs:upload-shipments-to-primary-freight')->twiceDaily(17, 20);
-        $schedule->command('ifs:check-for-missing-primary-freight-details')->dailyAt(8, 00);
+        $schedule->command('ifs:upload-shipments-to-primary-freight')->dailyAt(13, 00);
+        $schedule->command('ifs:upload-shipments-to-primary-freight')->twiceDaily(16, 19);
+        $schedule->command('ifs:check-for-missing-primary-freight-details')->dailyAt(7, 00);
 
         /*
          * Primary Logistics
@@ -126,33 +126,33 @@ class Kernel extends ConsoleKernel
         /*
          * RF server
          */
-        $schedule->command('ifs:start-rfserver')->everyMinute()->withoutOverlapping()->between('7:00', '23:00');
-        $schedule->command('ifs:check-rfserver')->everyFiveMinutes()->withoutOverlapping()->between('7:00', '23:00');
+        $schedule->command('ifs:start-rfserver')->everyMinute()->withoutOverlapping()->between('8:00', '22:00');
+        $schedule->command('ifs:check-rfserver')->everyFiveMinutes()->withoutOverlapping()->between('8:00', '22:00');
 
         /*
          * Misc
          */
         $schedule->command('ifs:upload-files')->everyMinute()->withoutOverlapping();
-        $schedule->command('ifs:check-job-queue')->everyFiveMinutes()->withoutOverlapping()->between('6:00', '23:00');
+        $schedule->command('ifs:check-job-queue')->everyFiveMinutes()->withoutOverlapping()->between('6:00', '22:00');
 
         /*
          * Transport
          */
-        $schedule->command('ifs:close-driver-manifests')->dailyAt('21:00');
-        $schedule->command('ifs:open-driver-manifests')->dailyAt('07:00');
+        $schedule->command('ifs:close-driver-manifests')->dailyAt('20:00');
+        $schedule->command('ifs:open-driver-manifests')->dailyAt('06:00');
         $schedule->command('ifs:close-stagnant-transport-jobs')->dailyAt('04:35');
         $schedule->command('ifs:correct-status-on-transport-jobs')->dailyAt('04:38');
-        $schedule->command('ifs:notify-transport-department-pod-required')->weekdays()->dailyAt('09:30');
+        $schedule->command('ifs:notify-transport-department-pod-required')->weekdays()->dailyAt('08:30');
         $schedule->command('ifs:log-scanning-kpis')->weekdays()->dailyAt('21:28');
-        $schedule->command('ifs:send-scanning-report-email')->weekdays()->dailyAt('21:30');
+        $schedule->command('ifs:send-scanning-report-email')->weekdays()->dailyAt('20:30');
 
         /*
          * Multifreight
          */
         $schedule->command('ifs:import-multifreight-files')->weekdays()->everyFiveMinutes()->withoutOverlapping();
         $schedule->command('ifs:process-scs-collection-requests')->weekdays()->everyFiveMinutes()->withoutOverlapping();
-        $schedule->command('ifs:update-scs-job-numbers-on-shipments --invoiced=1')->weekdays()->hourly()->between('10:00', '17:00')->withoutOverlapping();
-        $schedule->command('ifs:update-scs-job-numbers-on-shipments --invoiced=0')->weekdays()->dailyAt('22:45');
+        $schedule->command('ifs:update-scs-job-numbers-on-shipments --invoiced=1')->weekdays()->hourly()->between('09:00', '16:00')->withoutOverlapping();
+        $schedule->command('ifs:update-scs-job-numbers-on-shipments --invoiced=0')->weekdays()->dailyAt('21:45');
 
 
         /*
