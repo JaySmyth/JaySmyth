@@ -27,13 +27,13 @@ class CreateEasypostTracker implements ShouldQueue
     public function __construct($trackingCode, $carrier)
     {
         $this->trackingCode = $trackingCode;
-        $this->carrier = $carrier;        
-        $this->key = config('services.easypost.key');                
+        $this->carrier = $carrier;
+        $this->key = config('services.easypost.key');
     }
 
     /**
      * Execute the job.
-     * 
+     *
      * @return void
      */
     public function handle()
@@ -46,19 +46,24 @@ class CreateEasypostTracker implements ShouldQueue
             \EasyPost\EasyPost::setApiKey($this->key);
             \EasyPost\Tracker::create(array('tracking_code' => $this->trackingCode, 'carrier' => $this->carrier));
         } catch (\EasyPost\Error $ex) {
-            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Create Easypost Tracker (' . $this->trackingCode . ' - ' . $this->carrier . ')', $ex));
+            if (!App::environment('local')) {
+                Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Create Easypost Tracker (' . $this->trackingCode . ' - ' . $this->carrier . ')', $ex));
+            }
+
         }
     }
 
     /**
      * The job failed to process.
      *
-     * @param  Exception  $exception
+     * @param Exception $exception
      * @return void
      */
     public function failed($exception)
     {
-        Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Create Easypost Tracker (' . $this->trackingCode . ' - ' . $this->carrier . ')', $exception));
+        if (!App::environment('local')) {
+            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Create Easypost Tracker (' . $this->trackingCode . ' - ' . $this->carrier . ')', $exception));
+        }
     }
 
 }
