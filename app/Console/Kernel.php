@@ -25,6 +25,7 @@ class Kernel extends ConsoleKernel
         Commands\PurchaseInvoices\ImportUpsPurchaseInvoices::class,
         Commands\PurchaseInvoices\ImportDhlPurchaseInvoices::class,
         Commands\PurchaseInvoices\ImportPrimaryFreightPurchaseInvoices::class,
+        Commands\PurchaseInvoices\ImportTntPurchaseInvoices::class,
         Commands\Transend\SendJobs::class,
         Commands\Transend\CancelJobs::class,
         Commands\Transend\ProcessFiles::class,
@@ -86,14 +87,15 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:import-ups-purchase-invoices')->weekdays()->hourly()->between('9:00', '18:00');
         $schedule->command('ifs:import-dhl-purchase-invoices')->weekdays()->hourly()->between('9:00', '18:00');
         $schedule->command('ifs:import-primary-freight-purchase-invoices')->weekdays()->hourly()->between('9:00', '18:00');
+        $schedule->command('ifs:import-tnt-purchase-invoices')->weekdays()->hourly()->between('9:00', '18:00');
         $schedule->command('ifs:update-scs-job-numbers-on-purchase-invoice-lines')->weekdays()->dailyAt('05:30');
 
         /*
          * Transend
          */
-        $schedule->command('transend:send')->weekdays()->everyFiveMinutes()->withoutOverlapping()->between('7:10', '20:25');
-        $schedule->command('transend:cancel')->weekdays()->everyFiveMinutes()->withoutOverlapping()->between('7:10', '20:25');
-        $schedule->command('transend:process-files')->weekdays()->everyFiveMinutes()->withoutOverlapping()->between('8:00', '20:25');
+        $schedule->command('transend:send')->weekdays()->everyFiveMinutes()->withoutOverlapping()->between('6:10', '19:25');
+        $schedule->command('transend:cancel')->weekdays()->everyFiveMinutes()->withoutOverlapping()->between('6:10', '19:25');
+        $schedule->command('transend:process-files')->weekdays()->everyFiveMinutes()->withoutOverlapping()->between('7:00', '19:25');
 
         /*
          * Shipment related
