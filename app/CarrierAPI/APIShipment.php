@@ -19,7 +19,7 @@ use \Carbon\Carbon;
 
 /**
  * APIShipment Class.
- * 
+ *
  * This class contains an object orientated view of
  * the shipment. This is best suited to the external
  * API view. The class provides a function translate
@@ -171,33 +171,12 @@ class APIShipment
     }
 
     /**
-     * Processes $this->input and Converts specified
-     * fields flags from Y/ N to boolean in $this->input
-     * 
-     * @return  none  - Updates $this->input
-     */
-    private function fixFlags()
-    {
-
-        $fields = 'carrier_pickup_required, documents_flag';
-
-        $opts = ['N' => '0', 'Y' => '1'];
-        $fldArray = explode(',', $fields);
-        foreach ($fldArray as $field) {
-            if (isset($this->data[$field])) {
-                if (isset($opts[$this->data[$field]])) {
-                    $this->data[$field] = $opts[$this->data[$field]];
-                }
-            }
-        }
-    }
-
-    /**
      * Function loads Shipment data into class variables
-     * 
+     *
      * @param array $shipmentData
      * @return none Updates $this->errors
-     */ public function load($shipmentData)
+     */
+    public function load($shipmentData)
     {
         $fields = array_keys($shipmentData);
         foreach ($fields as $field) {
@@ -209,7 +188,7 @@ class APIShipment
 
     /**
      * Function loads Shipment data into class variables
-     * 
+     *
      * @param array $shipment
      * @return none Updates $this->errors
      */
@@ -231,7 +210,7 @@ class APIShipment
 
     /**
      * Function clears all errors caught
-     * 
+     *
      * @return none Clears $this->errors
      */
     public function clearErrors()
@@ -339,117 +318,91 @@ class APIShipment
         }
     }
 
+    /**
+     * Processes $this->input and Converts specified
+     * fields flags from Y/ N to boolean in $this->input
+     *
+     * @return  none  - Updates $this->input
+     */
+    private function fixFlags()
+    {
+
+        $fields = 'carrier_pickup_required, documents_flag';
+
+        $opts = ['N' => '0', 'Y' => '1'];
+        $fldArray = explode(',', $fields);
+        foreach ($fldArray as $field) {
+            if (isset($this->data[$field])) {
+                if (isset($opts[$this->data[$field]])) {
+                    $this->data[$field] = $opts[$this->data[$field]];
+                }
+            }
+        }
+    }
+
     /*
      * ************************************
      * Validator Functions
      * ************************************
      */
 
-    /**
-     * Returns a string indicating if the
-     * details for this type of address
-     * are optional or mandatory
-     * 
-     * @param string $type
-     * @return string Either "required" or blank
-     */
-    public function detailsRequired($type)
+    public function validateDeleteShipment($data)
     {
+        $errors = [];
 
-        switch ($type) {
-            case 'sender':
-            case 'recipient':
-                $required = 'required|';
-                break;
+        $rules['user_id'] = 'required|exists:users,id';
+        $rules['shipment_token'] = "required|exists:shipments,token";
 
-            default:
-                $required = '';
-                break;
+        // Do Generic validation
+        $dataValidation = Validator::make($data, $rules);
+
+        if ($dataValidation->fails()) {
+
+            // Return errors as an array
+            $errors = $this->buildValidationErrors($dataValidation->errors());
         }
 
-        return $required;
+        return $errors;
     }
 
-    /**
-     * Create validation rules for a Contact
-     * 
-     * @param string Contact Type
-     * @param array Rules
-     * @return array Validation rules
-     */
-    public function addContactRules($contactType = 'recipient', $rules = '')
+    public function buildValidationErrors($messages)
     {
-        $required = $this->detailsRequired($contactType);
-
-        $rules[$contactType . '_name'] = 'required_without:' . $contactType . '_company_name' . '|string|max:35';
-        $rules[$contactType . '_company_name'] = 'required_without:' . $contactType . '_name' . '|string|max:35';
-        $rules[$contactType . '_telephone'] = $required . 'string|min:8';
-        $rules[$contactType . '_email'] = 'sometimes|email';
-        // $rules[$contact_type . "_account"] = "string|max:12";
-        // $rules[$contact_type . "_account_id"] = "string";
-
-        return $rules;
-    }
-
-    /**
-     * Create validation rules for an Address
-     * 
-     * @param string Address Type
-     * @param array Rules
-     * @return array Validation rules
-     */
-    public function addAddressRules($addressType = 'recipient', $rules = '')
-    {
-        $required = $this->detailsRequired($addressType);
-
-        $rules[$addressType . '_address1'] = $required . 'string|max:35';
-        $rules[$addressType . '_address2'] = 'sometimes|string|max:35';
-        $rules[$addressType . '_address3'] = 'sometimes|string|max:35';
-        $rules[$addressType . '_city'] = $required . 'string|max:35';
-        $rules[$addressType . '_state'] = 'sometimes|string|max:35';
-        $rules[$addressType . '_postcode'] = 'sometimes|string|max:10';
-        $rules[$addressType . '_country_code'] = $required . 'exists:countries,country_code';
-        $rules[$addressType . '_type'] = $required . 'in:r,c';
-
-        return $rules;
-    }
-
-    /**
-     * Get Packaging Types
-     * 
-     * @param integer Company id
-     * @param integer Department id
-     * @return String of comma separated packaging types
-     */
-    public function getPackagingTypes($companyId, $modeId)
-    {
-
-        return CompanyPackagingType::where('company_id', $companyId)->where('mode_id', $modeId)->get()->implode('code', ',');
-    }
-
-    /**
-     * Create validation rules for packaging
-     * 
-     * @param integer Company id
-     * @param integer Department id
-     * @return array Validation rules
-     */
-    public function addPackagingRules($companyId, $modeId, $rules)
-    {
-
-        // Check for Company specific packaging (returns a string)
-        $packagingTypes = $this->getPackagingTypes($companyId, $modeId);
-
-        if ($packagingTypes == '') {
-
-            // No Customer Specific rates defined use defaults
-            $packagingTypes = $this->getPackagingTypes(0, $modeId);
+        foreach ($messages->all() as $message) {
+            $errors[] = ucfirst($message);
         }
 
-        // Identify the acceptable Packaging Types for this company (For all services)
-        $rules['packages.*.packaging_code'] = 'required|in:' . $packagingTypes;
+        return $errors;
+    }
 
-        return $rules;
+    public function validateShipment($shipment)
+    {
+        $errors = [];
+
+        $rules = $this->addShipmentRules($shipment);
+
+        // Do Generic validation
+        $shipmentValidation = Validator::make($shipment, $rules);
+
+        if ($shipmentValidation->fails()) {
+
+            // Return errors as an array
+            $errors = $this->buildValidationErrors($shipmentValidation->errors());
+        } else {
+
+            // Do Account Validation
+            $errors = $this->checkPayAccounts($shipment, $errors);
+
+            // Do Postcode Validation
+            $errors = $this->checkPostCodes($shipment, $errors);
+
+            // Validate based on Service limits
+            $errors = $this->checkPackageLimits($shipment, $errors);
+
+            // Check collection date is valid
+            $errors = $this->checkCollectionDate($shipment, $errors);
+        }
+
+        return $errors;
     }
 
     public function addShipmentRules($shipment)
@@ -574,7 +527,11 @@ class APIShipment
             $rules['contents.*.weight_uom'] = 'required|in:kg,lb';
             $rules['contents.*.country_of_manufacture'] = 'required|alpha|size:2';
             $rules['contents.*.unit_weight'] = 'numeric|greater_than_value:0';
-            //$rules['eori'] = 'required|string|max:14';
+
+            if (strtoupper($shipment['sender_country_code']) == 'GB' && !isUkDomestic(strtoupper($shipment['recipient_country_code']))) {
+                $rules['eori'] = 'required|string|max:14';
+            }
+
         }
 
         $rules['label_specification.label_size'] = 'sometimes|in:6X4,A4';
@@ -583,90 +540,111 @@ class APIShipment
         return $rules;
     }
 
-    public function validateDeleteShipment($data)
+    /**
+     * Create validation rules for a Contact
+     *
+     * @param string Contact Type
+     * @param array Rules
+     * @return array Validation rules
+     */
+    public function addContactRules($contactType = 'recipient', $rules = '')
     {
-        $errors = [];
+        $required = $this->detailsRequired($contactType);
 
-        $rules['user_id'] = 'required|exists:users,id';
-        $rules['shipment_token'] = "required|exists:shipments,token";
+        $rules[$contactType . '_name'] = 'required_without:' . $contactType . '_company_name' . '|string|max:35';
+        $rules[$contactType . '_company_name'] = 'required_without:' . $contactType . '_name' . '|string|max:35';
+        $rules[$contactType . '_telephone'] = $required . 'string|min:8';
+        $rules[$contactType . '_email'] = 'sometimes|email';
+        // $rules[$contact_type . "_account"] = "string|max:12";
+        // $rules[$contact_type . "_account_id"] = "string";
 
-        // Do Generic validation
-        $dataValidation = Validator::make($data, $rules);
-
-        if ($dataValidation->fails()) {
-
-            // Return errors as an array
-            $errors = $this->buildValidationErrors($dataValidation->errors());
-        }
-
-        return $errors;
+        return $rules;
     }
 
-    public function validateShipment($shipment)
+    /**
+     * Returns a string indicating if the
+     * details for this type of address
+     * are optional or mandatory
+     *
+     * @param string $type
+     * @return string Either "required" or blank
+     */
+    public function detailsRequired($type)
     {
-        $errors = [];
 
-        $rules = $this->addShipmentRules($shipment);
+        switch ($type) {
+            case 'sender':
+            case 'recipient':
+                $required = 'required|';
+                break;
 
-        // Do Generic validation
-        $shipmentValidation = Validator::make($shipment, $rules);
-
-        if ($shipmentValidation->fails()) {
-
-            // Return errors as an array
-            $errors = $this->buildValidationErrors($shipmentValidation->errors());
-        } else {
-
-            // Do Account Validation
-            $errors = $this->checkPayAccounts($shipment, $errors);
-
-            // Do Postcode Validation
-            $errors = $this->checkPostCodes($shipment, $errors);
-
-            // Validate based on Service limits
-            $errors = $this->checkPackageLimits($shipment, $errors);
-
-            // Check collection date is valid
-            $errors = $this->checkCollectionDate($shipment, $errors);
+            default:
+                $required = '';
+                break;
         }
 
-        return $errors;
+        return $required;
     }
 
-    public function getServiceLimits($serviceId)
+    /**
+     * Create validation rules for an Address
+     *
+     * @param string Address Type
+     * @param array Rules
+     * @return array Validation rules
+     */
+    public function addAddressRules($addressType = 'recipient', $rules = '')
+    {
+        $required = $this->detailsRequired($addressType);
+
+        $rules[$addressType . '_address1'] = $required . 'string|max:35';
+        $rules[$addressType . '_address2'] = 'sometimes|string|max:35';
+        $rules[$addressType . '_address3'] = 'sometimes|string|max:35';
+        $rules[$addressType . '_city'] = $required . 'string|max:35';
+        $rules[$addressType . '_state'] = 'sometimes|string|max:35';
+        $rules[$addressType . '_postcode'] = 'sometimes|string|max:10';
+        $rules[$addressType . '_country_code'] = $required . 'exists:countries,country_code';
+        $rules[$addressType . '_type'] = $required . 'in:r,c';
+
+        return $rules;
+    }
+
+    /**
+     * Create validation rules for packaging
+     *
+     * @param integer Company id
+     * @param integer Department id
+     * @return array Validation rules
+     */
+    public function addPackagingRules($companyId, $modeId, $rules)
     {
 
-        $service = Service::find($serviceId)->first();
-        if ($service) {
+        // Check for Company specific packaging (returns a string)
+        $packagingTypes = $this->getPackagingTypes($companyId, $modeId);
 
-            if ($service->volumetric_divisor > 0) {
-                $this->divisor = $service->volumetric_divisor;
-            }
+        if ($packagingTypes == '') {
 
-            if ($service->min_weight > 0) {
-                $this->minAllowedWeight = $service->min_weight;
-            }
-
-            if ($service->max_weight > 0) {
-                $this->maxAllowedWeight = $service->max_weight;
-            }
-
-            if ($service->max_pieces > 0) {
-                $this->maxAllowedPieces = $service->max_pieces;
-            }
-
-            if ($service->max_dimension > 0) {
-                $this->maxAllowedDimension = $service->max_dimension;
-            }
-
-            if ($service->max_girth > 0) {
-                $this->maxAllowedGirth = $service->max_girth;
-            }
-
-            if ($service->max_customs_value > 0) {
-                $this->maxAllowedValue = $service->max_customs_value;
-            }
+            // No Customer Specific rates defined use defaults
+            $packagingTypes = $this->getPackagingTypes(0, $modeId);
         }
+
+        // Identify the acceptable Packaging Types for this company (For all services)
+        $rules['packages.*.packaging_code'] = 'required|in:' . $packagingTypes;
+
+        return $rules;
+    }
+
+    /**
+     * Get Packaging Types
+     *
+     * @param integer Company id
+     * @param integer Department id
+     * @return String of comma separated packaging types
+     */
+    public function getPackagingTypes($companyId, $modeId)
+    {
+
+        return CompanyPackagingType::where('company_id', $companyId)->where('mode_id', $modeId)->get()->implode('code', ',');
     }
 
     public function checkPayAccounts($shipment, $errors)
@@ -796,6 +774,42 @@ class APIShipment
         return $errors;
     }
 
+    public function getServiceLimits($serviceId)
+    {
+
+        $service = Service::find($serviceId)->first();
+        if ($service) {
+
+            if ($service->volumetric_divisor > 0) {
+                $this->divisor = $service->volumetric_divisor;
+            }
+
+            if ($service->min_weight > 0) {
+                $this->minAllowedWeight = $service->min_weight;
+            }
+
+            if ($service->max_weight > 0) {
+                $this->maxAllowedWeight = $service->max_weight;
+            }
+
+            if ($service->max_pieces > 0) {
+                $this->maxAllowedPieces = $service->max_pieces;
+            }
+
+            if ($service->max_dimension > 0) {
+                $this->maxAllowedDimension = $service->max_dimension;
+            }
+
+            if ($service->max_girth > 0) {
+                $this->maxAllowedGirth = $service->max_girth;
+            }
+
+            if ($service->max_customs_value > 0) {
+                $this->maxAllowedValue = $service->max_customs_value;
+            }
+        }
+    }
+
     public function checkCollectionDate($shipment, $errors)
     {
 
@@ -810,15 +824,6 @@ class APIShipment
 
         if ($now->gt($cutoffTime)) {
             $errors[] = "Past todays collection cut-off time (" . $cutoffTime->format('h:ia') . ")";
-        }
-
-        return $errors;
-    }
-
-    public function buildValidationErrors($messages)
-    {
-        foreach ($messages->all() as $message) {
-            $errors[] = ucfirst($message);
         }
 
         return $errors;
