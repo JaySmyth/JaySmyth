@@ -1313,7 +1313,7 @@ class Shipment extends Model
      */
     public function originatesFromBtPostcode()
     {
-        $prefix = strtoupper(substr($this->sender_postcode, 0, 2));
+        $prefix = strtoupper(substr(trim($this->sender_postcode), 0, 2));
 
         if ($prefix == 'BT' && strtoupper($this->sender_country_code) == 'GB') {
             return true;
