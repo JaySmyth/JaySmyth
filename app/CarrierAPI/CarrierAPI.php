@@ -6,32 +6,32 @@
  * @todo Complete the following functions
  *
  * function getServiceByDest($shipment, $possibleServices);
+
  *
  */
 
 namespace App\CarrierAPI;
 
-use App\CarrierAPI\CWide\CWideAPI;
-use App\CarrierAPI\DHL\DHLAPI;
-use App\CarrierAPI\DHLGlobalMail\DHLGlobalMailAPI;
-use App\CarrierAPI\Fedex\FedexAPI;
-use App\CarrierAPI\IFS\IFSAPI;
-use App\CarrierAPI\PrimaryFreight\PrimaryFreightAPI;
-use App\CarrierAPI\TNT\TNTAPI;
-use App\CarrierAPI\UPS\UPSAPI;
+use DB;
 use App\Company;
-use App\Country;
-use App\Department;
-use App\Mode;
-use App\Pricing\Facades\Pricing;
 use App\Service;
+use App\Department;
 use App\Shipment;
 use App\State;
-use Carbon\Carbon;
-use DB;
-use Exception;
+use App\Mode;
+use App\Country;
+use App\CarrierAPI\Fedex\FedexAPI;
+use App\CarrierAPI\DHL\DHLAPI;
+use App\CarrierAPI\UPS\UPSAPI;
+use App\CarrierAPI\TNT\TNTAPI;
+use App\CarrierAPI\PrimaryFreight\PrimaryFreightAPI;
+use App\CarrierAPI\IFS\IFSAPI;
+use App\CarrierAPI\CWide\CWideAPI;
+use App\CarrierAPI\DHLGlobalMail\DHLGlobalMailAPI;
+use App\Pricing\Facades\Pricing;
 use TCPDI;
-
+use Carbon\Carbon;
+use Exception;
 
 /**
  * Description of CarrierWebServices.
@@ -424,7 +424,7 @@ class CarrierAPI
                 $service = $this->company
                     ->getServicesForMode($shipment['mode_id'])
                     ->where('code', $shipment['service_code'])
-                    ->where('carrier_id', (string)$shipment['carrier_id'])// Carrier_id needs to be typecast to string
+                    ->where('carrier_id', (string) $shipment['carrier_id']) // Carrier_id needs to be typecast to string
                     ->first();
 
                 if (!empty($service)) {
@@ -449,9 +449,9 @@ class CarrierAPI
      * Identies the correct Supplier Account
      * Number to use
      *
-     * @param integer companyID
-     * @param integer carrierID
-     * @param integer serviceID
+     * @param  integer companyID
+     * @param  integer carrierID
+     * @param  integer serviceID
      * @return string Account number
      */
     private function getServiceAcct($companyId, $carrierId, $serviceId)
@@ -515,14 +515,6 @@ class CarrierAPI
 
         return $data;
     }
-
-    /*
-     * *********************************************
-     * *********************************************
-     * Start of Interface Calls
-     * *********************************************
-     * *********************************************
-     */
 
     /**
      * Update Shipment tables with Shipment data
@@ -1278,9 +1270,9 @@ class CarrierAPI
      * Takes an unaltered PDF from a carrier and returns it in the size requested
      * with the addition of printing/folding instructions for A4/LETTER sizes.
      *
-     * @param mixed $shipment Loaded shipment model or shipment identifier.
-     * @param string $size Size of the PDF document required (accepts codes defined in print formats table).
-     * @param string $output Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
+     * @param   mixed   $shipment   Loaded shipment model or shipment identifier.
+     * @param   string  $size       Size of the PDF document required (accepts codes defined in print formats table).
+     * @param   string  $output     Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
      *
      * @return  mixed
      */
@@ -1293,9 +1285,9 @@ class CarrierAPI
     /**
      * Get a batch of labels
      *
-     * @param mixed $shipment_id Loaded shipment model or shipment identifier.
-     * @param string $size Size of the PDF document required (accepts codes defined in print formats table).
-     * @param string $output Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
+     * @param   mixed   $shipment_id   Loaded shipment model or shipment identifier.
+     * @param   string  $size       Size of the PDF document required (accepts codes defined in print formats table).
+     * @param   string  $output     Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
      *
      * @return  mixed
      */
@@ -1343,10 +1335,10 @@ class CarrierAPI
     /**
      * Generates a commercial invoice.
      *
-     * @param string $token Shipment identifier.
-     * @param array $parameters An array of options for customising invoice.
-     * @param string $size Size of the PDF document required (accepts codes defined in print formats table).
-     * @param string $output Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
+     * @param   string  $token      Shipment identifier.
+     * @param   array   $parameters An array of options for customising invoice.
+     * @param   string  $size       Size of the PDF document required (accepts codes defined in print formats table).
+     * @param   string  $output     Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
      *
      * @return  mixed
      */
@@ -1359,8 +1351,8 @@ class CarrierAPI
     /**
      * Generates a CN22.
      *
-     * @param string $token Shipment identifier.
-     * @param string $output Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
+     * @param   string  $token      Shipment identifier.
+     * @param   string  $output     Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
      *
      * @return  mixed
      */
@@ -1382,13 +1374,6 @@ class CarrierAPI
     {
         $pdf = new Pdf($size, $output);
         return $pdf->createDespatchNote($token);
-    }
-
-    private function debugSQL()
-    {
-        \Illuminate\Support\Facades\DB::listen(function ($sql) {
-            var_dump($sql);
-        });
     }
 
 }
