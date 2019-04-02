@@ -38,7 +38,7 @@ function inc(&$var, $value)
 
 /**
  * Un-dot a flattened array
- * 
+ *
  * @param array $array
  * @return array
  */
@@ -72,7 +72,7 @@ function trimData($data)
 
 /**
  * Get specific routing value for a given postcode.
- * 
+ *
  * @param type $postcode
  * @param type $day
  * @return type
@@ -90,7 +90,7 @@ function getRouteValue($postcode, $value = 'collection_route', $day = 1)
 
 /**
  * Get collection settings for a postcode.
- * 
+ *
  * @param type $postcode
  * @param type $day
  * @return type
@@ -733,7 +733,7 @@ function booleanToYn($value)
 function convertToUTF8($data)
 {
     if (is_array($data)) {
-        array_walk_recursive($data, function(&$item, $key) {
+        array_walk_recursive($data, function (&$item, $key) {
             $charSet = mb_detect_encoding($item, ['UTF-8', 'ISO-8859-1', 'Windows-1251'], false);
             if ($charSet != 'UTF-8') {
                 $item = iconv($charSet, 'UTF-8', $item);
@@ -865,8 +865,7 @@ function gmtToCarbonUtc($datetime)
 {
     $datetime = toCarbon($datetime);
 
-    return $datetime;
-    //return $datetime->subHour(1);
+    return $datetime->subHour(1);
 }
 
 /**
@@ -939,7 +938,7 @@ function calcVat($countryCode, $valueOfGoods, $vatExempt)
             $vatDetails['vat_code'] = 'Z';
         } else {
 
-            $percent = (float) \App\VatCodes::where('code', '1')->first()->percent;
+            $percent = (float)\App\VatCodes::where('code', '1')->first()->percent;
 
             // Goods are not Exempt
             if ($valueOfGoods > 0) {
@@ -1100,7 +1099,7 @@ function identifyDepartment($shipment)
 
 /**
  * Obtain value from json encoded data.
- * 
+ *
  * @param string $json
  * @param string $key
  * @return mixed
@@ -1196,12 +1195,12 @@ function nextAvailable($sequenceType)
 
 /**
  * Write a csv file to given path.
- * 
+ *
  * @param type $path
  * @param type $data
  * @param type $mode
  */
-function writeCsv($path, $data, $mode = 'w', $delimiter=',')
+function writeCsv($path, $data, $mode = 'w', $delimiter = ',')
 {
     $handle = fopen($path, $mode);
     foreach ($data as $row) {
@@ -1218,7 +1217,7 @@ function writeCsv($path, $data, $mode = 'w', $delimiter=',')
 
 /**
  * An array of excel column names.
- * 
+ *
  * @param int $numberOfColumns
  * @return array
  */
@@ -1676,8 +1675,8 @@ function fixShipmentCase($shipment)
 {
     // UPPERCASE (Note: important no spaces in list)
     $fields = 'bill_shipping_account,bill_tax_duty_account,country_of_destination,currency_code,sender_country_code,'
-            . 'sender_postcode,recipient_postcode,other_country_code,recipient_country_code,other_postcode,'
-            . 'customs_value_currency_code';
+        . 'sender_postcode,recipient_postcode,other_country_code,recipient_country_code,other_postcode,'
+        . 'customs_value_currency_code';
     $changeArray = explode(',', $fields);
     foreach ($changeArray as $field) {
         if (isset($shipment[$field])) {
@@ -1687,7 +1686,7 @@ function fixShipmentCase($shipment)
 
     // LOWERCASE (Note: important no spaces in list)
     $fields = 'carrier_code,service_code,bill_shipping,bill_tax_duty,ship_reason,weight_uom,dimension_uom,'
-            . 'recipient_type,other_type,terms_of_sale,commodity_uom,dims_uom';
+        . 'recipient_type,other_type,terms_of_sale,commodity_uom,dims_uom';
 
     $changeArray = explode(',', $fields);
     foreach ($changeArray as $field) {
@@ -1749,7 +1748,7 @@ function calcDiscPercentage($currentVal, $uploadedVal)
 
 /**
  * Log changes to Rates Tables
- * 
+ *
  * @param type $userId
  * @param type $companyId
  * @param type $serviceId
@@ -1761,20 +1760,20 @@ function calcDiscPercentage($currentVal, $uploadedVal)
 function logRateChange($userId, $companyId, $serviceId, $rateId, $directory = '', $fileName = '', $action = '')
 {
     return App\RateChangeLogs::create(
-                    [
-                        'user_id' => $userId,
-                        'company_id' => $companyId,
-                        'service_id' => $serviceId,
-                        'rate_id' => $rateId,
-                        'directory' => $directory,
-                        'filename' => $fileName,
-                        'action' => $action,
-                    ]
+        [
+            'user_id' => $userId,
+            'company_id' => $companyId,
+            'service_id' => $serviceId,
+            'rate_id' => $rateId,
+            'directory' => $directory,
+            'filename' => $fileName,
+            'action' => $action,
+        ]
     );
 }
 
 /**
- * 
+ *
  * @param type $sql
  * @param type $params
  * @return SQL_String
@@ -1803,7 +1802,7 @@ function girth($length, $width, $height)
 
 /**
  * Integer to string representation of day.
- * 
+ *
  * @param int $day
  * @return string
  */
