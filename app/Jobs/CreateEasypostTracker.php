@@ -27,13 +27,13 @@ class CreateEasypostTracker implements ShouldQueue
     public function __construct($trackingCode, $carrier)
     {
         $this->trackingCode = $trackingCode;
-        $this->carrier = $carrier;        
-        $this->key = config('services.easypost.key');                
+        $this->carrier = $carrier;
+        $this->key = config('services.easypost.key');
     }
 
     /**
      * Execute the job.
-     * 
+     *
      * @return void
      */
     public function handle()

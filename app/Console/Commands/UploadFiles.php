@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use League\Flysystem\Filesystem;
-use League\Flysystem\Sftp\SftpAdapter;
 use Illuminate\Support\Facades\Mail;
-use Carbon\Carbon;
+use League\Flysystem\Sftp\SftpAdapter;
 
 class UploadFiles extends Command
 {
@@ -148,117 +148,19 @@ class UploadFiles extends Command
 
         if (is_array($data) && count($data) > 0) {
             $this->log(count($data) . " records to upload");
+
+            // Add a heading row if required
+            if ($fileUpload->fileUploadHost->heading_row) {
+                $headings = array_keys($data[0]);
+                array_unshift($data, $headings);
+            }
+
             return writeCsv(storage_path() . '/app/temp/' . time() . str_random(3) . '.csv', $data, 'w', $fileUpload->fileUploadHost->csv_delimiter);
         }
 
         $this->log("No data to transfer", 'error');
 
         return null;
-    }
-
-    /**
-     * Generate a filename.
-     *
-     * @param type $fileUpload
-     * @return string
-     */
-    protected function getFilename($fileUpload)
-    {
-        $fileName = $fileUpload->type . '_' . date('d_m_y', time()) . '_' . time() . $fileUpload->id . '.csv';
-
-        if ($fileUpload->upload_directory) {
-            $fileName = $fileUpload->upload_directory . '/' . $fileName;
-        }
-        return $fileName;
-    }
-
-    /**
-     * Upload file to host.
-     *
-     * @param type $filePath
-     * @param type $host
-     * @return type
-     */
-    protected function connect($host)
-    {
-        $this->log("Connecting to remote host: " . $host->host . ":" . $host->port);
-
-        switch ($host->sftp) {
-
-            case 1:
-                $adapter = new SftpAdapter([
-                    'host' => $host->host,
-                    'port' => $host->port,
-                    'username' => $host->username,
-                    'password' => $host->password,
-                    'privateKey' => $host->private_key,
-                    'root' => $host->directory,
-                    'timeout' => $host->timeout,
-                    'directoryPerm' => $host->direcory_permissions
-                ]);
-
-                try {
-                    $filesystem = new Filesystem($adapter);
-                } catch (\Exception $exc) {
-                    $this->log($exc->getMessage(), 'error');
-                    return false;
-                }
-
-                return $filesystem;
-
-            default:
-
-                $connection = ftp_connect($host->host);
-                $loginResult = ftp_login($connection, $host->username, $host->password);
-
-                // Turn on passive mode
-                if ($host->passive) {
-                    ftp_pasv($connection, true);
-                }
-
-                // Check connection was made
-                if ((!$connection) || (!$loginResult)) {
-                    $this->log("Unable to connect to FTP host -> " . $host->host, 'error');
-                    return false;
-                }
-
-                return $connection;
-        }
-    }
-
-    /**
-     * Upload file to host.
-     *
-     * @param type $filePath
-     * @param type $host
-     * @return type
-     */
-    protected function upload($filename, $tempFile, $connection)
-    {
-        $this->log("Attempting to upload $filename");
-
-        if ($connection instanceof \League\Flysystem\Filesystem) {
-
-            try {
-                $result = $connection->write($filename, fopen($tempFile, 'r'));
-                $this->log("UPLOAD SUCCESS: $filename");
-            } catch (\Exception $exc) {
-                $this->log($exc->getMessage(), 'error');
-                return false;
-            }
-
-            return $result;
-        }
-
-        /*
-         * Standard FTP.
-         */
-        $result = ftp_put($connection, $filename, $tempFile, FTP_BINARY);
-
-        // Close the connection
-        ftp_close($connection);
-
-        return $result;
     }
 
     /**
@@ -271,70 +173,6 @@ class UploadFiles extends Command
     {
         $this->log[] = $message;
         $this->$method($message);
-    }
-
-    /**
-     * Log the upload results, send failure email or update last_upload timestamp.
-     *
-     * @param type $param
-     */
-    protected function finishJob($fileUpload, $uploaded = false, $tempFile = false)
-    {
-        $fileUpload->last_status = $uploaded;
-        $fileUpload->update();
-
-        if (!$uploaded) {
-            $fileUpload->retry(10);
-            $this->log("*** Upload will be attempted again in 10 minutes ***");
-            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('File Upload Failed', $this->log, $tempFile));
-        }
-
-        $log = \App\FileUploadLog::create([
-                    'output' => implode("<br>", $this->log),
-                    'uploaded' => $uploaded,
-                    'file_upload_id' => $fileUpload->id
-        ]);
-
-        if ($uploaded) {
-            $fileUpload->last_upload = Carbon::now();
-            $fileUpload->setNextUpload();
-
-            // Update "sent" flag on records after successful transfer
-            \App\Shipment::whereIn('id', $this->idsSent)->update([$fileUpload->type . '_sent' => 1]);
-        }
-    }
-
-    /**
-     * POD - get an array of shipment data. Shipments delivered but POD not sent.
-     *
-     * @param type $criteria
-     * @return array
-     */
-    protected function getPodShipments($companyId)
-    {
-        return \App\Shipment::whereDelivered(1)->wherePodSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
-    }
-
-    /**
-     * POD - get an array of shipment data. Shipments delivered but POD not sent.
-     *
-     * @param type $criteria
-     * @return array
-     */
-    protected function getReceivedShipments($companyId)
-    {
-        return \App\Shipment::whereReceived(1)->whereReceivedSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
-    }
-
-    /**
-     * Shipments created (ignore saved/cancelled shipments).
-     *
-     * @param type $criteria
-     * @return array
-     */
-    protected function getCreatedShipments($companyId)
-    {
-        return \App\Shipment::whereNotIn('status_id', [1, 7])->whereCreatedSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
     }
 
     /**
@@ -412,6 +250,175 @@ class UploadFiles extends Command
         endforeach;
 
         return $data;
+    }
+
+    /**
+     * Log the upload results, send failure email or update last_upload timestamp.
+     *
+     * @param type $param
+     */
+    protected function finishJob($fileUpload, $uploaded = false, $tempFile = false)
+    {
+        $fileUpload->last_status = $uploaded;
+        $fileUpload->update();
+
+        if (!$uploaded) {
+            $fileUpload->retry(10);
+            $this->log("*** Upload will be attempted again in 10 minutes ***");
+            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('File Upload Failed', $this->log, $tempFile));
+        }
+
+        $log = \App\FileUploadLog::create([
+            'output' => implode("<br>", $this->log),
+            'uploaded' => $uploaded,
+            'file_upload_id' => $fileUpload->id
+        ]);
+
+        if ($uploaded) {
+            $fileUpload->last_upload = Carbon::now();
+            $fileUpload->setNextUpload();
+
+            // Update "sent" flag on records after successful transfer
+            \App\Shipment::whereIn('id', $this->idsSent)->update([$fileUpload->type . '_sent' => 1]);
+        }
+    }
+
+    /**
+     * Upload file to host.
+     *
+     * @param type $filePath
+     * @param type $host
+     * @return type
+     */
+    protected function connect($host)
+    {
+        $this->log("Connecting to remote host: " . $host->host . ":" . $host->port);
+
+        switch ($host->sftp) {
+
+            case 1:
+                $adapter = new SftpAdapter([
+                    'host' => $host->host,
+                    'port' => $host->port,
+                    'username' => $host->username,
+                    'password' => $host->password,
+                    'privateKey' => $host->private_key,
+                    'root' => $host->directory,
+                    'timeout' => $host->timeout,
+                    'directoryPerm' => $host->direcory_permissions
+                ]);
+
+                try {
+                    $filesystem = new Filesystem($adapter);
+                } catch (\Exception $exc) {
+                    $this->log($exc->getMessage(), 'error');
+                    return false;
+                }
+
+                return $filesystem;
+
+            default:
+
+                $connection = ftp_connect($host->host);
+                $loginResult = ftp_login($connection, $host->username, $host->password);
+
+                // Turn on passive mode
+                if ($host->passive) {
+                    ftp_pasv($connection, true);
+                }
+
+                // Check connection was made
+                if ((!$connection) || (!$loginResult)) {
+                    $this->log("Unable to connect to FTP host -> " . $host->host, 'error');
+                    return false;
+                }
+
+                return $connection;
+        }
+    }
+
+    /**
+     * Generate a filename.
+     *
+     * @param type $fileUpload
+     * @return string
+     */
+    protected function getFilename($fileUpload)
+    {
+        $fileName = $fileUpload->type . '_' . date('d_m_y', time()) . '_' . time() . $fileUpload->id . '.csv';
+
+        if ($fileUpload->upload_directory) {
+            $fileName = $fileUpload->upload_directory . '/' . $fileName;
+        }
+        return $fileName;
+    }
+
+    /**
+     * Upload file to host.
+     *
+     * @param type $filePath
+     * @param type $host
+     * @return type
+     */
+    protected function upload($filename, $tempFile, $connection)
+    {
+        $this->log("Attempting to upload $filename");
+
+        if ($connection instanceof \League\Flysystem\Filesystem) {
+
+            try {
+                $result = $connection->write($filename, fopen($tempFile, 'r'));
+                $this->log("UPLOAD SUCCESS: $filename");
+            } catch (\Exception $exc) {
+                $this->log($exc->getMessage(), 'error');
+                return false;
+            }
+
+            return $result;
+        }
+
+        /*
+         * Standard FTP.
+         */
+        $result = ftp_put($connection, $filename, $tempFile, FTP_BINARY);
+
+        // Close the connection
+        ftp_close($connection);
+
+        return $result;
+    }
+
+    /**
+     * POD - get an array of shipment data. Shipments delivered but POD not sent.
+     *
+     * @param type $criteria
+     * @return array
+     */
+    protected function getPodShipments($companyId)
+    {
+        return \App\Shipment::whereDelivered(1)->wherePodSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
+    }
+
+    /**
+     * POD - get an array of shipment data. Shipments delivered but POD not sent.
+     *
+     * @param type $criteria
+     * @return array
+     */
+    protected function getReceivedShipments($companyId)
+    {
+        return \App\Shipment::whereReceived(1)->whereReceivedSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
+    }
+
+    /**
+     * Shipments created (ignore saved/cancelled shipments).
+     *
+     * @param type $criteria
+     * @return array
+     */
+    protected function getCreatedShipments($companyId)
+    {
+        return \App\Shipment::whereNotIn('status_id', [1, 7])->whereCreatedSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
     }
 
 }

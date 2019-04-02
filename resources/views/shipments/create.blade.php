@@ -438,7 +438,7 @@
                                 <div class="form-group row">
                                     {!! Form::Label('EORI:', null, array('class' => 'col-md-5 col-form-label')) !!}
                                     <div class="col-md-7">
-                                        {!! Form::Text('eori', old('eori'), ['id' => 'eori', 'class' =>'form-control form-control-sm', 'maxlength' => '50']) !!}
+                                        {!! Form::Text('eori', old('eori'), ['id' => 'eori', 'class' =>'form-control form-control-sm', 'maxlength' => '14']) !!}
                                     </div>
                                 </div>
                             </div>
