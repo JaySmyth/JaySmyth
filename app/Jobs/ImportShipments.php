@@ -462,6 +462,7 @@ class ImportShipments implements ShouldQueue
         $this->row['country_of_destination'] = $this->row['recipient_country_code'];
         $this->row['department_id'] = Department::where('code', identifyDepartment($this->row))->first()->id;
         $this->row['alerts'] = (isset($this->userPreferences['alerts'])) ? $this->userPreferences['alerts'] : [];
+        $this->row['other_email'] = (isset($this->userPreferences['other_email'])) ? $this->userPreferences['other_email'] : "";
         $this->row['product_quantity'] = (empty($this->row['product_quantity'])) ? 1 : $this->row['product_quantity'];
 
         // If Recipient Type not specified then Guess
