@@ -56,6 +56,54 @@ class CarrierAPI
 
     }
 
+    public function buildCarrier($carrier_code = 'fedex')
+    {
+
+        $this->carrier = null;
+        switch (strtolower($carrier_code)) {
+            case 'fedex':
+                $this->carrier = new FedexAPI($this->mode);
+                break;
+
+            case 'cwide':
+                $this->carrier = new CWideAPI($this->mode);
+                break;
+
+            case 'ups':
+                $this->carrier = new UPSAPI($this->mode);
+                break;
+
+            case 'dhl':
+                $this->carrier = new DHLAPI($this->mode);
+                break;
+
+            case 'tnt':
+                $this->carrier = new TNTAPI($this->mode);
+                break;
+
+            case 'pri':
+                $this->carrier = new PrimaryFreightAPI($this->mode);
+                break;
+
+            case 'easypost':
+                $this->carrier = new EasyPostAPI($this->mode);
+                break;
+
+            case 'ifs':
+                $this->carrier = new IFSAPI($this->mode);
+                break;
+
+            case 'dhlmail':
+                $this->carrier = new DHLGlobalMailAPI($this->mode);
+                break;
+
+            default:
+                // Do Nothing
+                dd('Unable to build carrier for : ' . strtolower($carrier_code));
+                break;
+        }
+    }
+
     /**
      * Accepts Shipment details and returns all services
      * that are available and appropriate for the shipment
@@ -128,101 +176,6 @@ class CarrierAPI
         }
 
         return $availableServices;
-    }
-
-    /**
-     * Checks addresses and performs any necessary Overrides
-     *
-     * @param type $shipment
-     * @return string
-     */
-    public function checkAddresses($shipment)
-    {
-
-        if (isset($this->company->shipper_type_override) && $this->company->shipper_type_override > "") {
-            $shipment['shipper_type'] = $this->company->shipper_type_override;
-        }
-
-        if (isset($this->company->recipient_type_override) && $this->company->recipient_type_override > "") {
-            $shipment['recipient_type'] = $this->company->recipient_type_override;
-        }
-
-        /*
-         * ***************************************************************
-         *  Ensure country codes for Jersey and Guernsey are correctly set
-         * ***************************************************************
-         */
-        if (isset($shipment['recipient_postcode'])) {
-
-            // If country code has been set to GB then change
-            if (isset($shipment['recipient_country_code']) && $shipment['recipient_country_code'] == 'GB') {
-
-                // Take first 2 chars of the postcode
-                $prefix = strtoupper(substr($shipment['recipient_postcode'], 0, 2));
-                switch ($prefix) {
-                    case 'GY':
-                        $shipment['recipient_country_code'] = 'GG';
-                        break;
-
-                    case 'IM':
-                        $shipment['recipient_country_code'] = 'IM';
-                        break;
-
-                    case 'JE':
-                        $shipment['recipient_country_code'] = 'JE';
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-        }
-
-        return $shipment;
-    }
-
-    public function isCollect($shipment)
-    {
-
-        /*
-         * ********************************************
-         * To be a collect shipment, bill_shipping must
-         * be "Recipient" and the carrier must be Fedex
-         * (Other Carriers not supported)
-         * ********************************************
-         */
-
-        if (isset($shipment['bill_shipping']) && $shipment['bill_shipping'] == 'recipient') {
-
-            return TRUE;
-        }
-
-        return FALSE;
-    }
-
-    public function setEnvironment($mode = '')
-    {
-
-        // if mode is defined then use it
-        $env_mode = ($mode > "") ? $mode : \App::environment();
-
-        // If Environment variable set to Production, then change mode
-        switch (strtoupper($env_mode)) {
-
-            case 'PRODUCTION':
-            case 'TESTING':
-                $this->mode = 'production';
-                break;
-
-            case 'LOCAL':
-            case 'TEST':
-                $this->mode = 'test';
-                break;
-
-            default:
-                dd('Unknown Mode : *' . $env_mode . '*');
-                break;
-        }
     }
 
     /**
@@ -338,6 +291,38 @@ class CarrierAPI
         return false;
     }
 
+    public function isCollect($shipment)
+    {
+
+        /*
+         * ********************************************
+         * To be a collect shipment, bill_shipping must
+         * be "Recipient" and the carrier must be Fedex
+         * (Other Carriers not supported)
+         * ********************************************
+         */
+
+        if (isset($shipment['bill_shipping']) && $shipment['bill_shipping'] == 'recipient') {
+
+            return TRUE;
+        }
+
+        return FALSE;
+    }
+
+    public function zeroPrices($prices)
+    {
+
+        $prices['shipping_cost'] = 0;
+        $prices['shipping_charge'] = 0;
+        $prices['cost_currency'] = '';
+        $prices['sales_currency'] = '';
+        $prices['sales'] = [];
+        $prices['costs'] = [];
+
+        return $prices;
+    }
+
     public function formatService($cnt, $serviceDetails, $prices)
     {
 
@@ -415,53 +400,354 @@ class CarrierAPI
         return $possibleServices;
     }
 
-    public function zeroPrices($prices)
+    /**
+     * Check to see if shipping account is set
+     * If not then attempts to set it
+     * Shipment held in  $this->input
+     *
+     * @return none Updates $this->input
+     */
+    private function setBillToAcct($shipment, $account_type)
     {
 
-        $prices['shipping_cost'] = 0;
-        $prices['shipping_charge'] = 0;
-        $prices['cost_currency'] = '';
-        $prices['sales_currency'] = '';
-        $prices['sales'] = [];
-        $prices['costs'] = [];
+        if (isset($shipment[$account_type . "_account"])) {
+            $account = $shipment[$account_type . "_account"];
+        } else {
+            $account = '';
+        }
 
-        return $prices;
+        // If account not defined or blank and payment is "Bill to Sender" - use service default
+        if (!isset($account) || $account == '') {
+            if (!isset($shipment[$account_type]) || $shipment[$account_type] == 'sender') {
+
+                $service = $this->company
+                    ->getServicesForMode($shipment['mode_id'])
+                    ->where('code', $shipment['service_code'])
+                    ->where('carrier_id', (string)$shipment['carrier_id'])// Carrier_id needs to be typecast to string
+                    ->first();
+
+                if (!empty($service)) {
+
+                    if (!empty($service->pivot->account)) {
+
+                        // Use Companies own account if defined
+                        $account = $service->pivot->account;
+                    } else {
+
+                        // Use Default Service Account no.
+                        $account = $service->account;
+                    }
+                }
+            }
+        }
+
+        return $account;
     }
 
     /**
-     * Creates Shipment with Carrier and updates tables
+     * Identies the correct Supplier Account
+     * Number to use
      *
-     * @param array $data
-     * @param string $mode Used by APIController to overide mode
-     *
-     * @return response
+     * @param integer companyID
+     * @param integer carrierID
+     * @param integer serviceID
+     * @return string Account number
      */
-    public function createShipment($data, $mode = '')
+    private function getServiceAcct($companyId, $carrierId, $serviceId)
     {
 
-        /*
-         * ************************************
-         * Set Environment, fixCase, preprocess
-         * and Validate Shipment
-         * ************************************
-         */
-        $response = [];
-        $this->setEnvironment($mode);
-        //$data = trimData($data);                                                 // Remove any leading/ trailing spaces etc.
-        $data = fixShipmentCase($data);                                         // Ensure all fields use correct case and Flags are boolean
-        $data = $this->preProcess($data);                                       // Complete any missing fields where possible
-        $apiShipment = new APIShipment();                                       // Shipment object with validation rules etc.
+        $account = $this->company->services()
+            ->where('carrier_id', $carrierId)
+            ->where('service_id', $serviceId)
+            ->first()
+            ->pivot
+            ->account;
 
-        $errors = $apiShipment->validateShipment($data);
-        if ($errors == []) {
+        // Returns incorrect field
+        // return Carrier::find($carrierId)->services()->where('service_id', $serviceId)->first()->pivot->account;
 
-            // No Errors, so send and create shipment
-            return $this->sendShipment($data, $mode);
-        } else {
+        return $account;
+    }
 
-            // Return errors
-            return $this->generateErrors($response, $errors);                   // Return with errors
+    /**
+     * Accepts Shipment array and if consignment_number
+     * is blank fn creates it
+     *
+     * @param type $data
+     *
+     * @return array Shipment Details
+     */
+    private function preProcessAddShipment($data)
+    {
+
+        if (!empty($data['alcohol'])) {
+            $data['alcohol_type'] = (isset($data['alcohol']['type'])) ? $data['alcohol']['type'] : '';
+            $data['alcohol_packaging'] = (isset($data['alcohol']['packaging'])) ? $data['alcohol']['packaging'] : '';
+            $data['alcohol_volume'] = (isset($data['alcohol']['volume'])) ? $data['alcohol']['volume'] : '';
+            $data['alcohol_quantity'] = (isset($data['alcohol']['quantity'])) ? $data['alcohol']['quantity'] : '';
         }
+
+        if (!empty($data['dry_ice'])) {
+            $data['dry_ice_flag'] = (isset($data['dry_ice']['flag'])) ? $data['dry_ice']['flag'] : '';
+            $data['dry_ice_weight_per_package'] = (isset($data['dry_ice']['weight_per_package'])) ? $data['dry_ice']['weight_per_package'] : '';
+            $data['dry_ice_total_weight'] = (isset($data['dry_ice']['total_weight'])) ? $data['dry_ice']['total_weight'] : '';
+        }
+
+        if (!isset($data['collection_route']) || $data['collection_route'] == '') {
+            $data['collection_route'] = 'ADHOC';
+        }
+
+        /*
+         * Save the serialized form values
+         */
+        if (isset($data['form_values'])) {
+
+            // Convert serialized form string to json string
+            parse_str($data['form_values'], $values);
+
+            // Flatten the multi-dimensional array into 1D array using dot notation
+            $values = array_dot($values);
+
+            $data['form_values'] = json_encode($values);
+        }
+
+
+        return $data;
+    }
+
+    /*
+     * *********************************************
+     * *********************************************
+     * Start of Interface Calls
+     * *********************************************
+     * *********************************************
+     */
+
+    /**
+     * Update Shipment tables with Shipment data
+     *
+     * @param array $data
+     * @return string IFS Consignment number
+     */
+    public function addShipment($data)
+    {
+        // Any preprocessing necessary before saving shipment
+        $data = $this->preProcessAddShipment($data);
+
+        /*
+         * ******************************************************************
+         * Transaction bracket updates so that all complete or none complete
+         * ******************************************************************
+         */
+        DB::beginTransaction();
+
+        try {
+
+            if (isset($data['shipment_id']) && is_numeric($data['shipment_id'])) {
+                $shipment = Shipment::find($data['shipment_id']);
+                $data['consignment_number'] = $shipment->consignment_number; // hack
+                $shipment->update($data);
+            } else {
+                // Shipment does not exist so create it
+                $shipment = Shipment::create($data);
+            }
+
+            // Set status
+            $shipment->setStatus('pre_transit', $data['user_id'], false, true, 'shipper');
+
+            /*
+             * *****************************************
+             * Save Shipment content (commodity details)
+             * *****************************************
+             */
+            if (isset($data['contents']) && !empty($data['contents'])) {
+                foreach ($data['contents'] as $content) {
+                    $shipment->contents()->create($content);
+                }
+            }
+
+            /*
+             * *****************************************
+             * Save Shipment content (package details)
+             * *****************************************
+             */
+            if (isset($data['packages']) && !empty($data['packages'])) {
+                foreach ($data['packages'] as $package) {
+                    $shipment->packages()->create($package);
+                }
+            }
+
+            /*
+             * *****************************************
+             * Save PDF document (original base64 from carrier - 6x4)
+             * *****************************************
+             */
+            foreach ($data['label_base64'] as $label) {
+                $shipment->label()->create([
+                    'base64' => $label['base64'],
+                    'shipment_id' => $shipment->id
+                ]);
+            }
+
+            /*
+             * *****************************************
+             * Save Shipment alerts
+             * *****************************************
+             */
+
+            /**
+             * If we have a valid sender address and sender alerts have been requested,
+             * create a record in the alerts table.
+             */
+            if (isset($data['alerts']['sender']) && filter_var($data['sender_email'], FILTER_VALIDATE_EMAIL)) {
+                $alert = ['email' => $data['sender_email'], 'type' => 's'] + $data['alerts']['sender'];
+                $shipment->alerts()->create($alert);
+            }
+
+            /**
+             * If we have a valid recipient address and recipient alerts have been requested,
+             * create a record in the alerts table.
+             */
+            if (isset($data['alerts']['recipient']) && filter_var($data['recipient_email'], FILTER_VALIDATE_EMAIL)) {
+                $alert = ['email' => $data['recipient_email'], 'type' => 'r'] + $data['alerts']['recipient'];
+                $shipment->alerts()->create($alert);
+            }
+
+            /**
+             * If we have a valid broker address and broker alerts have been requested,
+             * create a record in the alerts table.
+             */
+            if (isset($data['alerts']['broker']) && isset($data['broker_email']) && filter_var($data['broker_email'], FILTER_VALIDATE_EMAIL)) {
+                $alert = ['email' => $data['broker_email'], 'type' => 'b'] + $data['alerts']['broker'];
+                $shipment->alerts()->create($alert);
+            }
+
+            /**
+             * If we have a valid other address and other alerts have been requested,
+             * create a record in the alerts table.
+             */
+            if (isset($data['alerts']['other']) && filter_var($data['other_email'], FILTER_VALIDATE_EMAIL)) {
+                $alert = ['email' => $data['other_email'], 'type' => 'o'] + $data['alerts']['other'];
+                $shipment->alerts()->create($alert);
+            }
+
+            /**
+             * Create an alert request for the department associated with the shipment (problems only)
+             */
+            $shipment->setDepartmentAlerts();
+
+            /*
+             * Notify IFS staff (if parameters met)
+             */
+            $shipment->sendIfsNotifications();
+
+            /*
+             * Create a collection request for the transport department
+             */
+            $shipment->createCollectionRequest();
+
+            /*
+             * ******************************************
+             * Successful so commit all updates
+             * ******************************************
+             */
+            DB::Commit();
+        } catch (Exception $e) {
+
+            /*
+             * ******************************************
+             * Encountered error so rollback transactions
+             * ******************************************
+             */
+            DB::rollBack();
+
+            // Build email
+            $to = config('mail.error');
+            $subject = 'WebClient DB Error - ' . $to;
+            $message = 'Web Client failed to insert shipment ' . "\r\n\r\n" .
+                'App\CarrierAPI\CarrierAPI.php : ' . "\r\n\r\n" .
+                'Function addShipment() : ' . "\r\n\r\n" .
+                'IFS Consignment Number : ' . $data['consignment_number'] . "\r\n\r\n" .
+                'Carrier Consignment Number : ' . $data['carrier_consignment_number'] . "\r\n\r\n" .
+                'Error : ' . $e->getMessage() . " on line " . $e->getLine() . "\r\n\r\n" .
+                json_encode($data);
+            $headers = 'From: noreply@antrim.ifsgroup.com' . "\r\n" .
+                'Reply-To: it@antrim.ifsgroup.com' . "\r\n" .
+                'X-Mailer: PHP/' . phpversion();
+
+            mail($to, $subject, $message, $headers);
+
+            return NULL; // Return null to signify problem
+        }
+
+
+        // Create a tracker
+        dispatch(new \App\Jobs\CreateEasypostTracker($data['carrier_consignment_number'], $shipment->carrier->easypost));
+
+        return $shipment;
+    }
+
+    /**
+     * Adds Carrier tracking number/ Barcode etc.
+     * to Shipment array
+     *
+     * @param type $data
+     * @param type $response
+     * @return array Shipment Details
+     */
+    protected function addCarrierResponse($data, $response)
+    {
+        // Add Shipment level
+        $data['route_id'] = $response['route_id'];
+        $data['consignment_number'] = $response['ifs_consignment_number'];
+        $data['carrier_consignment_number'] = $response['consignment_number'];
+        $data['carrier_tracking_number'] = $response['consignment_number'];
+
+        // Add Carrier Tracking number and Barcode for each package
+        for ($i = 0; $i < $response['pieces']; $i++) {
+            $data['packages'][$i]['carrier_tracking_number'] = $response['packages'][$i]['carrier_tracking_code'];
+            $data['packages'][$i]['barcode'] = $response['packages'][$i]['barcode'];
+        }
+
+        $data['label_base64'] = $response['label_base64'];
+
+        return $data;
+    }
+
+    /**
+     * Creates a random 12 char string to use as a
+     * token for a shipment
+     *
+     * @return string Token
+     */
+    public function getShipmentToken()
+    {
+
+        $getNewToken = true;
+
+        while ($getNewToken) {
+            $token = str_random(12);
+            $shipment = Shipment::where('token', $token)->first();
+
+            if (!isset($shipment)) {
+                $getNewToken = false;
+            }
+        }
+
+        return $token;
+    }
+
+    private function generateErrors($response, $errors)
+    {
+        if (is_array($errors)) {
+            foreach ($errors as $error) {
+                $response['errors'][] = $error;
+            }
+        } else {
+            $response['errors'][] = $errors;
+        }
+
+        return $response;
     }
 
     /**
@@ -706,47 +992,115 @@ class CarrierAPI
     }
 
     /**
-     * Check to see if shipping account is set
-     * If not then attempts to set it
-     * Shipment held in  $this->input
+     * Checks addresses and performs any necessary Overrides
      *
-     * @return none Updates $this->input
+     * @param type $shipment
+     * @return string
      */
-    private function setBillToAcct($shipment, $account_type)
+    public function checkAddresses($shipment)
     {
 
-        if (isset($shipment[$account_type . "_account"])) {
-            $account = $shipment[$account_type . "_account"];
-        } else {
-            $account = '';
+        if (isset($this->company->shipper_type_override) && $this->company->shipper_type_override > "") {
+            $shipment['shipper_type'] = $this->company->shipper_type_override;
         }
 
-        // If account not defined or blank and payment is "Bill to Sender" - use service default
-        if (!isset($account) || $account == '') {
-            if (!isset($shipment[$account_type]) || $shipment[$account_type] == 'sender') {
+        if (isset($this->company->recipient_type_override) && $this->company->recipient_type_override > "") {
+            $shipment['recipient_type'] = $this->company->recipient_type_override;
+        }
 
-                $service = $this->company
-                    ->getServicesForMode($shipment['mode_id'])
-                    ->where('code', $shipment['service_code'])
-                    ->where('carrier_id', (string)$shipment['carrier_id'])// Carrier_id needs to be typecast to string
-                    ->first();
+        /*
+         * ***************************************************************
+         *  Ensure country codes for Jersey and Guernsey are correctly set
+         * ***************************************************************
+         */
+        if (isset($shipment['recipient_postcode'])) {
 
-                if (!empty($service)) {
+            // If country code has been set to GB then change
+            if (isset($shipment['recipient_country_code']) && $shipment['recipient_country_code'] == 'GB') {
 
-                    if (!empty($service->pivot->account)) {
+                // Take first 2 chars of the postcode
+                $prefix = strtoupper(substr($shipment['recipient_postcode'], 0, 2));
+                switch ($prefix) {
+                    case 'GY':
+                        $shipment['recipient_country_code'] = 'GG';
+                        break;
 
-                        // Use Companies own account if defined
-                        $account = $service->pivot->account;
-                    } else {
+                    case 'IM':
+                        $shipment['recipient_country_code'] = 'IM';
+                        break;
 
-                        // Use Default Service Account no.
-                        $account = $service->account;
-                    }
+                    case 'JE':
+                        $shipment['recipient_country_code'] = 'JE';
+                        break;
+
+                    default:
+                        break;
                 }
             }
         }
 
-        return $account;
+        return $shipment;
+    }
+
+    public function setEnvironment($mode = '')
+    {
+
+        // if mode is defined then use it
+        $env_mode = ($mode > "") ? $mode : \App::environment();
+
+        // If Environment variable set to Production, then change mode
+        switch (strtoupper($env_mode)) {
+
+            case 'PRODUCTION':
+            case 'TESTING':
+                $this->mode = 'production';
+                break;
+
+            case 'LOCAL':
+            case 'TEST':
+                $this->mode = 'test';
+                break;
+
+            default:
+                dd('Unknown Mode : *' . $env_mode . '*');
+                break;
+        }
+    }
+
+    /**
+     * Creates Shipment with Carrier and updates tables
+     *
+     * @param array $data
+     * @param string $mode Used by APIController to overide mode
+     *
+     * @return response
+     */
+    public function createShipment($data, $mode = '')
+    {
+
+        /*
+         * ************************************
+         * Set Environment, fixCase, preprocess
+         * and Validate Shipment
+         * ************************************
+         */
+        $response = [];
+        $this->setEnvironment($mode);
+        //$data = trimData($data);                                                 // Remove any leading/ trailing spaces etc.
+        $data = fixShipmentCase($data);                                         // Ensure all fields use correct case and Flags are boolean
+        $data = $this->preProcess($data);                                       // Complete any missing fields where possible
+        $apiShipment = new APIShipment();                                       // Shipment object with validation rules etc.
+
+        $errors = $apiShipment->validateShipment($data);
+        if ($errors == []) {
+
+            // No Errors, so send and create shipment
+            return $this->sendShipment($data, $mode);
+        } else {
+
+            // Return errors
+            return $this->generateErrors($response, $errors);                   // Return with errors
+        }
     }
 
     public function sendShipment($data, $mode)
@@ -804,61 +1158,21 @@ class CarrierAPI
         return $response;
     }
 
-    public function buildCarrier($carrier_code = 'fedex')
+    public function completeResponse($response, $data, $shipmentCreated)
     {
 
-        $this->carrier = null;
-        switch (strtolower($carrier_code)) {
-            case 'fedex':
-                $this->carrier = new FedexAPI($this->mode);
-                break;
+        if (strtolower($this->mode) == 'test' || $shipmentCreated) {
 
-            case 'cwide':
-                $this->carrier = new CWideAPI($this->mode);
-                break;
+            // Everything good so return token, consignment number and tracking URL for shipment
+            $response['ifs_consignment_number'] = $data['consignment_number'];
+            $response['token'] = $data['token'];
+            $response['tracking_url'] = config('app.url') . '/tracking/' . $data['token'];
+        } else {
 
-            case 'ups':
-                $this->carrier = new UPSAPI($this->mode);
-                break;
-
-            case 'dhl':
-                $this->carrier = new DHLAPI($this->mode);
-                break;
-
-            case 'tnt':
-                $this->carrier = new TNTAPI($this->mode);
-                break;
-
-            case 'pri':
-                $this->carrier = new PrimaryFreightAPI($this->mode);
-                break;
-
-            case 'easypost':
-                $this->carrier = new EasyPostAPI($this->mode);
-                break;
-
-            case 'ifs':
-                $this->carrier = new IFSAPI($this->mode);
-                break;
-
-            case 'dhlmail':
-                $this->carrier = new DHLGlobalMailAPI($this->mode);
-                break;
-
-            default:
-                // Do Nothing
-                dd('Unable to build carrier for : ' . strtolower($carrier_code));
-                break;
+            // Problem saving details - so return and error
+            $response['errors'][] = 'System Error (IT Support Notified)';
+            $response['label_base64'][0]['base64'] = '';
         }
-    }
-
-    public function setResponsePricingFields($response, $charges)
-    {
-
-        $response['pricing']['charges'] = $charges['sales'];
-        $response['pricing']['vat_code'] = $charges['sales_vat_code'];
-        $response['pricing']['vat_amount'] = $charges['sales_vat_amount'];
-        $response['pricing']['total_cost'] = $charges['shipping_charge'] + $charges['sales_vat_amount'];
 
         return $response;
     }
@@ -906,302 +1220,13 @@ class CarrierAPI
         return $data;
     }
 
-    /**
-     * Adds Carrier tracking number/ Barcode etc.
-     * to Shipment array
-     *
-     * @param type $data
-     * @param type $response
-     * @return array Shipment Details
-     */
-    protected function addCarrierResponse($data, $response)
-    {
-        // Add Shipment level
-        $data['route_id'] = $response['route_id'];
-        $data['consignment_number'] = $response['ifs_consignment_number'];
-        $data['carrier_consignment_number'] = $response['consignment_number'];
-        $data['carrier_tracking_number'] = $response['consignment_number'];
-
-        // Add Carrier Tracking number and Barcode for each package
-        for ($i = 0; $i < $response['pieces']; $i++) {
-            $data['packages'][$i]['carrier_tracking_number'] = $response['packages'][$i]['carrier_tracking_code'];
-            $data['packages'][$i]['barcode'] = $response['packages'][$i]['barcode'];
-        }
-
-        $data['label_base64'] = $response['label_base64'];
-
-        return $data;
-    }
-
-    /**
-     * Creates a random 12 char string to use as a
-     * token for a shipment
-     *
-     * @return string Token
-     */
-    public function getShipmentToken()
+    public function setResponsePricingFields($response, $charges)
     {
 
-        $getNewToken = true;
-
-        while ($getNewToken) {
-            $token = str_random(12);
-            $shipment = Shipment::where('token', $token)->first();
-
-            if (!isset($shipment)) {
-                $getNewToken = false;
-            }
-        }
-
-        return $token;
-    }
-
-    /*
-     * *********************************************
-     * *********************************************
-     * Start of Interface Calls
-     * *********************************************
-     * *********************************************
-     */
-
-    /**
-     * Update Shipment tables with Shipment data
-     *
-     * @param array $data
-     * @return string IFS Consignment number
-     */
-    public function addShipment($data)
-    {
-        // Any preprocessing necessary before saving shipment
-        $data = $this->preProcessAddShipment($data);
-
-        /*
-         * ******************************************************************
-         * Transaction bracket updates so that all complete or none complete
-         * ******************************************************************
-         */
-        DB::beginTransaction();
-
-        try {
-
-            if (isset($data['shipment_id']) && is_numeric($data['shipment_id'])) {
-                $shipment = Shipment::find($data['shipment_id']);
-                $data['consignment_number'] = $shipment->consignment_number; // hack
-                $shipment->update($data);
-            } else {
-                // Shipment does not exist so create it
-                $shipment = Shipment::create($data);
-            }
-
-            // Set status
-            $shipment->setStatus('pre_transit', $data['user_id'], false, true, 'shipper');
-
-            /*
-             * *****************************************
-             * Save Shipment content (commodity details)
-             * *****************************************
-             */
-            if (isset($data['contents']) && !empty($data['contents'])) {
-                foreach ($data['contents'] as $content) {
-                    $shipment->contents()->create($content);
-                }
-            }
-
-            /*
-             * *****************************************
-             * Save Shipment content (package details)
-             * *****************************************
-             */
-            if (isset($data['packages']) && !empty($data['packages'])) {
-                foreach ($data['packages'] as $package) {
-                    $shipment->packages()->create($package);
-                }
-            }
-
-            /*
-             * *****************************************
-             * Save PDF document (original base64 from carrier - 6x4)
-             * *****************************************
-             */
-            foreach ($data['label_base64'] as $label) {
-                $shipment->label()->create([
-                    'base64' => $label['base64'],
-                    'shipment_id' => $shipment->id
-                ]);
-            }
-
-            /*
-             * *****************************************
-             * Save Shipment alerts
-             * *****************************************
-             */
-
-            /**
-             * If we have a valid sender address and sender alerts have been requested,
-             * create a record in the alerts table.
-             */
-            if (isset($data['alerts']['sender']) && filter_var($data['sender_email'], FILTER_VALIDATE_EMAIL)) {
-                $alert = ['email' => $data['sender_email'], 'type' => 's'] + $data['alerts']['sender'];
-                $shipment->alerts()->create($alert);
-            }
-
-            /**
-             * If we have a valid recipient address and recipient alerts have been requested,
-             * create a record in the alerts table.
-             */
-            if (isset($data['alerts']['recipient']) && filter_var($data['recipient_email'], FILTER_VALIDATE_EMAIL)) {
-                $alert = ['email' => $data['recipient_email'], 'type' => 'r'] + $data['alerts']['recipient'];
-                $shipment->alerts()->create($alert);
-            }
-
-            /**
-             * If we have a valid broker address and broker alerts have been requested,
-             * create a record in the alerts table.
-             */
-            if (isset($data['alerts']['broker']) && isset($data['broker_email']) && filter_var($data['broker_email'], FILTER_VALIDATE_EMAIL)) {
-                $alert = ['email' => $data['broker_email'], 'type' => 'b'] + $data['alerts']['broker'];
-                $shipment->alerts()->create($alert);
-            }
-
-            /**
-             * If we have a valid other address and other alerts have been requested,
-             * create a record in the alerts table.
-             */
-            if (isset($data['alerts']['other']) && filter_var($data['other_email'], FILTER_VALIDATE_EMAIL)) {
-                $alert = ['email' => $data['other_email'], 'type' => 'o'] + $data['alerts']['other'];
-                $shipment->alerts()->create($alert);
-            }
-
-            /**
-             * Create an alert request for the department associated with the shipment (problems only)
-             */
-            $shipment->setDepartmentAlerts();
-
-            /*
-             * Notify IFS staff (if parameters met)
-             */
-            $shipment->sendIfsNotifications();
-
-            /*
-             * Create a collection request for the transport department
-             */
-            $shipment->createCollectionRequest();
-
-            /*
-             * ******************************************
-             * Successful so commit all updates
-             * ******************************************
-             */
-            DB::Commit();
-        } catch (Exception $e) {
-
-            /*
-             * ******************************************
-             * Encountered error so rollback transactions
-             * ******************************************
-             */
-            DB::rollBack();
-
-            // Build email
-            $to = config('mail.error');
-            $subject = 'WebClient DB Error - ' . $to;
-            $message = 'Web Client failed to insert shipment ' . "\r\n\r\n" .
-                'App\CarrierAPI\CarrierAPI.php : ' . "\r\n\r\n" .
-                'Function addShipment() : ' . "\r\n\r\n" .
-                'IFS Consignment Number : ' . $data['consignment_number'] . "\r\n\r\n" .
-                'Carrier Consignment Number : ' . $data['carrier_consignment_number'] . "\r\n\r\n" .
-                'Error : ' . $e->getMessage() . " on line " . $e->getLine() . "\r\n\r\n" .
-                json_encode($data);
-            $headers = 'From: noreply@antrim.ifsgroup.com' . "\r\n" .
-                'Reply-To: it@antrim.ifsgroup.com' . "\r\n" .
-                'X-Mailer: PHP/' . phpversion();
-
-            mail($to, $subject, $message, $headers);
-
-            return NULL; // Return null to signify problem
-        }
-
-
-        // Create a tracker
-        dispatch(new \App\Jobs\CreateEasypostTracker($data['carrier_consignment_number'], $shipment->carrier->easypost));
-
-        return $shipment;
-    }
-
-    /**
-     * Accepts Shipment array and if consignment_number
-     * is blank fn creates it
-     *
-     * @param type $data
-     *
-     * @return array Shipment Details
-     */
-    private function preProcessAddShipment($data)
-    {
-
-        if (!empty($data['alcohol'])) {
-            $data['alcohol_type'] = (isset($data['alcohol']['type'])) ? $data['alcohol']['type'] : '';
-            $data['alcohol_packaging'] = (isset($data['alcohol']['packaging'])) ? $data['alcohol']['packaging'] : '';
-            $data['alcohol_volume'] = (isset($data['alcohol']['volume'])) ? $data['alcohol']['volume'] : '';
-            $data['alcohol_quantity'] = (isset($data['alcohol']['quantity'])) ? $data['alcohol']['quantity'] : '';
-        }
-
-        if (!empty($data['dry_ice'])) {
-            $data['dry_ice_flag'] = (isset($data['dry_ice']['flag'])) ? $data['dry_ice']['flag'] : '';
-            $data['dry_ice_weight_per_package'] = (isset($data['dry_ice']['weight_per_package'])) ? $data['dry_ice']['weight_per_package'] : '';
-            $data['dry_ice_total_weight'] = (isset($data['dry_ice']['total_weight'])) ? $data['dry_ice']['total_weight'] : '';
-        }
-
-        if (!isset($data['collection_route']) || $data['collection_route'] == '') {
-            $data['collection_route'] = 'ADHOC';
-        }
-
-        /*
-         * Save the serialized form values
-         */
-        if (isset($data['form_values'])) {
-
-            // Convert serialized form string to json string
-            parse_str($data['form_values'], $values);
-
-            // Flatten the multi-dimensional array into 1D array using dot notation
-            $values = array_dot($values);
-
-            $data['form_values'] = json_encode($values);
-        }
-
-
-        return $data;
-    }
-
-    public function completeResponse($response, $data, $shipmentCreated)
-    {
-
-        if (strtolower($this->mode) == 'test' || $shipmentCreated) {
-
-            // Everything good so return token, consignment number and tracking URL for shipment
-            $response['ifs_consignment_number'] = $data['consignment_number'];
-            $response['token'] = $data['token'];
-            $response['tracking_url'] = config('app.url') . '/tracking/' . $data['token'];
-        } else {
-
-            // Problem saving details - so return and error
-            $response['errors'][] = 'System Error (IT Support Notified)';
-            $response['label_base64'][0]['base64'] = '';
-        }
-
-        return $response;
-    }
-
-    private function generateErrors($response, $errors)
-    {
-        if (is_array($errors)) {
-            foreach ($errors as $error) {
-                $response['errors'][] = $error;
-            }
-        } else {
-            $response['errors'][] = $errors;
-        }
+        $response['pricing']['charges'] = $charges['sales'];
+        $response['pricing']['vat_code'] = $charges['sales_vat_code'];
+        $response['pricing']['vat_amount'] = $charges['sales_vat_amount'];
+        $response['pricing']['total_cost'] = $charges['shipping_charge'] + $charges['sales_vat_amount'];
 
         return $response;
     }
@@ -1246,6 +1271,22 @@ class CarrierAPI
         }
 
         return $response;
+    }
+
+    /**
+     * Takes an unaltered PDF from a carrier and returns it in the size requested
+     * with the addition of printing/folding instructions for A4/LETTER sizes.
+     *
+     * @param mixed $shipment Loaded shipment model or shipment identifier.
+     * @param string $size Size of the PDF document required (accepts codes defined in print formats table).
+     * @param string $output Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
+     *
+     * @return  mixed
+     */
+    public function getLabel($shipment, $size = 'A4', $output = 'S', $encoded = true, $labelType = '')
+    {
+        $pdf = new Pdf($size, $output);
+        return $pdf->createLabel($shipment, $encoded, $labelType);
     }
 
     /**
@@ -1299,22 +1340,6 @@ class CarrierAPI
     }
 
     /**
-     * Takes an unaltered PDF from a carrier and returns it in the size requested
-     * with the addition of printing/folding instructions for A4/LETTER sizes.
-     *
-     * @param mixed $shipment Loaded shipment model or shipment identifier.
-     * @param string $size Size of the PDF document required (accepts codes defined in print formats table).
-     * @param string $output Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
-     *
-     * @return  mixed
-     */
-    public function getLabel($shipment, $size = 'A4', $output = 'S', $encoded = true, $labelType = '')
-    {
-        $pdf = new Pdf($size, $output);
-        return $pdf->createLabel($shipment, $encoded, $labelType);
-    }
-
-    /**
      * Generates a commercial invoice.
      *
      * @param string $token Shipment identifier.
@@ -1363,31 +1388,6 @@ class CarrierAPI
         \Illuminate\Support\Facades\DB::listen(function ($sql) {
             var_dump($sql);
         });
-    }
-
-    /**
-     * Identies the correct Supplier Account
-     * Number to use
-     *
-     * @param integer companyID
-     * @param integer carrierID
-     * @param integer serviceID
-     * @return string Account number
-     */
-    private function getServiceAcct($companyId, $carrierId, $serviceId)
-    {
-
-        $account = $this->company->services()
-            ->where('carrier_id', $carrierId)
-            ->where('service_id', $serviceId)
-            ->first()
-            ->pivot
-            ->account;
-
-        // Returns incorrect field
-        // return Carrier::find($carrierId)->services()->where('service_id', $serviceId)->first()->pivot->account;
-
-        return $account;
     }
 
 }
