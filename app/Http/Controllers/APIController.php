@@ -16,37 +16,28 @@
  *
  */
 
-namespace app\Http\Controllers;
+namespace App\Http\Controllers;
 
-use App\Pricing\Facades\Pricing;
-use App\CarrierAPI\APIShipment;
-use App\Service;
-use App\Company;
-use App\CompanyUser;
-use App\CompanyService;
-use App\CompanyPackagingType;
 use App\Carrier;
-use App\CarrierService;
-use App\Shipment;
-use App\Postcode;
-use App\Scan;
-use App\Status;
-use App\Log;
-use App\TransactionLog;
-use DOMDocument;
-use Illuminate\Support\Facades\DB;
-use TCPDF;
-use Auth;
-use EasyPost;
-use App\CarrierAPI\Facades\CarrierAPI;
+use App\CarrierAPI\APIShipment;
 use App\CarrierAPI\Facades\APIResponse;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Response;
+use App\CarrierAPI\Facades\CarrierAPI;
+use App\CarrierService;
+use App\Company;
+use App\CompanyPackagingType;
+use App\CompanyService;
+use App\CompanyUser;
 use App\Http\Requests\Request;
-use Illuminate\Support\Facades\App;
-// use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Validator;
+use App\Postcode;
+use App\Pricing\Facades\Pricing;
+use App\Scan;
+use App\Shipment;
+use App\TransactionLog;
+use Auth;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Input;
+
+// use Illuminate\Support\Facades\Request;
 
 class APIController extends Controller
 {
@@ -68,6 +59,228 @@ class APIController extends Controller
 
         // generate a psuedo random id for transaction header
         $this->transactionHeader = bin2hex(openssl_random_pseudo_bytes(14));
+    }
+
+    /**
+     * Accepts a POST object, validates it
+     * and creates a shipment and documentation
+     *
+     * @param Request
+     * @return Response
+     */
+    public function createShipment($version)
+    {
+
+        // Decode data and insert user_id of Authenticated User
+        $this->decodeInput('createShipment', $version);
+
+        if ($this->input['data']['user_id'] == 'UnAuthorized' || $this->input['data']['company_id'] == 'UnAuthorized') {
+            // Authentication Failed
+            return APIResponse::respondUnauthorized();
+        }
+
+        if ($this->input['data']['user_id'] == 'NotAvailable') {
+            // Mode not available
+            return APIResponse::respondNotAvailable();
+        }
+
+        // Authenticated so do initial processing
+        $this->preProcessShipment();
+
+        if ($this->input['data']['errors'] == []) {
+
+            $isAPITest = $this->checkIfApiTest();
+
+            // If this is an APITEST then return dummy transaction
+            if ($isAPITest) {
+
+                $data = json_decode('{"errors":[],"route_id":1,"carrier":"APITest Carrier","ifs_consignment_number":"10009999999","consignment_number":"10009999999","volumetric_divisor":5000,"pieces":1,"packages":[{"index":1,"carrier_tracking_number":"1000100099999999999999","barcode":"1000638144501525076895","carrier_tracking_code":"1000100099999999999999"}],"label_format_type":"PDF","label_size":"6X4","label_base64":[{"carrier_tracking_number":"10009999999","base64":""}],"pricing":{"charges":[{"code":"FRT","description":"Some Package(s) to Area 1","value":"22.50"}],"vat_code":"Z","vat_amount":0,"total_cost":22.5},"token":"DUMMYjzo7ekO","tracking_url":"https://ship.ifsgroup.com/tracking/DUMMYjzo7ekO"}', true);
+                $response = APIResponse::respondCreatedShipment($data, $version);        // Reformat response for API user
+            } else {
+
+                // Check we found an appropriate carrier
+                if (isset($this->input['data']['carrier_id']) && $this->input['data']['carrier_id'] > '') {
+
+                    // Authenticated so try to create shipment
+                    $reply = CarrierAPI::createShipment($this->input['data'], $this->mode);
+
+                    if ($reply['errors'] == []) {
+
+                        if (isset($reply['carrier_code'])) {
+                            $reply['carrier'] = $reply['carrier_code'];
+                            unset($reply['carrier_code']);
+                        }
+                    }
+
+                    $response = APIResponse::respondCreatedShipment($reply, $version);        // Reformat response for API user
+                } else {
+                    $response = APIResponse::respondNoCarrierAvailable();
+                }
+            }
+        } else {
+
+            $response = APIResponse::respondInvalid($this->input['data']);      // Errors in data
+        }
+
+        return $response;
+    }
+
+    /**
+     * Retrieves data from the Request object
+     * Decodes the JSON data element and adds
+     * User_id and Company_id
+     *
+     * @param Request
+     * @return none Updates $this->input
+     */
+    private function decodeInput($command, $version, $ifsConsignmentNumber = '', $companyCode = '')
+    {
+
+        // Check Valid URL & set DB connection depending on the URL
+        $this->setMode($version);
+
+        if ($this->input['data']['user_id'] != 'UnAuthorized') {
+
+            // Perform Actions
+            switch ($command) {
+
+                case 'priceShipment':
+                case 'createShipment':
+                    $this->decodeShipmentDetails();
+                    break;
+
+                case 'deleteShipment':
+                    $this->decodeDeleteShipment($ifsConsignmentNumber, $companyCode);
+                    break;
+
+                default:
+                    $this->returnUnauthorized('Invalid URL');
+                    break;
+            }
+        }
+    }
+
+    public function setMode($version)
+    {
+
+        switch ($version) {
+            case 'test':
+            case 'testv1':
+
+                // Set mode to Test
+                $this->mode = 'test';
+
+                // Change Database to test
+                config(['database.default' => 'apitest']);
+                break;
+
+            case 'v1':
+            case 'v1.1':
+            case 'v2':
+                $this->mode = 'production';
+                break;
+
+            default:
+                $this->returnUnauthorized('UnAuthorized');
+                break;
+        }
+    }
+
+    public function returnUnauthorized($message = "")
+    {
+
+        // Missing data - Return error
+        $this->input['data']['user_id'] = "UnAuthorized";
+        $this->input['data']['errors'][] = $message;
+    }
+
+    public function decodeShipmentDetails()
+    {
+
+        // Fetch API input as an Array
+        $data = $this->getInput();
+        if (empty($data)) {
+
+            // Missing data - Return error
+            $this->returnUnauthorized('Invalid Data or Characterset incorrect');
+        } else {
+
+            // log Transaction
+            $jsonData = $this->convertToJsonAndLog($data);
+
+            $this->APIShipment = new APIShipment();
+            $this->APIShipment->loadFromJSON($jsonData);                        // Read JSON from input into APIShipment Object
+            $this->APIShipment->translate();                                    // Translate into Internal API format
+
+            $this->input['data'] = $this->APIShipment->output;
+            $this->input['api_token'] = $this->getApiKey();
+            $this->input['data']['errors'] = [];
+            $this->input['data']['user_id'] = $this->getUserID();               // Retrieve authenticated User
+            $this->input['data']['company_id'] = $this->getCompanyID($this->input['data']['company_code']);
+            $this->input['data'] = fixShipmentCase($this->input['data']);       // Ensure all fields use correct case and Flags are boolean
+        }
+    }
+
+    public function getInput()
+    {
+
+        if (Input::get('data') <> null) {
+
+            $msg = json_decode(Input::get('data'), true);
+        } else {
+
+            $msg = Input::all();
+        }
+
+        return $msg;
+    }
+
+    public function convertToJsonAndLog($data)
+    {
+
+        // Make sure using correct characterset
+        $temp = convertToUTF8($data);
+
+        // Decode json. Invalid json or characterset will produce a null string
+        $jsonData = json_encode($temp);
+
+        // If API TEST then do Not Log
+        if (isset($data['options']) && is_array($data['options'])) {
+            if (!in_array('APITEST', array_map('strtolower', $data['options']))) {
+                return $jsonData;
+            }
+        }
+
+        // Save Transaction
+        $log = TransactionLog::create([
+            'type' => 'API',
+            'carrier' => "",
+            'direction' => 'O',
+            'msg' => $jsonData,
+            'mode' => $this->mode
+        ]);
+
+        return $jsonData;
+    }
+
+    /**
+     * Get the api_token used whether in body
+     * of data or in http headers
+     *
+     * @param
+     * @return
+     */
+    private function getApiKey()
+    {
+        $apiToken = '';
+
+        // Check for api_key sent as Bearer in Header
+        $data = Input::getFacadeRoot()->headers->get('authorization');
+        if (substr($data, 0, 6) == 'Bearer') {
+            $apiToken = trim(substr($data, 7));
+        }
+
+        return $apiToken;
     }
 
     /**
@@ -95,7 +308,7 @@ class APIController extends Controller
      * is authenticated for the requested
      * company and if so returns the company id
      *
-     * @param  array Shipment data
+     * @param array Shipment data
      * @return string company id or "UnAuthorized"
      */
     private function getCompanyID($companyCode)
@@ -124,26 +337,187 @@ class APIController extends Controller
         return $companyId;
     }
 
-    /**
-     * Function accepts a Carrier code
-     * and returns the Carrier object
-     *
-     * @param  string Carrier Code
-     * @return Carrier
-     */
-    private function getCarrier($carrierCode)
+    public function decodeDeleteShipment($ifsConsignmentNumber, $companyCode)
     {
 
-        $carrierCode = Carrier::where('code', $carrierCode)->first();
+        if ($ifsConsignmentNumber > '' && $companyCode > '') {
 
-        return $carrierCode;
+            //Get Users id and shipment details
+            $userId = $this->getUserID();
+
+            if ($this->mode == 'test') {
+
+                $authorized = true;
+                $company = Company::where('company_code', $companyCode)->first();
+                if ($company) {
+
+                    $this->input['api_token'] = $this->getApiKey();
+                    $this->input['data']['errors'] = [];
+                    $this->input['data']['user_id'] = $userId;                   // Retrieve authenticated User
+                    $this->input['data']['company_id'] = $company->id;
+                    $this->input['data']['ifs_consignment_number'] = '10004556445';
+
+                    // Return Success
+                    return;
+                }
+            } else {
+
+                $shipment = Shipment::where('consignment_number', $ifsConsignmentNumber)->first();
+                if ($shipment) {
+
+                    $code = Company::find($shipment->company_id)->company_code;
+                    if ($code == $companyCode) {
+
+                        $authorized = true;
+                        $this->input['api_token'] = $this->getApiKey();
+                        $this->input['data']['errors'] = [];
+                        $this->input['data']['user_id'] = $userId;                   // Retrieve authenticated User
+                        $this->input['data']['company_id'] = $shipment->company_id;
+                        $this->input['data']['ifs_consignment_number'] = $ifsConsignmentNumber;
+
+                        // Return Success
+                        return;
+                    }
+                }
+            }
+        }
+
+        $this->returnUnauthorized('Invalid Credentials');
+    }
+
+    /**
+     * Function to PreProcess the shipment details
+     * It calculates any additional fields required
+     *
+     * @param type $shipment
+     * @return array $shipment
+     */
+    private function preProcessShipment($mode = 'create')
+    {
+
+        if ($mode == "create") {
+
+            // Get Company Setting
+            $carrierChoice = strtolower(Company::find($this->input['data']['company_id'])->carrier_choice);
+
+            // If no carrier defined or company not set to user - set to auto
+            if ($carrierChoice == 'cost' || !isset($this->input['data']['carrier_code']) || $this->input['data']['carrier_code'] == '') {
+
+                $this->input['data']['carrier_choice'] = 'cost';
+            }
+        } else {
+
+        }
+
+        // Temporary Patch for Twinings
+        if (in_array($this->input['data']['company_id'], ["608", "807"])) {
+            $this->input['data']['sender_address3'] = 'Mallusk';
+            $this->input['data']['sender_city'] = 'Newtownabbey';
+            $this->input['data']['sender_county'] = 'Antrim';
+        }
+
+        // Shipment Depot
+        $this->input['data']['depot_id'] = Company::find($this->input['data']['company_id'])->depot_id;
+
+        // Set Department id
+        $this->input['data']['department_id'] = 1;
+
+        // Set Mode ID
+        $this->input['data']['mode_id'] = 1;
+
+        // Identify Carrier
+        if ($mode == "create" || $this->input['data']['carrier_code'] == '')
+            $this->chooseCarrier();
+
+        // Do Package level preProcessing
+        $this->preProcessPackages();
+
+        // Set Collection Date format if not supplied
+        if (!isset($this->input['data']['date_format'])) {
+            $this->input['data']['date_format'] = 'yyyy-mm-dd';
+        }
+
+        // Set Collection Date if not supplied or set to today
+        if (!isset($this->input['data']['collection_date']) || $this->input['data']['collection_date'] == '' || $this->input['data']['collection_date'] <= date('Y-m-d')) {
+
+            $timeZone = Company::find($this->input['data']['company_id'])->localisation->time_zone;
+            $pickUpTimes = new Postcode();
+            $this->input['data']['collection_date'] = $pickUpTimes->getPickUpDate(
+                $this->input['data']['sender_country_code'], $this->input['data']['sender_postcode'], $timeZone
+            );
+        }
+
+        // If no errors Set Account details
+        if ($this->input['data']['errors'] == []) {
+            // Set accounts
+            // $this->setShippingAcct();
+            // $this->setDutyTaxAcct();
+            // If hazard flag defined then overide hazard_code
+            if (isset($this->input['data']['hazard_flag']) && $this->input['data']['hazard_flag'] > '') {
+                switch ($this->input['data']['hazard_flag']) {
+                    case 'Y':
+                    case 'A':
+                    case 'I':
+                        if (isset($this->input['data']['hazard_class'])) {
+                            $this->input['data']['hazard_code'] = $this->input['data']['hazard_class'];
+                        }
+                        break;
+
+                    default:
+                        $this->input['data']['hazard_code'] = $this->input['data']['hazard_flag'];
+                        break;
+                }
+            }
+        }
+
+        // Set recipient name if not specified
+        if (!isset($this->input['data']['recipient_name'])) {
+            $this->input['data']['recipient_name'] = '';
+        }
+
+        // Set recipient company name if not specified
+        if (!isset($this->input['data']['recipient_company_name'])) {
+            $this->input['data']['recipient_company_name'] = '';
+        }
+
+        // Add any Alerts based on user preferences
+        $preferences = json_decode(Auth::guard('api')->user()->getPreferences($this->input['data']['company_id'], '1'), true);
+        if (!isset($this->input['data']['alerts']) || $this->input['data']['alerts'] == '') {
+
+            // Get sender_email if not specified
+            if (!isset($this->input['data']['sender_email']) || $this->input['data']['sender_email'] == '') {
+                if (isset($preferences['sender_email']) && $preferences['sender_email'] > '')
+                    $this->input['data']['sender_email'] = $preferences['sender_email'];
+            }
+
+            // Get other_email if not specified
+            if (!isset($this->input['data']['other_email']) || $this->input['data']['other_email'] == '') {
+                if (isset($preferences['other_email']) && $preferences['other_email'] > '')
+                    $this->input['data']['other_email'] = $preferences['other_email'];
+            }
+
+            // If Sender Email defined, set alert to preference
+            if (isset($this->input['data']['sender_email']) && $this->input['data']['sender_email'] > '')
+                $this->input['data']['alerts']['sender'] = $this->extractAlertPreferences('sender', $preferences);
+
+            // If Recipient Email defined, set alert to preference
+            if (isset($this->input['data']['recipient_email']) && $this->input['data']['recipient_email'] > '')
+                $this->input['data']['alerts']['recipient'] = $this->extractAlertPreferences('recipient', $preferences);
+
+            // If Broker Email defined, set alert to preference
+            if (isset($this->input['data']['broker_email']) && $this->input['data']['broker_email'] > '')
+                $this->input['data']['alerts']['broker'] = $this->extractAlertPreferences('broker', $preferences);
+
+            // If Other Email defined, set alert to preference
+            if (isset($this->input['data']['other_email']) && $this->input['data']['other_email'] > '')
+                $this->input['data']['alerts']['other'] = $this->extractAlertPreferences('other', $preferences);
+        }
     }
 
     /**
      * Identifies the correct carrier\ service to use for the
      * Shipment held in $this->input
-
-     * @param  array $possibleCarriers
+     * @param array $possibleCarriers
      * @return string carrierCode
      */
     public function chooseCarrier()
@@ -257,363 +631,6 @@ class APIController extends Controller
     }
 
     /**
-     * Get the api_token used whether in body
-     * of data or in http headers
-     *
-     * @param
-     * @return
-     */
-    private function getApiKey()
-    {
-        $apiToken = '';
-
-        // Check for api_key sent as Bearer in Header
-        $data = Input::getFacadeRoot()->headers->get('authorization');
-        if (substr($data, 0, 6) == 'Bearer') {
-            $apiToken = trim(substr($data, 7));
-        }
-
-        return $apiToken;
-    }
-
-    /**
-     * Retrieves data from the Request object
-     * Decodes the JSON data element and adds
-     * User_id and Company_id
-     *
-     * @param  Request
-     * @return none Updates $this->input
-     */
-    private function decodeInput($command, $version, $ifsConsignmentNumber = '', $companyCode = '')
-    {
-
-        // Check Valid URL & set DB connection depending on the URL
-        $this->setMode($version);
-
-        if ($this->input['data']['user_id'] != 'UnAuthorized') {
-
-            // Perform Actions
-            switch ($command) {
-
-                case 'priceShipment':
-                case 'createShipment':
-                    $this->decodeShipmentDetails();
-                    break;
-
-                case 'deleteShipment':
-                    $this->decodeDeleteShipment($ifsConsignmentNumber, $companyCode);
-                    break;
-
-                default:
-                    $this->returnUnauthorized('Invalid URL');
-                    break;
-            }
-        }
-    }
-
-    public function setMode($version)
-    {
-
-        switch ($version) {
-            case 'test':
-            case 'testv1':
-
-                // Set mode to Test
-                $this->mode = 'test';
-
-                // Change Database to test
-                config(['database.default' => 'apitest']);
-                break;
-
-            case 'v1':
-            case 'v1.1':
-            case 'v2':
-                $this->mode = 'production';
-                break;
-
-            default:
-                $this->returnUnauthorized('UnAuthorized');
-                break;
-        }
-    }
-
-    public function getInput()
-    {
-
-        if (Input::get('data') <> null) {
-
-            $msg = json_decode(Input::get('data'), true);
-        } else {
-
-            $msg = Input::all();
-        }
-
-        return $msg;
-    }
-
-    public function decodeShipmentDetails()
-    {
-
-        // Fetch API input as an Array
-        $data = $this->getInput();
-        if (empty($data)) {
-
-            // Missing data - Return error
-            $this->returnUnauthorized('Invalid Data or Characterset incorrect');
-        } else {
-
-            // log Transaction
-            $jsonData = $this->convertToJsonAndLog($data);
-
-            $this->APIShipment = new APIShipment();
-            $this->APIShipment->loadFromJSON($jsonData);                        // Read JSON from input into APIShipment Object
-            $this->APIShipment->translate();                                    // Translate into Internal API format
-
-            $this->input['data'] = $this->APIShipment->output;
-            $this->input['api_token'] = $this->getApiKey();
-            $this->input['data']['errors'] = [];
-            $this->input['data']['user_id'] = $this->getUserID();               // Retrieve authenticated User
-            $this->input['data']['company_id'] = $this->getCompanyID($this->input['data']['company_code']);
-            $this->input['data'] = fixShipmentCase($this->input['data']);       // Ensure all fields use correct case and Flags are boolean
-        }
-    }
-
-    public function convertToJsonAndLog($data)
-    {
-
-        // Make sure using correct characterset
-        $temp = convertToUTF8($data);
-
-        // Decode json. Invalid json or characterset will produce a null string
-        $jsonData = json_encode($temp);
-
-        // If API TEST then do Not Log
-        if (isset($data['options']) && is_array($data['options'])) {
-            if (!in_array('APITEST', array_map('strtolower', $data['options']))) {
-                return $jsonData;
-            }
-        }
-
-        // Save Transaction
-        $log = TransactionLog::create([
-                    'type' => 'API',
-                    'carrier' => "",
-                    'direction' => 'O',
-                    'msg' => $jsonData,
-                    'mode' => $this->mode
-        ]);
-
-        return $jsonData;
-    }
-
-    public function decodeDeleteShipment($ifsConsignmentNumber, $companyCode)
-    {
-
-        if ($ifsConsignmentNumber > '' && $companyCode > '') {
-
-            //Get Users id and shipment details
-            $userId = $this->getUserID();
-
-            if ($this->mode == 'test') {
-
-                $authorized = true;
-                $company = Company::where('company_code', $companyCode)->first();
-                if ($company) {
-
-                    $this->input['api_token'] = $this->getApiKey();
-                    $this->input['data']['errors'] = [];
-                    $this->input['data']['user_id'] = $userId;                   // Retrieve authenticated User
-                    $this->input['data']['company_id'] = $company->id;
-                    $this->input['data']['ifs_consignment_number'] = '10004556445';
-
-                    // Return Success
-                    return;
-                }
-            } else {
-
-                $shipment = Shipment::where('consignment_number', $ifsConsignmentNumber)->first();
-                if ($shipment) {
-
-                    $code = Company::find($shipment->company_id)->company_code;
-                    if ($code == $companyCode) {
-
-                        $authorized = true;
-                        $this->input['api_token'] = $this->getApiKey();
-                        $this->input['data']['errors'] = [];
-                        $this->input['data']['user_id'] = $userId;                   // Retrieve authenticated User
-                        $this->input['data']['company_id'] = $shipment->company_id;
-                        $this->input['data']['ifs_consignment_number'] = $ifsConsignmentNumber;
-
-                        // Return Success
-                        return;
-                    }
-                }
-            }
-        }
-
-        $this->returnUnauthorized('Invalid Credentials');
-    }
-
-    public function returnUnauthorized($message = "")
-    {
-
-        // Missing data - Return error
-        $this->input['data']['user_id'] = "UnAuthorized";
-        $this->input['data']['errors'][] = $message;
-    }
-
-    /**
-     * Function to PreProcess the shipment details
-     * It calculates any additional fields required
-     *
-     * @param type $shipment
-     * @return array $shipment
-     */
-    private function preProcessShipment($mode = 'create')
-    {
-
-        if ($mode == "create") {
-
-            // Get Company Setting
-            $carrierChoice = strtolower(Company::find($this->input['data']['company_id'])->carrier_choice);
-
-            // If no carrier defined or company not set to user - set to auto
-            if ($carrierChoice == 'cost' || !isset($this->input['data']['carrier_code']) || $this->input['data']['carrier_code'] == '') {
-
-                $this->input['data']['carrier_choice'] = 'cost';
-            }
-        } else {
-            
-        }
-        
-        // Temporary Patch for Twinings
-        if (in_array($this->input['data']['company_id'], ["608","807"])) {
-            $this->input['data']['sender_address3'] = 'Mallusk';
-            $this->input['data']['sender_city'] = 'Newtownabbey';
-            $this->input['data']['sender_county'] = 'Antrim';
-        }
-
-        // Shipment Depot
-        $this->input['data']['depot_id'] = Company::find($this->input['data']['company_id'])->depot_id;
-
-        // Set Department id
-        $this->input['data']['department_id'] = 1;
-
-        // Set Mode ID
-        $this->input['data']['mode_id'] = 1;
-
-        // Identify Carrier
-        if ($mode == "create" || $this->input['data']['carrier_code'] == '')
-            $this->chooseCarrier();
-
-        // Do Package level preProcessing
-        $this->preProcessPackages();
-
-        // Set Collection Date format if not supplied
-        if (!isset($this->input['data']['date_format'])) {
-            $this->input['data']['date_format'] = 'yyyy-mm-dd';
-        }
-
-        // Set Collection Date if not supplied or set to today
-        if (!isset($this->input['data']['collection_date']) || $this->input['data']['collection_date'] == '' || $this->input['data']['collection_date'] <= date('Y-m-d')) {
-
-            $timeZone = Company::find($this->input['data']['company_id'])->localisation->time_zone;
-            $pickUpTimes = new Postcode();
-            $this->input['data']['collection_date'] = $pickUpTimes->getPickUpDate(
-                    $this->input['data']['sender_country_code'], $this->input['data']['sender_postcode'], $timeZone
-            );
-        }
-
-        // If no errors Set Account details
-        if ($this->input['data']['errors'] == []) {
-            // Set accounts
-            // $this->setShippingAcct();
-            // $this->setDutyTaxAcct();
-            // If hazard flag defined then overide hazard_code
-            if (isset($this->input['data']['hazard_flag']) && $this->input['data']['hazard_flag'] > '') {
-                switch ($this->input['data']['hazard_flag']) {
-                    case 'Y':
-                    case 'A':
-                    case 'I':
-                        if (isset($this->input['data']['hazard_class'])) {
-                            $this->input['data']['hazard_code'] = $this->input['data']['hazard_class'];
-                        }
-                        break;
-
-                    default:
-                        $this->input['data']['hazard_code'] = $this->input['data']['hazard_flag'];
-                        break;
-                }
-            }
-        }
-
-        // Set recipient name if not specified
-        if (!isset($this->input['data']['recipient_name'])) {
-            $this->input['data']['recipient_name'] = '';
-        }
-
-        // Set recipient company name if not specified
-        if (!isset($this->input['data']['recipient_company_name'])) {
-            $this->input['data']['recipient_company_name'] = '';
-        }
-
-        // Add any Alerts based on user preferences
-        $preferences = json_decode(Auth::guard('api')->user()->getPreferences($this->input['data']['company_id'], '1'), true);
-        if (!isset($this->input['data']['alerts']) || $this->input['data']['alerts'] == '') {
-
-            // Get sender_email if not specified
-            if (!isset($this->input['data']['sender_email']) || $this->input['data']['sender_email'] == '') {
-                if (isset($preferences['sender_email']) && $preferences['sender_email'] > '')
-                    $this->input['data']['sender_email'] = $preferences['sender_email'];
-            }
-
-            // Get other_email if not specified
-            if (!isset($this->input['data']['other_email']) || $this->input['data']['other_email'] == '') {
-                if (isset($preferences['other_email']) && $preferences['other_email'] > '')
-                    $this->input['data']['other_email'] = $preferences['other_email'];
-            }
-
-            // If Sender Email defined, set alert to preference
-            if (isset($this->input['data']['sender_email']) && $this->input['data']['sender_email'] > '')
-                $this->input['data']['alerts']['sender'] = $this->extractAlertPreferences('sender', $preferences);
-
-            // If Recipient Email defined, set alert to preference
-            if (isset($this->input['data']['recipient_email']) && $this->input['data']['recipient_email'] > '')
-                $this->input['data']['alerts']['recipient'] = $this->extractAlertPreferences('recipient', $preferences);
-
-            // If Broker Email defined, set alert to preference
-            if (isset($this->input['data']['broker_email']) && $this->input['data']['broker_email'] > '')
-                $this->input['data']['alerts']['broker'] = $this->extractAlertPreferences('broker', $preferences);
-
-            // If Other Email defined, set alert to preference
-            if (isset($this->input['data']['other_email']) && $this->input['data']['other_email'] > '')
-                $this->input['data']['alerts']['other'] = $this->extractAlertPreferences('other', $preferences);
-        }
-    }
-
-    private function extractAlertPreferences($preference, $preferences)
-    {
-
-        $prefs = [];
-        if (isset($preferences['alerts.' . $preference . '.despatched']))
-            $prefs['despatched'] = $preferences['alerts.' . $preference . '.despatched'];
-
-        if (isset($preferences['alerts.' . $preference . '.out_for_delivery']))
-            $prefs['out_for_delivery'] = $preferences['alerts.' . $preference . '.out_for_delivery'];
-
-        if (isset($preferences['alerts.' . $preference . '.delivered']))
-            $prefs['delivered'] = $preferences['alerts.' . $preference . '.delivered'];
-
-        if (isset($preferences['alerts.' . $preference . '.cancelled']))
-            $prefs['cancelled'] = $preferences['alerts.' . $preference . '.cancelled'];
-
-        if (isset($preferences['alerts.' . $preference . '.problems']))
-            $prefs['problems'] = $preferences['alerts.' . $preference . '.problems'];
-
-        return $prefs;
-    }
-
-    /**
      * Do Package level preprocessing eg
      * Check for Dry Ice, add dims/ weight
      * for Customer defined packaging and
@@ -633,7 +650,7 @@ class APIController extends Controller
 
             // Check if Customers defined packaging
             $pkg = CompanyPackagingType::where('code', $this->input['data']['packages'][$i]['packaging_code'])
-                            ->where('company_id', $this->input['data']['company_id'])->first();
+                ->where('company_id', $this->input['data']['company_id'])->first();
 
             if ($pkg) {
                 // if no length supplied but defined for package use definition
@@ -656,91 +673,31 @@ class APIController extends Controller
         }
     }
 
-    /**
-     * Formats data to be returned to the user
-     * in the correct format
-     *
-     * @param  array $data
-     * @return Response
-     */
-    private function formatResponse($data, $format)
-    {
-        switch ($format) {
-            case 'JSON':
-                $response = json_encode($data);
-                break;
-            default:
-                break;
-        }
-
-        return $response;
-    }
-
-    /**
-     * Accepts a POST object, validates it
-     * and creates a shipment and documentation
-     *
-     * @param  Request
-     * @return Response
-     */
-    public function createShipment($version)
+    private
+    function extractAlertPreferences($preference, $preferences)
     {
 
-        // Decode data and insert user_id of Authenticated User
-        $this->decodeInput('createShipment', $version);
+        $prefs = [];
+        if (isset($preferences['alerts.' . $preference . '.despatched']))
+            $prefs['despatched'] = $preferences['alerts.' . $preference . '.despatched'];
 
-        if ($this->input['data']['user_id'] == 'UnAuthorized' || $this->input['data']['company_id'] == 'UnAuthorized') {
-            // Authentication Failed
-            return APIResponse::respondUnauthorized();
-        }
+        if (isset($preferences['alerts.' . $preference . '.out_for_delivery']))
+            $prefs['out_for_delivery'] = $preferences['alerts.' . $preference . '.out_for_delivery'];
 
-        if ($this->input['data']['user_id'] == 'NotAvailable') {
-            // Mode not available
-            return APIResponse::respondNotAvailable();
-        }
+        if (isset($preferences['alerts.' . $preference . '.delivered']))
+            $prefs['delivered'] = $preferences['alerts.' . $preference . '.delivered'];
 
-        // Authenticated so do initial processing
-        $this->preProcessShipment();
+        if (isset($preferences['alerts.' . $preference . '.cancelled']))
+            $prefs['cancelled'] = $preferences['alerts.' . $preference . '.cancelled'];
 
-        if ($this->input['data']['errors'] == []) {
+        if (isset($preferences['alerts.' . $preference . '.problems']))
+            $prefs['problems'] = $preferences['alerts.' . $preference . '.problems'];
 
-            $isAPITest = $this->checkIfApiTest();
-
-            // If this is an APITEST then return dummy transaction
-            if ($isAPITest) {
-
-                $data = json_decode('{"errors":[],"route_id":1,"carrier":"APITest Carrier","ifs_consignment_number":"10009999999","consignment_number":"10009999999","volumetric_divisor":5000,"pieces":1,"packages":[{"index":1,"carrier_tracking_number":"1000100099999999999999","barcode":"1000638144501525076895","carrier_tracking_code":"1000100099999999999999"}],"label_format_type":"PDF","label_size":"6X4","label_base64":[{"carrier_tracking_number":"10009999999","base64":""}],"pricing":{"charges":[{"code":"FRT","description":"Some Package(s) to Area 1","value":"22.50"}],"vat_code":"Z","vat_amount":0,"total_cost":22.5},"token":"DUMMYjzo7ekO","tracking_url":"https://ship.ifsgroup.com/tracking/DUMMYjzo7ekO"}', true);
-                $response = APIResponse::respondCreatedShipment($data, $version);        // Reformat response for API user
-            } else {
-
-                // Check we found an appropriate carrier
-                if (isset($this->input['data']['carrier_id']) && $this->input['data']['carrier_id'] > '') {
-
-                    // Authenticated so try to create shipment
-                    $reply = CarrierAPI::createShipment($this->input['data'], $this->mode);
-
-                    if ($reply['errors'] == []) {
-
-                        if (isset($reply['carrier_code'])) {
-                            $reply['carrier'] = $reply['carrier_code'];
-                            unset($reply['carrier_code']);
-                        }
-                    }
-
-                    $response = APIResponse::respondCreatedShipment($reply, $version);        // Reformat response for API user
-                } else {
-                    $response = APIResponse::respondNoCarrierAvailable();
-                }
-            }
-        } else {
-
-            $response = APIResponse::respondInvalid($this->input['data']);      // Errors in data
-        }
-
-        return $response;
+        return $prefs;
     }
 
-    public function checkIfApitest()
+    public
+    function checkIfApitest()
     {
 
         if (isset($this->input['data']['options'])) {
@@ -771,12 +728,13 @@ class APIController extends Controller
      * Accepts a DELETE object, validates it
      * and deletes the requested shipment
      *
-     * @param  string Shipment Token
-     * @param  string Company Token
+     * @param string Shipment Token
+     * @param string Company Token
      *
      * @return Response
      */
-    public function deleteShipment($version, $ifsConsignmentNumber = '', $companyCode = '')
+    public
+    function deleteShipment($version, $ifsConsignmentNumber = '', $companyCode = '')
     {
 
         // Decode data and insert user_id of Authenticated User etc.
@@ -830,22 +788,8 @@ class APIController extends Controller
         return $response;
     }
 
-    private function checkRemoteFile($url)
-    {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        // don't download content
-        curl_setopt($ch, CURLOPT_NOBODY, 1);
-        curl_setopt($ch, CURLOPT_FAILONERROR, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        if (curl_exec($ch) !== FALSE) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public function labelTest()
+    public
+    function labelTest()
     {
 
         $awbs = ["654896508720"];
@@ -880,7 +824,24 @@ class APIController extends Controller
         echo $pdf->Output($awbs[0] . '.PDF', 'S');
     }
 
-    public function printLabel($id)
+    private
+    function checkRemoteFile($url)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        // don't download content
+        curl_setopt($ch, CURLOPT_NOBODY, 1);
+        curl_setopt($ch, CURLOPT_FAILONERROR, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        if (curl_exec($ch) !== FALSE) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public
+    function printLabel($id)
     {
 
         $json = TransactionLog::find($id)->msg;
@@ -895,11 +856,12 @@ class APIController extends Controller
     /**
      * Receive shipment as JSON and price it
      * Returning Pricing info as JSON
-     * 
+     *
      * @param type $version
      * @return type
      */
-    public function priceShipment($version)
+    public
+    function priceShipment($version)
     {
 
         // Decode data and insert user_id of Authenticated User
@@ -956,7 +918,8 @@ class APIController extends Controller
         return $response;
     }
 
-    public function reprice(Shipment $shipment)
+    public
+    function reprice(Shipment $shipment)
     {
 
         if ($shipment) {
@@ -982,7 +945,8 @@ class APIController extends Controller
         }
     }
 
-    public function test1()
+    public
+    function test1()
     {
 
         $quotedRate['min_discount'] = 0;
@@ -990,6 +954,43 @@ class APIController extends Controller
         $test = !($quotedRate['min_discount'] == 0 && $quotedRate['max_discount'] == 0);
 
         dd($test);
+    }
+
+    /**
+     * Function accepts a Carrier code
+     * and returns the Carrier object
+     *
+     * @param string Carrier Code
+     * @return Carrier
+     */
+    private
+    function getCarrier($carrierCode)
+    {
+
+        $carrierCode = Carrier::where('code', $carrierCode)->first();
+
+        return $carrierCode;
+    }
+
+    /**
+     * Formats data to be returned to the user
+     * in the correct format
+     *
+     * @param array $data
+     * @return Response
+     */
+    private
+    function formatResponse($data, $format)
+    {
+        switch ($format) {
+            case 'JSON':
+                $response = json_encode($data);
+                break;
+            default:
+                break;
+        }
+
+        return $response;
     }
 
 }

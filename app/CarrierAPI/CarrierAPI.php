@@ -6,35 +6,32 @@
  * @todo Complete the following functions
  *
  * function getServiceByDest($shipment, $possibleServices);
-
  *
  */
 
-namespace app\CarrierAPI;
+namespace App\CarrierAPI;
 
-use DB;
+use App\CarrierAPI\CWide\CWideAPI;
+use App\CarrierAPI\DHL\DHLAPI;
+use App\CarrierAPI\DHLGlobalMail\DHLGlobalMailAPI;
+use App\CarrierAPI\Fedex\FedexAPI;
+use App\CarrierAPI\IFS\IFSAPI;
+use App\CarrierAPI\PrimaryFreight\PrimaryFreightAPI;
+use App\CarrierAPI\TNT\TNTAPI;
+use App\CarrierAPI\UPS\UPSAPI;
 use App\Company;
-use App\Service;
+use App\Country;
 use App\Department;
+use App\Mode;
+use App\Pricing\Facades\Pricing;
+use App\Service;
 use App\Shipment;
 use App\State;
-use App\Mode;
-use App\Country;
-use App\CarrierAPI\ServiceRules;
-use App\CarrierAPI\APIShipment;
-use App\CarrierAPI\Fedex\FedexAPI;
-use App\CarrierAPI\DHL\DHLAPI;
-use App\CarrierAPI\UPS\UPSAPI;
-use App\CarrierAPI\TNT\TNTAPI;
-use App\CarrierAPI\PrimaryFreight\PrimaryFreightAPI;
-use App\CarrierAPI\IFS\IFSAPI;
-use App\CarrierAPI\CWide\CWideAPI;
-use App\CarrierAPI\DHLGlobalMail\DHLGlobalMailAPI;
-use App\CarrierAPI\Pdf;
-use App\Pricing\Facades\Pricing;
-use TCPDI;
 use Carbon\Carbon;
+use DB;
 use Exception;
+use TCPDI;
+
 
 /**
  * Description of CarrierWebServices.
@@ -57,14 +54,7 @@ class CarrierAPI
 
     public function __construct()
     {
-        
-    }
 
-    private function debugSQL()
-    {
-        \Illuminate\Support\Facades\DB::listen(function($sql) {
-            var_dump($sql);
-        });
     }
 
     public function buildCarrier($carrier_code = 'fedex')
@@ -163,7 +153,7 @@ class CarrierAPI
          * ***************************************************
          * If this is a collect shipment then remove pricing
          * info even for those shipments we were able to price
-         * since recipient will be billed according to 
+         * since recipient will be billed according to
          * recipients rates
          * ***************************************************
          */
@@ -208,7 +198,7 @@ class CarrierAPI
 
         /*
          * *********************************************
-         * Loop through all services configured for this 
+         * Loop through all services configured for this
          * Customer/ mode.
          * *********************************************
          */
@@ -432,10 +422,10 @@ class CarrierAPI
             if (!isset($shipment[$account_type]) || $shipment[$account_type] == 'sender') {
 
                 $service = $this->company
-                        ->getServicesForMode($shipment['mode_id'])
-                        ->where('code', $shipment['service_code'])
-                        ->where('carrier_id', (string) $shipment['carrier_id']) // Carrier_id needs to be typecast to string
-                        ->first();
+                    ->getServicesForMode($shipment['mode_id'])
+                    ->where('code', $shipment['service_code'])
+                    ->where('carrier_id', (string)$shipment['carrier_id'])// Carrier_id needs to be typecast to string
+                    ->first();
 
                 if (!empty($service)) {
 
@@ -459,20 +449,20 @@ class CarrierAPI
      * Identies the correct Supplier Account
      * Number to use
      *
-     * @param  integer companyID
-     * @param  integer carrierID
-     * @param  integer serviceID
+     * @param integer companyID
+     * @param integer carrierID
+     * @param integer serviceID
      * @return string Account number
      */
     private function getServiceAcct($companyId, $carrierId, $serviceId)
     {
 
         $account = $this->company->services()
-                        ->where('carrier_id', $carrierId)
-                        ->where('service_id', $serviceId)
-                        ->first()
-                ->pivot
-                ->account;
+            ->where('carrier_id', $carrierId)
+            ->where('service_id', $serviceId)
+            ->first()
+            ->pivot
+            ->account;
 
         // Returns incorrect field
         // return Carrier::find($carrierId)->services()->where('service_id', $serviceId)->first()->pivot->account;
@@ -525,6 +515,14 @@ class CarrierAPI
 
         return $data;
     }
+
+    /*
+     * *********************************************
+     * *********************************************
+     * Start of Interface Calls
+     * *********************************************
+     * *********************************************
+     */
 
     /**
      * Update Shipment tables with Shipment data
@@ -668,15 +666,15 @@ class CarrierAPI
             $to = config('mail.error');
             $subject = 'WebClient DB Error - ' . $to;
             $message = 'Web Client failed to insert shipment ' . "\r\n\r\n" .
-                    'App\CarrierAPI\CarrierAPI.php : ' . "\r\n\r\n" .
-                    'Function addShipment() : ' . "\r\n\r\n" .
-                    'IFS Consignment Number : ' . $data['consignment_number'] . "\r\n\r\n" .
-                    'Carrier Consignment Number : ' . $data['carrier_consignment_number'] . "\r\n\r\n" .
-                    'Error : ' . $e->getMessage() . " on line " . $e->getLine() . "\r\n\r\n" .
-                    json_encode($data);
+                'App\CarrierAPI\CarrierAPI.php : ' . "\r\n\r\n" .
+                'Function addShipment() : ' . "\r\n\r\n" .
+                'IFS Consignment Number : ' . $data['consignment_number'] . "\r\n\r\n" .
+                'Carrier Consignment Number : ' . $data['carrier_consignment_number'] . "\r\n\r\n" .
+                'Error : ' . $e->getMessage() . " on line " . $e->getLine() . "\r\n\r\n" .
+                json_encode($data);
             $headers = 'From: noreply@antrim.ifsgroup.com' . "\r\n" .
-                    'Reply-To: it@antrim.ifsgroup.com' . "\r\n" .
-                    'X-Mailer: PHP/' . phpversion();
+                'Reply-To: it@antrim.ifsgroup.com' . "\r\n" .
+                'X-Mailer: PHP/' . phpversion();
 
             mail($to, $subject, $message, $headers);
 
@@ -946,6 +944,23 @@ class CarrierAPI
                 $shipment['packages'][$cnt]['height'] = ceil($shipment['packages'][$cnt]['height']);
                 $shipment['packages'][$cnt]['index'] = $cnt + 1;
 
+                /*
+                * ****************************************
+                * Patch for Babocush USA - resize packages
+                * Change Dims to match those used by Fedex
+                * ****************************************
+                */
+                if ($shipment['company_id'] == '874') {
+                    if ($package['length'] == 67) {
+                        if ($package['width'] == 40) {
+                            if ($package['height'] == 19) {
+                                $shipment['packages'][$cnt]['length'] = 66;
+                                $shipment['packages'][$cnt]['height'] = 20;
+                            }
+                        }
+                    }
+                }
+
                 // Collect Dimensions
                 $dims[] = $package['length'];
                 $dims[] = $package['width'];
@@ -953,7 +968,7 @@ class CarrierAPI
 
                 // Calc Volumetric weight
                 $shipment['packages'][$cnt]['volumetric_weight'] = calcVolume(
-                        $shipment['packages'][$cnt]['length'], $shipment['packages'][$cnt]['width'], $shipment['packages'][$cnt]['height'], $shipment['volumetric_divisor']
+                    $shipment['packages'][$cnt]['length'], $shipment['packages'][$cnt]['width'], $shipment['packages'][$cnt]['height'], $shipment['volumetric_divisor']
                 );
 
                 $volumetric_weight += $shipment['packages'][$cnt]['volumetric_weight'];
@@ -979,7 +994,7 @@ class CarrierAPI
 
     /**
      * Checks addresses and performs any necessary Overrides
-     * 
+     *
      * @param type $shipment
      * @return string
      */
@@ -1053,14 +1068,6 @@ class CarrierAPI
         }
     }
 
-    /*
-     * *********************************************
-     * *********************************************
-     * Start of Interface Calls
-     * *********************************************
-     * *********************************************
-     */
-
     /**
      * Creates Shipment with Carrier and updates tables
      *
@@ -1080,14 +1087,15 @@ class CarrierAPI
          */
         $response = [];
         $this->setEnvironment($mode);
-        //$data = trimData($data);                                                 // Remove any leading/ trailing spaces etc.        
+        //$data = trimData($data);                                                 // Remove any leading/ trailing spaces etc.
         $data = fixShipmentCase($data);                                         // Ensure all fields use correct case and Flags are boolean
         $data = $this->preProcess($data);                                       // Complete any missing fields where possible
         $apiShipment = new APIShipment();                                       // Shipment object with validation rules etc.
+
         $errors = $apiShipment->validateShipment($data);
         if ($errors == []) {
 
-            // No Errors so send and create shipment
+            // No Errors, so send and create shipment
             return $this->sendShipment($data, $mode);
         } else {
 
@@ -1240,8 +1248,8 @@ class CarrierAPI
 
         // Identify Shipment Carrier
         $shipment = Shipment::where('company_id', $data['company_id'])
-                ->where('token', $data['shipment_token'])
-                ->first();
+            ->where('token', $data['shipment_token'])
+            ->first();
 
         if ($shipment) {
 
@@ -1270,9 +1278,9 @@ class CarrierAPI
      * Takes an unaltered PDF from a carrier and returns it in the size requested
      * with the addition of printing/folding instructions for A4/LETTER sizes.
      *
-     * @param   mixed   $shipment   Loaded shipment model or shipment identifier.
-     * @param   string  $size       Size of the PDF document required (accepts codes defined in print formats table).
-     * @param   string  $output     Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
+     * @param mixed $shipment Loaded shipment model or shipment identifier.
+     * @param string $size Size of the PDF document required (accepts codes defined in print formats table).
+     * @param string $output Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
      *
      * @return  mixed
      */
@@ -1285,9 +1293,9 @@ class CarrierAPI
     /**
      * Get a batch of labels
      *
-     * @param   mixed   $shipment_id   Loaded shipment model or shipment identifier.
-     * @param   string  $size       Size of the PDF document required (accepts codes defined in print formats table).
-     * @param   string  $output     Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
+     * @param mixed $shipment_id Loaded shipment model or shipment identifier.
+     * @param string $size Size of the PDF document required (accepts codes defined in print formats table).
+     * @param string $output Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
      *
      * @return  mixed
      */
@@ -1335,10 +1343,10 @@ class CarrierAPI
     /**
      * Generates a commercial invoice.
      *
-     * @param   string  $token      Shipment identifier.
-     * @param   array   $parameters An array of options for customising invoice.
-     * @param   string  $size       Size of the PDF document required (accepts codes defined in print formats table).
-     * @param   string  $output     Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
+     * @param string $token Shipment identifier.
+     * @param array $parameters An array of options for customising invoice.
+     * @param string $size Size of the PDF document required (accepts codes defined in print formats table).
+     * @param string $output Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
      *
      * @return  mixed
      */
@@ -1351,8 +1359,8 @@ class CarrierAPI
     /**
      * Generates a CN22.
      *
-     * @param   string  $token      Shipment identifier.
-     * @param   string  $output     Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
+     * @param string $token Shipment identifier.
+     * @param string $output Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
      *
      * @return  mixed
      */
@@ -1364,7 +1372,7 @@ class CarrierAPI
 
     /**
      * Create a despatch note.
-     * 
+     *
      * @param type $token
      * @param type $size
      * @param type $output
@@ -1374,6 +1382,13 @@ class CarrierAPI
     {
         $pdf = new Pdf($size, $output);
         return $pdf->createDespatchNote($token);
+    }
+
+    private function debugSQL()
+    {
+        \Illuminate\Support\Facades\DB::listen(function ($sql) {
+            var_dump($sql);
+        });
     }
 
 }
