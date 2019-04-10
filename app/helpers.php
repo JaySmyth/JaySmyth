@@ -286,7 +286,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             $result = App\Country::select('country', 'country_code')->orderBy('country')->pluck('country', 'country_code');
             break;
         case 'senderCountries':
-            $result = ['GB' => 'UNITED KINGDOM', 'IE' => 'IRELAND', 'US' => 'UNITED STATES'];
+            $result = ['GB' => 'UNITED KINGDOM', 'IE' => 'IRELAND', 'US' => 'UNITED STATES', 'CA' => 'CANADA'];
             break;
         case 'currencies':
             $result = App\Currency::select('code')->orderBy('display_order')->pluck('code', 'code');
