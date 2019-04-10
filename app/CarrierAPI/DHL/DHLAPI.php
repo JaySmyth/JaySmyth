@@ -337,7 +337,7 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase {
 
     public function preProcess($shipment)
     {
-        if ($shipment['recipient_company_name'] == '') {
+        if (!isset($shipment['recipient_company_name']) || $shipment['recipient_company_name'] == '') {
             $shipment['recipient_company_name'] = $shipment['recipient_name'];
             $shipment['recipient_name'] = '.';
         }

@@ -52,16 +52,27 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
 
             default:
                 $this->accounts['meterNumbers'] = array(
-                    205691588 => 611030, // IFS
-                    327423851 => 958196, // TEREX
-                    631510906 => 477484, // CMASS
-                    342638775 => 991058, // ALMAC
-                    811732648 => 418725, // DOMESTIC
-                    811250724 => 418727  // Glen Dimplex
+                    205691588 => 482731, // IFS
+                    327423851 => 482746, // TEREX
+                    631510906 => 482768, // CMASS
+                    342638775 => 482764, // ALMAC
+                    811732648 => 564790, // DOMESTIC
+                    811250724 => 564800  // Glen Dimplex
                 );
-
                 break;
         }
+
+        /*
+         * OLD METERS FOR 63.34.42.84
+         *
+        205691588 => 611030, // IFS
+        327423851 => 958196, // TEREX
+        631510906 => 477484, // CMASS
+        342638775 => 991058, // ALMAC
+        811732648 => 418725, // DOMESTIC
+        811250724 => 418727  // Glen Dimplex
+        */
+
 
         /*
          * *****************************************
