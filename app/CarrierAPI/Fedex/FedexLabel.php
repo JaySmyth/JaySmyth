@@ -59,7 +59,7 @@ class FedexLabel extends \App\CarrierAPI\CarrierLabel
             if ($width > $height) {
                 $this->pdf->Rotate(90);
                 $this->pdf->Image('http://' . $this->data . '/' . $awb . 'AWB.PNG', -153, 0, 153, 102);
-                $this->pdf->Rotate(0);
+                $this->pdf->Rotate(-90);
             } else {
                 $this->pdf->Image('http://' . $this->data . '/' . $awb . 'AWB.PNG', 0, 0, 102, 153);
             }
