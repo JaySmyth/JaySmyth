@@ -489,7 +489,7 @@ class ShipmentsController extends Controller
         // Log the event (model loaded as code below expects a collection)
         $shipment = Shipment::whereToken($token)->firstOrFail();
 
-        if(Carbon::now()->addSeconds(5) < $shipment->created_at){
+        if(Carbon::now()->subSeconds(5) > $shipment->created_at){
             $shipment->log('Downloaded Label');
         }
 
