@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Mail;
 
 class Shipment extends Model
 {
-
     use ShipmentScopes,
-        ShipmentAlerting;
+        ShipmentAlerting,
+        Logable;
 
     protected $fillable = [
         'consignment_number',
@@ -130,7 +130,7 @@ class Shipment extends Model
     /**
      * Set the shipment reference.
      *
-     * @param  string $value
+     * @param string $value
      * @return string
      */
     public function setShipmentReferenceAttribute($value)
@@ -141,7 +141,7 @@ class Shipment extends Model
     /**
      * Set the shipment reference.
      *
-     * @param  string $value
+     * @param string $value
      * @return string
      */
     public function setSenderTypeAttribute($value)
@@ -152,7 +152,7 @@ class Shipment extends Model
     /**
      * Set the shipment reference.
      *
-     * @param  string $value
+     * @param string $value
      * @return string
      */
     public function setEoriAttribute($value)
@@ -773,8 +773,8 @@ class Shipment extends Model
     /**
      * Sets the shipment to delivered. Updates delivered flag, delivery date and signature.
      *
-     * @param   string $podSignature
-     * @param   string $deliveryDate
+     * @param string $podSignature
+     * @param string $deliveryDate
      *
      * @return  void
      */

@@ -542,6 +542,9 @@
 
 @endif
 
+
+@include('partials.log', ['logs' => $shipment->logs])
+
 @if(isset($shipment->quoted_array['costs_zone']))
 @include('shipments.partials.cost_breakdown', ['quoted' => $shipment->quoted_array])
 @endif
