@@ -1111,6 +1111,11 @@ class Shipment extends Model
     {
         $this->setStatus('cancelled', $userId);
 
+        // If sender postcode not "BT", mainland pickup may need cancelled
+        if (!$this->originatesFromBtPostcode() && strtoupper($this->sender_country_code != 'US')) {
+            Mail::to('courier@antrim.ifsgroup.com')->cc('courieruk@antrim.ifsgroup.com')->queue(new \App\Mail\GenericError('Shipment Cancelled (' . $this->company->company_name . '/' . $this->consignment_number . ')', 'Carrier pickup may need to be cancelled.'));
+        }
+
         /*
          * Cancel collection/delivery requests
          */
