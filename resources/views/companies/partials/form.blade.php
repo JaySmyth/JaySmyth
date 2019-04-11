@@ -128,7 +128,7 @@
             </label>
 
             <div class="col-sm-6">
-                {!! Form::select('country_code', dropDown('countries'), old('country_code', 'GB'), array('id' => 'country_code', 'class' => 'form-control')) !!}
+                {!! Form::select('country_code', dropDown('countries', 'Please select'), old('country_code'), array('id' => 'country_code', 'class' => 'form-control')) !!}
 
                 @if ($errors->has('country_code'))
                 <span class="form-text">
