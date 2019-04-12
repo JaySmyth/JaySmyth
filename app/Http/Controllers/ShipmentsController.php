@@ -74,6 +74,7 @@ class ShipmentsController extends Controller
             ->orderBy('shipments.id', 'DESC')
             ->filter($request->filter)
             ->hasScsJobNumber($request->scs_job_number)
+            ->hasManifestNumber($request->manifest_number)
             ->hasMode($request->mode)
             ->hasCompany($request->company)
             ->hasStatus($request->status)

@@ -40,9 +40,9 @@ trait ShipmentScopes
             $filter = trim($filter);
 
             return $query->where('consignment_number', $filter)
-                            ->orWhere('carrier_consignment_number', $filter)
-                            ->orWhere('carrier_tracking_number',  $filter )
-                            ->orWhere('shipment_reference', 'LIKE', '%' . $filter . '%');
+                ->orWhere('carrier_consignment_number', $filter)
+                ->orWhere('carrier_tracking_number', $filter)
+                ->orWhere('shipment_reference', 'LIKE', '%' . $filter . '%');
         }
     }
 
@@ -73,10 +73,10 @@ trait ShipmentScopes
             $filter = trim($filter);
 
             return $query->where('recipient_company_name', 'LIKE', '%' . $filter . '%')
-                            ->orWhere('recipient_name', 'LIKE', '%' . $filter . '%')
-                            ->orWhere('recipient_address1', 'LIKE', '%' . $filter . '%')
-                            ->orWhere('recipient_city', 'LIKE', '%' . $filter . '%')
-                            ->orWhere('recipient_postcode', 'LIKE', '%' . $filter . '%');
+                ->orWhere('recipient_name', 'LIKE', '%' . $filter . '%')
+                ->orWhere('recipient_address1', 'LIKE', '%' . $filter . '%')
+                ->orWhere('recipient_city', 'LIKE', '%' . $filter . '%')
+                ->orWhere('recipient_postcode', 'LIKE', '%' . $filter . '%');
         }
     }
 
@@ -94,8 +94,8 @@ trait ShipmentScopes
 
         if ($mode) {
             return $query->select('shipments.*')
-                            ->join('modes', 'shipments.mode_id', '=', 'modes.id')
-                            ->where('modes.name', '=', $mode);
+                ->join('modes', 'shipments.mode_id', '=', 'modes.id')
+                ->where('modes.name', '=', $mode);
         }
     }
 
@@ -212,8 +212,8 @@ trait ShipmentScopes
 
         if ($service) {
             return $query->select('shipments.*')
-                            ->join('services', 'shipments.service_id', '=', 'services.id')
-                            ->where('services.code', '=', $service);
+                ->join('services', 'shipments.service_id', '=', 'services.id')
+                ->where('services.code', '=', $service);
         }
     }
 
@@ -283,6 +283,90 @@ trait ShipmentScopes
     }
 
     /**
+     * Scope shipment is UK domestic.
+     *
+     * @return type
+     */
+    public function scopeIsDomestic($query)
+    {
+        return $query->where('sender_country_code', '=', DB::raw('recipient_country_code'));
+    }
+
+    public function scopeWithinEu($query)
+    {
+        if (!isJoined($query, 'countries')) {
+            $query->join('countries', 'shipments.recipient_country_code', '=', 'countries.country_code');
+        }
+
+        return $query->where('countries.eu', 1);
+    }
+
+    /*
+     * Scope restrict results by company.
+     *
+     */
+
+    public function scopeEuExcludingUkDomestic($query)
+    {
+        if (!isJoined($query, 'countries')) {
+            $query->join('countries', 'shipments.recipient_country_code', '=', 'countries.country_code');
+        }
+
+        return $query->where('countries.eu', 1)
+            ->whereNotIn('recipient_country_code', getUkDomesticCountries());
+    }
+
+    /*
+     * Scope restrict results by mode.
+     *
+     */
+
+    /**
+     * Scope shipment is international.
+     *
+     * @return type
+     */
+    public function scopeIsInternational($query)
+    {
+        return $query->whereIn('sender_country_code', getUkDomesticCountries())
+            ->whereNotIn('recipient_country_code', getUkDomesticCountries());
+    }
+
+    /*
+     * Scope restrict by depot.
+     *
+     */
+
+    public function scopeNotEu($query)
+    {
+        if (!isJoined($query, 'countries')) {
+            $query->join('countries', 'shipments.recipient_country_code', '=', 'countries.country_code');
+        }
+
+        return $query->where('countries.eu', 0);
+    }
+
+    /*
+     * Get the shipments available for manifesting.
+     */
+
+    /**
+     * Scope shipment is domestic.
+     *
+     * @return type
+     */
+    public function scopeIsUkDomestic($query)
+    {
+        return $query->whereIn('sender_country_code', getUkDomesticCountries())
+            ->whereIn('recipient_country_code', getUkDomesticCountries());
+    }
+
+    /*
+     * Scope recipient not EU.
+     *
+     */
+
+    /**
      * Scope single/multi-piece.
      *
      * @return
@@ -299,6 +383,11 @@ trait ShipmentScopes
         }
     }
 
+    /*
+     * Scope recipient EU.
+     *
+     */
+
     /**
      * Scope customs value.
      *
@@ -312,7 +401,7 @@ trait ShipmentScopes
     }
 
     /*
-     * Scope restrict results by company.
+     * Scope recipient EU.
      *
      */
 
@@ -325,86 +414,19 @@ trait ShipmentScopes
         return $query->whereIn('company_id', $companyIds);
     }
 
-    /*
-     * Scope restrict results by mode.
-     *
-     */
-
     public function scopeRestrictMode($query, $modeIds)
     {
         return $query->whereIn('shipments.mode_id', $modeIds);
     }
-
-    /*
-     * Scope restrict by depot.
-     *
-     */
 
     public function scopeRestrictDepot($query, $depotIds)
     {
         return $query->whereIn('shipments.depot_id', $depotIds);
     }
 
-    /*
-     * Get the shipments available for manifesting.
-     */
-
     public function scopeAvailableForManifesting($query)
     {
         return $query->whereReceived(1)->whereNull('manifest_id')->whereNotIn('status_id', [1, 7]);
-    }
-
-    /*
-     * Scope recipient not EU.
-     *
-     */
-
-    public function scopeNotEu($query)
-    {
-        if (!isJoined($query, 'countries')) {
-            $query->join('countries', 'shipments.recipient_country_code', '=', 'countries.country_code');
-        }
-
-        return $query->where('countries.eu', 0);
-    }
-
-    /*
-     * Scope recipient EU.
-     *
-     */
-
-    public function scopeWithinEu($query)
-    {
-        if (!isJoined($query, 'countries')) {
-            $query->join('countries', 'shipments.recipient_country_code', '=', 'countries.country_code');
-        }
-
-        return $query->where('countries.eu', 1);
-    }
-
-    /*
-     * Scope recipient EU.
-     *
-     */
-
-    public function scopeEuExcludingUkDomestic($query)
-    {
-        if (!isJoined($query, 'countries')) {
-            $query->join('countries', 'shipments.recipient_country_code', '=', 'countries.country_code');
-        }
-
-        return $query->where('countries.eu', 1)
-                        ->whereNotIn('recipient_country_code', getUkDomesticCountries());
-    }
-
-    /**
-     * Scope shipment is UK domestic.
-     *
-     * @return type
-     */
-    public function scopeIsDomestic($query)
-    {
-        return $query->where('sender_country_code', '=', DB::raw('recipient_country_code'));
     }
 
     /**
@@ -418,17 +440,6 @@ trait ShipmentScopes
     }
 
     /**
-     * Scope shipment is domestic.
-     *
-     * @return type
-     */
-    public function scopeIsUkDomestic($query)
-    {
-        return $query->whereIn('sender_country_code', getUkDomesticCountries())
-                        ->whereIn('recipient_country_code', getUkDomesticCountries());
-    }
-
-    /**
      * Scope shipment is international.
      *
      * @return type
@@ -436,17 +447,6 @@ trait ShipmentScopes
     public function scopeNotUkDomestic($query)
     {
         return $query->whereNotIn('recipient_country_code', getUkDomesticCountries());
-    }
-
-    /**
-     * Scope shipment is international.
-     *
-     * @return type
-     */
-    public function scopeIsInternational($query)
-    {
-        return $query->whereIn('sender_country_code', getUkDomesticCountries())
-                        ->whereNotIn('recipient_country_code', getUkDomesticCountries());
     }
 
     /*
@@ -497,8 +497,8 @@ trait ShipmentScopes
     public function scopeIsActive($query)
     {
         return $query->whereDelivered(0)
-                        ->whereReceived(1)
-                        ->whereNotIn('status_id', [7, 9, 10, 11, 17]);
+            ->whereReceived(1)
+            ->whereNotIn('status_id', [7, 9, 10, 11, 17]);
     }
 
     /*
@@ -517,15 +517,15 @@ trait ShipmentScopes
         }
 
         return $query->whereReceived(1)
-                        ->whereInvoicingStatus(0)
-                        ->whereNull('scs_job_number')
-                        ->whereNull('invoice_run_id')
-                        ->where('bill_shipping', 'sender')
-                        ->where('mode_id', 1)
-                        ->where('companies.legacy_pricing', 0)
-                        ->where('status_id', '<>', 7)
-                        ->where('shipments.id', '>', 640711)
-                        ->whereNotIn('companies.id', $excludedCompanies);
+            ->whereInvoicingStatus(0)
+            ->whereNull('scs_job_number')
+            ->whereNull('invoice_run_id')
+            ->where('bill_shipping', 'sender')
+            ->where('mode_id', 1)
+            ->where('companies.legacy_pricing', 0)
+            ->where('status_id', '<>', 7)
+            ->where('shipments.id', '>', 640711)
+            ->whereNotIn('companies.id', $excludedCompanies);
     }
 
     /**
@@ -548,11 +548,30 @@ trait ShipmentScopes
     public function scopeIsFedexCollect($query)
     {
         return $query->where('bill_shipping', '!=', 'sender')
-                        ->where('bill_shipping_account', '!=', 205691588)
-                        ->where('bill_shipping_account', '!=', '')
-                        ->where('carrier_id', 2)
-                        ->whereIn('sender_country_code', getUkDomesticCountries())
-                        ->whereNotIn('recipient_country_code', getUkDomesticCountries());
+            ->where('bill_shipping_account', '!=', 205691588)
+            ->where('bill_shipping_account', '!=', '')
+            ->where('carrier_id', 2)
+            ->whereIn('sender_country_code', getUkDomesticCountries())
+            ->whereNotIn('recipient_country_code', getUkDomesticCountries());
+    }
+
+    /*
+    * Scope Manifest number.
+    *
+    */
+    public function scopeHasManifestNumber($query, $manifestNumber)
+    {
+        if ($manifestNumber) {
+
+            $manifestNumber = trim($manifestNumber);
+
+            if (!isJoined($query, 'manifests')) {
+                $query->join('manifests', 'shipments.manifest_id', '=', 'manifests.id');
+            }
+
+            return $query->where('manifests.number', $manifestNumber);
+        }
+
     }
 
 }
