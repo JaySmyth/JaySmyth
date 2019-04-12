@@ -36,6 +36,7 @@ class PricingModel1 extends PricingModel
      *      calcDiscount()
      * *************************************
      */
+    public $maxStdDimension = 150;
 
     public function __construct()
     {
@@ -339,14 +340,10 @@ class PricingModel1 extends PricingModel
 
             if (isset($package['length']) && isset($package['width']) && isset($package['height'])) {
 
-                if ($package['length'] > 150)
+                $maxSide = max($package['length'], $package['width'], $package['height']);
+                if ($maxSide > $this->maxStdDimension) {
                     return true;
-
-                if ($package['width'] > 150)
-                    return true;
-
-                if ($package['height'] > 150)
-                    return true;
+                }
             }
         }
     }
