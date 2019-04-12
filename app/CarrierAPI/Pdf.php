@@ -756,23 +756,30 @@ class Pdf
             }
 
             if (file_exists(storage_path('app/' . $tempFile))) {
+
                 // Import the pdf to the existing pdf
-                $this->pdf->setSourceFile(storage_path('app/' . $tempFile));
+                $pageCount = $this->pdf->setSourceFile(storage_path('app/' . $tempFile));
 
                 for ($i = 0; $i < $copies; $i++) {
-                    $tpl = $this->pdf->importPage(1);
 
-                    // get the size of the imported page
-                    $size = $this->pdf->getTemplateSize($tpl);
+                    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
 
-                    // create a page (landscape or portrait depending on the imported page size)
-                    if ($size['w'] > $size['h']) {
-                        $this->pdf->addPage('L', array($size['w'], $size['h']));
-                    } else {
-                        $this->pdf->addPage('P', array($size['w'], $size['h']));
+                        $tpl = $this->pdf->importPage($pageNo);
+
+                        // get the size of the imported page
+                        $size = $this->pdf->getTemplateSize($tpl);
+
+                        // create a page (landscape or portrait depending on the imported page size)
+                        if ($size['w'] > $size['h']) {
+                            $this->pdf->addPage('L', array($size['w'], $size['h']));
+                        } else {
+                            $this->pdf->addPage('P', array($size['w'], $size['h']));
+                        }
+
+                        $this->pdf->useTemplate($tpl);
                     }
 
-                    $this->pdf->useTemplate($tpl);
+
                 }
             }
         }
