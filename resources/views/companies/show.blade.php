@@ -97,6 +97,11 @@
                 </div>
 
                 <div class="row mb-2">
+                    <div class="col-sm-6 text-truncate"><span class="fas fa-fw fa-file-invoice " aria-hidden="true"></span> <strong class="ml-sm-3">EORI</strong></div>
+                    <div class="col-sm-6">{{$company->eori}}</div>
+                </div>
+
+                <div class="row mb-2">
                     <div class="col-sm-6 text-truncate"><span class="fas fa-fw fa-credit-card" aria-hidden="true"></span> <strong class="ml-sm-3">VAT Exempt</strong></div>
                     <div class="col-sm-6">
                         @if($company->vat_exempt)

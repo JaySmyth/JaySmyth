@@ -10,7 +10,7 @@
                 {!! Form::Text('company_name', old('company_name'), ['id' => 'company_name', 'class' => 'form-control', 'maxlength' => '50']) !!}
 
                 @if ($errors->has('company_name'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('company_name') }}</strong>
                 </span>
                 @endif
@@ -27,7 +27,7 @@
                 {!! Form::select('address_type',dropDown('type'), old('address_type'), array('id' => 'address_type', 'class' => 'form-control')) !!}
 
                 @if ($errors->has('address_type'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('address_type')}}</strong>
                 </span>
                 @endif
@@ -44,7 +44,7 @@
                 {!! Form::Text('address1', old('address1'), ['id' => 'address1', 'class' => 'form-control', 'maxlength' => 35]) !!}
 
                 @if ($errors->has('address1'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('address1') }}</strong>
                 </span>
                 @endif
@@ -80,7 +80,7 @@
                 {!! Form::Text('city', old('city'), ['id' => 'city', 'class' => 'form-control', 'maxlength' => 35]) !!}
 
                 @if ($errors->has('city'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('city') }}</strong>
                 </span>
                 @endif
@@ -97,7 +97,7 @@
                 {!! Form::Text('state', old('state'), ['id' => 'state', 'class' => 'form-control', 'maxlength' => 35]) !!}
 
                 @if ($errors->has('state'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('state') }}</strong>
                 </span>
                 @endif
@@ -114,7 +114,7 @@
                 {!! Form::Text('postcode', old('postcode'), ['id' => 'postcode', 'class' => 'form-control', 'maxlength' => '9']) !!}
 
                 @if ($errors->has('postcode'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('postcode') }}</strong>
                 </span>
                 @endif
@@ -131,7 +131,7 @@
                 {!! Form::select('country_code', dropDown('countries', 'Please select'), old('country_code'), array('id' => 'country_code', 'class' => 'form-control')) !!}
 
                 @if ($errors->has('country_code'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('country_code') }}</strong>
                 </span>
                 @endif
@@ -147,7 +147,7 @@
                 {!! Form::Text('telephone', old('telephone'), ['id' => 'telephone', 'class' => 'form-control', 'maxlength' => '15']) !!}
 
                 @if ($errors->has('telephone'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('telephone') }}</strong>
                 </span>
                 @endif
@@ -164,7 +164,7 @@
                 {!! Form::Text('email', old('email'), ['id' => 'email', 'class' => 'form-control', 'maxlength' => '50']) !!}
 
                 @if ($errors->has('email'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('email') }}</strong>
                 </span>
                 @endif
@@ -173,14 +173,15 @@
         </div>
         <div class="form-group row{{ $errors->has('shipper_type_override') ? ' has-danger' : '' }}">
             <label class="col-sm-4  col-form-label">
-                Shipper Address Override: <abbr title="Usually Customer Supplied. May be used to overide Customer supplied value if Customer consistently misdeclares address type">*</abbr>
+                Shipper Address Override:
+                <abbr title="Usually Customer Supplied. May be used to overide Customer supplied value if Customer consistently misdeclares address type">*</abbr>
             </label>
 
             <div class="col-sm-6">
                 {!! Form::select('shipper_type_override',dropDown('type', 'Customer Supplied'), old('shipper_type_override'), array('id' => 'shipper_type_override', 'class' => 'form-control')) !!}
 
                 @if ($errors->has('shipper_type_override'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('shipper_type_override')}}</strong>
                 </span>
                 @endif
@@ -197,7 +198,7 @@
                 {!! Form::select('recipient_type_override',dropDown('type', 'Customer Supplied'), old('recipient_type_override'), array('id' => 'recipient_type_override', 'class' => 'form-control')) !!}
 
                 @if ($errors->has('recipient_type_override'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('recipient_type_override')}}</strong>
                 </span>
                 @endif
@@ -211,13 +212,14 @@
     <div class="col-sm-6">
 
         <div class="form-group row{{ $errors->has('site_name') ? ' has-danger' : '' }}">
-            <label class="col-sm-4  col-form-label">Site Name: <abbr title="This information is required.">*</abbr></label>
+            <label class="col-sm-4  col-form-label">Site Name:
+                <abbr title="This information is required.">*</abbr></label>
 
             <div class="col-sm-6">
                 {!! Form::Text('site_name', old('site_name'), ['id' => 'site_name', 'class' => 'form-control', 'maxlength' => 35]) !!}
 
                 @if ($errors->has('site_name'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('site_name') }}</strong>
                 </span>
                 @endif
@@ -234,7 +236,7 @@
                 {!! Form::select('depot_id', dropDown('depots'), old('depot_id'), array('id' => 'depot_id', 'class' => 'form-control')) !!}
 
                 @if ($errors->has('depot_id'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('depot_id') }}</strong>
                 </span>
                 @endif
@@ -243,15 +245,15 @@
         </div>
 
         @if(!Request::is('companies/*/edit'))
-        <div class="form-group row">
-            <label class="col-sm-4  col-form-label">
-                Account Status: <abbr title="This information is required.">*</abbr>
-            </label>
+            <div class="form-group row">
+                <label class="col-sm-4  col-form-label">
+                    Account Status: <abbr title="This information is required.">*</abbr>
+                </label>
 
-            <div class="col-sm-6">
-                {!! Form::select('enabled', dropDown('enabled'), old('enabled'), array('id' => 'enabled', 'class' => 'form-control')) !!}
+                <div class="col-sm-6">
+                    {!! Form::select('enabled', dropDown('enabled'), old('enabled'), array('id' => 'enabled', 'class' => 'form-control')) !!}
+                </div>
             </div>
-        </div>
         @endif
 
         <div class="form-group row">
@@ -261,23 +263,6 @@
 
             <div class="col-sm-6">
                 {!! Form::select('testing', dropDown('testing'), old('testing'), array('id' => 'testing', 'class' => 'form-control')) !!}
-            </div>
-        </div>
-
-        <div class="form-group row{{ $errors->has('notes') ? ' has-danger' : '' }}">
-            <label class="col-sm-4  col-form-label">
-                Notes:
-            </label>
-
-            <div class="col-sm-6">
-                {!! Form::Text('notes', old('notes'), ['id' => 'notes', 'class' => 'form-control', 'maxlength' => '255']) !!}
-
-                @if ($errors->has('notes'))
-                <span class="form-text">
-                    <strong>{{ $errors->first('notes') }}</strong>
-                </span>
-                @endif
-
             </div>
         </div>
 
@@ -294,15 +279,15 @@
         </div>
 
         @if(Auth::user()->hasRole('ifsa'))
-        <div class="form-group row">
-            <label class="col-sm-4  col-form-label">
-                Master Label Req: <abbr title="This information is required.">*</abbr>
-            </label>
+            <div class="form-group row">
+                <label class="col-sm-4  col-form-label">
+                    Master Label Req: <abbr title="This information is required.">*</abbr>
+                </label>
 
-            <div class="col-sm-6">
-                {!! Form::select('master_label', dropDown('boolean'), old('master_label'), array('id' => 'master_label', 'class' => 'form-control')) !!}
+                <div class="col-sm-6">
+                    {!! Form::select('master_label', dropDown('boolean'), old('master_label'), array('id' => 'master_label', 'class' => 'form-control')) !!}
+                </div>
             </div>
-        </div>
         @endif
 
         <div class="form-group row">
@@ -328,14 +313,30 @@
         <div class="form-group row">&nbsp;</div>
 
         <div class="form-group row{{ $errors->has('scs_code') ? ' has-danger' : '' }}">
-            <label class="col-sm-4  col-form-label">SCS Code: <abbr title="This information is required.">*</abbr></label>
+            <label class="col-sm-4  col-form-label">SCS Code:
+                <abbr title="This information is required.">*</abbr></label>
 
             <div class="col-sm-6">
                 {!! Form::Text('scs_code', old('scs_code'), ['id' => 'scs_code', 'class' => 'form-control numeric-only', 'maxlength' => '7']) !!}
 
                 @if ($errors->has('scs_code'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('scs_code') }}</strong>
+                </span>
+                @endif
+
+            </div>
+        </div>
+
+        <div class="form-group row{{ $errors->has('eori') ? ' has-danger' : '' }}">
+            <label class="col-sm-4 col-form-label">EORI:</label>
+
+            <div class="col-sm-6">
+                {!! Form::Text('eori', old('eori'), ['id' => 'eori', 'class' => 'form-control', 'maxlength' => '14']) !!}
+
+                @if ($errors->has('eori'))
+                    <span class="form-text">
+                    <strong>{{ $errors->first('eori') }}</strong>
                 </span>
                 @endif
 
@@ -349,7 +350,7 @@
                 {!! Form::Text('group_account', old('group_account'), ['id' => 'group_account', 'class' => 'form-control', 'maxlength' => '10']) !!}
 
                 @if ($errors->has('group_account'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('group_account') }}</strong>
                 </span>
                 @endif
@@ -378,15 +379,15 @@
         </div>
 
         @if(Auth::user()->hasRole('ifsa'))
-        <div class="form-group row">
-            <label class="col-sm-4  col-form-label">
-                Carrier Choice: <abbr title="This information is required.">*</abbr>
-            </label>
+            <div class="form-group row">
+                <label class="col-sm-4  col-form-label">
+                    Carrier Choice: <abbr title="This information is required.">*</abbr>
+                </label>
 
-            <div class="col-sm-6">
-                {!! Form::select('carrier_choice', dropDown('carrierChoice'), old('carrier_choice'), array('id' => 'carrier_choice', 'class' => 'form-control')) !!}
+                <div class="col-sm-6">
+                    {!! Form::select('carrier_choice', dropDown('carrierChoice'), old('carrier_choice'), array('id' => 'carrier_choice', 'class' => 'form-control')) !!}
+                </div>
             </div>
-        </div>
         @endif
 
     </div>
