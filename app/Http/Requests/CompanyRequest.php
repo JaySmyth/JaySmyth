@@ -40,6 +40,7 @@ class CompanyRequest extends Request
             'notes' => 'max:255',
             'company_code' => 'alpha|unique',
             'scs_code' => 'required|size:7',
+            'eori' => 'size:14',
             'group_account' => 'max:10',
             'vat_exempt' => 'required|boolean',
             'enabled' => 'boolean',
