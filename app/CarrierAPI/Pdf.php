@@ -852,11 +852,11 @@ class Pdf
         $this->pdf->Text(165, 50, 'Tel:' . $shipment->recipient_telephone);
         $this->pdf->Text(6, 88, getCountry($shipment->sender_country_code));
 
-        if (!empty($shipment->eori)) {
+        if (!empty($shipment->eori) || !empty($shipment->company->eori)) {
             $this->pdf->SetFont($this->font, 'B', 10);
             $this->pdf->Text(63, 84, 'EORI');
             $this->pdf->SetFont($this->font, '', 10);
-            $this->pdf->Text(63, 88, $shipment->eori);
+            $this->pdf->Text(63, 88, ($shipment->eori) ? $shipment->eori : $shipment->company->eori);
         }
 
         $this->pdf->Text(6, 99, ucfirst($shipReason));
