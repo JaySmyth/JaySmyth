@@ -2,7 +2,6 @@
 
 namespace app\CarrierAPI\Fedex;
 
-use App\CarrierAPI\Fedex\FedexSettings;
 use App\Carrier;
 use App\Company;
 use App\CarrierPackagingType;
@@ -10,6 +9,7 @@ use App\TransactionLog;
 use App\CarrierAPI\Fedex\FedexLabel;
 use App\Sequence;
 use Carbon\Carbon;
+use App\CarrierAPI\Fedex\FedexSettings;
 use Illuminate\Support\Facades\Validator;
 
 /**

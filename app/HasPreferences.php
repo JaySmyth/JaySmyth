@@ -95,6 +95,7 @@ trait HasPreferences
                 'sender_email' => $this->email,
                 'terms_of_sale' => 'DAP',
                 'bill_tax_duty' => 'recipient',
+                'eori' => $company->eori
             ];
         }
 

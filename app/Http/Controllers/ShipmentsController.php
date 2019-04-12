@@ -61,6 +61,47 @@ class ShipmentsController extends Controller
         return view('shipments.index', compact('shipments', 'company', 'user'));
     }
 
+    private function search($request, $paginate = true, $limit = false)
+    {
+        // Default results to "today" for IFS staff to limit large result set
+        if ($request->user()->hasIfsRole() && strlen($request->filter) < 5 && !$request->date_from && !$request->date_to && !$request->company && !$request->user && !$request->scs_job_number) {
+            $request->date_from = Carbon::today();
+            $request->date_to = Carbon::today();
+        }
+
+        $query = Shipment::select('shipments.*')
+            ->orderBy('created_at', 'DESC')
+            ->orderBy('shipments.id', 'DESC')
+            ->filter($request->filter)
+            ->hasScsJobNumber($request->scs_job_number)
+            ->hasMode($request->mode)
+            ->hasCompany($request->company)
+            ->hasStatus($request->status)
+            ->hasSource($request->source)
+            ->hasDestination($request->destination)
+            ->hasRecipientType($request->recipient_type)
+            ->hasPieces($request->pieces)
+            ->hasService($request->service)
+            ->traffic($request->traffic)
+            ->hasCarrier($request->carrier)
+            ->shipDateBetween($request->date_from, $request->date_to)
+            ->createdBy($request->user)
+            ->recipientFilter($request->recipient_filter)
+            ->restrictCompany($request->user()->getAllowedCompanyIds())
+            ->restrictMode($request->user()->getAllowedModeIds())
+            ->with('service', 'status', 'department', 'mode', 'company', 'depot');
+
+        if ($limit) {
+            $query->limit($limit);
+        }
+
+        if (!$paginate) {
+            return $query->get();
+        }
+
+        return $query->paginate(50);
+    }
+
     /**
      * Show a shipment.
      *
@@ -101,6 +142,31 @@ class ShipmentsController extends Controller
         $formView = true;
 
         return view('shipments.create', compact('shipment', 'mode', 'arrays', 'formView'));
+    }
+
+    /**
+     * Returns the values to pass to the create/edit shipment form.
+     *
+     * @param   $mode
+     * @param   $shipment
+     * @return  multidimensional array
+     */
+    private function prepareForm($mode, $companyId = null)
+    {
+        // Use previous form submission values or default values
+        $packages = null !== old('packages') ? old('packages') : array(0 => array('packaging_code' => '', 'weight' => '', 'length' => '', 'width' => '', 'height' => ''));
+        $contents = null !== old('contents') ? old('contents') : [];
+
+        if (!$companyId) {
+            // If old company ID doesn't exist, default to authenticated user's company id
+            $companyId = null !== old('company_id') ? old('company_id') : Auth::user()->company_id;
+        }
+
+        $company = Company::findOrFail($companyId);
+        $packaging = $company->getPackagingTypes($mode->id)->pluck('description', 'code');
+        $localisation = $company->localisation;
+
+        return compact('packages', 'contents', 'packaging', 'localisation');
     }
 
     /**
@@ -243,31 +309,6 @@ class ShipmentsController extends Controller
     }
 
     /**
-     * Returns the values to pass to the create/edit shipment form.
-     *
-     * @param   $mode
-     * @param   $shipment
-     * @return  multidimensional array
-     */
-    private function prepareForm($mode, $companyId = null)
-    {
-        // Use previous form submission values or default values
-        $packages = null !== old('packages') ? old('packages') : array(0 => array('packaging_code' => '', 'weight' => '', 'length' => '', 'width' => '', 'height' => ''));
-        $contents = null !== old('contents') ? old('contents') : [];
-
-        if (!$companyId) {
-            // If old company ID doesn't exist, default to authenticated user's company id
-            $companyId = null !== old('company_id') ? old('company_id') : Auth::user()->company_id;
-        }
-
-        $company = Company::findOrFail($companyId);
-        $packaging = $company->getPackagingTypes($mode->id)->pluck('description', 'code');
-        $localisation = $company->localisation;
-
-        return compact('packages', 'contents', 'packaging', 'localisation');
-    }
-
-    /**
      * Display update DIMs page
      *
      * @param
@@ -281,16 +322,16 @@ class ShipmentsController extends Controller
         $dateTo = new Carbon($request->date_to);
 
         $shipments = Shipment::orderBy('created_at', 'DESC')
-                ->orderBy('shipments.id', 'DESC')
-                ->whereNull('supplied_volumetric_weight')
-                ->filter($request->filter)
-                ->hasMode($request->mode)
-                ->hasDepot($request->depot)
-                ->hasService($request->service)
-                ->hasCompany($request->company)
-                ->shipDateBetween($dateFrom, $dateTo)
-                ->with('service', 'packages', 'company')
-                ->paginate(50);
+            ->orderBy('shipments.id', 'DESC')
+            ->whereNull('supplied_volumetric_weight')
+            ->filter($request->filter)
+            ->hasMode($request->mode)
+            ->hasDepot($request->depot)
+            ->hasService($request->service)
+            ->hasCompany($request->company)
+            ->shipDateBetween($dateFrom, $dateTo)
+            ->with('service', 'packages', 'company')
+            ->paginate(50);
 
         return view('shipments.update_dims', compact('shipments'));
     }
@@ -370,6 +411,8 @@ class ShipmentsController extends Controller
 
             $shipment->save();
 
+            $shipment->log('DIMS updated');
+
             return 'success';
         }
     }
@@ -441,6 +484,13 @@ class ShipmentsController extends Controller
         // user authenticated so use their preferred label size
         if (!Auth::guest()) {
             $printFormatCode = Auth::user()->printFormat->code;
+        }
+
+        // Log the event (model loaded as code below expects a collection)
+        $shipment = Shipment::whereToken($token)->firstOrFail();
+
+        if(Carbon::now()->subSeconds(5) > $shipment->created_at){
+            $shipment->log('Downloaded Label');
         }
 
         // load the shipment model from the token
@@ -553,7 +603,7 @@ class ShipmentsController extends Controller
     {
         $this->authorize('upload', new Shipment);
 
-        // Validate the request        
+        // Validate the request
         $this->validate($request, ['import_config_id' => 'required|numeric', 'file' => 'required|mimes:csv,txt'], ['import_config_id.required' => 'Please select an upload profile.', 'file.mimes' => 'Not a valid CSV file - please check for unsupported characters', 'file.required' => 'Please select a file to upload.']);
 
         // Upload the file to the temp directory
@@ -575,7 +625,7 @@ class ShipmentsController extends Controller
     /**
      * Download the result set to an Excel Document.
      *
-     * @param  Request
+     * @param Request
      * @return Excel document
      */
     public function download(Request $request)
@@ -590,7 +640,7 @@ class ShipmentsController extends Controller
     /**
      * Download the result set to an Excel Document.
      *
-     * @param  Request
+     * @param Request
      * @return Excel document
      */
     public function downloadDims(Request $request)
@@ -613,10 +663,10 @@ class ShipmentsController extends Controller
         $this->authorize('index', new Shipment);
 
         $shipments = Shipment::orderBy('ship_date', 'DESC')
-                ->hasCompany($request->company)
-                ->hasStatus('pre_transit')
-                ->restrictCompany($request->user()->getAllowedCompanyIds())
-                ->get();
+            ->hasCompany($request->company)
+            ->hasStatus('pre_transit')
+            ->restrictCompany($request->user()->getAllowedCompanyIds())
+            ->get();
 
         $pdf = new Pdf($request->user()->localisation->document_size, 'D');
 
@@ -673,11 +723,11 @@ class ShipmentsController extends Controller
     public function todaysLabels(Request $request)
     {
         $shipments = Shipment::orderBy('id', 'desc')
-                ->groupBy('source')
-                ->restrictCompany($request->user()->getAllowedCompanyIds())
-                ->restrictMode($request->user()->getAllowedModeIds())
-                ->whereBetween('created_at', [Carbon::today()->startOfDay(), Carbon::today()->endOfDay()])
-                ->paginate(50);
+            ->groupBy('source')
+            ->restrictCompany($request->user()->getAllowedCompanyIds())
+            ->restrictMode($request->user()->getAllowedModeIds())
+            ->whereBetween('created_at', [Carbon::today()->startOfDay(), Carbon::today()->endOfDay()])
+            ->paginate(50);
 
         return view('shipments.todays_labels', compact('shipments'));
     }
@@ -748,6 +798,15 @@ class ShipmentsController extends Controller
         return redirect("shipments/$id");
     }
 
+    /*
+     * Shipment search.
+     *
+     * @param   $request
+     * @param   $paginate
+     *
+     * @return
+     */
+
     /**
      * Dumps out shipment model.
      *
@@ -759,56 +818,6 @@ class ShipmentsController extends Controller
         $this->authorize('rawData', $shipment);
         $transactionLog = \App\TransactionLog::where('msg', 'like', '%' . $shipment->carrier_consignment_number . '%')->get();
         dd($transactionLog);
-    }
-
-    /*
-     * Shipment search.
-     *
-     * @param   $request
-     * @param   $paginate
-     *
-     * @return
-     */
-
-    private function search($request, $paginate = true, $limit = false)
-    {
-        // Default results to "today" for IFS staff to limit large result set
-        if ($request->user()->hasIfsRole() && strlen($request->filter) < 5 && !$request->date_from && !$request->date_to && !$request->company && !$request->user && !$request->scs_job_number) {
-            $request->date_from = Carbon::today();
-            $request->date_to = Carbon::today();
-        }
-
-        $query = Shipment::select('shipments.*')
-                ->orderBy('created_at', 'DESC')
-                ->orderBy('shipments.id', 'DESC')
-                ->filter($request->filter)
-                ->hasScsJobNumber($request->scs_job_number)
-                ->hasMode($request->mode)
-                ->hasCompany($request->company)
-                ->hasStatus($request->status)
-                ->hasSource($request->source)
-                ->hasDestination($request->destination)
-                ->hasRecipientType($request->recipient_type)
-                ->hasPieces($request->pieces)
-                ->hasService($request->service)
-                ->traffic($request->traffic)
-                ->hasCarrier($request->carrier)
-                ->shipDateBetween($request->date_from, $request->date_to)
-                ->createdBy($request->user)
-                ->recipientFilter($request->recipient_filter)
-                ->restrictCompany($request->user()->getAllowedCompanyIds())
-                ->restrictMode($request->user()->getAllowedModeIds())
-                ->with('service', 'status', 'department', 'mode', 'company', 'depot');
-
-        if ($limit) {
-            $query->limit($limit);
-        }
-
-        if (!$paginate) {
-            return $query->get();
-        }
-
-        return $query->paginate(50);
     }
 
     /**
