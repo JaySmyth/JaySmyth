@@ -329,11 +329,11 @@ class SeaFreightShipmentController extends Controller
 
         $this->authorize('status', $shipment);
 
-        $shipment->setStatus($request->sea_freight_status_id, $request->user()->id, $request->date . ' ' . $request->time, $request->message);
+        $shipment->setStatus($request->sea_freight_status_id, $request->user()->id, gmtToCarbonUtc($request->date . ' ' . $request->time), $request->message);
 
         flash()->success('Status updated!', 'Shipment status updated.');
 
-        return redirect('sea-freight');
+        return redirect('sea-freight/' . $shipment->id);
     }
 
     /**
