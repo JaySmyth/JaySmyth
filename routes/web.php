@@ -384,6 +384,9 @@ Route::get('sea-freight/{id}/status', 'SeaFreightShipmentController@status');
 Route::post('sea-freight/{id}/status', 'SeaFreightShipmentController@updateStatus');
 Route::get('sea-freight/download', 'SeaFreightShipmentController@download');
 Route::resource('sea-freight', 'SeaFreightShipmentController');
+Route::get('sea-freight-tracking/{seaFreightTracking}/edit', 'SeaFreightTrackingController@edit');
+Route::patch('sea-freight-tracking/{seaFreightTracking}', 'SeaFreightTrackingController@update');
+
 
 /*
   |--------------------------------------------------------------------------
