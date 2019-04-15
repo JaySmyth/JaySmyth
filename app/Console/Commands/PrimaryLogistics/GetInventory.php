@@ -72,7 +72,7 @@ class GetInventory extends Command
 
                 fclose($handle);
 
-                Mail::to(['aplatt@antrim.ifsgroup.com', 'epalframan@antrim.ifsgroup.com'])->bcc(['it@antrim.ifsgroup.com'])->send(new \App\Mail\GenericError('Daily Inventory Report - Babocush USA', null, $this->tempFile));
+                Mail::to(['aplatt@antrim.ifsgroup.com', 'epalframan@antrim.ifsgroup.com', 'vmi@kilroot.ifsgroup.com'])->bcc(['it@antrim.ifsgroup.com'])->send(new \App\Mail\GenericError('Daily Inventory Report - Babocush USA', null, $this->tempFile));
             }
         } catch (GuzzleException $exc) {
             if ($exc->hasResponse()) {

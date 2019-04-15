@@ -246,7 +246,7 @@ class SeaFreightShipment extends Model
      */
     public function getTimeRemainingAttribute()
     {
-        if (in_array($this->sea_freight_status_id, [11, 12])) {
+        if (in_array($this->sea_freight_status_id, [12])) {
             return 0;
         }
 
