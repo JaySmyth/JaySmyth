@@ -14,8 +14,8 @@
         @foreach ($shipment->tracking as $tracking)
         <tr>
             <td>{{$loop->iteration}}</td>
-            <td>{{$tracking->datetime->format('jS M - Y')}}</td>
-            <td>{{$tracking->datetime->format('g:ia')}}</td>
+            <td>{{$tracking->datetime->timezone(Auth::user()->time_zone)->format('jS M - Y')}}</td>
+            <td>{{$tracking->datetime->timezone(Auth::user()->time_zone)->format('g:ia')}}</td>
             <td>{{$tracking->status_name}}</td>
             <td>
                 @if($tracking->status == 'delivered')
