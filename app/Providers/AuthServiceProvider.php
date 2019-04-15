@@ -45,6 +45,7 @@ class AuthServiceProvider extends ServiceProvider
         \App\Postcode::class => \App\Policies\PostcodePolicy::class,
         \App\Quotation::class => \App\Policies\QuotationPolicy::class,
         \App\Log::class => \App\Policies\LogPolicy::class,
+        \App\SeaFreightTracking::class => \App\Policies\SeaFreightTrackingPolicy::class,
     ];
 
     /**

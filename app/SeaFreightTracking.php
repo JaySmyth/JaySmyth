@@ -29,6 +29,16 @@ class SeaFreightTracking extends Model
     protected $dates = ['datetime'];
 
     /**
+     * A tracking event is owned by a shipment.
+     *
+     * @return
+     */
+    public function seaFreightShipment()
+    {
+        return $this->belongsTo(SeaFreightShipment::class);
+    }
+
+    /**
      * Returns a user's name if the tracking event has been created manually
      * 
      * @return string or null
