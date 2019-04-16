@@ -760,26 +760,29 @@ class Pdf
                 // Import the pdf to the existing pdf
                 $pageCount = $this->pdf->setSourceFile(storage_path('app/' . $tempFile));
 
-                for ($i = 0; $i < $copies; $i++) {
+                if ($pageCount > 0) {
 
-                    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+                    for ($i = 0; $i < $copies; $i++) {
 
-                        $tpl = $this->pdf->importPage($pageNo);
+                        for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
 
-                        // get the size of the imported page
-                        $size = $this->pdf->getTemplateSize($tpl);
+                            $tpl = $this->pdf->importPage($pageNo);
 
-                        // create a page (landscape or portrait depending on the imported page size)
-                        if ($size['w'] > $size['h']) {
-                            $this->pdf->addPage('L', array($size['w'], $size['h']));
-                        } else {
-                            $this->pdf->addPage('P', array($size['w'], $size['h']));
+                            // get the size of the imported page
+                            $size = $this->pdf->getTemplateSize($tpl);
+
+                            // create a page (landscape or portrait depending on the imported page size)
+                            if ($size['w'] > $size['h']) {
+                                $this->pdf->addPage('L', array($size['w'], $size['h']));
+                            } else {
+                                $this->pdf->addPage('P', array($size['w'], $size['h']));
+                            }
+
+                            $this->pdf->useTemplate($tpl);
                         }
 
-                        $this->pdf->useTemplate($tpl);
+
                     }
-
-
                 }
             }
         }
