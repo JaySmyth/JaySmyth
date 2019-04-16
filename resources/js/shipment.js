@@ -152,7 +152,11 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
     }
 
     // Display popover
-    $('#insurance_value').popover({title: 'Insured Shipment', content: "Please note that insured shipments will incur an additional charge. This charge is not reflected in the total shipping cost on the following screen. For more information please contact the courier department", trigger: "focus"})
+    $('#insurance_value').popover({
+        title: 'Insured Shipment',
+        content: "Please note that insured shipments will incur an additional charge. This charge is not reflected in the total shipping cost on the following screen. For more information please contact the courier department",
+        trigger: "focus"
+    })
 
     // Set the hidden commodity count
     var commodityCount = $('#container-contents').find('.item').length;
@@ -228,7 +232,8 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
         },
         messages: {
             noResults: '',
-            results: function () {}
+            results: function () {
+            }
         },
         minLength: 3,
         select: function (event, ui) {
@@ -402,7 +407,6 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
     });
 
 
-
     /**
      *
      *
@@ -567,9 +571,6 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
     });
 
 
-
-
-
     /*
      * Open the address book and load results
      */
@@ -631,9 +632,6 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
      */
     function validateContents() {
 
-        // BYPASS VALIDATION
-        return true;
-
         // No need to define shipment contents for docs or domestic shipments
         if ($('#ship_reason').val() == 'documents' || isDomestic()) {
             return true;
@@ -658,8 +656,8 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
             if (passValidation[i] === false) {
 
                 swal({
-                    title: "Shipment Contents Panel",
-                    text: "Please tell us what's inside each package (there should be at least one line for each package).<br><br>For shipments with multiple packages but only one commodity, use the 'Fill' button to autocomplete the package contents for you.",
+                    title: "Shipment Contents",
+                    text: "Please add commodity details to your shipment.",
                     type: "error"
                 })
 
@@ -740,22 +738,21 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
         var id = $(this).attr('id').match(/\d+/);
 
         $.get("/commodities/" + id,
-                function (response) {
+            function (response) {
 
-                    // Hide the page loading indicator
-                    $('.modal-loading').hide();
+                // Hide the page loading indicator
+                $('.modal-loading').hide();
 
-                    $.each(response, function (key, value) {
-                        $("#commodity_" + key).val(value);
-                    });
-
-                    $('.lightbox-form-title').text('Edit Commodity');
-
-                    $('#commodity-form').show();
+                $.each(response, function (key, value) {
+                    $("#commodity_" + key).val(value);
                 });
 
-    });
+                $('.lightbox-form-title').text('Edit Commodity');
 
+                $('#commodity-form').show();
+            });
+
+    });
 
 
     $('#button-cancel-commodity').click(function () {
@@ -860,7 +857,6 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
     });
 
 
-
     /**
      *
      *
@@ -870,7 +866,7 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
 
     function isDomestic() {
 
-        var domesticCountries = ['GB', 'IE', 'GG', 'JE', 'IM'];
+        var domesticCountries = ['GB', 'IE'];
         var countryCode = $('#recipient_country_code').val();
 
         if ($.inArray(countryCode, domesticCountries) !== -1) {
@@ -879,7 +875,6 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
 
         return false;
     }
-
 
 
     /**
@@ -1076,10 +1071,10 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
     function populateForm(data) {
         // reset the entire form before loading in new values
         $(':input', '#create-shipment')
-                .not(':button, :submit, :reset, :hidden, #company_id, #collection_date, input[name="save_sender"], input[name="save_recipient"]')
-                .val('')
-                .removeAttr('selected')
-                .removeAttr('checked');
+            .not(':button, :submit, :reset, :hidden, #company_id, #collection_date, input[name="save_sender"], input[name="save_recipient"]')
+            .val('')
+            .removeAttr('selected')
+            .removeAttr('checked');
 
         // reset the hidden address ids
         $('#sender_id').val('');
@@ -1195,36 +1190,36 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
     function getAddress(id) {
 
         $.get("/addresses/" + id,
-                function (response) {
+            function (response) {
 
-                    // Load the states drop down/text field
-                    getStates(response['country_code'], response['definition'], response['state']);
+                // Load the states drop down/text field
+                getStates(response['country_code'], response['definition'], response['state']);
 
-                    // Set the values of the fields
-                    $.each(response, function (key, value) {
-                        $("#" + response['definition'] + "_" + key).val(value);
-                        $("#" + response['definition'] + "_" + key).parent("div").removeClass("has-danger");
-                    });
+                // Set the values of the fields
+                $.each(response, function (key, value) {
+                    $("#" + response['definition'] + "_" + key).val(value);
+                    $("#" + response['definition'] + "_" + key).parent("div").removeClass("has-danger");
+                });
 
-                    setDomestic();
+                setDomestic();
 
-                    $("#display_" + response['definition'] + "_email").val(response['email']);
+                $("#display_" + response['definition'] + "_email").val(response['email']);
 
-                    if (response['definition'] == 'recipient') {
+                if (response['definition'] == 'recipient') {
 
-                        $("#ultimate_destination_country_code").val(response['country_code']);
+                    $("#ultimate_destination_country_code").val(response['country_code']);
 
-                        if ($('#bill_shipping').val() === 'recipient') {
-                            $('#bill_shipping_account').val(response['account_number']);
-                        }
-
-                        if ($('#bill_tax_duty').val() === 'recipient') {
-                            $('#bill_tax_duty_account').val(response['account_number']);
-                        }
-
+                    if ($('#bill_shipping').val() === 'recipient') {
+                        $('#bill_shipping_account').val(response['account_number']);
                     }
 
-                });
+                    if ($('#bill_tax_duty').val() === 'recipient') {
+                        $('#bill_tax_duty_account').val(response['account_number']);
+                    }
+
+                }
+
+            });
     }
 
     // Address book item clicked
@@ -1249,10 +1244,9 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
     }
 
 
-
     /**
      * Get the largest girth.
-     * 
+     *
      * @returns integer
      */
     function getLargestGirth() {
@@ -1418,13 +1412,13 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
 
             $.each(response, function (i, commodity) {
                 var tr = $('<tr id="commodity-' + commodity.id + '">').append(
-                        $('<td class="select-commodity">').text(commodity.description),
-                        $('<td class="select-commodity">').text(commodity.commodity_code),
-                        $('<td class="select-commodity">').text(commodity.harmonized_code),
-                        $('<td class="select-commodity">').text(commodity.country_of_manufacture),
-                        $('<td class="select-commodity">').text(commodity.unit_value + " " + commodity.currency_code),
-                        $('<td class="p-2 text-right">').html('<a href="/commodities/' + commodity.id + '" title="Delete Commodity" class="delete mr-2" data-record-name="commodity"><i class="fas fa-times"></i></a><a href="#" id="edit-commodity-' + commodity.id + '" class="edit-commodity"><span class="far fa-edit" aria-hidden="true"></span></a>')
-                        );
+                    $('<td class="select-commodity">').text(commodity.description),
+                    $('<td class="select-commodity">').text(commodity.commodity_code),
+                    $('<td class="select-commodity">').text(commodity.harmonized_code),
+                    $('<td class="select-commodity">').text(commodity.country_of_manufacture),
+                    $('<td class="select-commodity">').text(commodity.unit_value + " " + commodity.currency_code),
+                    $('<td class="p-2 text-right">').html('<a href="/commodities/' + commodity.id + '" title="Delete Commodity" class="delete mr-2" data-record-name="commodity"><i class="fas fa-times"></i></a><a href="#" id="edit-commodity-' + commodity.id + '" class="edit-commodity"><span class="far fa-edit" aria-hidden="true"></span></a>')
+                );
                 tr.appendTo('#commodities_body');
             });
 
@@ -1509,13 +1503,13 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
                     hiddenFields += '<input type="hidden" name="contents[' + commodityCount + '][shipping_cost]" id="contents-' + commodityCount + '-shipping-cost" value="' + response.shipping_cost + '">';
 
                     var div = $('<div id="commodity-' + commodityCount + '" class="form-group row item">').append(
-                            $('<div class="col-xl-3">').html('<input type="text" name="contents[' + commodityCount + '][description]" id="contents-' + commodityCount + '-description" class="form-control form-control-sm" value="' + response.description + '" readonly>' + hiddenFields),
-                            $('<div class="col-xl-2">').html(select),
-                            $('<div class="col-xl-2">').html('<input class="form-control form-control-sm numeric-only-required" name="contents[' + commodityCount + '][quantity]"  id="contents-' + commodityCount + '-quantity" value="' + quantity + '" type="text" maxlength="8">'),
-                            $('<div class="col-xl-2">').html('<div class="input-group input-group-sm"><input class="form-control decimal-only-required" name="contents[' + commodityCount + '][unit_weight]"  id="contents-' + commodityCount + '-unit-weight" type="text" value="' + unitWeight + '" maxlength="8"><div class="input-group-append"><span id="weight_uom_' + commodityCount + '" class="input-group-text commodity-weight-uom text-uppercase">' + response.weight_uom + '</span></div></div>'),
-                            $('<div class="col-xl-2">').html('<div class="input-group input-group-sm"><input class="form-control decimal-only-required" name="contents[' + commodityCount + '][unit_value]"  id="contents-' + commodityCount + '-unit-value" type="text" value="' + unitValue + '" maxlength="12"><div class="input-group-append"><span id="currency_code_' + commodityCount + '" class="input-group-text commodity-currency-code text-uppercase">' + response.currency_code + '</span></div></div>'),
-                            $('<div class="col-xl-1">').html('<div class="row action-links"><a href="#" title="Duplicate Commodity"><span class="far fa-copy duplicate-commodity" aria-hidden="true"></span></a> <a href="#" title="Remove Commodity"><span class="fas fa-times remove-commodity ml-xl-1" aria-hidden="true"></span></a></div>')
-                            );
+                        $('<div class="col-xl-3">').html('<input type="text" name="contents[' + commodityCount + '][description]" id="contents-' + commodityCount + '-description" class="form-control form-control-sm" value="' + response.description + '" readonly>' + hiddenFields),
+                        $('<div class="col-xl-2">').html(select),
+                        $('<div class="col-xl-2">').html('<input class="form-control form-control-sm numeric-only-required" name="contents[' + commodityCount + '][quantity]"  id="contents-' + commodityCount + '-quantity" value="' + quantity + '" type="text" maxlength="8">'),
+                        $('<div class="col-xl-2">').html('<div class="input-group input-group-sm"><input class="form-control decimal-only-required" name="contents[' + commodityCount + '][unit_weight]"  id="contents-' + commodityCount + '-unit-weight" type="text" value="' + unitWeight + '" maxlength="8"><div class="input-group-append"><span id="weight_uom_' + commodityCount + '" class="input-group-text commodity-weight-uom text-uppercase">' + response.weight_uom + '</span></div></div>'),
+                        $('<div class="col-xl-2">').html('<div class="input-group input-group-sm"><input class="form-control decimal-only-required" name="contents[' + commodityCount + '][unit_value]"  id="contents-' + commodityCount + '-unit-value" type="text" value="' + unitValue + '" maxlength="12"><div class="input-group-append"><span id="currency_code_' + commodityCount + '" class="input-group-text commodity-currency-code text-uppercase">' + response.currency_code + '</span></div></div>'),
+                        $('<div class="col-xl-1">').html('<div class="row action-links"><a href="#" title="Duplicate Commodity"><span class="far fa-copy duplicate-commodity" aria-hidden="true"></span></a> <a href="#" title="Remove Commodity"><span class="fas fa-times remove-commodity ml-xl-1" aria-hidden="true"></span></a></div>')
+                    );
 
                     div.appendTo('#container-contents');
 
