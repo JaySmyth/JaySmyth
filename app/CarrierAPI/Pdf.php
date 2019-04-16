@@ -5,10 +5,9 @@ namespace App\CarrierAPI;
 use TCPDI;
 use App\Shipment;
 use App\Company;
-use App\Carrier;
 use App\PrintFormat;
-use App\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class Pdf
@@ -35,6 +34,7 @@ class Pdf
     protected $font = 'helvetica';
     protected $pageDims;
     protected $customerLabelRequired = false;
+    protected $user = false;
     #
     protected $masterLabelRequired = false;
     protected $packageLabelRequired = false;
@@ -50,11 +50,12 @@ class Pdf
      */
     public function __construct($size = 'A4', $output = 'S', $encoded = true)
     {
+        $this->user = false;
 
         // If User authenticated then use their label preferences
         if (Auth::check()) {
-            $user = Auth::user();
-            $this->customerLabelRequired = $user->customer_label;
+            $this->user = Auth::user();
+            $this->customerLabelRequired = $this->user->customer_label;
         } else {
             $this->customerLabelRequired = false;
         }
@@ -277,7 +278,11 @@ class Pdf
                 if ((strtoupper($labelType) != 'MASTER') && $this->size == 'A4') {
 
                     // If Customer requires a commercial invoice or Invoice requested using invType == "INVOICE/CUSTOMS"
-                    $commercial_invoice_required = Company::find($shipment->company_id)->commercial_invoice;
+                    if ($this->user && $this->user->hasIfsRole()) {
+                        $commercial_invoice_required = true;
+                    } else {
+                        $commercial_invoice_required = Company::find($shipment->company_id)->commercial_invoice;
+                    }
 
                     if ($commercial_invoice_required || $labelType == "INVOICE" || $labelType == "CUSTOMS") {
 
@@ -757,8 +762,13 @@ class Pdf
 
             if (file_exists(storage_path('app/' . $tempFile))) {
 
-                // Import the pdf to the existing pdf
-                $pageCount = $this->pdf->setSourceFile(storage_path('app/' . $tempFile));
+                $pageCount = 0;
+
+                try {
+                    $pageCount = $this->pdf->setSourceFile(storage_path('app/' . $tempFile));
+                } catch (\Exception $exc) {
+                    Mail::to(($this->user) ? $this->user->email : 'courier@antrim.ifsgroup.com')->queue(new \App\Mail\GenericError('Document Error - ' . $shipment->consignment_number, 'Warning, unable to include uploaded documents for shipment ' . $shipment->consignment_number));
+                }
 
                 if ($pageCount > 0) {
 
