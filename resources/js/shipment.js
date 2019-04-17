@@ -637,6 +637,20 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
             return true;
         }
 
+        if ($("#commodity_count").val() == 0) {
+            swal({
+                title: "Shipment Contents",
+                text: "Please add commodity details to your shipment.",
+                type: "error"
+            });
+
+            return false;
+        }
+
+        return true;
+
+        /*
+
         var pieces = $('#pieces').val();
         var passValidation = [];
 
@@ -657,7 +671,7 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
 
                 swal({
                     title: "Shipment Contents",
-                    text: "Please add commodity details to your shipment.",
+                    text: "Please tell us what's inside each package (there should be at least one line for each package). For shipments with multiple packages but only one commodity, use the 'Fill' button to autocomplete the package contents for you.",
                     type: "error"
                 })
 
@@ -666,6 +680,8 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
         }
 
         return true;
+
+         */
 
     }
 
