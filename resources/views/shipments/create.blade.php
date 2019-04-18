@@ -639,35 +639,35 @@
                         Shipment Contents
                         <span class="fas fa-info-circle" aria-hidden="true" data-placement="bottom" data-toggle="tooltip" data-original-title="This panel allows you to define what is contained within each of your packages. There MUST be at least one line for every package. For shipments with multiple packages but only one commodity, use the 'Fill' button to autocomplete the package contents for you (the 'Fill' button is only displayed when appropriate)."></span>
                         <div class="float-right">
-                            <button id="button-fill" class="btn btn-outline-secondary btn-sm btn-xs" type="button">Fill</button>
                             <button type="button" id="button-add-commodity" class="btn btn-outline-secondary btn-sm btn-xs" data-toggle="modal" data-target="#commodities">Add Commodity</button>
                         </div>
                     </div>
                     <div id="container-contents" class="card-body pt-2 pb-2 text-nowrap">
                         <div id="commodity-headings" class="row font-weight-bold">
-                            <div class="col-md-3">Description</div>
-                            <div class="col-md-2">Package</div>
-                            <div class="col-md-2">Quantity</div>
-                            <div class="col-md-2">Unit Weight</div>
-                            <div class="col-md-2">Unit Value</div>
-                            <div class="col-md-1">&nbsp;</div>
+                            <div class="col-3">Description</div>
+                            <div class="col-2">Product Code</div>
+                            <div class="col-2">Quantity</div>
+                            <div class="col-2">Unit Weight</div>
+                            <div class="col-2">Unit Value</div>
+                            <div class="col-1">&nbsp;</div>
                         </div>
 
                         @foreach($arrays['contents'] as $key => $val)
                             <div id="commodity-{!! $key !!}" class="form-group row item">
-                                <div class="col-md-3">
+
+                                <div class="col-3">
                                     {!! Form::Text('contents['.$key.'][description]', (isset($val['description'])) ? $val['description']: null, ['id' => 'contents-'.$key.'-description', 'class' => 'form-control form-control-sm', 'readonly']) !!}
                                 </div>
 
-                                <div class="col-md-2">
-                                    {!! Form::select('contents['.$key.'][package_index]', array_combine($package_index = range(1, old('pieces')), $package_index), (isset($val['package_index'])) ? $val['package_index']: null, array('id' => 'contents-'.$key.'-package-index', 'class' => 'form-control form-control-sm package-index')) !!}
+                                <div class="col-2">
+                                    {!! Form::Text('contents['.$key.'][product_code]', (isset($val['product_code'])) ? $val['product_code']: null, ['id' => 'contents-'.$key.'-product-code', 'class' => 'form-control form-control-sm', 'readonly']) !!}
                                 </div>
 
-                                <div class="col-md-2">
+                                <div class="col-2">
                                     {!! Form::Text('contents['.$key.'][quantity]', (isset($val['quantity'])) ? $val['quantity']: null, ['id' => 'contents-'.$key.'-quantity', 'class' => 'form-control form-control-sm numeric-only-required', 'maxlength' => 12]) !!}
                                 </div>
 
-                                <div class="col-md-2">
+                                <div class="col-2">
                                     <div class="input-group input-group-sm">
                                         {!! Form::Text('contents['.$key.'][unit_weight]', (isset($val['unit_weight'])) ? $val['unit_weight']: null, ['id' => 'contents-'.$key.'-unit-weight', 'class' => 'form-control decimal-only', 'maxlength' => 12]) !!}
                                         <div class="input-group-append">
@@ -676,7 +676,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-2">
+                                <div class="col-2">
                                     <div class="input-group input-group-sm">
                                         {!! Form::Text('contents['.$key.'][unit_value]', (isset($val['unit_value'])) ? $val['unit_value']: null, ['id' => 'contents-'.$key.'-unit-value', 'class' => 'form-control decimal-only', 'maxlength' => 12]) !!}
                                         <div class="input-group-append">
@@ -685,14 +685,10 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-1">
-                                    <div class="row">
-                                        <a href="#" title="Duplicate Commodity"><span class="far fa-copy duplicate-commodity" aria-hidden="true"></span></a>
-                                        <a href="#" title="Remove Commodity"><span class="fas fa-times remove-commodity" aria-hidden="true"></span></a>
-                                    </div>
+                                <div class="col-1 pt-2">
+                                    <a href="#" title="Remove Commodity"><i class="fas fa-times fa-lg remove-commodity"></i></a>
                                 </div>
 
-                                {!! Form::hidden('contents['.$key.'][product_code]', (isset($val['product_code'])) ? $val['product_code']: null, ['id' => 'contents-'.$key.'-product-code']) !!}
                                 {!! Form::hidden('contents['.$key.'][currency_code]', (isset($val['currency_code'])) ? $val['currency_code']: null, ['id' => 'contents-'.$key.'-currency-code']) !!}
                                 {!! Form::hidden('contents['.$key.'][country_of_manufacture]', (isset($val['country_of_manufacture'])) ? $val['country_of_manufacture']: null, ['id' => 'contents-'.$key.'-country-of-manufacture']) !!}
                                 {!! Form::hidden('contents['.$key.'][manufacturer]', (isset($val['manufacturer'])) ? $val['manufacturer']: null, ['id' => 'contents-'.$key.'-manufacturer']) !!}

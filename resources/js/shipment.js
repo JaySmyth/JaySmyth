@@ -571,40 +571,6 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
     });
 
 
-    /*
-     * Open the address book and load results
-     */
-    $(document).on('click', '#button-fill', function () {
-
-        var pieces = $("#pieces").val();
-        var commodityCount = $("#commodity_count").val();
-
-        if (commodityCount == 1 && pieces > 1) {
-
-            var row = $('#container-contents').find('.item').first();
-            var loop = pieces - commodityCount;
-
-            for (var i = 1; i <= loop; i++) {
-                row.clone(true, true).appendTo('#container-contents');
-                commodityCount++;
-            }
-
-            var i = 1;
-            $('#container-contents').find('select').each(function () {
-                $(this).val(i);
-                i++;
-            });
-
-            setCommodityCount(commodityCount);
-            updateInputAttributes('#container-contents');
-
-            // set focus on the 1st quantity field
-            $('#contents-0-quantity').focus();
-
-        }
-
-    });
-
     $(document).on('click', '#button-duplicate', function () {
 
         var packagingId = $('#packages-0-packaging-code').val();
@@ -648,40 +614,6 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
         }
 
         return true;
-
-        /*
-
-        var pieces = $('#pieces').val();
-        var passValidation = [];
-
-        for (var i = 1; i <= pieces; i++) {
-
-            passValidation[i] = false;
-
-            $(".package-index option:selected").each(function () {
-                if ($(this).val() == i) {
-                    passValidation[i] = true;
-                }
-            });
-        }
-
-        for (var i = 1; i <= pieces; i++) {
-
-            if (passValidation[i] === false) {
-
-                swal({
-                    title: "Shipment Contents",
-                    text: "Please tell us what's inside each package (there should be at least one line for each package). For shipments with multiple packages but only one commodity, use the 'Fill' button to autocomplete the package contents for you.",
-                    type: "error"
-                })
-
-                return false;
-            }
-        }
-
-        return true;
-
-         */
 
     }
 
@@ -1178,24 +1110,8 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
             $('#commodity-headings').show();
         }
 
-        //Set the visibility of the fill commodities button
-        setFillVisibility();
     }
 
-
-    /**
-     * Sets the visibility of the fill commodities button
-     *
-     * @param null
-     * @returns void
-     */
-    function setFillVisibility() {
-        if ($("#pieces").val() > 1 && $("#commodity_count").val() == 1) {
-            $('#button-fill').show();
-        } else {
-            $('#button-fill').hide();
-        }
-    }
 
     /**
      * Populate the address panel fields with an address (sender or recipient)
@@ -1334,17 +1250,6 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
                 // update the package number display
                 row.find('.package-number').empty().append(index);
 
-                // Update the package index select boxes
-                var inputs = $('.package-index');
-
-                $.each(inputs, function () {
-                    $(this).append($('<option>', {
-                        value: index,
-                        text: index
-                    }));
-                });
-
-
                 // Dry ice - clone the first row and append it to #dry-ice-fieldset
                 var row = $('#dry-ice-fieldset').find('.item').first().clone(true, true).appendTo('#dry-ice-fieldset');
 
@@ -1365,28 +1270,13 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
                 // Remove the list row
                 $('#container-packages').find('.item').last().remove();
 
-                $(".package-index option:selected").each(function () {
-                    if ($(this).val() == index) {
-                        $(this).closest('.item').remove();
-                        commodityCount--;
-                        setCommodityCount(commodityCount);
-                    }
-                });
-
                 // Remove the last dry ice field from options panel
                 $('#dry-ice-fieldset').find('.item').last().remove();
 
             }
 
-            // remove the options from the package select
-            $(".package-index option").each(function () {
-                if ($(this).val() > pieces) {
-                    $(this).remove();
-                }
-            });
         }
 
-        setFillVisibility();
         updateInputAttributes('#container-packages');
         updateInputAttributes('#dry-ice-fieldset');
 
@@ -1496,20 +1386,9 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
 
                     var commodityCount = $("#commodity_count").val();
                     var pieces = $("#pieces").val();
-                    var select = $('<select class="form-control form-control-sm package-index" name="contents[' + commodityCount + '][package_index]" id="contents-' + commodityCount + '-package-index">');
-
-                    // Build the package index select box
-                    for (var i = 1; i <= pieces; i++) {
-                        select.append($("<option></option>").attr("value", i).text(i));
-                    }
-
-                    if (packageIndex) {
-                        select.val(packageIndex);
-                    }
 
                     var hiddenFields = '';
                     hiddenFields += '<input type="hidden" name="contents[' + commodityCount + '][id]" id="contents-' + commodityCount + '-id" value="' + response.id + '">';
-                    hiddenFields += '<input type="hidden" name="contents[' + commodityCount + '][product_code]" id="contents-' + commodityCount + '-product-code" value="' + response.product_code + '">';
                     hiddenFields += '<input type="hidden" name="contents[' + commodityCount + '][currency_code]" id="contents-' + commodityCount + '-currency-code" value="' + response.currency_code + '">';
                     hiddenFields += '<input type="hidden" name="contents[' + commodityCount + '][country_of_manufacture]" id="contents-' + commodityCount + '-country-of-manufacture" value="' + response.country_of_manufacture + '">';
                     hiddenFields += '<input type="hidden" name="contents[' + commodityCount + '][manufacturer]" id="contents-' + commodityCount + '-manufacturer" value="' + response.manufacturer + '">';
@@ -1519,12 +1398,12 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
                     hiddenFields += '<input type="hidden" name="contents[' + commodityCount + '][shipping_cost]" id="contents-' + commodityCount + '-shipping-cost" value="' + response.shipping_cost + '">';
 
                     var div = $('<div id="commodity-' + commodityCount + '" class="form-group row item">').append(
-                        $('<div class="col-xl-3">').html('<input type="text" name="contents[' + commodityCount + '][description]" id="contents-' + commodityCount + '-description" class="form-control form-control-sm" value="' + response.description + '" readonly>' + hiddenFields),
-                        $('<div class="col-xl-2">').html(select),
-                        $('<div class="col-xl-2">').html('<input class="form-control form-control-sm numeric-only-required" name="contents[' + commodityCount + '][quantity]"  id="contents-' + commodityCount + '-quantity" value="' + quantity + '" type="text" maxlength="8">'),
-                        $('<div class="col-xl-2">').html('<div class="input-group input-group-sm"><input class="form-control decimal-only-required" name="contents[' + commodityCount + '][unit_weight]"  id="contents-' + commodityCount + '-unit-weight" type="text" value="' + unitWeight + '" maxlength="8"><div class="input-group-append"><span id="weight_uom_' + commodityCount + '" class="input-group-text commodity-weight-uom text-uppercase">' + response.weight_uom + '</span></div></div>'),
-                        $('<div class="col-xl-2">').html('<div class="input-group input-group-sm"><input class="form-control decimal-only-required" name="contents[' + commodityCount + '][unit_value]"  id="contents-' + commodityCount + '-unit-value" type="text" value="' + unitValue + '" maxlength="12"><div class="input-group-append"><span id="currency_code_' + commodityCount + '" class="input-group-text commodity-currency-code text-uppercase">' + response.currency_code + '</span></div></div>'),
-                        $('<div class="col-xl-1">').html('<div class="row action-links"><a href="#" title="Duplicate Commodity"><span class="far fa-copy duplicate-commodity" aria-hidden="true"></span></a> <a href="#" title="Remove Commodity"><span class="fas fa-times remove-commodity ml-xl-1" aria-hidden="true"></span></a></div>')
+                        $('<div class="col-3">').html('<input type="text" name="contents[' + commodityCount + '][description]" id="contents-' + commodityCount + '-description" class="form-control form-control-sm" value="' + response.description + '" readonly>'),
+                        $('<div class="col-2">').html('<input type="text" name="contents[' + commodityCount + '][product_code]" id="contents-' + commodityCount + '-product-code" class="form-control form-control-sm" value="' + response.product_code + '" readonly>' + hiddenFields),
+                        $('<div class="col-2">').html('<input class="form-control form-control-sm numeric-only-required" name="contents[' + commodityCount + '][quantity]"  id="contents-' + commodityCount + '-quantity" value="' + quantity + '" type="text" maxlength="8">'),
+                        $('<div class="col-2">').html('<div class="input-group input-group-sm"><input class="form-control decimal-only-required" name="contents[' + commodityCount + '][unit_weight]"  id="contents-' + commodityCount + '-unit-weight" type="text" value="' + unitWeight + '" maxlength="8"><div class="input-group-append"><span id="weight_uom_' + commodityCount + '" class="input-group-text commodity-weight-uom text-uppercase">' + response.weight_uom + '</span></div></div>'),
+                        $('<div class="col-2">').html('<div class="input-group input-group-sm"><input class="form-control decimal-only-required" name="contents[' + commodityCount + '][unit_value]"  id="contents-' + commodityCount + '-unit-value" type="text" value="' + unitValue + '" maxlength="12"><div class="input-group-append"><span id="currency_code_' + commodityCount + '" class="input-group-text commodity-currency-code text-uppercase">' + response.currency_code + '</span></div></div>'),
+                        $('<div class="col-1 pt-2">').html('<a href="#" title="Remove Commodity"><i class="fas fa-times fa-lg remove-commodity"></i></a>')
                     );
 
                     div.appendTo('#container-contents');
