@@ -688,10 +688,12 @@ class ShipmentsController extends Controller
      */
     public function batchedShippingDocsPdf(Request $request, $labelType)
     {
-        // warehouse login
-        if (Auth::user()->id == 3026) {
-            flash()->error('Warning', "Not authorised to print labels.", true);
-            return back();
+        if (!Auth::guest()) {
+            // warehouse login
+            if (Auth::user()->id == 3026) {
+                flash()->error('Warning', "Not authorised to print labels.", true);
+                return back();
+            }
         }
 
         $this->authorize('index', new Shipment);
