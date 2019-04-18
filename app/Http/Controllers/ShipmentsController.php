@@ -481,16 +481,22 @@ class ShipmentsController extends Controller
      */
     public function label($token, $printFormatCode = 'A4')
     {
-
         // user authenticated so use their preferred label size
         if (!Auth::guest()) {
+
+            // warehouse login
+            if (Auth::user()->id == 3026) {
+                flash()->error('Warning', "Not authorised to print label.", true);
+                return back();
+            }
+
             $printFormatCode = Auth::user()->printFormat->code;
         }
 
         // Log the event (model loaded as code below expects a collection)
         $shipment = Shipment::whereToken($token)->firstOrFail();
 
-        if(Carbon::now()->subSeconds(5) > $shipment->created_at){
+        if (Carbon::now()->subSeconds(5) > $shipment->created_at) {
             $shipment->log('Downloaded Label');
         }
 
@@ -682,6 +688,14 @@ class ShipmentsController extends Controller
      */
     public function batchedShippingDocsPdf(Request $request, $labelType)
     {
+        if (!Auth::guest()) {
+            // warehouse login
+            if (Auth::user()->id == 3026) {
+                flash()->error('Warning', "Not authorised to print labels.", true);
+                return back();
+            }
+        }
+
         $this->authorize('index', new Shipment);
 
         $shipments = $this->search($request, false, false);
