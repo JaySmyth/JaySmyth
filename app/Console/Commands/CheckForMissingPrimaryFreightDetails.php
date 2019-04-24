@@ -48,6 +48,7 @@ class CheckForMissingPrimaryFreightDetails extends Command
 
         $shipments = Shipment::where('company_id', '=', '874')
                         ->whereRaw('carrier_consignment_number = consignment_number')
+                        ->where('source', 'cartrover')
                         ->where('status_id', '!=', '7')
                         ->where('id', '>', '756170')
                         ->where('ship_date', '<', $shipDate)
@@ -55,7 +56,7 @@ class CheckForMissingPrimaryFreightDetails extends Command
 
         if ($shipments->count() > 0) {
 
-            Mail::to(['njwhse@primaryfreight.com', 'kkaralekas@primaryfreight.com'])->cc(['aplatt@antrim.ifsgroup.com', 'babocushenquiry@antrim.ifsgroup.com'])->bcc(['gmcbroom@antrim.ifsgroup.com'])->send(new \App\Mail\MissingPrimaryFreightDetails($shipments));
+            Mail::to(['ryepez@primaryfreight.com', 'chenderson@primarylogistics.net'])->cc(['aplatt@antrim.ifsgroup.com', 'babocushenquiry@antrim.ifsgroup.com'])->bcc(['gmcbroom@antrim.ifsgroup.com'])->send(new \App\Mail\MissingPrimaryFreightDetails($shipments));
         }
     }
 
