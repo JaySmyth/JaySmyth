@@ -391,14 +391,14 @@
     @else
 
         <h4 class="mb-2">Contents
-            <span class="badge badge-pill badge-secondary badge-sm ml-sm-1">{{ $shipment->packages->count()}}</span>
+            <span class="badge badge-pill badge-secondary badge-sm ml-sm-1">1</span>
         </h4>
         <table class="table table-striped table-bordered mb-5">
             <thead>
             <tr>
                 <th>#</th>
-                <th>Package</th>
                 <th>Description</th>
+                <th>Product Code</th>
                 <th>Manufacturer</th>
                 <th>Country of Manufacture</th>
                 <th class="text-right">Quantity</th>
@@ -406,17 +406,15 @@
             </tr>
             </thead>
             <tbody>
-            @foreach ($shipment->packages as $package)
-                <tr>
-                    <td>{{$loop->iteration}}</td>
-                    <td>Package {{$package->index}}</td>
-                    <td>{{$shipment->goods_description}}{{$shipment->documents_description}}</td>
-                    <td>n/a</td>
-                    <td>n/a</td>
-                    <td class="text-right">n/a</td>
-                    <td class="text-right">n/a</td>
-                </tr>
-            @endforeach
+            <tr>
+                <td>1</td>
+                <td>{{$shipment->goods_description}}{{$shipment->documents_description}}</td>
+                <td>n/a</td>
+                <td>n/a</td>
+                <td>n/a</td>
+                <td class="text-right">n/a</td>
+                <td class="text-right">n/a</td>
+            </tr>
             </tbody>
         </table>
 
