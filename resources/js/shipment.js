@@ -599,11 +599,11 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
     function validateContents() {
 
         // No need to define shipment contents for docs or domestic shipments
-        if ($('#ship_reason').val() == 'documents' || isDomestic()) {
+        if ($('#ship_reason').val() == 'documents' || isUkDomestic()) {
             return true;
         }
 
-        if ($("#commodity_count").val() == 0) {
+        if ($("#commodity_count").val() == 0 && !isDomestic()) {
             swal({
                 title: "Shipment Contents",
                 text: "Please add commodity details to your shipment.",
@@ -780,11 +780,11 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
             $("#documents_description").prop("disabled", true);
         }
 
-        if (!isDomestic() || $('#ship_reason').val() == 'documents') {
+        if (!isUkDomestic() || $('#ship_reason').val() == 'documents') {
             $("#goods_description").prop("disabled", true);
         }
 
-        if (isDomestic()) {
+        if (isUkDomestic()) {
             $('input[name^="contents"]').prop("disabled", true);
         }
 
@@ -806,13 +806,13 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
 
 
     /**
-     *
+     * UK Domestic
      *
      * @param null
      * @returns boolean
      */
 
-    function isDomestic() {
+    function isUkDomestic() {
 
         var domesticCountries = ['GB', 'IE'];
         var countryCode = $('#recipient_country_code').val();
@@ -826,6 +826,25 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
 
 
     /**
+     * Domestic
+     *
+     * @param null
+     * @returns boolean
+     */
+
+    function isDomestic() {
+
+        var senderCountryCode = $('#sender_country_code').val();
+        var recipientCountryCode = $('#recipient_country_code').val();
+
+        if (senderCountryCode == recipientCountryCode) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      *
      *
      * @param null
@@ -836,7 +855,7 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
 
         if ($("#ship_reason").val() != 'documents') {
 
-            if (isDomestic()) {
+            if (isUkDomestic()) {
                 $('#panel-contents').hide();
                 $('#panel-goods-description').show();
                 $('#commercial_invoice').hide();
@@ -1726,7 +1745,7 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
         if ($('#company_id').val() > 0) {
 
             // Don't save any commodity info if documents or domestic
-            if ($('#ship_reason').val() == 'documents' || isDomestic()) {
+            if ($('#ship_reason').val() == 'documents' || isUkDomestic()) {
                 setCommodityCount(0);
             }
 
