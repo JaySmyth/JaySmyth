@@ -113,7 +113,6 @@ class Kernel extends ConsoleKernel
         // $schedule->command('ifs:update-primary-freight-shipments')->hourly();
         // $schedule->command('ifs:upload-shipments-to-primary-freight')->dailyAt(13, 00);
         // $schedule->command('ifs:upload-shipments-to-primary-freight')->twiceDaily(16, 19);
-        // $schedule->command('ifs:check-for-missing-primary-freight-details')->dailyAt(7, 00);
 
         /*
          * Primary Logistics
@@ -122,6 +121,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('primary-logistics:cancel-orders')->hourly();
         $schedule->command('primary-logistics:get-tracking-numbers')->hourly();
         $schedule->command('primary-logistics:get-inventory')->weekdays()->dailyAt('09:30');
+        $schedule->command('ifs:check-for-missing-primary-freight-details')->dailyAt(7, 00);
 
         /*
          * RF server

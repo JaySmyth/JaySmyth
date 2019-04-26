@@ -20,6 +20,8 @@ use App\Shipment;
 use App\State;
 use App\Mode;
 use App\Country;
+use App\CarrierAPI\ServiceRules;
+use App\CarrierAPI\APIShipment;
 use App\CarrierAPI\Fedex\FedexAPI;
 use App\CarrierAPI\DHL\DHLAPI;
 use App\CarrierAPI\UPS\UPSAPI;
@@ -28,6 +30,7 @@ use App\CarrierAPI\PrimaryFreight\PrimaryFreightAPI;
 use App\CarrierAPI\IFS\IFSAPI;
 use App\CarrierAPI\CWide\CWideAPI;
 use App\CarrierAPI\DHLGlobalMail\DHLGlobalMailAPI;
+use App\CarrierAPI\Pdf;
 use App\Pricing\Facades\Pricing;
 use TCPDI;
 use Carbon\Carbon;
@@ -54,7 +57,7 @@ class CarrierAPI
 
     public function __construct()
     {
-
+        
     }
 
     public function buildCarrier($carrier_code = 'fedex')
@@ -153,7 +156,7 @@ class CarrierAPI
          * ***************************************************
          * If this is a collect shipment then remove pricing
          * info even for those shipments we were able to price
-         * since recipient will be billed according to
+         * since recipient will be billed according to 
          * recipients rates
          * ***************************************************
          */
@@ -198,7 +201,7 @@ class CarrierAPI
 
         /*
          * *********************************************
-         * Loop through all services configured for this
+         * Loop through all services configured for this 
          * Customer/ mode.
          * *********************************************
          */
@@ -422,10 +425,10 @@ class CarrierAPI
             if (!isset($shipment[$account_type]) || $shipment[$account_type] == 'sender') {
 
                 $service = $this->company
-                    ->getServicesForMode($shipment['mode_id'])
-                    ->where('code', $shipment['service_code'])
-                    ->where('carrier_id', (string) $shipment['carrier_id']) // Carrier_id needs to be typecast to string
-                    ->first();
+                        ->getServicesForMode($shipment['mode_id'])
+                        ->where('code', $shipment['service_code'])
+                        ->where('carrier_id', (string) $shipment['carrier_id']) // Carrier_id needs to be typecast to string
+                        ->first();
 
                 if (!empty($service)) {
 
@@ -458,11 +461,11 @@ class CarrierAPI
     {
 
         $account = $this->company->services()
-            ->where('carrier_id', $carrierId)
-            ->where('service_id', $serviceId)
-            ->first()
-            ->pivot
-            ->account;
+                        ->where('carrier_id', $carrierId)
+                        ->where('service_id', $serviceId)
+                        ->first()
+                ->pivot
+                ->account;
 
         // Returns incorrect field
         // return Carrier::find($carrierId)->services()->where('service_id', $serviceId)->first()->pivot->account;
@@ -658,15 +661,15 @@ class CarrierAPI
             $to = config('mail.error');
             $subject = 'WebClient DB Error - ' . $to;
             $message = 'Web Client failed to insert shipment ' . "\r\n\r\n" .
-                'App\CarrierAPI\CarrierAPI.php : ' . "\r\n\r\n" .
-                'Function addShipment() : ' . "\r\n\r\n" .
-                'IFS Consignment Number : ' . $data['consignment_number'] . "\r\n\r\n" .
-                'Carrier Consignment Number : ' . $data['carrier_consignment_number'] . "\r\n\r\n" .
-                'Error : ' . $e->getMessage() . " on line " . $e->getLine() . "\r\n\r\n" .
-                json_encode($data);
+                    'App\CarrierAPI\CarrierAPI.php : ' . "\r\n\r\n" .
+                    'Function addShipment() : ' . "\r\n\r\n" .
+                    'IFS Consignment Number : ' . $data['consignment_number'] . "\r\n\r\n" .
+                    'Carrier Consignment Number : ' . $data['carrier_consignment_number'] . "\r\n\r\n" .
+                    'Error : ' . $e->getMessage() . " on line " . $e->getLine() . "\r\n\r\n" .
+                    json_encode($data);
             $headers = 'From: noreply@antrim.ifsgroup.com' . "\r\n" .
-                'Reply-To: it@antrim.ifsgroup.com' . "\r\n" .
-                'X-Mailer: PHP/' . phpversion();
+                    'Reply-To: it@antrim.ifsgroup.com' . "\r\n" .
+                    'X-Mailer: PHP/' . phpversion();
 
             mail($to, $subject, $message, $headers);
 
@@ -960,7 +963,7 @@ class CarrierAPI
 
                 // Calc Volumetric weight
                 $shipment['packages'][$cnt]['volumetric_weight'] = calcVolume(
-                    $shipment['packages'][$cnt]['length'], $shipment['packages'][$cnt]['width'], $shipment['packages'][$cnt]['height'], $shipment['volumetric_divisor']
+                        $shipment['packages'][$cnt]['length'], $shipment['packages'][$cnt]['width'], $shipment['packages'][$cnt]['height'], $shipment['volumetric_divisor']
                 );
 
                 $volumetric_weight += $shipment['packages'][$cnt]['volumetric_weight'];
@@ -986,7 +989,7 @@ class CarrierAPI
 
     /**
      * Checks addresses and performs any necessary Overrides
-     *
+     * 
      * @param type $shipment
      * @return string
      */
@@ -1079,7 +1082,7 @@ class CarrierAPI
          */
         $response = [];
         $this->setEnvironment($mode);
-        //$data = trimData($data);                                                 // Remove any leading/ trailing spaces etc.
+        //$data = trimData($data);                                                 // Remove any leading/ trailing spaces etc.        
         $data = fixShipmentCase($data);                                         // Ensure all fields use correct case and Flags are boolean
         $data = $this->preProcess($data);                                       // Complete any missing fields where possible
         $apiShipment = new APIShipment();                                       // Shipment object with validation rules etc.
@@ -1240,8 +1243,8 @@ class CarrierAPI
 
         // Identify Shipment Carrier
         $shipment = Shipment::where('company_id', $data['company_id'])
-            ->where('token', $data['shipment_token'])
-            ->first();
+                ->where('token', $data['shipment_token'])
+                ->first();
 
         if ($shipment) {
 
@@ -1364,7 +1367,7 @@ class CarrierAPI
 
     /**
      * Create a despatch note.
-     *
+     * 
      * @param type $token
      * @param type $size
      * @param type $output

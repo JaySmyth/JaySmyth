@@ -35,10 +35,10 @@ class ReportsController extends Controller
         $this->authorize(new Report);
 
         $reports = Report::orderBy('name', 'ASC')
-                ->whereIn('mode_id', $request->user()->getAllowedModeIds())
-                ->whereIn('depot_id', $request->user()->getDepotIds())
-                ->with('depot', 'mode')
-                ->paginate(100);
+            ->whereIn('mode_id', $request->user()->getAllowedModeIds())
+            ->whereIn('depot_id', $request->user()->getDepotIds())
+            ->with('depot', 'mode')
+            ->paginate(100);
 
         return view('reports.index', compact('reports'));
     }
@@ -93,10 +93,10 @@ class ReportsController extends Controller
         $criteria = json_decode($report->criteria, true);
 
         $shipments = Shipment::select(DB::raw('round(customs_value / currencies.rate, 2) as customs_value_gbp, shipments.*'))
-                ->join('currencies', 'shipments.customs_value_currency_code', '=', 'currencies.code')
-                ->orderBy('pieces')
-                ->orderBy('sender_company_name')
-                ->orderBy('sender_name');
+            ->join('currencies', 'shipments.customs_value_currency_code', '=', 'currencies.code')
+            ->orderBy('pieces')
+            ->orderBy('sender_company_name')
+            ->orderBy('sender_name');
 
         if (is_numeric($request->manifest_id)) {
             $shipments->hasManifest($request->manifest_id);
@@ -105,14 +105,14 @@ class ReportsController extends Controller
         }
 
         $shipments->hasMode($report->mode_id)
-                ->hasDepot($report->depot_id)
-                ->hasCarrier($criteria['carrier_id'])
-                ->hasServiceIn($criteria['services'])
-                ->having('customs_value_gbp', '>=', $criteria['customs_value_low'])
-                ->having('customs_value_gbp', '<', $criteria['customs_value_high'])
-                ->notEu()
-                ->where('bill_shipping', 'sender')
-                ->$fedexRoute();
+            ->hasDepot($report->depot_id)
+            ->hasCarrier($criteria['carrier_id'])
+            ->hasServiceIn($criteria['services'])
+            ->having('customs_value_gbp', '>=', $criteria['customs_value_low'])
+            ->having('customs_value_gbp', '<', $criteria['customs_value_high'])
+            ->notEu()
+            ->where('bill_shipping', 'sender')
+            ->$fedexRoute();
 
         return $shipments->get();
     }
@@ -134,16 +134,17 @@ class ReportsController extends Controller
         $dateTo = new Carbon($request->date_to);
 
         $shipments = Shipment::orderBy('company_name')
-                ->traffic($request->traffic)
-                ->hasCarrier($request->carrier)
-                ->hasDepot($request->depot)
-                ->hasService($request->service)
-                ->shipDateBetween($dateFrom, $dateTo)
-                ->whereNotIn('status_id', [1, 7])
-                ->join('companies', 'companies.id', '=', 'shipments.company_id')
-                ->groupBy('company_id')
-                ->select(DB::raw('count(*) as total, sum(pieces) as total_pieces, sum(weight) as total_weight, sum(volumetric_weight) as total_volumetric_weight, shipments.*'))
-                ->with('company');
+            ->traffic($request->traffic)
+            ->hasCarrier($request->carrier)
+            ->hasDepot($request->depot)
+            ->hasService($request->service)
+            ->shipDateBetween($dateFrom, $dateTo)
+            ->whereNotIn('status_id', [1, 7])
+            ->restrictCompany($request->user()->getAllowedCompanyIds())
+            ->join('companies', 'companies.id', '=', 'shipments.company_id')
+            ->groupBy('company_id')
+            ->select(DB::raw('count(*) as total, sum(pieces) as total_pieces, sum(weight) as total_weight, sum(volumetric_weight) as total_volumetric_weight, shipments.*'))
+            ->with('company');
 
         // Restrict salespersons to their allocated companies
         if ($request->user()->hasRole('ifss')) {
@@ -173,20 +174,20 @@ class ReportsController extends Controller
         $dateTo = new Carbon($request->date_to);
 
         $shippers = Shipment::select('company_id')
-                ->hasDepot($request->depot)
-                ->shipDateBetween($dateFrom, $dateTo)
-                ->whereNotIn('status_id', [1, 7])
-                ->groupBy('company_id')
-                ->pluck('company_id');
+            ->hasDepot($request->depot)
+            ->shipDateBetween($dateFrom, $dateTo)
+            ->whereNotIn('status_id', [1, 7])
+            ->groupBy('company_id')
+            ->pluck('company_id');
 
         $companies = Company::orderBy('company_name')
-                ->whereNotIn('id', $shippers)
-                ->whereNotIn('depot_id', [4])
-                ->hasDepot($request->depot)
-                ->hasSalesperson($request->salesperson)
-                ->whereEnabled(1)
-                ->whereTesting(0)
-                ->with('sale', 'depot');
+            ->whereNotIn('id', $shippers)
+            ->whereNotIn('depot_id', [4])
+            ->hasDepot($request->depot)
+            ->hasSalesperson($request->salesperson)
+            ->whereEnabled(1)
+            ->whereTesting(0)
+            ->with('sale', 'depot');
 
         // Restrict salespersons to their allocated companies
         if ($request->user()->hasRole('ifss')) {
@@ -200,7 +201,7 @@ class ReportsController extends Controller
     }
 
     /**
-     * 
+     *
      * @param Request $request
      * @param type $id
      * @return type
@@ -218,15 +219,15 @@ class ReportsController extends Controller
         }
 
         $packages = \App\Package::orderBy('shipments.sender_company_name')
-                ->orderBy('packages.id')
-                ->select('packages.*')
-                ->join('shipments', 'packages.shipment_id', '=', 'shipments.id')
-                ->whereBetween('ship_date', [Carbon::parse($date)->startOfDay(), Carbon::parse($date)->endOfDay()])
-                ->where('shipments.depot_id', 1)
-                ->whereNotIn('shipments.status_id', [1, 7])
-                ->whereNotIn('shipments.service_id', [7, 18, 20, 39, 44, 45, 48, 50])
-                ->where('sender_postcode', 'LIKE', 'BT%')
-                ->with('shipment', 'shipment.route', 'shipment.service', 'shipment.company', 'shipment.depot');
+            ->orderBy('packages.id')
+            ->select('packages.*')
+            ->join('shipments', 'packages.shipment_id', '=', 'shipments.id')
+            ->whereBetween('ship_date', [Carbon::parse($date)->startOfDay(), Carbon::parse($date)->endOfDay()])
+            ->where('shipments.depot_id', 1)
+            ->whereNotIn('shipments.status_id', [1, 7])
+            ->whereNotIn('shipments.service_id', [7, 18, 20, 39, 44, 45, 48, 50])
+            ->where('sender_postcode', 'LIKE', 'BT%')
+            ->with('shipment', 'shipment.route', 'shipment.service', 'shipment.company', 'shipment.depot');
 
         if ($request->company) {
             $packages->where('shipments.company_id', $request->company);
@@ -280,17 +281,17 @@ class ReportsController extends Controller
 
 
         $shipments = Shipment::select('shipments.*')
-                ->orderBy('created_at', 'DESC')
-                ->orderBy('shipments.id', 'DESC')
-                ->traffic($request->traffic)
-                ->hasCarrier($request->carrier)
-                ->hasDepot($request->depot)
-                ->hasCompany($request->company)
-                ->hasService($request->service)
-                ->hasStatus($request->status)
-                ->shipDateBetween($dateFrom, $dateTo)
-                ->whereNotIn('status_id', [1])
-                ->paginate(500);
+            ->orderBy('created_at', 'DESC')
+            ->orderBy('shipments.id', 'DESC')
+            ->traffic($request->traffic)
+            ->hasCarrier($request->carrier)
+            ->hasDepot($request->depot)
+            ->hasCompany($request->company)
+            ->hasService($request->service)
+            ->hasStatus($request->status)
+            ->shipDateBetween($dateFrom, $dateTo)
+            ->whereNotIn('status_id', [1])
+            ->paginate(500);
 
 
         return view('reports.dims', compact('report', 'shipments'));
@@ -339,16 +340,16 @@ class ReportsController extends Controller
         $this->authorize(new Report);
 
         $shipments = Shipment::orderBy('ship_date', 'DESC')
-                ->filter($request->filter)
-                ->hasCompany($request->company)
-                ->shipDateBetween($request->date_from, $request->date_to)
-                ->hasMode($report->mode_id)
-                ->where('service_id', '<>', 4)
-                ->whereReceived(1)
-                ->whereIn('status_id', [8, 9, 10, 11, 12, 17])
-                ->restrictCompany($request->user()->getAllowedCompanyIds())
-                ->with('service')
-                ->paginate(250);
+            ->filter($request->filter)
+            ->hasCompany($request->company)
+            ->shipDateBetween($request->date_from, $request->date_to)
+            ->hasMode($report->mode_id)
+            ->where('service_id', '<>', 4)
+            ->whereReceived(1)
+            ->whereIn('status_id', [8, 9, 10, 11, 12, 17])
+            ->restrictCompany($request->user()->getAllowedCompanyIds())
+            ->with('service')
+            ->paginate(250);
 
         return view('reports.exceptions', compact('report', 'shipments'));
     }
@@ -367,14 +368,14 @@ class ReportsController extends Controller
         $this->authorize(new Report);
 
         $shipments = Shipment::orderBy('ship_date', 'DESC')
-                ->filter($request->filter)
-                ->hasCompany($request->company)
-                ->shipDateBetween($request->date_from, $request->date_to)
-                ->hasMode($report->mode_id)
-                ->whereDelivered(1)
-                ->restrictCompany($request->user()->getAllowedCompanyIds())
-                ->with('service')
-                ->paginate(250);
+            ->filter($request->filter)
+            ->hasCompany($request->company)
+            ->shipDateBetween($request->date_from, $request->date_to)
+            ->hasMode($report->mode_id)
+            ->whereDelivered(1)
+            ->restrictCompany($request->user()->getAllowedCompanyIds())
+            ->with('service')
+            ->paginate(250);
 
         return view('reports.pod', compact('report', 'shipments'));
     }
@@ -393,12 +394,12 @@ class ReportsController extends Controller
         $this->authorize(new Report);
 
         $purchaseInvoiceLines = \App\PurchaseInvoiceLine::select('purchase_invoice_lines.*')
-                ->where('purchase_invoices.status', 0)
-                ->whereNull('scs_job_number')
-                ->join('purchase_invoices', 'purchase_invoice_lines.purchase_invoice_id', '=', 'purchase_invoices.id')
-                ->orderBy('purchase_invoice_lines.ship_date', 'DESC')
-                ->with('charges')
-                ->get();
+            ->where('purchase_invoices.status', 0)
+            ->whereNull('scs_job_number')
+            ->join('purchase_invoices', 'purchase_invoice_lines.purchase_invoice_id', '=', 'purchase_invoices.id')
+            ->orderBy('purchase_invoice_lines.ship_date', 'DESC')
+            ->with('charges')
+            ->get();
 
         return view('reports.unknown_jobs', compact('report', 'purchaseInvoiceLines'));
     }
@@ -434,16 +435,17 @@ class ReportsController extends Controller
         for ($i = 0; $i < $date->daysInMonth; $i++) {
 
             $shipmentsGroupedByCompany = Shipment::orderBy('id')
-                    ->traffic($request->traffic)
-                    ->hasCarrier($request->carrier)
-                    ->hasDepot($request->depot)
-                    ->hasService($request->service)
-                    ->hasCompany($request->company)
-                    ->shipDateBetween($date->startOfDay(), $date->endOfDay())
-                    ->whereNotIn('status_id', [1, 7])
-                    ->groupBy('company_id')
-                    ->select(DB::raw('count(*) as total_shipments, sum(pieces) as total_pieces, sum(weight) as total_weight, sum(volumetric_weight) as total_volumetric_weight, shipments.*'))
-                    ->get();
+                ->traffic($request->traffic)
+                ->hasCarrier($request->carrier)
+                ->hasDepot($request->depot)
+                ->hasService($request->service)
+                ->hasCompany($request->company)
+                ->shipDateBetween($date->startOfDay(), $date->endOfDay())
+                ->restrictCompany($request->user()->getAllowedCompanyIds())
+                ->whereNotIn('status_id', [1, 7])
+                ->groupBy('company_id')
+                ->select(DB::raw('count(*) as total_shipments, sum(pieces) as total_pieces, sum(weight) as total_weight, sum(volumetric_weight) as total_volumetric_weight, shipments.*'))
+                ->get();
 
             $results[$i]['date'] = $date->format('l jS F, Y');
             $results[$i]['date_short'] = $date->format('d-m-Y');
@@ -485,12 +487,12 @@ class ReportsController extends Controller
         $this->authorize(new Report);
 
         $users = \App\User::whereEnabled(1)
-                ->whereNotNull('browser')
-                ->orderBy('last_login', 'DESC')
-                ->orderBy('browser')
-                ->orderBy('platform')
-                ->orderBy('screen_resolution')
-                ->get();
+            ->whereNotNull('browser')
+            ->orderBy('last_login', 'DESC')
+            ->orderBy('browser')
+            ->orderBy('platform')
+            ->orderBy('screen_resolution')
+            ->get();
 
         return view('reports.user_agents', compact('report', 'users'));
     }
@@ -508,7 +510,14 @@ class ReportsController extends Controller
 
         $this->authorize(new Report);
 
-        $shipments = \App\Shipment::whereCarrierId(2)->availableForManifesting()->isInternational()->whereStatusId(3)->orderBy('sender_company_name')->orderBy('id')->get();
+        $shipments = \App\Shipment::whereCarrierId(2)
+            ->availableForManifesting()
+            ->isInternational()
+            ->whereStatusId(3)
+            ->restrictCompany($request->user()->getAllowedCompanyIds())
+            ->orderBy('sender_company_name')
+            ->orderBy('id')
+            ->get();
 
         $total = $shipments->count();
         $ant = $shipments->where('route_id', 1);
@@ -534,15 +543,15 @@ class ReportsController extends Controller
         $dateTo = new Carbon($request->date_to);
 
         $shipments = Shipment::orderBy('sender_company_name')
-                ->orderBy('ship_date', 'desc')
-                ->traffic($request->traffic)
-                ->hasCarrier($request->carrier)
-                ->hasDepot($request->depot)
-                ->hasService($request->service)
-                ->hasCompany($request->company)
-                ->shipDateBetween($dateFrom, $dateTo)
-                ->whereNotIn('status_id', [1, 7])
-                ->paginate(500);
+            ->orderBy('ship_date', 'desc')
+            ->traffic($request->traffic)
+            ->hasCarrier($request->carrier)
+            ->hasDepot($request->depot)
+            ->hasService($request->service)
+            ->hasCompany($request->company)
+            ->shipDateBetween($dateFrom, $dateTo)
+            ->whereNotIn('status_id', [1, 7])
+            ->paginate(500);
 
         return view('reports.margins', compact('report', 'shipments'));
     }
@@ -561,9 +570,9 @@ class ReportsController extends Controller
         $this->authorize(new Report);
 
         $tracking = \App\Tracking::orderBy('id', 'desc')
-                ->where('tracking.message', 'LIKE', '%(carrier scan)%')
-                ->with('shipment', 'shipment.service', 'shipment.company', 'shipment.depot')
-                ->paginate(50);
+            ->where('tracking.message', 'LIKE', '%(carrier scan)%')
+            ->with('shipment', 'shipment.service', 'shipment.company', 'shipment.depot')
+            ->paginate(50);
 
         return view('reports.carrier_scans', compact('report', 'tracking'));
     }
@@ -582,13 +591,13 @@ class ReportsController extends Controller
         $this->authorize(new Report);
 
         $purchaseInvoiceLines = \App\PurchaseInvoiceLine::orderBy('purchase_invoice_lines.ship_date', 'DESC')
-                ->filter($request->filter)
-                ->shipDateBetween($request->date_from, $request->date_to)
-                ->invoiceDateBetween($request->invoice_date_from, $request->invoice_date_to)
-                ->hasCarrier($request->carrier)
-                ->orderBy('purchase_invoice_lines.ship_date', 'DESC')
-                ->with('charges')
-                ->paginate(2000);
+            ->filter($request->filter)
+            ->shipDateBetween($request->date_from, $request->date_to)
+            ->invoiceDateBetween($request->invoice_date_from, $request->invoice_date_to)
+            ->hasCarrier($request->carrier)
+            ->orderBy('purchase_invoice_lines.ship_date', 'DESC')
+            ->with('charges')
+            ->paginate(2000);
 
         return view('reports.purchase_invoice_lines', compact('report', 'purchaseInvoiceLines'));
     }
@@ -607,16 +616,16 @@ class ReportsController extends Controller
         $this->authorize(new Report);
 
         $shipments = Shipment::orderBy('id', 'DESC')
-                ->filter($request->filter)
-                ->hasCompany($request->company)
-                ->shipDateBetween($request->date_from, $request->date_to)
-                ->hasMode($report->mode_id)
-                ->hasService($request->service)
-                ->whereReceived(0)
-                ->whereStatusId(2)
-                ->restrictCompany($request->user()->getAllowedCompanyIds())
-                ->with('service')
-                ->paginate(250);
+            ->filter($request->filter)
+            ->hasCompany($request->company)
+            ->shipDateBetween($request->date_from, $request->date_to)
+            ->hasMode($report->mode_id)
+            ->hasService($request->service)
+            ->whereReceived(0)
+            ->whereStatusId(2)
+            ->restrictCompany($request->user()->getAllowedCompanyIds())
+            ->with('service')
+            ->paginate(250);
 
         return view('reports.pre_transit', compact('report', 'shipments'));
     }
@@ -641,19 +650,19 @@ class ReportsController extends Controller
         }
 
         $shipments = Shipment::orderBy('id', 'DESC')
-                ->hasCompany($request->company)
-                ->shipDateBetween($request->date_from, $request->date_to)
-                ->hasMode($report->mode_id)
-                ->hasService($request->service)
-                ->whereBillShipping('sender')
-                ->where(function ($query) {
-                    $query->orWhere('hazardous', '>', 0)
+            ->hasCompany($request->company)
+            ->shipDateBetween($request->date_from, $request->date_to)
+            ->hasMode($report->mode_id)
+            ->hasService($request->service)
+            ->whereBillShipping('sender')
+            ->where(function ($query) {
+                $query->orWhere('hazardous', '>', 0)
                     ->orWhere('hazardous', 'E')
                     ->orWhere('dry_ice_flag', 1);
-                })
-                ->restrictCompany($request->user()->getAllowedCompanyIds())
-                ->with('service')
-                ->paginate(250);
+            })
+            ->restrictCompany($request->user()->getAllowedCompanyIds())
+            ->with('service')
+            ->paginate(250);
 
         return view('reports.hazardous', compact('report', 'shipments'));
     }
@@ -675,15 +684,15 @@ class ReportsController extends Controller
         $dateTo = new Carbon($request->date_to);
 
         $shipments = Shipment::orderBy('carriers.name')
-                ->traffic($request->traffic)
-                ->hasCompany($request->company)
-                ->hasDepot($request->depot)
-                ->hasService($request->service)
-                ->shipDateBetween($dateFrom, $dateTo)
-                ->hasStatus('S')
-                ->join('carriers', 'carriers.id', '=', 'shipments.carrier_id')
-                ->groupBy('carrier_id')
-                ->select(DB::raw('count(*) as total, sum(pieces) as total_pieces, sum(weight) as total_weight, sum(volumetric_weight) as total_volumetric_weight, shipments.*'));
+            ->traffic($request->traffic)
+            ->hasCompany($request->company)
+            ->hasDepot($request->depot)
+            ->hasService($request->service)
+            ->shipDateBetween($dateFrom, $dateTo)
+            ->hasStatus('S')
+            ->join('carriers', 'carriers.id', '=', 'shipments.carrier_id')
+            ->groupBy('carrier_id')
+            ->select(DB::raw('count(*) as total, sum(pieces) as total_pieces, sum(weight) as total_weight, sum(volumetric_weight) as total_volumetric_weight, shipments.*'));
 
         $shipments = $shipments->paginate(2500);
 
@@ -692,7 +701,7 @@ class ReportsController extends Controller
 
     /**
      * Collection settings report.
-     * 
+     *
      * @param Request $request
      * @param type $id
      * @return type
@@ -745,7 +754,7 @@ class ReportsController extends Controller
         }
 
         $start = Carbon::parse($date)->startOfMonth();
-        $finish = Carbon::parse($date)->endOfMonth();        
+        $finish = Carbon::parse($date)->endOfMonth();
         $collectionPercentageForMonth = 0;
         $receiptPercentageForMonth = 0;
         $routePercentageForMonth = 0;
