@@ -155,7 +155,7 @@ class TransendOrderImport implements ShouldQueue
 
     /**
      * Get depot.
-     * 
+     *
      * @return string
      */
     protected function getDepot()
@@ -169,11 +169,16 @@ class TransendOrderImport implements ShouldQueue
 
     /**
      * Get account code.
-     * 
+     *
      * @return type
      */
     private function getAccountCode()
     {
+        // Already set
+        if (strlen($this->transportJob->transend_account_code) > 0) {
+            return $this->transportJob->transend_account_code;
+        }
+
         // Deliveries, use company name and postcode
         if ($this->transportJob->type == 'd') {
             return strtoupper(substr($this->transportJob->to_company_name, 0, 3) . '00' . preg_replace('/\s+/', '', $this->transportJob->to_postcode) . '-001');
@@ -190,7 +195,7 @@ class TransendOrderImport implements ShouldQueue
 
     /**
      * Get account name.
-     * 
+     *
      * @return string
      */
     private function getAccountName()
@@ -204,7 +209,7 @@ class TransendOrderImport implements ShouldQueue
 
     /**
      * Address element.
-     * 
+     *
      * @param type $order
      */
     private function getAddress()
@@ -276,7 +281,7 @@ class TransendOrderImport implements ShouldQueue
 
     /**
      * Get contact element.
-     * 
+     *
      * @param type $order
      */
     private function getContactDetail()
@@ -318,7 +323,7 @@ class TransendOrderImport implements ShouldQueue
 
     /**
      * Planned time to arrive/depart.
-     * 
+     *
      * @param type $minutes
      * @return string
      */
@@ -347,7 +352,7 @@ class TransendOrderImport implements ShouldQueue
 
     /**
      * Clean up malformed Transend JSON.
-     * 
+     *
      * @param type $string
      * @return string
      */
@@ -365,7 +370,7 @@ class TransendOrderImport implements ShouldQueue
     /**
      * The job failed to process.
      *
-     * @param  Exception  $exception
+     * @param Exception $exception
      * @return void
      */
     public function failed($exception)
