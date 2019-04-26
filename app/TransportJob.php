@@ -458,7 +458,7 @@ class TransportJob extends Model
     public function setTransendRoute($route = false)
     {
         $this->transend_route = ($route) ? $route : $this->getTransendRoute();
-        //$this->transend_account_code = $this->getTransendAccountCode();
+        $this->transend_account_code = $this->getTransendAccountCode();
         $this->save();
     }
 
