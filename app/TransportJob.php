@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Mail;
 
 class TransportJob extends Model
 {
-    
+
     use Logable;
 
     protected $fillable = [
@@ -173,8 +173,8 @@ class TransportJob extends Model
             $filter = trim($filter);
 
             return $query->where('number', 'LIKE', '%' . $filter . '%')
-                            ->orWhere('reference', 'LIKE', '%' . $filter . '%')
-                            ->orWhere('scs_job_number', 'LIKE', '%' . $filter . '%');
+                ->orWhere('reference', 'LIKE', '%' . $filter . '%')
+                ->orWhere('scs_job_number', 'LIKE', '%' . $filter . '%');
         }
     }
 
@@ -238,19 +238,6 @@ class TransportJob extends Model
     }
 
     /**
-     * Job active - i.e. not cancelled or completed
-     *
-     * @return boolean
-     */
-    public function isActive()
-    {
-        if ($this->status->code == 'cancelled' || $this->completed) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
      * A job is cancellable
      *
      * @return boolean
@@ -264,25 +251,16 @@ class TransportJob extends Model
     }
 
     /**
-     * Update the job status.
+     * Job active - i.e. not cancelled or completed
      *
-     * @param type $status
+     * @return boolean
      */
-    public function setStatus($status)
+    public function isActive()
     {
-        // Look up the status
-        if (is_numeric($status)) {
-            $status = \App\Status::find($status);
-        } else {
-            $status = \App\Status::whereCode($status)->first();
+        if ($this->status->code == 'cancelled' || $this->completed) {
+            return false;
         }
-
-        if (!$status) {
-            $status = \App\Status::whereCode('unknown')->first();
-        }
-
-        $this->status_id = $status->id;
-        $this->save();
+        return true;
     }
 
     /**
@@ -312,6 +290,28 @@ class TransportJob extends Model
     }
 
     /**
+     * Update the job status.
+     *
+     * @param type $status
+     */
+    public function setStatus($status)
+    {
+        // Look up the status
+        if (is_numeric($status)) {
+            $status = \App\Status::find($status);
+        } else {
+            $status = \App\Status::whereCode($status)->first();
+        }
+
+        if (!$status) {
+            $status = \App\Status::whereCode('unknown')->first();
+        }
+
+        $this->status_id = $status->id;
+        $this->save();
+    }
+
+    /**
      * Close the job (set it to completed).
      *
      * @param type $userId
@@ -321,7 +321,7 @@ class TransportJob extends Model
     public function close($podDatetime = null, $podSignature = 'Unknown', $userId = 0, $podImage = null, $podShipment = true)
     {
         $podDatetime = toCarbon($podDatetime);
-        
+
         // Set the status of this job to completed
         $this->setStatus('completed');
 
@@ -370,15 +370,15 @@ class TransportJob extends Model
     public function unmanifested()
     {
         return $this->whereNull('driver_manifest_id')
-                        ->hasStatus('unmanifested')
-                        ->where('date_requested', '<', Carbon::now()->endOfDay())
-                        ->where('visible', '1')
-                        ->orderBy('from_company_name')
-                        ->orderBy('from_name')
-                        ->orderBy('to_company_name')
-                        ->orderBy('to_name')
-                        ->orderBy('date_requested')
-                        ->get();
+            ->hasStatus('unmanifested')
+            ->where('date_requested', '<', Carbon::now()->endOfDay())
+            ->where('visible', '1')
+            ->orderBy('from_company_name')
+            ->orderBy('from_name')
+            ->orderBy('to_company_name')
+            ->orderBy('to_name')
+            ->orderBy('date_requested')
+            ->get();
     }
 
     /**
@@ -434,7 +434,7 @@ class TransportJob extends Model
 
     /**
      * Get routing info (collection/delivery route and time)
-     * 
+     *
      * @return array
      */
     public function getRoutingAttribute()
@@ -451,8 +451,20 @@ class TransportJob extends Model
     }
 
     /**
+     * Set the transend route.
+     *
+     * @param type $route
+     */
+    public function setTransendRoute($route = false)
+    {
+        $this->transend_route = ($route) ? $route : $this->getTransendRoute();
+        $this->transend_account_code = $this->getTransendAccountCode();
+        $this->save();
+    }
+
+    /**
      * Get the transend route.
-     * 
+     *
      * @return string
      */
     public function getTransendRoute()
@@ -477,7 +489,7 @@ class TransportJob extends Model
                     return 'UK2';
                 }
 
-                // Override Fedex International BFS            
+                // Override Fedex International BFS
                 if ($this->shipment->route->code == 'BFS') {
                     return 'FEDF';
                 }
@@ -497,13 +509,23 @@ class TransportJob extends Model
 
     /**
      * Set the transend route.
-     * 
+     *
      * @param type $route
      */
-    public function setTransendRoute($route = false)
+    public function getTransendAccountCode()
     {
-        $this->transend_route = ($route) ? $route : $this->getTransendRoute();
-        $this->save();
+        // Deliveries, use company name and postcode
+        if ($this->type == 'd') {
+            return strtoupper(substr($this->to_company_name, 0, 3) . '00' . preg_replace('/\s+/', '', $this->to_postcode) . '-001');
+        }
+
+        // Collections with known SCS code
+        if ($this->scs_company_code) {
+            return $this->scs_company_code . '-002';
+        }
+
+        // Collections where SCS code isn't known, use company name and postcode
+        return strtoupper(substr($this->from_company_name, 0, 3) . '00' . preg_replace('/\s+/', '', $this->from_postcode) . '-002');
     }
 
 }
