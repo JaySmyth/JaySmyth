@@ -9,6 +9,8 @@
 
 namespace App\Pricing;
 
+use App\TntEas;
+
 class PricingModel4 extends PricingModel
 {
     /*
@@ -40,9 +42,18 @@ class PricingModel4 extends PricingModel
 
     /*
      * **********************************
-     * Carrier Specific Surcharges
+     * Carrier Specific Surcharges.
      * **********************************
      */
+    // Extended Area Surcharge
+    public function isRAS()
+    {
+
+        $eas = new TntEas();
+        // Implemented at child level
+        return $eas->isEas($this->shipment['recipient_country_code'], $this->shipment['recipient_postcode']);
+    }
+
 
 }
 
