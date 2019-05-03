@@ -233,6 +233,14 @@ class ReportsController extends Controller
             $packages->where('shipments.company_id', $request->company);
         }
 
+        if (strlen($request->received) > 0) {
+            $packages->where('packages.received', $request->received);
+        }
+
+        if (strlen($request->routed) > 0) {
+            $packages->where('packages.loaded', $request->routed);
+        }
+
         $packages = $packages->get();
 
         $routes = [];

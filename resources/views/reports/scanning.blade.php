@@ -18,6 +18,16 @@
             {!! Form::select('company', dropDown('enabledSites', 'All Shippers'), Input::get('company'), array('class' => 'form-control')) !!}
         </div>
 
+        <div class="form-group">
+            <label for="month">Received</label>
+            {!! Form::select('received', dropDown('boolean', 'All'), Input::get('received'), array('class' => 'form-control')) !!}
+        </div>
+
+        <div class="form-group">
+            <label for="month">Routed</label>
+            {!! Form::select('routed', dropDown('boolean', 'All'), Input::get('routed'), array('class' => 'form-control')) !!}
+        </div>
+
         <button type="submit" class="btn btn-primary mt-3">Update Report</button>
 
         {!! Form::Close() !!}
