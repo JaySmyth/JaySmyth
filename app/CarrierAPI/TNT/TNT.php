@@ -47,8 +47,18 @@ class TNT
     }
 
     /**
+     * Strips ampersand from values.
+     */
+    private function removeUnwantedCharactersFromData()
+    {
+        foreach ($this->shipment as $key => $value) {
+            $this->shipment[$key] = str_replace('&', '', $value);
+        }
+    }
+
+    /**
      * Get the account number to use.
-     * 
+     *
      * @param type $mode
      * @return string
      */
@@ -70,7 +80,7 @@ class TNT
     /**
      * Generates XML and sends it to TNT. Returns an array containing a consignment
      * number and data for generating a label.
-     * 
+     *
      * @return array
      */
     public function sendMessage()
@@ -81,7 +91,7 @@ class TNT
         // Create a transaction log
         $this->log('MSG-1', 'O', $expressConnectXml);
 
-        // Send the Express Connect XML to TNT server      
+        // Send the Express Connect XML to TNT server
         $result = $this->postExpressConnect($expressConnectXml);
 
         $this->log('REPLY-1', 'I', $result);
@@ -98,18 +108,18 @@ class TNT
 
         $this->log('REPLY-2', 'I', $result);
 
-        // Obtain the XML portion of the string returned            
+        // Obtain the XML portion of the string returned
         if (!$xml = $this->getXmlResult($result)) {
             return $reply['errors'][] = 'Invalid reply from carrier. Please try again.';
         }
 
-        // Read the result into a simpleXML object 
+        // Read the result into a simpleXML object
         $result = new SimpleXMLElement($xml);
 
         // Errors found: move them to our reply array
         if (isset($result->ERROR)) {
             foreach ($result->ERROR as $error) {
-                $reply['errors'][] = (string) $error->DESCRIPTION;
+                $reply['errors'][] = (string)$error->DESCRIPTION;
             }
 
             return $reply;
@@ -123,8 +133,8 @@ class TNT
          * We have successfully obtained a consignment number from the first 2 calls to the TNT server
          * TNT may return a consignment number as an alphanumeric string or a number.
          * "Express Label" requires a numeric only consignment number. If an alphanumeric
-         * consignment number is returned, strip the non numeric characters out.                                                
-         * 
+         * consignment number is returned, strip the non numeric characters out.
+         *
          */
 
         $consignmentNumber = preg_replace('/[^0-9]+/', '', $result->CREATE->CONNUMBER);
@@ -149,14 +159,14 @@ class TNT
         // Errors found, return the reply
         if (isset($result->brokenRules)) {
             foreach ($result->brokenRules as $error) {
-                $reply['errors'][] = (string) $error->errorDescription; // Cast the simpleXML object to a string
+                $reply['errors'][] = (string)$error->errorDescription; // Cast the simpleXML object to a string
             }
             return $reply;
         }
 
         // Read the XML response, moving barcode info into reply array
         foreach ($result->consignment->pieceLabelData as $labelData) {
-            $reply['barcode'][] = (string) $labelData->barcode; // Cast the simpleXML object to a string                        
+            $reply['barcode'][] = (string)$labelData->barcode; // Cast the simpleXML object to a string
         }
 
         // Pass the label data back to use when generating the TNT labels
@@ -167,126 +177,8 @@ class TNT
     }
 
     /**
-     * Strips ampersand from values.
-     */
-    private function removeUnwantedCharactersFromData()
-    {
-        foreach ($this->shipment as $key => $value) {
-            $this->shipment[$key] = str_replace('&', '', $value);
-        }
-    }
-
-    /**
-     * Get the access key from the TNT Express Connect response.
-     * 
-     * @param type $result
-     * @return boolean
-     */
-    private function getAccessKey($result)
-    {
-        $start = stripos($result, 'COMPLETE:');
-        if ($start > 0) {
-            $start = $start + 9;
-            $access_key = substr($result, $start);
-            if (is_numeric($access_key)) {
-                return $access_key;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Get the result from the TNT Express Connect response.
-     * 
-     * @param type $response
-     * @return boolean|string
-     */
-    private function getXmlResult($response)
-    {
-        $start = stripos($response, '<document>');
-        if ($start > 0) {
-            return "<?xml version='1.0' standalone='yes'?>" . substr($response, $start);
-        }
-        return false;
-    }
-
-    /**
-     * Send express connect XML to tnt.
-     * 
-     * @param string $string
-     * @return type
-     */
-    private function postExpressConnect($string)
-    {
-        $string = "xml_in=" . $string; // Append "xml_in=" to beginning of string
-
-        $header = array(
-            "POST ShipperGate2.asp HTTP/1.0",
-            "Accept: */*",
-            "User-Agent: ShipperGate_socket/1.0",
-            "Content-type: application/x-www-form-urlencoded",
-            "Content-length: " . strlen($string),
-            ""
-        );
-
-        $ch = curl_init(); // initialize curl handle
-        curl_setopt($ch, CURLOPT_URL, $this->express_connect_url);                // set url to post to
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        if ($header != '') {
-            curl_setopt($ch, CURLOPT_HEADER, 1);            // CURL to output header
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);  // Header for CURL to output
-        } else {
-            curl_setopt($ch, CURLOPT_HEADER, 0);            // CURL NOT to output header
-        }
-
-        curl_setopt($ch, CURLOPT_POST, 0);                  // Transmit as POST method
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $string);
-
-        $result = curl_exec($ch);                           // send!
-        curl_close($ch);                                    // close
-
-        return $result;
-    }
-
-    /**
-     * Send express label XML to tnt.
-     * 
-     * @param type $string
-     * @return type
-     */
-    private function postExpressLabel($string)
-    {
-        $ch = curl_init(); // New curl instance
-        curl_setopt($ch, CURLOPT_URL, $this->express_label_url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-
-        if ((trim($this->username) != "") && (trim($this->password) != "")) {
-            curl_setopt($ch, CURLOPT_USERPWD, $this->username . ":" . $this->password);
-        }
-
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $string);
-
-        $is_secure = strpos($this->express_label_url, "https://");
-        if ($is_secure === 0) {
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        }
-
-        curl_setopt($ch, CURLOPT_POST, 1);
-        $result = curl_exec($ch);
-        curl_close($ch);
-
-        return $result;
-    }
-
-    /**
      * Build XML for express label call.
-     * 
+     *
      * @return string
      */
     private function generateExpressConnectXml()
@@ -401,16 +293,14 @@ class TNT
             if (!isUkDomestic($this->shipment['recipient_country_code']) && !empty($this->shipment['contents'])) {
 
                 foreach ($this->shipment['contents'] as $content) {
-                    if (isset($content['package_index']) && $content['package_index'] == $package['index']) {
-                        $articleNode = $packageNode->addChild('ARTICLE');
-                        $articleNode->addChild('ITEMS', $content['quantity']);
-                        $articleNode->addChild('DESCRIPTION', $content['description']);
-                        $articleNode->addChild('WEIGHT', $content['unit_weight']);
-                        $articleNode->addChild('INVOICEVALUE', $content['unit_value']);
-                        $articleNode->addChild('INVOICEDESC', $content['description']);
-                        $articleNode->addChild('HTS', $content['harmonized_code']);
-                        $articleNode->addChild('COUNTRY', $content['country_of_manufacture']);
-                    }
+                    $articleNode = $packageNode->addChild('ARTICLE');
+                    $articleNode->addChild('ITEMS', $content['quantity']);
+                    $articleNode->addChild('DESCRIPTION', $content['description']);
+                    $articleNode->addChild('WEIGHT', $content['unit_weight']);
+                    $articleNode->addChild('INVOICEVALUE', $content['unit_value']);
+                    $articleNode->addChild('INVOICEDESC', $content['description']);
+                    $articleNode->addChild('HTS', $content['harmonized_code']);
+                    $articleNode->addChild('COUNTRY', $content['country_of_manufacture']);
                 }
             }
         }
@@ -432,8 +322,26 @@ class TNT
     }
 
     /**
+     * Get TNT postcode for a given town (IE only).
+     *
+     * @return type
+     */
+    protected function getTntPostcode()
+    {
+        $tntPostcode = new \App\TntPostcode();
+
+        $postcode = $tntPostcode->getPostcode($this->shipment['recipient_country_code'], $this->shipment['recipient_city']);
+
+        if ($postcode) {
+            return $postcode;
+        }
+
+        return trim($this->shipment['recipient_postcode']);
+    }
+
+    /**
      * Get TNT consignment type - must be either ‘N’ (NonDoc) or ‘D’ (Doc).
-     * 
+     *
      * @return string
      */
     private function getConType()
@@ -445,8 +353,49 @@ class TNT
     }
 
     /**
+     * Get the shipment volume.
+     *
+     * @return int
+     */
+    protected function getTotalVolume()
+    {
+        $totalVolume = 0;
+
+        foreach ($this->shipment['packages'] as $package) {
+            $totalVolume += ($package['length'] / 100) * ($package['width'] / 100) * ($package['height'] / 100);
+        }
+
+        return $totalVolume;
+    }
+
+    /**
+     * Get a goods description.
+     *
+     * @param type $packageIndex
+     * @return string
+     */
+    private function getGoodsDescription($packageIndex = null)
+    {
+        if ($this->shipment['ship_reason'] == 'documents') {
+            return $this->shipment['documents_description'];
+        }
+
+        if (isUkDomestic($this->shipment['recipient_country_code'])) {
+            return $this->shipment['goods_description'];
+        }
+
+        if (!empty($this->shipment['contents'])) {
+            foreach ($this->shipment['contents'] as $content) {
+                return $content['description'];
+            }
+        }
+
+        return 'COMMODITIES';
+    }
+
+    /**
      * Count the number of items in a package.
-     * 
+     *
      * @param type $packageIndex
      * @return type
      */
@@ -456,9 +405,7 @@ class TNT
 
         if (isset($this->shipment['contents']) && is_array($this->shipment['contents'])) {
             foreach ($this->shipment['contents'] as $content) {
-                if ($content['package_index'] == $packageIndex) {
-                    $items ++;
-                }
+                $items++;
             }
         }
 
@@ -469,8 +416,102 @@ class TNT
     }
 
     /**
+     * Create a transaction log.
+     *
+     * @param type $type
+     * @param type $direction
+     * @param type $msg
+     */
+    protected function log($type, $direction, $msg)
+    {
+        \App\TransactionLog::create([
+            'type' => $type,
+            'carrier' => 'tnt',
+            'direction' => $direction,
+            'msg' => $msg
+        ]);
+    }
+
+    /**
+     * Send express connect XML to tnt.
+     *
+     * @param string $string
+     * @return type
+     */
+    private function postExpressConnect($string)
+    {
+        $string = "xml_in=" . $string; // Append "xml_in=" to beginning of string
+
+        $header = array(
+            "POST ShipperGate2.asp HTTP/1.0",
+            "Accept: */*",
+            "User-Agent: ShipperGate_socket/1.0",
+            "Content-type: application/x-www-form-urlencoded",
+            "Content-length: " . strlen($string),
+            ""
+        );
+
+        $ch = curl_init(); // initialize curl handle
+        curl_setopt($ch, CURLOPT_URL, $this->express_connect_url);                // set url to post to
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        if ($header != '') {
+            curl_setopt($ch, CURLOPT_HEADER, 1);            // CURL to output header
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);  // Header for CURL to output
+        } else {
+            curl_setopt($ch, CURLOPT_HEADER, 0);            // CURL NOT to output header
+        }
+
+        curl_setopt($ch, CURLOPT_POST, 0);                  // Transmit as POST method
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $string);
+
+        $result = curl_exec($ch);                           // send!
+        curl_close($ch);                                    // close
+
+        return $result;
+    }
+
+    /**
+     * Get the access key from the TNT Express Connect response.
+     *
+     * @param type $result
+     * @return boolean
+     */
+    private function getAccessKey($result)
+    {
+        $start = stripos($result, 'COMPLETE:');
+        if ($start > 0) {
+            $start = $start + 9;
+            $access_key = substr($result, $start);
+            if (is_numeric($access_key)) {
+                return $access_key;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Get the result from the TNT Express Connect response.
+     *
+     * @param type $response
+     * @return boolean|string
+     */
+    private function getXmlResult($response)
+    {
+        $start = stripos($response, '<document>');
+        if ($start > 0) {
+            return "<?xml version='1.0' standalone='yes'?>" . substr($response, $start);
+        }
+        return false;
+    }
+
+    /**
      * Generate XML for expressLabel request.
-     * 
+     *
      * @param type $consignmentNumber
      * @return string
      */
@@ -543,11 +584,11 @@ class TNT
              */
             if (!isUkDomestic($this->shipment['recipient_country_code']) && !empty($this->shipment['contents'])) {
                 foreach ($this->shipment['contents'] as $content) {
-                    if (isset($content['package_index']) && $content['package_index'] == $package['index']) {
-                        $piecesNode = $pieceLineNode->addChild('pieces');
-                        $piecesNode->addChild('sequenceNumbers', $package['index']);
-                        $piecesNode->addChild('pieceReference', $content['description']);
-                    }
+
+                    $piecesNode = $pieceLineNode->addChild('pieces');
+                    $piecesNode->addChild('sequenceNumbers', $package['index']);
+                    $piecesNode->addChild('pieceReference', $content['description']);
+
                 }
             } else {
                 $piecesNode = $pieceLineNode->addChild('pieces');
@@ -560,35 +601,21 @@ class TNT
     }
 
     /**
-     * Get a goods description.
-     * 
-     * @param type $packageIndex
-     * @return string
+     * TNT "line of business".
+     *
+     * @return int
      */
-    private function getGoodsDescription($packageIndex = null)
+    private function getLineOfBusiness()
     {
-        if ($this->shipment['ship_reason'] == 'documents') {
-            return $this->shipment['documents_description'];
+        if (strtoupper($this->shipment['recipient_country_code']) == 'GB') {
+            return 1;
         }
-
-        if (isUkDomestic($this->shipment['recipient_country_code'])) {
-            return $this->shipment['goods_description'];
-        }
-
-        if (!empty($this->shipment['contents'])) {
-            foreach ($this->shipment['contents'] as $content) {
-                if ($content['package_index'] == $packageIndex) {
-                    return $content['description'];
-                }
-            }
-        }
-
-        return 'COMMODITIES';
+        return 2;
     }
 
     /**
      * Map the service to an express label product id.
-     * 
+     *
      * @return string
      */
     private function getProductId()
@@ -612,37 +639,39 @@ class TNT
     }
 
     /**
-     * TNT "line of business".
-     * 
-     * @return int
+     * Send express label XML to tnt.
+     *
+     * @param type $string
+     * @return type
      */
-    private function getLineOfBusiness()
+    private function postExpressLabel($string)
     {
-        if (strtoupper($this->shipment['recipient_country_code']) == 'GB') {
-            return 1;
-        }
-        return 2;
-    }
+        $ch = curl_init(); // New curl instance
+        curl_setopt($ch, CURLOPT_URL, $this->express_label_url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-    /**
-     * Get the shipment volume.
-     * 
-     * @return int
-     */
-    protected function getTotalVolume()
-    {
-        $totalVolume = 0;
-
-        foreach ($this->shipment['packages'] as $package) {
-            $totalVolume += ($package['length'] / 100) * ($package['width'] / 100) * ($package['height'] / 100);
+        if ((trim($this->username) != "") && (trim($this->password) != "")) {
+            curl_setopt($ch, CURLOPT_USERPWD, $this->username . ":" . $this->password);
         }
 
-        return $totalVolume;
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $string);
+
+        $is_secure = strpos($this->express_label_url, "https://");
+        if ($is_secure === 0) {
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        }
+
+        curl_setopt($ch, CURLOPT_POST, 1);
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        return $result;
     }
 
     /**
      * Build an array to pass to the label class.
-     * 
+     *
      * @param SimpleXml object $result
      * @return array
      */
@@ -655,8 +684,8 @@ class TNT
         }
 
         foreach ($result->pieceLabelData as $label) {
-            $barcode[] = (string) $label->barcode;
-            $weight[] = (string) $label->weightDisplay;
+            $barcode[] = (string)$label->barcode;
+            $weight[] = (string)$label->weightDisplay;
         }
 
         $hazardous = '';
@@ -666,59 +695,24 @@ class TNT
         }
 
         return [
-            'consignment_number' => (string) $result->consignmentLabelData->consignmentNumber,
-            'transport_display' => $transport . (string) $result->consignmentLabelData->transportDisplay,
+            'consignment_number' => (string)$result->consignmentLabelData->consignmentNumber,
+            'transport_display' => $transport . (string)$result->consignmentLabelData->transportDisplay,
             'hazardous' => $hazardous,
-            'xray_display' => (string) $result->consignmentLabelData->xrayDisplay,
-            'free_circulation_display' => (string) $result->consignmentLabelData->freeCirculationDisplay,
-            'sort_split_text' => (string) $result->consignmentLabelData->sortSplitText,
+            'xray_display' => (string)$result->consignmentLabelData->xrayDisplay,
+            'free_circulation_display' => (string)$result->consignmentLabelData->freeCirculationDisplay,
+            'sort_split_text' => (string)$result->consignmentLabelData->sortSplitText,
             'weight' => $weight,
-            'account_number' => (string) $result->consignmentLabelData->account->accountNumber,
-            'cluster_code' => (string) $result->consignmentLabelData->clusterCode,
-            'product' => (string) $result->consignmentLabelData->product,
-            'option' => (string) $result->consignmentLabelData->option,
-            'depot_code' => (string) $result->consignmentLabelData->originDepot->depotCode,
-            'collection_date' => (string) $result->consignmentLabelData->collectionDate,
+            'account_number' => (string)$result->consignmentLabelData->account->accountNumber,
+            'cluster_code' => (string)$result->consignmentLabelData->clusterCode,
+            'product' => (string)$result->consignmentLabelData->product,
+            'option' => (string)$result->consignmentLabelData->option,
+            'depot_code' => (string)$result->consignmentLabelData->originDepot->depotCode,
+            'collection_date' => (string)$result->consignmentLabelData->collectionDate,
             'transit_depot' => $result->consignmentLabelData->transitDepots->transitDepot,
-            'destination_depot_code' => (string) $result->consignmentLabelData->destinationDepot->depotCode,
-            'due_day' => (string) $result->consignmentLabelData->destinationDepot->dueDayOfMonth,
+            'destination_depot_code' => (string)$result->consignmentLabelData->destinationDepot->depotCode,
+            'due_day' => (string)$result->consignmentLabelData->destinationDepot->dueDayOfMonth,
             'barcode' => $barcode
         ];
-    }
-
-    /**
-     * Get TNT postcode for a given town (IE only).
-     * 
-     * @return type
-     */
-    protected function getTntPostcode()
-    {
-        $tntPostcode = new \App\TntPostcode();
-
-        $postcode = $tntPostcode->getPostcode($this->shipment['recipient_country_code'], $this->shipment['recipient_city']);
-
-        if ($postcode) {
-            return $postcode;
-        }
-
-        return trim($this->shipment['recipient_postcode']);
-    }
-
-    /**
-     * Create a transaction log.
-     * 
-     * @param type $type
-     * @param type $direction
-     * @param type $msg
-     */
-    protected function log($type, $direction, $msg)
-    {
-        \App\TransactionLog::create([
-            'type' => $type,
-            'carrier' => 'tnt',
-            'direction' => $direction,
-            'msg' => $msg
-        ]);
     }
 
 }
