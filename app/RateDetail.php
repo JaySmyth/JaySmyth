@@ -77,9 +77,9 @@ class RateDetail extends Model
                     rate_details.package_type AS package_type, 
                     rate_details.zone AS zone,
                     rate_details.break_point AS break_point,
-                    ROUND(rate_details.weight_rate, :weight_precision1) - ROUND(COALESCE((rate_details.weight_rate * weight_discount)/100,0), :weight_precision2) AS weight_rate,
-                    ROUND(rate_details.package_rate, :package_precision1) - ROUND(COALESCE((rate_details.package_rate * package_discount)/100,0), :package_precision2) AS package_rate,
-                    ROUND(rate_details.consignment_rate, :consignment_precision1) - ROUND(COALESCE((rate_details.consignment_rate * consignment_discount)/100,0), :consignment_precision2) AS consignment_rate,
+                    ROUND(rate_details.weight_rate - COALESCE((rate_details.weight_rate * weight_discount)/100,0), :weight_precision) AS weight_rate,
+                    ROUND(rate_details.package_rate - COALESCE((rate_details.package_rate * package_discount)/100,0), :package_precision) AS package_rate,
+                    ROUND(rate_details.consignment_rate - COALESCE((rate_details.consignment_rate * consignment_discount)/100,0), :consignment_precision) AS consignment_rate,
                     rate_details.weight_increment AS weight_increment, 
                     rate_details.weight_units AS weight_units,
                     rate_details.from_date AS from_date, 
@@ -99,12 +99,9 @@ class RateDetail extends Model
                 WHERE   rate_details.rate_id = :rateId ";
 
         $PARAMS = [
-            'weight_precision1' => $precision,
-            'package_precision1' => $precision,
-            'consignment_precision1' => $precision,
-            'weight_precision2' => $precision,
-            'package_precision2' => $precision,
-            'consignment_precision2' => $precision,
+            'weight_precision' => $precision,
+            'package_precision' => $precision,
+            'consignment_precision' => $precision,
             'serviceId' => $serviceId,
             'companyId' => $companyId,
             'fromDate1' => date('Y-m-d', strtotime($shipDate)),
