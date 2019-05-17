@@ -41,8 +41,8 @@ class PricingModel3 extends PricingModel
 
         $this->maxStdDimension = 122;
         $this->maxStdWeight = 32;
-        $this->lowerMaxGirth = 330;
-        $this->upperMaxGirth = 419;
+        $this->lowerMaxGirth = 300;
+        $this->upperMaxGirth = 400;
 
         // Calculate Fuel Surcharge on the following charge codes
         $this->fuelChargeCodes = ['BRO', 'COR', 'DISC', 'DTP', 'EAS', 'FRT', 'FUEL', 'ICE', 'LIA', 'LPS', 'MIS', 'OOA', 'OSP', 'OWP', 'RAS', 'RES'];
