@@ -145,13 +145,10 @@
                 <td>
                     @if($shipment->contents->count() > 0)
                         @foreach($shipment->contents as $content)
-                            Pkg {{$content->package_index}} - {{$content->description}}<br>
+                            {{$content->description}}<br>
                         @endforeach
                     @else
-                        @foreach ($shipment->packages as $package)
-                            Pkg {{$loop->iteration}} - {{$shipment->goods_description}}{{$shipment->documents_description}}
-                            <br>
-                        @endforeach
+                        {{$shipment->goods_description}}{{$shipment->documents_description}}
                     @endif
                 </td>
                 <td>{{$shipment->bill_shipping_account}}</td>
