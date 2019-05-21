@@ -3,30 +3,25 @@
 namespace App\CarrierAPI\DHL;
 
 use App\Carrier;
-use App\Service;
-use App\Company;
+use App\CarrierAPI\CarrierBase;
 use App\Country;
 use App\PackagingType;
-use App\CarrierPackagingType;
+use App\Service;
 use App\TransactionLog;
-use App\CarrierAPI\DHL\DHLLabel;
-use DHL\Entity\GB\ShipmentResponse;
-use DHL\Entity\GB\ShipmentRequest;
+use Carbon\Carbon;
 use DHL\Client\Web as WebserviceClient;
 use DHL\Datatype\GB\Piece;
 use DHL\Datatype\GB\SpecialService;
-use SimpleXMLElement;
-use DOMDocument;
-use Carbon\Carbon;
-use Exception;
-use Illuminate\Support\Facades\Validator;
+use DHL\Entity\GB\ShipmentRequest;
+use DHL\Entity\GB\ShipmentResponse;
 
 /**
  * Description of DHLWebAPI
  *
  * @author gmcbroom
  */
-class DHLAPI extends \App\CarrierAPI\CarrierBase {
+class DHLAPI extends CarrierBase
+{
     /*
      *  Carrier Specific Variable declarations
      */
@@ -62,9 +57,9 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase {
         $this->account = [
             'test' => [
                 // ID to use to connect to DHL
-                'id' => 'CIMGBTest',
+                'id' => 'v62_HxvnFkM8EK',
                 // Password to use to connect to DHL
-                'pass' => 'DLUntOcJma',
+                'pass' => 'fZVp5yrGJB',
                 // Shipper, Billing and Duty Account numbers
                 'shipperAccountNumber' => '418289240',
                 'billingAccountNumber' => '418289240',
@@ -161,7 +156,6 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase {
         $dhlShipment->Shipper->CountryName = Country::where('country_code', $shipment['sender_country_code'])->first()->country;
         $dhlShipment->Shipper->Contact->PersonName = $shipment['sender_name'];
         $dhlShipment->Shipper->Contact->PhoneNumber = $shipment['sender_telephone'];
-        ;
         // $sample->Shipper->Contact->PhoneExtension = '3403';
         // $sample->Shipper->Contact->FaxNumber = '1 905 8613411';
         // $sample->Shipper->Contact->Telex = '1245';
@@ -183,9 +177,9 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase {
         // $sample->Consignee->Contact->FaxNumber = '506-851-7403';
         // $sample->Consignee->Contact->Telex = '506-851-7121';
         if (isset($shipment['recipient_email'])) {
-        $dhlShipment->Consignee->Contact->Email = $shipment['recipient_email'];
+            $dhlShipment->Consignee->Contact->Email = $shipment['recipient_email'];
         } else {
-        $dhlShipment->Consignee->Contact->Email = '';
+            $dhlShipment->Consignee->Contact->Email = '';
         }
 
         if (customsEntryRequired($shipment['sender_country_code'], $shipment['recipient_country_code'])) {
@@ -193,15 +187,12 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase {
             if ($shipment['bill_tax_duty'] == 'sender') {
                 $dhlShipment->Billing->DutyPaymentType = $this->paymentTypes[$shipment['bill_tax_duty']];
                 $dhlShipment->Billing->DutyAccountNumber = $shipment['bill_tax_duty_account'];
-                $dhlShipment->Dutiable->TermsOfTrade = strtoupper($shipment['terms_of_sale']);
                 $specialService = new SpecialService();
                 $specialService->SpecialServiceType = 'DD';
                 $dhlShipment->addSpecialService($specialService);
             }
 
-            $dhlShipment->ShipmentDetails->IsDutiable = 'Y';
-            $dhlShipment->Dutiable->DeclaredValue = number_format($shipment['customs_value'], 2, '.', '');
-            $dhlShipment->Dutiable->DeclaredCurrency = $shipment['customs_value_currency_code'];
+            $shipment['contents'] = null;
             if (!empty($shipment['contents'])) {
                 foreach ($shipment['contents'] as $content) {
                     if ($content['commodity_code'] > "") {
@@ -232,6 +223,7 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase {
         $dhlShipment->ShipmentDetails->NumberOfPieces = $shipment['pieces'];
 
         $pkg = 0;
+        $dhlShipment->ShipmentDetails->PackageType = "EE";
         foreach ($shipment['packages'] as $package) {
             $pkg++;
             $piece = new Piece();
@@ -242,6 +234,11 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase {
             $piece->Width = $package['width'];
             $piece->Height = $package['height'];
             $piece->Depth = $package['length'];
+
+            // For shipment to be a document shipment all packages must be documents
+            if ($dhlShipment->ShipmentDetails->PackageType == "EE" and $piece->PackageType <> "EE") {
+                $dhlShipment->ShipmentDetails->PackageType = $piece->PackageType;
+            }
             $dhlShipment->ShipmentDetails->addPiece($piece);
         }
 
@@ -267,6 +264,17 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase {
         $dhlShipment->ShipmentDetails->PackageType = $this->packageTypes[$shipment['packages'][0]['packaging_code']];
         $dhlShipment->ShipmentDetails->CurrencyCode = $shipment['customs_value_currency_code'];
 
+        // Is this a document shipment?
+        $dhlShipment->ShipmentDetails->IsDutiable = 'N';
+        if ($dhlShipment->ShipmentDetails->PackageType == "EE") {
+        } else {
+
+            $dhlShipment->ShipmentDetails->IsDutiable = 'Y';
+            $dhlShipment->Dutiable->TermsOfTrade = strtoupper($shipment['terms_of_sale']);
+        }
+
+        $dhlShipment->Dutiable->DeclaredValue = number_format($shipment['customs_value'], 2, '.', '');
+        $dhlShipment->Dutiable->DeclaredCurrency = $shipment['customs_value_currency_code'];
         /*
          *  Special Service Flags
          */
@@ -375,19 +383,23 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase {
 
         // Call the DHL service and display the XML result
         $sentXML = $dhlShipment->toXML();
-        
-        $sentXML = str_replace('9.880000000000001' , '9.88', $sentXML);
+
+        $sentXML = str_replace('9.880000000000001', '9.88', $sentXML);
 
         $dhlResponse = new ShipmentResponse();
 
         // Log Message to be sent
-        TransactionLog::create(['carrier' => 'dhl', 'type' => 'MSG', 'direction' => 'O', 'msg' => 'v1 - ' . $sentXML, 'mode' => $this->mode]);
+        TransactionLog::create([
+            'carrier' => 'dhl', 'type' => 'MSG', 'direction' => 'O', 'msg' => 'v1 - '.$sentXML, 'mode' => $this->mode
+        ]);
 
         // Send Message to DHL
         $receivedXML = $this->client->call($dhlShipment);
 
         // Log Response
-        TransactionLog::create(['carrier' => 'dhl', 'type' => $msgType, 'direction' => 'I', 'msg' => $receivedXML, 'mode' => $this->mode]);
+        TransactionLog::create([
+            'carrier' => 'dhl', 'type' => $msgType, 'direction' => 'I', 'msg' => $receivedXML, 'mode' => $this->mode
+        ]);
 
         // Request succesful - Return Response as an array
         $route_id = 1;
@@ -419,12 +431,12 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase {
 
                 // Request unsuccessful - return errors
                 $errorMsg = 'Carrier Error : '
-                        . ((string) $reply['Response']['Status']['Condition']['ConditionCode']) . ' : '
-                        . str_replace(chr(10), ' - ', (string) $reply['Response']['Status']['Condition']['ConditionData']);
-                
+                    .((string) $reply['Response']['Status']['Condition']['ConditionCode']).' : '
+                    .str_replace(chr(10), ' - ', (string) $reply['Response']['Status']['Condition']['ConditionData']);
+
                 // Replace all references to DHL with IFS
                 $errorMsg = str_replace("DHL", "IFS", $errorMsg);
-                
+
                 return $this->generateErrorResponse($response, $errorMsg);
             } else {
 
@@ -472,7 +484,7 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase {
             for ($i = 0; $i < $response['pieces']; ++$i) {
                 $response['packages'][$i]['sequence_number'] = $reply['Pieces']['Piece'][$i]['PieceNumber'];
                 $response['packages'][$i]['carrier_tracking_code'] = $reply['Pieces']['Piece'][$i]['LicensePlate'];
-                $response['packages'][$i]['barcode'] = 'J' . $reply['Pieces']['Piece'][$i]['LicensePlate'];
+                $response['packages'][$i]['barcode'] = 'J'.$reply['Pieces']['Piece'][$i]['LicensePlate'];
                 $awbs[] = $response['packages'][$i]['carrier_tracking_code'];
             }
         } else {
@@ -481,7 +493,7 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase {
             $response['pieces'] = 1;
             $response['packages'][0]['sequence_number'] = 1;
             $response['packages'][0]['carrier_tracking_code'] = $reply['Pieces']['Piece']['LicensePlate'];
-            $response['packages'][0]['barcode'] = 'J' . $reply['Pieces']['Piece']['LicensePlate'];
+            $response['packages'][0]['barcode'] = 'J'.$reply['Pieces']['Piece']['LicensePlate'];
             $awbs[] = $reply['Pieces']['Piece']['LicensePlate'];
         }
 
