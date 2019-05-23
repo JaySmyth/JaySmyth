@@ -2,6 +2,9 @@
 
 namespace App;
 
+use App\Legacy\FukShipment;
+use App\Mail\GenericError;
+use App\Mail\TransportJobReinstated;
 use App\Pricing\Pricing;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
@@ -40,6 +43,8 @@ class Shipment extends Model
         'invoicing_status',
         'shipping_charge',
         'shipping_cost',
+        'fuel_charge',
+        'fuel_cost',
         'cost_currency',
         'sales_currency',
         'quoted',
@@ -365,7 +370,7 @@ class Shipment extends Model
         }
 
         if ($this->isUkDomestic()) {
-            $FukShipment = \App\Legacy\FukShipment::select('id')->where('docketno', $this->carrier_consignment_number)->where('compID', $this->company_id)->first();
+            $FukShipment = FukShipment::select('id')->where('docketno', $this->carrier_consignment_number)->where('compID', $this->company_id)->first();
 
             if ($FukShipment) {
                 return "https://www.ifsgl.com/CourierUK/reprint.php?id=" . $FukShipment->id . "&format=A4";
@@ -1016,7 +1021,7 @@ class Shipment extends Model
 
         // Create Transport Job
         $transportJob = $this->transportJobs()->create([
-            'number' => \App\Sequence::whereCode('JOB')->lockForUpdate()->first()->getNextAvailable(),
+            'number' => Sequence::whereCode('JOB')->lockForUpdate()->first()->getNextAvailable(),
             'reference' => $this->carrier_consignment_number,
             'pieces' => $this->pieces,
             'weight' => $this->weight,
@@ -1113,7 +1118,7 @@ class Shipment extends Model
 
         // If sender postcode not "BT", mainland pickup may need cancelled
         if (!$this->originatesFromBtPostcode() && strtoupper($this->sender_country_code != 'US')) {
-            Mail::to('courier@antrim.ifsgroup.com')->cc('courieruk@antrim.ifsgroup.com')->queue(new \App\Mail\GenericError('Shipment Cancelled (' . $this->company->company_name . '/' . $this->consignment_number . ')', 'Carrier pickup may need to be cancelled.'));
+            Mail::to('courier@antrim.ifsgroup.com')->cc('courieruk@antrim.ifsgroup.com')->queue(new GenericError('Shipment Cancelled (' . $this->company->company_name . '/' . $this->consignment_number . ')', 'Carrier pickup may need to be cancelled.'));
         }
 
         /*
@@ -1166,7 +1171,7 @@ class Shipment extends Model
             }
 
             // Notify transport
-            Mail::to('transport@antrim.ifsgroup.com')->cc('it@antrim.ifsgroup.com')->queue(new \App\Mail\TransportJobReinstated($collection));
+            Mail::to('transport@antrim.ifsgroup.com')->cc('it@antrim.ifsgroup.com')->queue(new TransportJobReinstated($collection));
 
 
             // Reinstate delivery request if exists
@@ -1177,7 +1182,7 @@ class Shipment extends Model
                 $delivery->unmanifest();
 
                 // Notify transport
-                Mail::to('transport@antrim.ifsgroup.com')->cc('it@antrim.ifsgroup.com')->queue(new \App\Mail\TransportJobReinstated($delivery));
+                Mail::to('transport@antrim.ifsgroup.com')->cc('it@antrim.ifsgroup.com')->queue(new TransportJobReinstated($delivery));
             }
         }
 
@@ -1213,7 +1218,7 @@ class Shipment extends Model
         }
 
         $transportJob = $this->transportJobs()->create([
-            'number' => \App\Sequence::whereCode('JOB')->lockForUpdate()->first()->getNextAvailable(),
+            'number' => Sequence::whereCode('JOB')->lockForUpdate()->first()->getNextAvailable(),
             'reference' => $this->carrier_consignment_number,
             'pieces' => $this->pieces,
             'weight' => $this->weight,
@@ -1349,7 +1354,7 @@ class Shipment extends Model
      */
     public function getGbpCustomsValue()
     {
-        $currency = \App\Currency::where('code', $this->customs_value_currency_code)->first();
+        $currency = Currency::where('code', $this->customs_value_currency_code)->first();
         if ($currency) {
             return round($this->customs_value / $currency->rate, 2);
         }
@@ -1391,7 +1396,7 @@ class Shipment extends Model
     public function addToLastManifest()
     {
         // Load the manifest profiles
-        $manifestProfiles = \App\ManifestProfile::all();
+        $manifestProfiles = ManifestProfile::all();
 
         // Loop through until we find a viable profile
         foreach ($manifestProfiles as $manifestProfile) :
@@ -1399,7 +1404,7 @@ class Shipment extends Model
             if ($manifestProfile->isShipmentViable($this->id)) {
 
                 // Load the last manifest for this profile
-                $lastManifest = \App\Manifest::whereManifestProfileId($manifestProfile->id)->orderBy('id', 'desc')->first();
+                $lastManifest = Manifest::whereManifestProfileId($manifestProfile->id)->orderBy('id', 'desc')->first();
 
                 if ($lastManifest) {
                     // Set the manifest ID on the shipment
