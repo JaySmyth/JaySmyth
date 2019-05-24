@@ -63,7 +63,6 @@ class Kernel extends ConsoleKernel
         Commands\PrimaryLogistics\GetInventory::class,
         Commands\LogScanningKpis::class,
         Commands\TntTotalVolume::class,
-        Commands\PopulateFuelOnShipmentsTable::class,
     ];
 
     /**
