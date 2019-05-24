@@ -19,9 +19,12 @@
 
 namespace app\Pricing;
 
-use App\Shipment;
+use App\Carrier;
+use App\Company;
+use App\CompanyRate;
 use App\Package;
-use App\Pricing\PricingModel;
+use App\Service;
+use App\Shipment;
 use App\Pricing\PricingModel0;
 use App\Pricing\PricingModel1;
 use App\Pricing\PricingModel2;
@@ -29,19 +32,16 @@ use App\Pricing\PricingModel3;
 use App\Pricing\PricingModel4;
 use App\Pricing\PricingModel5;
 use App\Pricing\PricingModel6;
-use App\Service;
-use App\Carrier;
-use App\CompanyRate;
-use App\Company;
 
 /**
  * ********************************
- * buildModel() builds the correct 
- * Pricing Model to allow the 
+ * buildModel() builds the correct
+ * Pricing Model to allow the
  * shipment to be priced.
  * ********************************
  */
-class Pricing {
+class Pricing
+{
 
     private $service = '';
     private $serviceId;
@@ -158,15 +158,20 @@ class Pricing {
         return $errors;
     }
 
-    public function sumCharges($charges)
+    public function sumCharges($charges, $chargeCode = '')
     {
 
         $total = 0;
         if (is_array($charges)) {
 
             foreach ($charges as $charge) {
-
-                $total += $charge['value'];
+                if ($chargeCode == '') {
+                    $total += $charge['value'];
+                } else {
+                    if ($chargeCode == $charge['code']) {
+                        $total += $charge['value'];
+                    }
+                }
             }
             return $total;
         }
@@ -183,6 +188,8 @@ class Pricing {
 
             $response['shipping_cost'] = round($this->sumCharges($this->costs['charges']), 2);
             $response['shipping_charge'] = round($this->sumCharges($this->sales['charges']), 2);
+            $response['fuel_cost'] = round($this->sumCharges($this->costs['charges'], 'FUEL'), 2);
+            $response['fuel_charge'] = round($this->sumCharges($this->sales['charges'], 'FUEL'), 2);
             $response['cost_vat_amount'] = $this->costs['vat_amount'];
             $response['cost_vat_code'] = $this->costs['vat_code'];
             $response['cost_currency'] = $this->costs['currency'];
@@ -209,6 +216,8 @@ class Pricing {
         } else {
             $response['shipping_cost'] = 0;
             $response['shipping_charge'] = 0;
+            $response['fuel_cost'] = 0;
+            $response['fuel_charge'] = 0;
             $response['cost_currency'] = '';
             $response['sales_currency'] = '';
             $response['cost_vat_amount'] = 0;
@@ -287,7 +296,8 @@ class Pricing {
         $this->costs = $this->getPrice($this->costRate, 'Costs');
 
         // Calculate Vat
-        $vat = calcVat($this->shipment['recipient_country_code'], $this->sumCharges($this->costs['charges']), $this->shipment['vat_exempt']);
+        $vat = calcVat($this->shipment['recipient_country_code'], $this->sumCharges($this->costs['charges']),
+            $this->shipment['vat_exempt']);
         $this->costs['vat_amount'] = $vat['vat_amount'];
         $this->costs['vat_code'] = $vat['vat_code'];
 
@@ -308,7 +318,8 @@ class Pricing {
         $this->sales = $this->getPrice($this->salesRate, 'Sales');
 
         // Calculate Vat
-        $vat = calcVat($this->shipment['recipient_country_code'], $this->sumCharges($this->sales['charges']), $this->shipment['vat_exempt']);
+        $vat = calcVat($this->shipment['recipient_country_code'], $this->sumCharges($this->sales['charges']),
+            $this->shipment['vat_exempt']);
         $this->sales['vat_amount'] = $vat['vat_amount'];
         $this->sales['vat_code'] = $vat['vat_code'];
 

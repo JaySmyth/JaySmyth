@@ -12,6 +12,8 @@
 
 namespace App\CarrierAPI;
 
+use App;
+use App\Jobs\CreateEasypostTracker;
 use DB;
 use App\Company;
 use App\Service;
@@ -678,7 +680,7 @@ class CarrierAPI
 
 
         // Create a tracker
-        dispatch(new \App\Jobs\CreateEasypostTracker($data['carrier_consignment_number'], $shipment->carrier->easypost));
+        dispatch(new CreateEasypostTracker($data['carrier_consignment_number'], $shipment->carrier->easypost));
 
         return $shipment;
     }
@@ -1042,7 +1044,7 @@ class CarrierAPI
     {
 
         // if mode is defined then use it
-        $env_mode = ($mode > "") ? $mode : \App::environment();
+        $env_mode = ($mode > "") ? $mode : App::environment();
 
         // If Environment variable set to Production, then change mode
         switch (strtoupper($env_mode)) {
@@ -1202,6 +1204,8 @@ class CarrierAPI
             $data['quoted'] = NULL;
             $data['shipping_cost'] = NULL;
             $data['shipping_charge'] = NULL;
+            $data['fuel_cost'] = NULL;
+            $data['fuel_charge'] = NULL;
             $data['cost_currency'] = 'GBP';
             $data['sales_currency'] = 'GBP';
         } else {
@@ -1209,6 +1213,8 @@ class CarrierAPI
             $data['quoted'] = json_encode($charges);
             $data['shipping_cost'] = $charges['shipping_cost'];
             $data['shipping_charge'] = $charges['shipping_charge'];
+            $data['fuel_cost'] = $charges['fuel_cost'];
+            $data['fuel_charge'] = $charges['fuel_charge'];
             $data['cost_currency'] = $charges['cost_currency'];
             $data['sales_currency'] = $charges['sales_currency'];
         }
