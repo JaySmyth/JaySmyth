@@ -63,12 +63,13 @@ class Kernel extends ConsoleKernel
         Commands\PrimaryLogistics\GetInventory::class,
         Commands\LogScanningKpis::class,
         Commands\TntTotalVolume::class,
+        Commands\PopulateFuelOnShipmentsTable::class,
     ];
 
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @param  Schedule  $schedule
      * @return void
      */
     protected function schedule(Schedule $schedule)
