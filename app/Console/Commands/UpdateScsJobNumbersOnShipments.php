@@ -45,15 +45,15 @@ class UpdateScsJobNumbersOnShipments extends Command
         if (is_numeric($company)) {
             $shipments = \App\Shipment::where('invoicing_status', $invoiced)->whereNull('scs_job_number')->whereNotIn('status_id', [1, 7])->whereNotIn('carrier_id', [6])->whereCompanyId($company)->orderBy('id', 'ASC')->get();
         } else {
-            $shipments = \App\Shipment::where('invoicing_status', $invoiced)->whereNull('scs_job_number')->whereNotIn('status_id', [1, 7])->whereNotIn('carrier_id', [6])->where('created_at', '>=', Carbon::parse('-2 months'))->orderBy('id', 'ASC')->get();
+            $shipments = \App\Shipment::where('invoicing_status', $invoiced)->whereNull('scs_job_number')->whereNotIn('status_id', [1, 7])->whereNotIn('carrier_id', [6])->where('update_at', '>=', Carbon::parse('-2 months'))->orderBy('id', 'ASC')->get();
         }
 
         foreach ($shipments as $shipment) {
 
-            $jobLine = \App\Multifreight\JobLine::select('id', 'job_id')
-                    ->orWhere('cargo_desc', 'LIKE', '%AWB:' . $shipment->consignment_number . '%')
-                    ->orWhere('cargo_desc', 'LIKE', '%AWB:' . $shipment->carrier_consignment_number . '%')
-                    ->first();
+            $jobLine = \App\Legacy\MfJobLine::select('id', 'job_id')
+                ->orWhere('cargo_desc', 'LIKE', '%AWB:' . $shipment->consignment_number . '%')
+                ->orWhere('cargo_desc', 'LIKE', '%AWB:' . $shipment->carrier_consignment_number . '%')
+                ->first();
 
             if ($jobLine && $jobLine->scs_job_number) {
 
@@ -68,12 +68,12 @@ class UpdateScsJobNumbersOnShipments extends Command
             // Check job header for consignment number
             $withHypen = substr($shipment->carrier_consignment_number, 0, 3) . '-' . substr($shipment->carrier_consignment_number, 3);
 
-            $jobHdr = \App\Multifreight\JobHdr::select('job_disp')
-                    ->orWhere('hawb_char', $shipment->carrier_consignment_number)
-                    ->orWhere('hawb_char', $withHypen)
-                    ->orWhere('mawb_char', $shipment->carrier_consignment_number)
-                    ->orWhere('mawb_char', $withHypen)
-                    ->first();
+            $jobHdr = \App\Legacy\MfJobHdr::select('job_disp')
+                ->orWhere('hawb_char', $shipment->carrier_consignment_number)
+                ->orWhere('hawb_char', $withHypen)
+                ->orWhere('mawb_char', $shipment->carrier_consignment_number)
+                ->orWhere('mawb_char', $withHypen)
+                ->first();
 
             if ($jobHdr && $jobHdr->job_disp) {
                 $shipment->scs_job_number = $jobHdr->job_disp;
