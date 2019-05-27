@@ -123,7 +123,7 @@
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-md-5 col-form-label">
-                                        Ship Reference: <abbr title="This information is required.">*</abbr>
+                                        Ship Reference / PO: <abbr title="This information is required.">*</abbr>
                                     </label>
                                     <div class="col-md-7">
                                         {!! Form::Text('shipment_reference', old('shipment_reference'), ['id' => 'shipment_reference', 'class' =>'form-control form-control-sm', 'maxlength' => '30']) !!}
