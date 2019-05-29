@@ -9,6 +9,9 @@
 
 namespace App\Pricing;
 
+use App\CarrierPackagingType;
+use App\Company;
+
 class PricingModel5 extends PricingModel
 {
     /*
@@ -41,6 +44,22 @@ class PricingModel5 extends PricingModel
         $this->maxStdWeight = 70;
     }
 
+    /**
+     * Gets the Packaging Type of the current package
+     * and set this->packagingType to the IFS equivalent
+     *
+     * @param type $pkgNo
+     */
+    public function getPackagingType($pkgNo = 0)
+    {
+        // A Document only shipment can only contain documents for DHL
+        if ($this->shipment['packages'][$pkgNo]['packaging_code'] == 'ENV' && $this->shipment['ship_reason'] != 'documents') {
+            $this->shipment['packages'][$pkgNo]['packaging_code'] = "CTN";
+        }
+
+        parent::getPackagingType();
+
     }
+}
 
 ?>
