@@ -63,7 +63,7 @@ class ProcessFiles extends Command
      * @var array
      */
     protected $fields = [
-        0 => ['RecordType', 'JobRef1', 'JobRef2', 'JobRef3', 'JobRef4', 'JobTypeCode', 'RouteNumber', 'RouteDate', 'VehicleReg', 'DriverName', 'CompletedTime', 'TypedName', 'Signature', 'Barcode', 'Description', 'Quantity', 'UnitMeasure', 'ExceptionReasonCode', 'ExceptionQty'],
+        0 => ['RecordType', 'JobRef1', 'JobRef2', 'JobRef3', 'JobRef4', 'JobTypeCode', 'RouteNumber', 'RouteDate', 'VehicleReg', 'DriverName', 'CompletedTime', 'TypedName', 'Signature', 'Barcode', 'Description', 'Quantity', 'UnitMeasure', 'ScanUnload', 'ExceptionReasonCode', 'ExceptionQty'],
         1 => ['RecordType', 'JobRef1', 'JobRef2', 'JobRef3', 'JobRef4', 'JobTypeCode', 'RouteNumber', 'RouteDate', 'VehicleReg', 'DriverName', 'CompletedTime', 'ExceptionReasonCode']
     ];
 
