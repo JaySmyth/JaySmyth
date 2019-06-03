@@ -63,8 +63,9 @@ class ProcessFiles extends Command
      * @var array
      */
     protected $fields = [
-        0 => ['RecordType', 'JobRef1', 'JobRef2', 'JobRef3', 'JobRef4', 'JobTypeCode', 'RouteNumber', 'RouteDate', 'VehicleReg', 'DriverName', 'CompletedTime', 'TypedName', 'Signature', 'Barcode', 'Description', 'Quantity', 'UnitMeasure', 'ScanUnload', 'ExceptionReasonCode', 'ExceptionQty'],
-        1 => ['RecordType', 'JobRef1', 'JobRef2', 'JobRef3', 'JobRef4', 'JobTypeCode', 'RouteNumber', 'RouteDate', 'VehicleReg', 'DriverName', 'CompletedTime', 'ExceptionReasonCode']
+        0 => ['RecordType', 'JobRef1', 'JobRef2', 'JobRef3', 'JobRef4', 'JobTypeCode', 'RouteNumber', 'RouteDate', 'VehicleReg', 'DriverName', 'CompletedTime', 'TypedName', 'Signature', 'Barcode', 'Description', 'Quantity', 'UnitMeasure', 'ExceptionReasonCode', 'ExceptionQty'],
+        1 => ['RecordType', 'JobRef1', 'JobRef2', 'JobRef3', 'JobRef4', 'JobTypeCode', 'RouteNumber', 'RouteDate', 'VehicleReg', 'DriverName', 'CompletedTime', 'ExceptionReasonCode'],
+        2 => ['RecordType', 'JobRef1', 'JobRef2', 'JobRef3', 'JobRef4', 'JobTypeCode', 'RouteNumber', 'RouteDate', 'VehicleReg', 'DriverName', 'CompletedTime', 'TypedName', 'Signature', 'Barcode', 'Description', 'Quantity', 'UnitMeasure', 'ScanUnload', 'ExceptionReasonCode', 'ExceptionQty'],
     ];
 
     /**
@@ -127,24 +128,94 @@ class ProcessFiles extends Command
     }
 
     /**
-     * Read one line at a time and create an array of field names and values.
+     * Download files from ftp site.
      *
-     * @param array $data
-     *
-     * @return array
+     * @return void
      */
-    protected function assignFieldNames($data)
+    private function downloadFiles()
     {
-        $numberOfFields = count($data);
+        $this->info("Attempting to download files from remote FTP site");
 
-        $fields = ($numberOfFields == 12) ? $this->fields[1] : $this->fields[0];
+        $connection = ftp_connect($this->ftpHost);
 
-        $i = 0;
-        foreach ($fields as $field) {
-            $row[$field] = (isset($data[$i]) && $data[$i] != '?') ? trim($data[$i]) : null;
-            $i++;
+        // Check connection was made
+        if (!$connection) {
+            $this->error("Unable to connect to FTP host -> " . $this->ftpHost);
+            return false;
         }
-        return $row;
+
+        $loginResult = ftp_login($connection, $this->ftpUsername, $this->ftpPassword);
+
+        if (!$loginResult) {
+            $this->error("Unable to login to FTP host -> " . $this->ftpHost);
+            return false;
+        }
+
+        $this->info("Connection established to FTP host -> " . $this->ftpHost);
+
+        /*
+         * FTP BETWEEN TWO EC2 INSTANCES REQUIRES PASSIVE AND IP IGNORE
+         *
+         */
+        ftp_set_option($connection, FTP_USEPASVADDRESS, false);
+        ftp_pasv($connection, true);
+
+        // Get the file list for /
+        $fileList = ftp_rawlist($connection, $this->ftpWorkingDirectory);
+
+        $this->line(count($fileList) . ' files on remote server');
+
+        foreach ($fileList as $file):
+
+            if ($filename = $this->validateFile($file)) {
+
+                // Open a local file to write to
+                $handle = fopen($this->directory . '/' . $filename, 'w');
+
+                // Download file
+                ftp_fget($connection, $handle, $this->ftpWorkingDirectory . $filename, FTP_ASCII, 0);
+
+                if (!$this->testMode) {
+
+                    if (file_exists($this->directory . '/' . $filename)) {
+
+                        $this->line('Attempting to delete file from remote server');
+
+                        if (ftp_delete($connection, $this->ftpWorkingDirectory . $filename)) {
+                            $this->info('File deleted from remote server');
+                        } else {
+                            $this->error('Unable to delete file:' . $this->ftpWorkingDirectory . $filename);
+                        }
+                    }
+                }
+            }
+
+        endforeach;
+
+        ftp_close($connection);
+    }
+
+    /**
+     * Check if a file has been downloaded before and returns filename.
+     *
+     * @param type $string
+     * @return string filename
+     */
+    private function validateFile($string)
+    {
+        // Obtain the file name from the string returned from ftp_rawlist
+        $pieces = explode(' ', $string);
+
+        // Last array element
+        $filename = end($pieces);
+
+        // Check the current directory and the archive directory to see if the file has already been downloaded
+        if (file_exists($this->directory . '/' . $filename) || file_exists($this->directory . $this->archiveDirectory . '/' . $filename)) {
+            $this->error("File $filename has already been downloaded");
+            return false;
+        }
+
+        return $filename;
     }
 
     /**
@@ -184,6 +255,50 @@ class ProcessFiles extends Command
         }
 
         fclose($handle);
+    }
+
+    /**
+     * Read one line at a time and create an array of field names and values.
+     *
+     * @param array $data
+     *
+     * @return array
+     */
+    protected function assignFieldNames($data)
+    {
+        $numberOfFields = count($data);
+
+        // Temp code to allow for field addition - remove fields[2] after transition period
+        if ($numberOfFields == 20) {
+            $fields = $this->fields[2];
+        } else {
+            $fields = ($numberOfFields == 12) ? $this->fields[1] : $this->fields[0];
+        }
+
+        $i = 0;
+        foreach ($fields as $field) {
+            $row[$field] = (isset($data[$i]) && $data[$i] != '?') ? trim($data[$i]) : null;
+            $i++;
+        }
+        return $row;
+    }
+
+    /**
+     * Parse the datetime string to carbon UTC.
+     *
+     * @param type $datetime
+     * @return type
+     */
+    protected function parseDateTime($datetime)
+    {
+        if (empty($datetime)) {
+            $datetime = \Carbon\Carbon::now()->toDateTimeString();
+        } else {
+            $datetime = str_replace('/', '.', $datetime);
+            $datetime = \Carbon\Carbon::createFromTimestamp(strtotime($datetime))->toDateTimeString();
+            $datetime = gmtToCarbonUtc($datetime);
+        }
+        return $datetime;
     }
 
     /**
@@ -362,6 +477,20 @@ class ProcessFiles extends Command
     }
 
     /**
+     * Image url.
+     *
+     * @param type $signature
+     * @return type
+     */
+    protected function getSignatureImageUrl($signature)
+    {
+        if (strlen($signature) > 0) {
+            return 'https://tsapp.ifsgroup.com/images/signatures/' . $signature;
+        }
+        return null;
+    }
+
+    /**
      * Lookup transend code and handle accordingly.
      *
      * @param type $code
@@ -422,115 +551,6 @@ class ProcessFiles extends Command
     }
 
     /**
-     * Parse the datetime string to carbon UTC.
-     *
-     * @param type $datetime
-     * @return type
-     */
-    protected function parseDateTime($datetime)
-    {
-        if (empty($datetime)) {
-            $datetime = \Carbon\Carbon::now()->toDateTimeString();
-        } else {
-            $datetime = str_replace('/', '.', $datetime);
-            $datetime = \Carbon\Carbon::createFromTimestamp(strtotime($datetime))->toDateTimeString();
-            $datetime = gmtToCarbonUtc($datetime);
-        }
-        return $datetime;
-    }
-
-    /**
-     * Download files from ftp site.
-     *
-     * @return void
-     */
-    private function downloadFiles()
-    {
-        $this->info("Attempting to download files from remote FTP site");
-
-        $connection = ftp_connect($this->ftpHost);
-
-        // Check connection was made
-        if (!$connection) {
-            $this->error("Unable to connect to FTP host -> " . $this->ftpHost);
-            return false;
-        }
-
-        $loginResult = ftp_login($connection, $this->ftpUsername, $this->ftpPassword);
-
-        if (!$loginResult) {
-            $this->error("Unable to login to FTP host -> " . $this->ftpHost);
-            return false;
-        }
-
-        $this->info("Connection established to FTP host -> " . $this->ftpHost);
-
-        /*
-         * FTP BETWEEN TWO EC2 INSTANCES REQUIRES PASSIVE AND IP IGNORE
-         *
-         */
-        ftp_set_option($connection, FTP_USEPASVADDRESS, false);
-        ftp_pasv($connection, true);
-
-        // Get the file list for /
-        $fileList = ftp_rawlist($connection, $this->ftpWorkingDirectory);
-
-        $this->line(count($fileList) . ' files on remote server');
-
-        foreach ($fileList as $file):
-
-            if ($filename = $this->validateFile($file)) {
-
-                // Open a local file to write to
-                $handle = fopen($this->directory . '/' . $filename, 'w');
-
-                // Download file
-                ftp_fget($connection, $handle, $this->ftpWorkingDirectory . $filename, FTP_ASCII, 0);
-
-                if (!$this->testMode) {
-
-                    if (file_exists($this->directory . '/' . $filename)) {
-
-                        $this->line('Attempting to delete file from remote server');
-
-                        if (ftp_delete($connection, $this->ftpWorkingDirectory . $filename)) {
-                            $this->info('File deleted from remote server');
-                        } else {
-                            $this->error('Unable to delete file:' . $this->ftpWorkingDirectory . $filename);
-                        }
-                    }
-                }
-            }
-
-        endforeach;
-
-        ftp_close($connection);
-    }
-
-    /**
-     * Check if a file has been downloaded before and returns filename.
-     *
-     * @param type $string
-     * @return string filename
-     */
-    private function validateFile($string)
-    {
-        // Obtain the file name from the string returned from ftp_rawlist
-        $pieces = explode(' ', $string);
-
-        // Last array element
-        $filename = end($pieces);
-
-        // Check the current directory and the archive directory to see if the file has already been downloaded
-        if (file_exists($this->directory . '/' . $filename) || file_exists($this->directory . $this->archiveDirectory . '/' . $filename)) {
-            $this->error("File $filename has already been downloaded");
-            return false;
-        }
-
-        return $filename;
-    }
-
-    /**
      * Move file to archive directory.
      *
      * @param string $file
@@ -553,20 +573,6 @@ class ProcessFiles extends Command
             unlink($originalFile);
             $this->info("File archived successfully");
         }
-    }
-
-    /**
-     * Image url.
-     *
-     * @param type $signature
-     * @return type
-     */
-    protected function getSignatureImageUrl($signature)
-    {
-        if (strlen($signature) > 0) {
-            return 'https://tsapp.ifsgroup.com/images/signatures/' . $signature;
-        }
-        return null;
     }
 
 }
