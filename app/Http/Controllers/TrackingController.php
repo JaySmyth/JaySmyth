@@ -130,21 +130,21 @@ class TrackingController extends Controller
         }
 
         $tracking = Tracking::firstOrCreate([
-                    'message' => $request->message,
-                    'status' => $request->status_code,
-                    'datetime' => $datetime,
-                    'local_datetime' => strtotime($request->date . ' ' . $request->time),
-                    'carrier' => 'ifs',
-                    'city' => $request->city,
-                    'state' => $request->state,
-                    'country_code' => $request->country_code,
-                    'postcode' => $request->postcode,
-                    'tracker_id' => str_random(12),
-                    'source' => 'ifs',
-                    'estimated_delivery_date' => $estimatedDeliveryDate,
-                    'local_estimated_delivery_date' => $localEstimatedDeliveryDate,
-                    'user_id' => $request->user()->id,
-                    'shipment_id' => $shipment->id
+            'message' => $request->message,
+            'status' => $request->status_code,
+            'datetime' => $datetime,
+            'local_datetime' => strtotime($request->date . ' ' . $request->time),
+            'carrier' => 'ifs',
+            'city' => $request->city,
+            'state' => $request->state,
+            'country_code' => $request->country_code,
+            'postcode' => $request->postcode,
+            'tracker_id' => str_random(12),
+            'source' => 'ifs',
+            'estimated_delivery_date' => $estimatedDeliveryDate,
+            'local_estimated_delivery_date' => $localEstimatedDeliveryDate,
+            'user_id' => $request->user()->id,
+            'shipment_id' => $shipment->id
         ]);
 
         if ($tracking) {
@@ -184,9 +184,9 @@ class TrackingController extends Controller
     public function destroy($id)
     {
         return Tracking::where('id', $id)
-                        ->where('user_id', '>', 0)
-                        ->where('status', '!=', 'received')
-                        ->delete();
+            ->where('user_id', '>', 0)
+            ->where('status', '!=', 'received')
+            ->delete();
     }
 
     /**
@@ -268,17 +268,20 @@ class TrackingController extends Controller
 
     /**
      * Send request to easypost to push events to the webhook.
-     * 
+     *
      * @param type $id
      */
-    public function requestPushToWebhook()
+    public function requestPushToWebhook(Request $request)
     {
-
-        $shipments = Shipment::orderBy('ship_date', 'DESC')
+        if ($request->consignment) {
+            $shipments = Shipment::where('consignment_number')->whereReceived(1)->get();
+        } else {
+            $shipments = Shipment::orderBy('ship_date', 'DESC')
                 ->whereReceived(1)
                 ->whereIn('status_id', [8, 9, 10, 11, 12, 17])
                 ->limit(10)
                 ->get();
+        }
 
         foreach ($shipments as $shipment) {
 
@@ -295,8 +298,8 @@ class TrackingController extends Controller
                 curl_setopt($ch, CURLOPT_USERNAME, 'mmJ7I06Yq6Ogg2soH5RncQ');
 
                 curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                    'Content-Type: application/json',
-                    'Content-Length: ' . strlen(json_encode(["result_id" => $tracking->tracker_id])))
+                        'Content-Type: application/json',
+                        'Content-Length: ' . strlen(json_encode(["result_id" => $tracking->tracker_id])))
                 );
 
                 $res = curl_exec($ch);
