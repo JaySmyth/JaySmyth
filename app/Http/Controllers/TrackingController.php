@@ -283,6 +283,8 @@ class TrackingController extends Controller
                 ->get();
         }
 
+        echo $shipments->count() . " shipments loaded<br>";
+
         foreach ($shipments as $shipment) {
 
             $tracking = \App\Tracking::whereShipmentId($shipment->id)->whereSource('easypost')->first();
