@@ -274,7 +274,7 @@ class TrackingController extends Controller
     public function requestPushToWebhook(Request $request)
     {
         if ($request->consignment) {
-            $shipments = Shipment::where('consignment_number', $request->consignment_number)->whereReceived(1)->get();
+            $shipments = Shipment::where('consignment_number', $request->consignment)->whereReceived(1)->get();
         } else {
             $shipments = Shipment::orderBy('ship_date', 'DESC')
                 ->whereReceived(1)
