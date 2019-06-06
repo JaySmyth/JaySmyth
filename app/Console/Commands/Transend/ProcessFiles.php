@@ -416,7 +416,7 @@ class ProcessFiles extends Command
             return false;
         }
 
-        if ($package->collected) {
+        if ($package->collected || $package->received) {
             return false;
         }
 
