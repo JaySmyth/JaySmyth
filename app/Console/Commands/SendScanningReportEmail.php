@@ -36,7 +36,7 @@ class SendScanningReportEmail extends Command
      *
      * @var string
      */
-    protected $cc = ['transport@antrim.ifsgroup.com', 'it@antrim.ifsgroup.com', 'gdonald@antrim.ifsgroup.com', 'shaunf@antrim.ifsgroup.com'];
+    protected $cc = ['transport@antrim.ifsgroup.com', 'shaunf@antrim.ifsgroup.com'];
 
     /**
      * Create a new command instance.
