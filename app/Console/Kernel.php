@@ -63,6 +63,7 @@ class Kernel extends ConsoleKernel
         Commands\PrimaryLogistics\GetInventory::class,
         Commands\LogScanningKpis::class,
         Commands\TntTotalVolume::class,
+        Commands\NormaliseRates::class,
     ];
 
     /**
@@ -93,9 +94,9 @@ class Kernel extends ConsoleKernel
         /*
          * Transend
          */
-        $schedule->command('transend:send')->weekdays()->everyFiveMinutes()->withoutOverlapping()->between('6:10', '19:25');
-        $schedule->command('transend:cancel')->weekdays()->everyFiveMinutes()->withoutOverlapping()->between('6:10', '19:25');
-        $schedule->command('transend:process-files')->weekdays()->everyFiveMinutes()->withoutOverlapping()->between('7:00', '19:25');
+        $schedule->command('transend:send')->weekdays()->everyFiveMinutes()->withoutOverlapping()->between('6:10', '20:25');
+        $schedule->command('transend:cancel')->weekdays()->everyFiveMinutes()->withoutOverlapping()->between('6:10', '20:25');
+        $schedule->command('transend:process-files')->weekdays()->everyFiveMinutes()->withoutOverlapping()->between('7:00', '20:25');
 
         /*
          * Shipment related
