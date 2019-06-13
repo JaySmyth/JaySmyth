@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\DimsExport;
+use App\Exports\ShipmentsExport;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\Jobs\ImportShipments;
+use App\Jobs\LogScanningKpis;
+use App\TransactionLog;
 use Illuminate\Http\Request;
 use Auth;
 use App\Shipment;
@@ -47,6 +52,8 @@ class ShipmentsController extends Controller
     public function index(Request $request)
     {
         $this->authorize(new Shipment);
+        $company = null;
+        $user = null;
 
         if ($request->company) {
             $company = Company::findOrFail($request->company);
@@ -622,7 +629,7 @@ class ShipmentsController extends Controller
             return back();
         }
 
-        dispatch(new \App\Jobs\ImportShipments(storage_path('app/' . $path), $request->import_config_id, $request->user()))->onQueue('import');
+        dispatch(new ImportShipments(storage_path('app/' . $path), $request->import_config_id, $request->user()))->onQueue('import');
 
         // Notify user and redirect
         flash()->info('File Uploaded!', 'Please check your email for results.', true);
@@ -641,7 +648,7 @@ class ShipmentsController extends Controller
 
         $shipments = $this->search($request, false, 2000);
 
-        return Excel::download(new \App\Exports\ShipmentsExport($shipments), 'shipments.xlsx');
+        return Excel::download(new ShipmentsExport($shipments), 'shipments.xlsx');
     }
 
     /**
@@ -656,7 +663,7 @@ class ShipmentsController extends Controller
 
         $shipments = $this->search($request, false, 2000);
 
-        return Excel::download(new \App\Exports\DimsExport($shipments), 'dims.xlsx');
+        return Excel::download(new DimsExport($shipments), 'dims.xlsx');
     }
 
     /**
@@ -831,7 +838,7 @@ class ShipmentsController extends Controller
     {
         $shipment = Shipment::findOrFail($id);
         $this->authorize('rawData', $shipment);
-        $transactionLog = \App\TransactionLog::where('msg', 'like', '%' . $shipment->carrier_consignment_number . '%')->get();
+        $transactionLog = TransactionLog::where('msg', 'like', '%' . $shipment->carrier_consignment_number . '%')->get();
         dd($transactionLog);
     }
 
@@ -921,7 +928,7 @@ class ShipmentsController extends Controller
      */
     public function test()
     {
-        dispatch(new \App\Jobs\LogScanningKpis('18-01-2019'));
+        dispatch(new LogScanningKpis('18-01-2019'));
     }
 
 }
