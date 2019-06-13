@@ -26,7 +26,7 @@
 
         <a class="dropdown-item" href="{{ url('/despatch-note', $shipment->token) }}" title="Despatch Note"><span class="fas fa-file mr-sm-2" aria-hidden="true"></span> Despatch Note</a>
 
-        @if(!$shipment->legacy)
+        @if($shipment->isActive() && !$shipment->legacy)
         <a class="dropdown-item" href="{{ url('/documents/create/shipment/' . $shipment->id) }}" title="Upload Supporting Documents"><span class="fas fa-file mr-sm-2" aria-hidden="true"></span> Upload Documents</a>
         @else
         <a href="#" class="dropdown-item disabled faded" title="Upload Supporting Documents (unavailable)"><span class="fas fa-file text-secondary mr-sm-2" aria-hidden="true"></span> Upload Documents</a>
