@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Exports\RatesExport;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Database\Eloquent\Model;
 
@@ -13,28 +15,28 @@ class Rate extends Model
 
         if (strtolower($this->model) == 'domestic') {
             return $this->hasMany(DomesticRate::class)
-                            ->orderBy('area');
+                ->orderBy('area');
         }
 
         return $this->hasMany(RateDetail::class)
-                        ->orderBy('package_type')
-                        ->orderBy('zone')
-                        ->orderBy('break_point')
-                        ->orderBy('piece_limit');
+            ->orderBy('package_type')
+            ->orderBy('zone')
+            ->orderBy('break_point')
+            ->orderBy('piece_limit');
     }
 
     public function getRateDetails($rateId, $service, $packagingType, $zone, $pieces, $weight, $shipDate)
     {
 
         return Rate::find($rateId)
-                        ->details()
-                        ->hasPackageType($packagingType)
-                        ->hasZone($zone)
-                        ->hasPieces($pieces)
-                        ->hasWeight($weight)
-                        ->where('from_date', '<=', $shipDate)
-                        ->where('to_date', '>=', $shipDate)
-                        ->first();
+            ->details()
+            ->hasPackageType($packagingType)
+            ->hasZone($zone)
+            ->hasPieces($pieces)
+            ->hasWeight($weight)
+            ->where('from_date', '<=', $shipDate)
+            ->where('to_date', '>=', $shipDate)
+            ->first();
     }
 
     public function getRateView($company, $service, $discount, $shipDate = null, $viewFormat = 'html')
@@ -59,7 +61,8 @@ class Rate extends Model
 
                     $rate = $this;
                     $charges = $this->getSurcharges($company->id);
-                    return view('rates.show_' . $tableFormat, compact("tableFormat", "rate", "table", "zones", "charges"));
+                    return view('rates.show_'.$tableFormat,
+                        compact("tableFormat", "rate", "table", "zones", "charges"));
                     break;
             }
         }
@@ -104,7 +107,7 @@ class Rate extends Model
         $tableRows = [];
         $customerTypes = ['0' => 'N', '1' => 'Y'];
         $rateTypes = ['weight_rate', 'package_rate', 'consignment_rate'];
-        $suffix = ['weight_rate' => '/' . $this->weight_units, 'package_rate' => '/ea', 'consignment_rate' => ''];
+        $suffix = ['weight_rate' => '/'.$this->weight_units, 'package_rate' => '/ea', 'consignment_rate' => ''];
 
         // Extract Residential/ Commercial Tables
         foreach ($table as $residential => $rateTable) {
@@ -126,7 +129,7 @@ class Rate extends Model
                             $data['piece_limit'] = $pieceLimit;
                             $data['package_type'] = $packageType;
                             $data['break_point'] = $breakpoint;
-                            $data['zone_' . $zone] = $rateDetails['value'];
+                            $data['zone_'.$zone] = $rateDetails['value'];
                         }
                         $tableRows[] = $data;
                     }
@@ -139,11 +142,11 @@ class Rate extends Model
 
     /**
      * Download rate - excel.
-     * 
-     * @param Company $company
-     * @param Service $service
-     * @param type $effectiveDate
-     * 
+     *
+     * @param  Company  $company
+     * @param  Service  $service
+     * @param  type  $effectiveDate
+     *
      * @return Excel document
      */
     public function downloadCompanyRate($company, $service, $discount = 0, $effectiveDate = '', $download = true)
@@ -165,7 +168,8 @@ class Rate extends Model
             if (!empty($data)) {
 
                 if ($download) {
-                    return Excel::download(new \App\Exports\RatesExport($data), $company->company_name . '-' . strtoupper($service->code) . '.csv');
+                    return Excel::download(new RatesExport($data),
+                        $company->company_name.'-'.strtoupper($service->code).'.csv');
                 } else {
 
                     return $data;

@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\SurchargesExport;
 use App\Http\Requests\SurchargeDetailRequest;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Surcharge;
 use App\SurchargeDetail;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
 class SurchargeDetailsController extends Controller
@@ -67,18 +68,51 @@ class SurchargeDetailsController extends Controller
         return view('surcharge_details.index', compact('title', 'surcharges', 'companyId'));
     }
 
+    private function search($request, $paginate = true)
+    {
+
+        if (isset($request->effective_date)) {
+            $effectiveDate = $request_date;
+        } else {
+            $effectiveDate = date('Y-m-d');
+        }
+
+        $query = SurchargeDetail::select('surcharge_details.*')
+            ->join('surcharges', 'surcharges.id', '=', 'surcharge_details.surcharge_id')
+            ->orderBy('surcharge_details.name')
+            ->orderBy('surcharge_details.company_id', 'desc')
+            ->orderBy('surcharge_details.name')
+            ->filter($request->filter)
+            ->hasSurcharge($request->surcharge);
+
+        if (isset($request->company)) {
+            $query->whereIn('company_id', ['0', $request->company]);
+        } else {
+            $query->whereIn('company_id', ['0']);
+        }
+
+        $query->whereDate('from_date', '<=', $effectiveDate)
+            ->whereDate('to_date', '>=', $effectiveDate);
+
+        if (!$paginate) {
+            return $query->get();
+        }
+
+        return $query->paginate(50);
+    }
+
     /**
      * Displays new surcharge form.
      *
      * @param
      * @return
      */
-    public function create()
+    public function create(Surcharge $surcharge)
     {
 
         $this->authorize('index', new Surcharge);
 
-        return view('surcharge_details.create');
+        return view('surcharge_details.create', compact('surcharge'));
     }
 
     /**
@@ -87,24 +121,31 @@ class SurchargeDetailsController extends Controller
      * @param
      * @return
      */
-    public function store(SurchargeDetailsRequest $request)
+    public function store(Request $request, $surcharge, $company)
     {
 
         $this->authorize('index', new Surcharge);
 
         // Check to see if record already exists
-        $surcharge = Surcharge::where('service_id', $request->service_id)
-                ->where('company_id', $request->company_id)
-                ->where('code', $request->code)
-                ->first();
+        $surchargeDetails = SurchargeDetail::where('code', $request->code)
+            ->where('surcharge_id', $request->surcharge_id)
+            ->where('company_id', $request->company_id)
+            ->where('to_date','>=',$request->from_date)
+            ->first();
 
-        if ($surcharge) {
+        if ($surchargeDetails) {
             flash()->error('Failed!', "Sorry, Surcharge already exists.", true);
             return back();
         } else {
-            Surcharge::create($request->all());
+
+            // Get charge name from default charge (company 0)
+            $request->name = SurchargeDetail::where('code', $request->code)
+                ->where('surcharge_id', $request->surcharge_id)
+                ->where('company_id', '0')
+                ->first()->name;
+            SurchargeDetail::create($request->all());
             flash()->success('Created!', 'Surcharge created successfully.');
-            return redirect('surcharges');
+            return redirect("surchargedetails/$surcharge/$company/index");
         }
     }
 
@@ -130,11 +171,26 @@ class SurchargeDetailsController extends Controller
      */
     public function update(SurchargeDetail $surcharge, SurchargeDetailRequest $request)
     {
+
         $this->authorize('index', new Surcharge);
+
+        dd($surcharge);
+
+        $surchargeDetails = SurchargeDetail::where('code', $request->code)
+            ->where('surcharge_id', $request->surcharge_id)
+            ->where('company_id', $request->company_id)
+            ->where('to_date','>=',$request->from_date)
+            ->first();
+
+        // Close old Record
+        if ($surchargeDetails) {
+            $surchargeDetails->to_date = Carbon\Carbon::createFromformat('d-m-Y',$request->to_date)->addDay(-1)->format('Y-m-d');
+            $surchargeDetails->save();
+        }
 
         $surcharge->update($request->all());
         flash()->success('Updated!', 'Surcharge updated successfully.');
-        
+
         $surchargeId = (isset($request->surcharge_id)) ? $request->surcharge_id : 0;
         $companyId = (isset($request->company_id)) ? $request->company_id : 0;
         $url = 'surchargedetails' . '/' . $surchargeId . '/' . $companyId . '/index';
@@ -157,21 +213,6 @@ class SurchargeDetailsController extends Controller
         }
     }
 
-    /**
-     * Download the result set to an Excel Document.
-     *
-     * @param  Request
-     * @return Excel document
-     */
-    public function download(Request $request)
-    {
-        $this->authorize('index', new Surcharge);
-
-        $surcharges = $this->search($request, false);
-
-        return Excel::download(new \App\Exports\SurchargesExport($surcharges), 'surcharges.xlsx');
-    }
-
     /*
      * Surcharge search.
      *
@@ -181,37 +222,19 @@ class SurchargeDetailsController extends Controller
      * @return
      */
 
-    private function search($request, $paginate = true)
+    /**
+     * Download the result set to an Excel Document.
+     *
+     * @param Request
+     * @return Excel document
+     */
+    public function download(Request $request)
     {
+        $this->authorize('index', new Surcharge);
 
-        if (isset($request->effective_date)) {
-            $effectiveDate = $request_date;
-        } else {
-            $effectiveDate = date('Y-m-d');
-        }
+        $surcharges = $this->search($request, false);
 
-        $query = SurchargeDetail::select('surcharge_details.*')
-                ->join('surcharges', 'surcharges.id', '=', 'surcharge_details.surcharge_id')
-                ->orderBy('surcharge_details.name')
-                ->orderBy('surcharge_details.company_id', 'desc')
-                ->orderBy('surcharge_details.name')
-                ->filter($request->filter)
-                ->hasSurcharge($request->surcharge);
-
-        if (isset($request->company)) {
-            $query->whereIn('company_id', ['0', $request->company]);
-        } else {
-            $query->whereIn('company_id', ['0']);
-        }
-
-        $query->whereDate('from_date', '<=', $effectiveDate)
-                ->whereDate('to_date', '>=', $effectiveDate);
-
-        if (!$paginate) {
-            return $query->get();
-        }
-
-        return $query->paginate(50);
+        return Excel::download(new SurchargesExport($surcharges), 'surcharges.xlsx');
     }
 
 }
