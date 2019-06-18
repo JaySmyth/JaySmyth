@@ -25,7 +25,7 @@ class Kernel extends ConsoleKernel
         Commands\PurchaseInvoices\ImportUpsPurchaseInvoices::class,
         Commands\PurchaseInvoices\ImportDhlPurchaseInvoices::class,
         Commands\PurchaseInvoices\ImportPrimaryFreightPurchaseInvoices::class,
-        //Commands\PurchaseInvoices\ImportTntPurchaseInvoices::class,
+        Commands\PurchaseInvoices\ImportTntPurchaseInvoices::class,
         Commands\Transend\SendJobs::class,
         Commands\Transend\CancelJobs::class,
         Commands\Transend\ProcessFiles::class,
@@ -88,7 +88,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:import-ups-purchase-invoices')->weekdays()->hourly()->between('8:00', '17:00');
         $schedule->command('ifs:import-dhl-purchase-invoices')->weekdays()->hourly()->between('8:00', '17:00');
         $schedule->command('ifs:import-primary-freight-purchase-invoices')->weekdays()->hourly()->between('8:00', '17:00');
-        //$schedule->command('ifs:import-tnt-purchase-invoices')->weekdays()->hourly()->between('8:00', '17:00');
+        $schedule->command('ifs:import-tnt-purchase-invoices')->weekdays()->hourly()->between('8:00', '17:00');
         $schedule->command('ifs:update-scs-job-numbers-on-purchase-invoice-lines')->weekdays()->dailyAt('05:30');
 
         /*
@@ -107,13 +107,6 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:process-shipment-uploads')->everyMinute()->withoutOverlapping();
         $schedule->command('ifs:check-for-duplicate-shipments')->twiceDaily(12, 16);
         $schedule->command('ifs:update-shopify')->twiceDaily(10, 19);
-
-        /*
-         * Primary Freight
-         */
-        // $schedule->command('ifs:update-primary-freight-shipments')->hourly();
-        // $schedule->command('ifs:upload-shipments-to-primary-freight')->dailyAt(13, 00);
-        // $schedule->command('ifs:upload-shipments-to-primary-freight')->twiceDaily(16, 19);
 
         /*
          * Primary Logistics
@@ -154,7 +147,6 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:process-scs-collection-requests')->weekdays()->everyFiveMinutes()->withoutOverlapping();
         $schedule->command('ifs:update-scs-job-numbers-on-shipments --invoiced=1')->weekdays()->hourly()->between('09:00', '16:00')->withoutOverlapping();
         $schedule->command('ifs:update-scs-job-numbers-on-shipments --invoiced=0')->weekdays()->dailyAt('21:45');
-
 
         /*
          * Vendorvillage
