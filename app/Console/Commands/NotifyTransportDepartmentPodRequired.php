@@ -50,7 +50,7 @@ class NotifyTransportDepartmentPodRequired extends Command
                 ->get();
 
         if ($transportJobs->count() > 20) {
-            Mail::to('scharlton@antrim.ifsgroup.com')->cc(['transport@antrim.ifsgroup.com', 'it@antrim.ifsgroup.com'])->send(new \App\Mail\PodTransportJobs($transportJobs));
+            Mail::to('scharlton@antrim.ifsgroup.com')->cc(['transport@antrim.ifsgroup.com'])->send(new \App\Mail\PodTransportJobs($transportJobs));
         }
 
         $localPod = Shipment::where('carrier_id', 1)
@@ -61,7 +61,7 @@ class NotifyTransportDepartmentPodRequired extends Command
                 ->get();
 
         if ($localPod->count() > 0) {
-            Mail::to(['lclose@antrim.ifsgroup.com', 'cgordon@antrim.ifsgroup.com'])->cc(['gmcnicholl@antrim.ifsgroup.com', 'it@antrim.ifsgroup.com'])->send(new \App\Mail\PodShipments($localPod));
+            Mail::to(['lclose@antrim.ifsgroup.com', 'cgordon@antrim.ifsgroup.com'])->cc(['gmcnicholl@antrim.ifsgroup.com'])->send(new \App\Mail\PodShipments($localPod));
         }
     }
 
