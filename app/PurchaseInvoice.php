@@ -67,7 +67,7 @@ class PurchaseInvoice extends Model
 
     /**
      * Invoice lines grouped by overcharge (negative / positive variances).
-     * 
+     *
      * @return type
      */
     public function getCostComparisons()
@@ -79,7 +79,7 @@ class PurchaseInvoice extends Model
 
     /**
      * Return lines with a negative variances (overcharge).
-     * 
+     *
      * @return type
      */
     public function getNegativeVariances()
@@ -89,7 +89,7 @@ class PurchaseInvoice extends Model
 
     /**
      * Get verbose status.
-     * 
+     *
      * @return string
      */
     public function getStatusNameAttribute()
@@ -118,7 +118,7 @@ class PurchaseInvoice extends Model
 
     /**
      * Get the supplier code used within SCS application.
-     * 
+     *
      * @return string
      */
     public function getScsSupplierCodeAttribute()
@@ -145,6 +145,8 @@ class PurchaseInvoice extends Model
 
             case 3:
                 return '0169978'; // UPS
+            case 4:
+                return '0103690'; // TNT
             case 5:
                 return '0101610'; // DHL
             case 12:
@@ -156,7 +158,7 @@ class PurchaseInvoice extends Model
 
     /**
      * Set the invoice type.
-     * 
+     *
      * @param type $type
      */
     public function setType($type)
@@ -188,6 +190,16 @@ class PurchaseInvoice extends Model
         }
         $this->type = $invoiceType;
         $this->save();
+    }
+
+    /**
+     * Sets additional values on the invoice.
+     */
+    public function setAdditionalValues()
+    {
+        $this->setScsJobNumbersAndShipmentIds();
+        $this->setImportExport();
+        $this->autoPass();
     }
 
     /**
@@ -223,11 +235,11 @@ class PurchaseInvoice extends Model
                 $withHypen = substr($line->carrier_tracking_number, 0, 3) . '-' . substr($line->carrier_tracking_number, 3);
 
                 $jobHdr = \App\Multifreight\JobHdr::select('job_disp')
-                        ->orWhere('hawb_char', $line->carrier_tracking_number)
-                        ->orWhere('hawb_char', $withHypen)
-                        ->orWhere('mawb_char', $line->carrier_tracking_number)
-                        ->orWhere('mawb_char', $withHypen)
-                        ->first();
+                    ->orWhere('hawb_char', $line->carrier_tracking_number)
+                    ->orWhere('hawb_char', $withHypen)
+                    ->orWhere('mawb_char', $line->carrier_tracking_number)
+                    ->orWhere('mawb_char', $withHypen)
+                    ->first();
 
                 if ($jobHdr) {
                     $line->scs_job_number = $jobHdr->job_disp;
@@ -258,36 +270,8 @@ class PurchaseInvoice extends Model
     }
 
     /**
-     * Sets additional values on the invoice.
-     */
-    public function setAdditionalValues()
-    {
-        $this->setScsJobNumbersAndShipmentIds();
-        $this->setImportExport();
-        $this->autoPass();
-    }
-
-    /**
-     * Set the total taxable amount for this invoice.
-     */
-    public function setTotalTaxable()
-    {
-        $this->total_taxable = $this->charges->where('vat_applied', 1)->sum('billed_amount');
-        $this->save();
-    }
-
-    /**
-     * Set the total taxable amount for this invoice.
-     */
-    public function setTotalNonTaxable()
-    {
-        $this->total_non_taxable = $this->charges->where('vat_applied', 0)->sum('billed_amount');
-        $this->save();
-    }
-
-    /**
      * Check every line of an invoice and set to passed if there are no overcharges.
-     * Called automatically after an invoice has been imported. 
+     * Called automatically after an invoice has been imported.
      */
     public function autoPass()
     {
@@ -309,9 +293,27 @@ class PurchaseInvoice extends Model
     }
 
     /**
+     * Set the total taxable amount for this invoice.
+     */
+    public function setTotalTaxable()
+    {
+        $this->total_taxable = $this->charges->where('vat_applied', 1)->sum('billed_amount');
+        $this->save();
+    }
+
+    /**
+     * Set the total taxable amount for this invoice.
+     */
+    public function setTotalNonTaxable()
+    {
+        $this->total_non_taxable = $this->charges->where('vat_applied', 0)->sum('billed_amount');
+        $this->save();
+    }
+
+    /**
      * Set the invoice status to (1)Passed. If any overcharge present, update
-     * each line that has a negative variance with the user ID that passed the invoice.      
-     * 
+     * each line that has a negative variance with the user ID that passed the invoice.
+     *
      * @param type $userId
      */
     public function setPassed($userId = false)
@@ -331,7 +333,7 @@ class PurchaseInvoice extends Model
     }
 
     /**
-     * 
+     *
      * @return boolean
      */
     public function setExported()
@@ -391,35 +393,35 @@ class PurchaseInvoice extends Model
 
     /**
      * Scope filter.
-     * 
+     *
      * @return
      */
     public function scopeFilter($query, $filter)
     {
         if ($filter) {
             return $query->where('invoice_number', 'LIKE', '%' . $filter . '%')
-                            ->orWhere('account_number', 'LIKE', '%' . $filter . '%');
+                ->orWhere('account_number', 'LIKE', '%' . $filter . '%');
         }
     }
 
     /**
      * Scope filter.
-     * 
+     *
      * @return
      */
     public function scopeHasConsignmentOrScsJob($query, $consignment)
     {
         if ($consignment) {
             return $query->select('purchase_invoices.*')
-                            ->join('purchase_invoice_lines', 'purchase_invoices.id', '=', 'purchase_invoice_lines.purchase_invoice_id')
-                            ->where('purchase_invoice_lines.carrier_consignment_number', '=', $consignment)
-                            ->orWhere('purchase_invoice_lines.scs_job_number', '=', $consignment);
+                ->join('purchase_invoice_lines', 'purchase_invoices.id', '=', 'purchase_invoice_lines.purchase_invoice_id')
+                ->where('purchase_invoice_lines.carrier_consignment_number', '=', $consignment)
+                ->orWhere('purchase_invoice_lines.scs_job_number', '=', $consignment);
         }
     }
 
     /**
      * Scope carrier.
-     * 
+     *
      * @return
      */
     public function scopeHasCarrier($query, $carrierId)
@@ -431,7 +433,7 @@ class PurchaseInvoice extends Model
 
     /**
      * Scope status.
-     * 
+     *
      * @return
      */
     public function scopeHasStatus($query, $status)
@@ -447,7 +449,7 @@ class PurchaseInvoice extends Model
 
     /**
      * Scope import/export.
-     * 
+     *
      * @return
      */
     public function scopeHasType($query, $type)
@@ -459,7 +461,7 @@ class PurchaseInvoice extends Model
 
     /**
      * Scope import/export.
-     * 
+     *
      * @return
      */
     public function scopeHasImportExport($query, $importExport)
@@ -471,7 +473,7 @@ class PurchaseInvoice extends Model
 
     /**
      * Scope received.
-     * 
+     *
      * @return
      */
     public function scopeHasReceived($query, $received)
@@ -483,7 +485,7 @@ class PurchaseInvoice extends Model
 
     /**
      * Scope received.
-     * 
+     *
      * @return
      */
     public function scopeHasQueried($query, $queried)
@@ -495,7 +497,7 @@ class PurchaseInvoice extends Model
 
     /**
      * Scope received.
-     * 
+     *
      * @return
      */
     public function scopeHasCosts($query, $costs)
@@ -507,7 +509,7 @@ class PurchaseInvoice extends Model
 
     /**
      * Scope received.
-     * 
+     *
      * @return
      */
     public function scopeHasCopyDocs($query, $copyDocs)
