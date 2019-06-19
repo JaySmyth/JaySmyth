@@ -85,7 +85,7 @@ class HandleEasypostWebhook implements ShouldQueue
         $event['carrier'] = $this->result['carrier'];
         $event['tracker_id'] = $this->result['id'];
         $event['source'] = 'easypost';
-        $event['estimated_delivery_date'] = ($this->result['est_delivery_date']) ? Carbon::parse($event['datetime']) : null;
+        $event['estimated_delivery_date'] = ($this->result['est_delivery_date']) ? Carbon::parse($this->result['est_delivery_date']) : null;
         $event['local_estimated_delivery_date'] = ($this->result['est_delivery_date']) ? Carbon::parse($this->result['est_delivery_date']) : null;
         $event['user_id'] = 0;
         $event['message'] = ($event['message']) ? $event['message'] : $event['status'];

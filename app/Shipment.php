@@ -750,7 +750,7 @@ class Shipment extends Model
             $timezone = $this->destination_timezone;
         }
 
-        if ($this->tracking->count() > 0) {
+        if ($this->tracking) {
             if ($this->tracking->first()->estimated_delivery_date) {
                 return $this->tracking->first()->estimated_delivery_date->timezone($timezone)->format($format);
             }
@@ -1132,6 +1132,22 @@ class Shipment extends Model
     }
 
     /**
+     * Determine if shipment originates from BT postcode.
+     *
+     * @return boolean
+     */
+    public function originatesFromBtPostcode()
+    {
+        $prefix = strtoupper(substr(trim($this->sender_postcode), 0, 2));
+
+        if ($prefix == 'BT' && strtoupper($this->sender_country_code) == 'GB') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Undo a cancellation. Deletes tracking event, returns shipment back to previous status and
      * reinstates transport jobs.
      *
@@ -1313,22 +1329,6 @@ class Shipment extends Model
         if ($this->isActive() && $this->status->code == 'pre_transit' && $this->depot->code == 'ANT' && !$this->originatesFromBtPostcode()) {
             return true;
         }
-        return false;
-    }
-
-    /**
-     * Determine if shipment originates from BT postcode.
-     *
-     * @return boolean
-     */
-    public function originatesFromBtPostcode()
-    {
-        $prefix = strtoupper(substr(trim($this->sender_postcode), 0, 2));
-
-        if ($prefix == 'BT' && strtoupper($this->sender_country_code) == 'GB') {
-            return true;
-        }
-
         return false;
     }
 
