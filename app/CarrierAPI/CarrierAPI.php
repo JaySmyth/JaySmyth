@@ -122,63 +122,67 @@ class CarrierAPI
     public function getAvailableServices($shipment, $mode = '')
     {
 
-        $available = [];
-
+        // Check Company is enabled
         $this->company = Company::find($shipment['company_id']);
+        if ($this->company->enabled) {
 
-        // Check addresses and perform any necessary Overrides
-        $shipment = $this->checkAddresses($shipment);
+            // Check addresses and perform any necessary Overrides
+            $shipment = $this->checkAddresses($shipment);
 
-        $collect = $this->isCollect($shipment);
+            $collect = $this->isCollect($shipment);
 
-        $this->setEnvironment($mode);
+            $this->setEnvironment($mode);
 
-        $companyServices = $this->company->getServicesForMode($shipment['mode_id'])->toArray();
+            $companyServices = $this->company->getServicesForMode($shipment['mode_id'])->toArray();
 
-        $suitableServices = $this->getAllSuitableServices($shipment, $companyServices);
+            $suitableServices = $this->getAllSuitableServices($shipment, $companyServices);
 
-        // Reduce list of services depending select criteria
-        switch ($this->company->carrier_choice) {
+            // Reduce list of services depending select criteria
+            switch ($this->company->carrier_choice) {
 
-            case 'price':
-            case 'cost':
-                $availableServices = $this->getCheapestService($suitableServices, $this->company->carrier_choice, $collect);
-                break;
+                case 'price':
+                case 'cost':
+                    $availableServices = $this->getCheapestService($suitableServices, $this->company->carrier_choice,
+                        $collect);
+                    break;
 
-            case 'dest':
-                $availableServices = $this->getServiceByDest($shipment, $suitableServices); // Not yet handled
-                break;
+                case 'dest':
+                    $availableServices = $this->getServiceByDest($shipment, $suitableServices); // Not yet handled
+                    break;
 
-            default:
-                $availableServices = $suitableServices;
-                break;
-        }
-
-        /*
-         * ***************************************************
-         * If this is a collect shipment then remove pricing
-         * info even for those shipments we were able to price
-         * since recipient will be billed according to 
-         * recipients rates
-         * ***************************************************
-         */
-        if ($collect) {
-
-            foreach ($availableServices as $key => $availableService) {
-                $availableServices[$key]['cost'] = [];
-                $availableServices[$key]['cost_currency'] = '';
-                $availableServices[$key]['cost_detail'] = [];
-                $availableServices[$key]['price'] = [];
-                $availableServices[$key]['price_currency'] = '';
-                $availableServices[$key]['price_detail'] = [];
+                default:
+                    $availableServices = $suitableServices;
+                    break;
             }
-        }
+
+            /*
+             * ***************************************************
+             * If this is a collect shipment then remove pricing
+             * info even for those shipments we were able to price
+             * since recipient will be billed according to
+             * recipients rates
+             * ***************************************************
+             */
+            if ($collect) {
+
+                foreach ($availableServices as $key => $availableService) {
+                    $availableServices[$key]['cost'] = [];
+                    $availableServices[$key]['cost_currency'] = '';
+                    $availableServices[$key]['cost_detail'] = [];
+                    $availableServices[$key]['price'] = [];
+                    $availableServices[$key]['price_currency'] = '';
+                    $availableServices[$key]['price_detail'] = [];
+                }
+            }
 
 
-        if (isset($availableServices) && count($availableServices) > 1) {
-            usort($availableServices, function ($item1, $item2) {
-                return $item1['price'] <=> $item2['price'];
-            });
+            if (isset($availableServices) && count($availableServices) > 1) {
+                usort($availableServices, function ($item1, $item2) {
+                    return $item1['price'] <=> $item2['price'];
+                });
+            }
+        } else {
+            $availableServices = [];
         }
 
         return $availableServices;
