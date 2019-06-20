@@ -95,8 +95,7 @@ class SendScanningReportEmail extends Command
                 ->orderBy('packages.index')
                 ->get();
 
-        Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\MissedScans($receiptScans, $routeScans, 'Missed Scans (receipt: ' . $receiptScans->count() . ' / route: ' . $routeScans->count() . ') - ' . $date));
-        //Mail::to($this->recipient)->cc($this->cc)->send(new \App\Mail\MissedScans($receiptScans, $routeScans, 'Missed Scans (receipt: ' . $receiptScans->count() . ' / route: ' . $routeScans->count() . ') - ' . $date));
+        Mail::to($this->recipient)->cc($this->cc)->send(new \App\Mail\MissedScans($receiptScans, $routeScans, 'Missed Scans (receipt: ' . $receiptScans->count() . ' / route: ' . $routeScans->count() . ') - ' . $date));
     }
 
 }
