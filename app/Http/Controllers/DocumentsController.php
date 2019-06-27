@@ -28,8 +28,8 @@ class DocumentsController extends Controller
     /**
      * Displays the upload document form.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function create($parent, $id)
     {
@@ -41,10 +41,31 @@ class DocumentsController extends Controller
     }
 
     /**
+     * Load the parent model that the document will be associated with.
+     *
+     * @param type $model
+     * @param type $id
+     * @return type
+     */
+    private function instantiateModel($model, $id)
+    {
+        switch ($model) {
+            case 'shipment':
+                return Shipment::findOrFail($id);
+            case 'customs-entry':
+                return CustomsEntry::findOrFail($id);
+            case 'sea-freight-shipment':
+                return SeaFreightShipment::findOrFail($id);
+            default:
+                return false;
+        }
+    }
+
+    /**
      * Uploads a file to S3 and saves the record to the database.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function store(DocumentRequest $request)
     {
@@ -60,6 +81,14 @@ class DocumentsController extends Controller
 
         // Read the contents of the file
         $fileContents = file_get_contents($file);
+
+        // Check for EOF
+        $endOfFile = substr($fileContents, -5);
+
+        if ($endOfFile != "%%EOF") {
+            flash()->error('Document corrupt!', 'This document is corrupt and cannot be uploaded.');
+            return back();
+        }
 
         // Upload the file to S3
         $s3 = Storage::disk('s3');
@@ -80,7 +109,7 @@ class DocumentsController extends Controller
             'size' => $file->getSize(),
             'user_id' => Auth::user()->id
         ]);
- 
+
         // Save a copy to the temp directory for batch printing later in the day
         if ($request->parent == 'shipment' && $request->document_type == 'invoice') {
             Storage::disk('local')->put('temp/invoice' . $result->id . '.pdf', $fileContents);
@@ -102,10 +131,10 @@ class DocumentsController extends Controller
     }
 
     /**
-     * Deletes a file that has been uploaded to S3 and removes the 
+     * Deletes a file that has been uploaded to S3 and removes the
      * associated record from the database.
      *
-     * @param  integer  $id     document id.
+     * @param integer $id document id.
      * @return boolean
      */
     public function destroy(Request $request, $id)
@@ -129,27 +158,6 @@ class DocumentsController extends Controller
             $document->delete();
 
             return response()->json(null, 204);
-        }
-    }
-
-    /**
-     * Load the parent model that the document will be associated with.
-     * 
-     * @param type $model
-     * @param type $id
-     * @return type
-     */
-    private function instantiateModel($model, $id)
-    {
-        switch ($model) {
-            case 'shipment':
-                return Shipment::findOrFail($id);
-            case 'customs-entry':
-                return CustomsEntry::findOrFail($id);
-            case 'sea-freight-shipment':
-                return SeaFreightShipment::findOrFail($id);
-            default:
-                return false;
         }
     }
 
