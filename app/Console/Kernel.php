@@ -131,6 +131,7 @@ class Kernel extends ConsoleKernel
 
         /*
          * Transport
+         *
          */
         $schedule->command('ifs:close-driver-manifests')->dailyAt('20:00');
         $schedule->command('ifs:open-driver-manifests')->dailyAt('06:00');
