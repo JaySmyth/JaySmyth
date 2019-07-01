@@ -251,7 +251,7 @@ class UsersController extends Controller
 
         $this->authorize('resetPassword', $user);
 
-        $this->validate($request, ['password' => 'required|confirmed|min:6']);
+        $this->validate($request, ['password' => 'required|confirmed|min:8']);
 
         $user->password = bcrypt($request->password);
         $user->update();
