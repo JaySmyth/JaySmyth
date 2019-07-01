@@ -79,7 +79,7 @@ class Company extends Model
      */
     public function services()
     {
-        return $this->belongsToMany(Service::class)->withPivot('name', 'preference', 'account', 'scs_account', 'country_filter')->orderBy('preference', 'name');
+        return $this->belongsToMany(Service::class)->withPivot('name', 'preference', 'account', 'scs_account', 'country_filter')->orderBy('preference')->orderBy('name');
     }
 
     /**
@@ -165,7 +165,7 @@ class Company extends Model
     /**
      * Get collection settings for a company. If no collection settings are defined, default
      * the values from the postcodes table.
-     * 
+     *
      * @return array
      */
     public function getCollectionSettingsArrayAttribute()
@@ -180,9 +180,9 @@ class Company extends Model
     /**
      * Get collection settings for a specific day. If no collection settings are defined, default
      * the values from the postcodes table.  Days numbered 0 - 6 (Sunday = 0)
-     * 
+     *
      * @param int $day
-     * 
+     *
      * @return mixed array/boolean
      */
     public function getCollectionSettingsForDay($day, $postcode = false)
@@ -194,13 +194,13 @@ class Company extends Model
 
         // Use postcode passed via param or default to compay's postcode
         $postcode = ($postcode) ? $postcode : $this->postcode;
-        
+
         return getRouting($postcode, $day);
     }
 
     /**
      * Returns a company's last 10 shipments.
-     * 
+     *
      * @return type
      */
     public function getLatestShipments()
@@ -641,7 +641,7 @@ class Company extends Model
 
     /**
      * Identifies if User is a member of this company
-     * 
+     *
      * @param int $userId
      * @return boolean
      */
@@ -652,7 +652,7 @@ class Company extends Model
 
     /**
      * Get last ship date.
-     * 
+     *
      * @param type $timeZone
      * @param type $format
      * @return string
