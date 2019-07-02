@@ -82,7 +82,7 @@ class SendJobs extends Command
         }
 
         // If it's a resend, only send on date resend defined 
-        if ($job->is_resend) {
+        if ($job->is_resend && $job->resend_date) {
 
             $this->info("Resend identified for " . $job->number);
 
