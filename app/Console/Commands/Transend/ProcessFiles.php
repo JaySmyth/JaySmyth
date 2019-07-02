@@ -63,9 +63,8 @@ class ProcessFiles extends Command
      * @var array
      */
     protected $fields = [
-        0 => ['RecordType', 'JobRef1', 'JobRef2', 'JobRef3', 'JobRef4', 'JobTypeCode', 'RouteNumber', 'RouteDate', 'VehicleReg', 'DriverName', 'CompletedTime', 'TypedName', 'Signature', 'Barcode', 'Description', 'Quantity', 'UnitMeasure', 'ExceptionReasonCode', 'ExceptionQty'],
+        0 => ['RecordType', 'JobRef1', 'JobRef2', 'JobRef3', 'JobRef4', 'JobTypeCode', 'RouteNumber', 'RouteDate', 'VehicleReg', 'DriverName', 'CompletedTime', 'TypedName', 'Signature', 'Barcode', 'Description', 'Quantity', 'UnitMeasure', 'TickOrScan', 'ExceptionReasonCode', 'ExceptionQty'],
         1 => ['RecordType', 'JobRef1', 'JobRef2', 'JobRef3', 'JobRef4', 'JobTypeCode', 'RouteNumber', 'RouteDate', 'VehicleReg', 'DriverName', 'CompletedTime', 'ExceptionReasonCode'],
-        2 => ['RecordType', 'JobRef1', 'JobRef2', 'JobRef3', 'JobRef4', 'JobTypeCode', 'RouteNumber', 'RouteDate', 'VehicleReg', 'DriverName', 'CompletedTime', 'TypedName', 'Signature', 'Barcode', 'Description', 'Quantity', 'UnitMeasure', 'TickOrScan', 'ExceptionReasonCode', 'ExceptionQty'],
     ];
 
     /**
@@ -268,12 +267,7 @@ class ProcessFiles extends Command
     {
         $numberOfFields = count($data);
 
-        // Temp code to allow for field addition - remove fields[2] after transition period
-        if ($numberOfFields == 20) {
-            $fields = $this->fields[2];
-        } else {
-            $fields = ($numberOfFields == 12) ? $this->fields[1] : $this->fields[0];
-        }
+        $fields = ($numberOfFields == 12) ? $this->fields[1] : $this->fields[0];
 
         $i = 0;
         foreach ($fields as $field) {
