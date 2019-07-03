@@ -170,10 +170,8 @@ class ImportTntPurchaseInvoices extends Command
                         $this->applyCharge($row["Net Amount$i"], 'ADD', $row["Description$i"], $purchaseInvoiceLine->id);
                     }
 
-                    // Build totals
-                    $vat += $row['Net Amount (VAT)'];
-
                     if (is_numeric($row['Net Amount (VAT)']) && $row['Net Amount (VAT)'] > 0) {
+                        $vat += $row['Net Amount (VAT)'];
                         $totalTaxable += $purchaseInvoiceLine->charges->sum('billed_amount');
                     } else {
                         $totalNonTaxable += $purchaseInvoiceLine->charges->sum('billed_amount');
