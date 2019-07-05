@@ -62,13 +62,14 @@ class InvoiceRunController extends Controller
 
         // Get uninvoiced shipments
         $shipments = Shipment::select('shipments.*')
-                ->hasCompany($request->company)
-                ->hasDepartment($request->department)
-                ->where('ship_date', '<', Carbon::today())
-                ->uninvoiced()
-                ->orderBy('sender_company_name', 'consignment_number')
-                ->with(['company', 'service'])
-                ->get();
+            ->hasCompany($request->company)
+            ->hasDepartment($request->department)
+            ->where('ship_date', '<', Carbon::today())
+            ->uninvoiced()
+            ->orderBy('sender_company_name')
+            ->orderBy('consignment_number')
+            ->with(['company', 'service'])
+            ->get();
 
         // Attempt to price unpriced shipments
         $unpricedShipments = $shipments->where('shipping_charge', 0);
@@ -85,7 +86,6 @@ class InvoiceRunController extends Controller
     /**
      * Handles the create invoice run form. Job dispatched to create an invoice run record and generate
      * the multifreight sales XML.
-
      *
      * @param Request $request
      */
