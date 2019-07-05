@@ -82,6 +82,7 @@ class DocumentsController extends Controller
         // Read the contents of the file
         $fileContents = file_get_contents($file);
 
+        /*
         // Check for EOF
         $endOfFile = substr($fileContents, -5);
 
@@ -89,6 +90,8 @@ class DocumentsController extends Controller
             flash()->error('Document corrupt!', 'This document is corrupt and cannot be uploaded.');
             return back();
         }
+        */
+
 
         // Upload the file to S3
         $s3 = Storage::disk('s3');
