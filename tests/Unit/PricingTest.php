@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use TestCase;
+use Tests\TestCase;
 
 use App\User;
 use App\Service;
