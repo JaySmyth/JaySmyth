@@ -47,6 +47,7 @@
   },
   "autoload": {
     "classmap": [
+      "tests",
       "database/seeds",
       "database/factories"
     ],
