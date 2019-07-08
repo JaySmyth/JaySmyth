@@ -5,13 +5,10 @@ namespace Tests\Feature;
 use TestCase;
 
 use App\User;
-use App\Service;
 use App\CarrierAPI\Facades\CarrierAPI;
-use Illuminate\Foundation\Testing\WithoutMiddleware;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class ApiShipmentAvailabilityTest extends TestCase {
+class ApiShipmentAvailabilityTest extends TestCase
+{
 
     private $userId = 2672;
     private $companyId = 849;  // IFS Unit Testing Co
@@ -39,27 +36,6 @@ class ApiShipmentAvailabilityTest extends TestCase {
         $this->usAddress = '{"_token":"fL7A9od2enTzf5glM89ChrXp0egRHs1WKrjrysai","address_book_definition":"","shipment_id":"","user_id":"' . $this->user->id . '","print_formats_id":"2","mode":"courier","mode_id":"1","dims_uom":"cm","weight_uom":"kg","date_format":"dd-mm-yyyy","currency_code":"GBP","weight":"10.00","service_id":"0","freight_charge":"0","data_loaded":"true","customs_value":"0.00","customs_value_currency_code":"","commodity_count":"0","sender_id":"","sender_name":"Garfield McBroom","sender_company_name":"Demo Company","sender_type":"c","sender_address1":"Unit D","sender_address2":"17 Bedford Street","sender_address3":"","sender_city":"Belfast","sender_country_code":"GB","sender_state":"County Antrim","sender_postcode":"BT2 7EF","sender_telephone":"02894464211","sender_email":"gmcbroom@antrim.ifsgroup.com","company_id":"' . $this->companyId . '","recipient_id":"134242","recipient_name":"Adriana Lucin","recipient_company_name":"BROOKS BROS","recipient_type":"c","recipient_address1":"39-25 Skillman Ave.","recipient_address2":"Sunnyside NY 11104","recipient_address3":"","recipient_city":"SUNNYSIDE","recipient_country_code":"US","recipient_state":"NY","recipient_postcode":"11104","recipient_telephone":"7186094425","recipient_email":"","pieces":"1","shipment_reference":"test shipment","ship_reason":"sold","collection_date":"14-09-2017","hazardous":"N","special_instructions":"","display_sender_email":"gmcbroom@antrim.ifsgroup.com","display_recipient_email":"","display_broker_email":"","other_email":"","bill_shipping":"sender","bill_tax_duty":"recipient","bill_shipping_account":"","bill_tax_duty_account":"","broker":{"company":"","contact":"","address1":"","address2":"","city":"","country_code":"","state":"","postcode":"","telephone":"","email":"","id":"","account":""},"invoice_type":"c","terms_of_sale":"DAP","ultimate_destination_country_code":"US","commercial_invoice_comments":"","dry_ice":{"flag":"","weight_per_package":"","total_weight":""},"alcohol":{"type":"","packaging":"BL","volume":"","quantity":""},"packages":[{"packaging_code":"CTN","weight":"10","length":"10","width":"10","height":"10"}],"documents_description":"BUSINESS DOCUMENTS ONLY","goods_description":"test"}';
     }
 
-    private function checkAvailability($targetService, $availableServices, $msg)
-    {
-
-        echo "Checking Service : $msg\n";
-        $services = [];
-        foreach ($availableServices as $service) {
-            $services[] = $service['id'];
-        }
-        $this->assertContains($targetService, $services, 'Service ' . $targetService . ' not available');
-    }
-
-    /*
-     * ************************************
-     * ***     Start of Unit Tests      ***
-     * ************************************
-     * 
-     * Note:
-     *      Target values should exclude
-     *      Fuel Surcharge.
-     */
-
     public function testHeading()
     {
 
@@ -68,6 +44,23 @@ class ApiShipmentAvailabilityTest extends TestCase {
         echo "\n     Checking Service Availability";
         echo "\n******************************************\n";
         $this->assertEquals(1, 1);
+    }
+
+    /*
+     * ************************************
+     * ***     Start of Unit Tests      ***
+     * ************************************
+     *
+     * Note:
+     *      Target values should exclude
+     *      Fuel Surcharge.
+     */
+
+    public function test_availability_NI48_Shipment()
+    {
+
+        $availableServices = CarrierAPI::getAvailableServices(json_decode($this->niAddress, true), $this->mode);
+        $this->checkAvailability('2', $availableServices, 'NI48');
     }
 
     /*
@@ -85,11 +78,15 @@ class ApiShipmentAvailabilityTest extends TestCase {
       }
      */
 
-    public function test_availability_NI48_Shipment()
+    private function checkAvailability($targetService, $availableServices, $msg)
     {
 
-        $availableServices = CarrierAPI::getAvailableServices(json_decode($this->niAddress, true), $this->mode);
-        $this->checkAvailability('2', $availableServices, 'NI48');
+        echo "Checking Service : $msg\n";
+        $services = [];
+        foreach ($availableServices as $service) {
+            $services[] = $service['id'];
+        }
+        $this->assertContains($targetService, $services, 'Service ' . $targetService . ' not available');
     }
 
     public function test_availability_IE48_Shipment()

@@ -7,11 +7,9 @@ use TestCase;
 use App\User;
 use App\Service;
 use App\Pricing\Pricing;
-use Illuminate\Foundation\Testing\WithoutMiddleware;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class PricingTest extends TestCase {
+class PricingTest extends TestCase
+{
 
     private $user;
     private $niAddress;
@@ -41,10 +39,37 @@ class PricingTest extends TestCase {
         $this->pricing = new Pricing();
     }
 
+    public function testHeading()
+    {
+
+        echo "\n******************************************";
+        echo "\n               Unit Test";
+        echo "\n      Check Pricing for Test Cases";
+        echo "\n******************************************\n";
+        $this->assertEquals(1, 1);
+    }
+
+    public function test_IFS_NI48_Shipment()
+    {
+
+        $serviceId = $this->getServiceId('ni48', 'ifs');
+        $shipment = $this->decode($this->niAddress);
+
+        $target = [
+            'freight_cost' => 0,
+            'freight_charge' => 7.42,
+            'costs_zone' => 'ni',
+            'sales_zone' => 'ni'
+        ];
+        $prices = $this->pricing->price($shipment, $serviceId);
+
+        $this->checkMatch($target, $prices, 'IFS NI48');
+    }
+
     /**
      * Accepts a service code and Carrier Code
      * and returns the Service Id
-     * 
+     *
      * @param type $serviceCode
      * @param type $carrier
      * @return integer service_id
@@ -55,14 +80,38 @@ class PricingTest extends TestCase {
         $carriers = ['ifs' => 1, 'fedex' => 2, 'ups' => 3, 'dhl' => 5];
         $service = new Service();
         return $service->where('code', $serviceCode)
-                        ->where('carrier_id', $carriers[$carrier])
-                        ->first()->id;
+            ->where('carrier_id', $carriers[$carrier])
+            ->first()->id;
+    }
+
+    /**
+     * Creates the shipment array using the
+     * named address and sets as Residential
+     * or commercial as required
+     *
+     * @param type $address
+     * @param type $residential
+     * @return string
+     */
+    public function decode($address, $residential = false)
+    {
+
+        $shipment = json_decode($address, true);
+
+        // Set as a Commercial/ residential address
+        if ($residential) {
+            $shipment['recipient_type'] = 'r';
+        } else {
+            $shipment['recipient_type'] = 'c';
+        }
+
+        return $shipment;
     }
 
     /**
      * Accepts Priced Shipment and compares with
      * what we expect, raising errors if appropriate
-     * 
+     *
      * @param type $target
      * @param type $prices
      */
@@ -110,6 +159,16 @@ class PricingTest extends TestCase {
         $this->assertEquals($target['sales_zone'], $prices['sales_zone'], 'Sales Zone incorrect', 0.005);
     }
 
+    /*
+     * ************************************
+     * ***     Start of Unit Tests      ***
+     * ************************************
+     *
+     * Note:
+     *      Target values should exclude
+     *      Fuel Surcharge.
+     */
+
     public function buildError($target, $prices)
     {
 
@@ -119,6 +178,12 @@ class PricingTest extends TestCase {
 
         return $error;
     }
+
+    /*
+     * ************************************
+     *             Carrier IFS
+     * ************************************
+     */
 
     public function displayValues($prices, $heading)
     {
@@ -138,73 +203,6 @@ class PricingTest extends TestCase {
         }
 
         return $error;
-    }
-
-    /**
-     * Creates the shipment array using the
-     * named address and sets as Residential
-     * or commercial as required
-     * 
-     * @param type $address
-     * @param type $residential
-     * @return string
-     */
-    public function decode($address, $residential = false)
-    {
-
-        $shipment = json_decode($address, true);
-
-        // Set as a Commercial/ residential address
-        if ($residential) {
-            $shipment['recipient_type'] = 'r';
-        } else {
-            $shipment['recipient_type'] = 'c';
-        }
-
-        return $shipment;
-    }
-
-    /*
-     * ************************************
-     * ***     Start of Unit Tests      ***
-     * ************************************
-     * 
-     * Note:
-     *      Target values should exclude
-     *      Fuel Surcharge.
-     */
-
-    public function testHeading()
-    {
-
-        echo "\n******************************************";
-        echo "\n               Unit Test";
-        echo "\n      Check Pricing for Test Cases";
-        echo "\n******************************************\n";
-        $this->assertEquals(1, 1);
-    }
-
-    /*
-     * ************************************
-     *             Carrier IFS
-     * ************************************
-     */
-
-    public function test_IFS_NI48_Shipment()
-    {
-
-        $serviceId = $this->getServiceId('ni48', 'ifs');
-        $shipment = $this->decode($this->niAddress);
-
-        $target = [
-            'freight_cost' => 0,
-            'freight_charge' => 7.42,
-            'costs_zone' => 'ni',
-            'sales_zone' => 'ni'
-        ];
-        $prices = $this->pricing->price($shipment, $serviceId);
-
-        $this->checkMatch($target, $prices, 'IFS NI48');
     }
 
     /*

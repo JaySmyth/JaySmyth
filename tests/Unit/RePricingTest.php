@@ -7,11 +7,9 @@ use App\User;
 use App\Company;
 use App\Shipment;
 use App\Pricing\Pricing;
-use Illuminate\Foundation\Testing\WithoutMiddleware;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class RePricingTest extends TestCase {
+class RePricingTest extends TestCase
+{
 
     private $user;
     private $companies;
@@ -32,40 +30,11 @@ class RePricingTest extends TestCase {
         $this->checkDate = \Carbon\Carbon::today()->modify("last weekday")->format('Y-m-d');     // Last working day
         $this->companies = Company::where('legacy', 0)->pluck('id')->toArray();                 // Get all Non Legacy Customers
         $this->shipments = Shipment::whereIn('company_id', $this->companies)
-                ->whereDate('collection_date', $this->checkDate)
-                ->whereNotNull('quoted')
-                ->get();
+            ->whereDate('collection_date', $this->checkDate)
+            ->whereNotNull('quoted')
+            ->get();
 
         $this->pricing = new Pricing();
-    }
-
-    /**
-     * Accepts Priced Shipment and compares with
-     * what we expect, raising errors if appropriate
-     * 
-     * @param type $target
-     * @param type $prices
-     */
-    public function checkMatch($quoted, $prices, $text = '')
-    {
-
-        // Save data so that it is available to the custom error fn
-        $this->quoted = $quoted;
-        $this->prices = $prices;
-
-        $display = "\n" . $text . " " . $this->buildError($this->quoted, $this->prices);
-
-        $this->assertEquals($this->quoted['shipping_cost'], $this->prices['shipping_cost'], $display . ' - Costs do not match', 0.005);
-        $this->assertEquals($this->quoted['shipping_charge'], $this->prices['shipping_charge'], $display . ' - Sales do not match', 0.005);
-    }
-
-    public function buildError($quoted, $prices)
-    {
-
-        $error = "\n    Original - Cost : " . $quoted['shipping_cost'] . " Sales : " . $quoted['shipping_charge'] . " ";
-        $error .= "\n    Repriced - Cost : " . $prices['shipping_cost'] . " Sales : " . $prices['shipping_charge'];
-
-        return $error;
     }
 
     public function displayValues($prices, $heading)
@@ -88,16 +57,6 @@ class RePricingTest extends TestCase {
         return $error;
     }
 
-    /*
-     * ************************************
-     * ***     Start of Unit Tests      ***
-     * ************************************
-     * 
-     * Note:
-     *      Target values should exclude
-     *      Fuel Surcharge.
-     */
-
     public function testHeading()
     {
 
@@ -109,12 +68,6 @@ class RePricingTest extends TestCase {
         echo "\n******************************************\n";
         $this->assertEquals(1, 1);
     }
-
-    /*
-     * ************************************
-     *             Carrier IFS
-     * ************************************
-     */
 
     public function test_reprice_last_working_days_shipments()
     {
@@ -147,6 +100,51 @@ class RePricingTest extends TestCase {
         }
 
         echo "\n" . count($this->shipments) . " Shipments repriced\n";
+    }
+
+    /*
+     * ************************************
+     * ***     Start of Unit Tests      ***
+     * ************************************
+     *
+     * Note:
+     *      Target values should exclude
+     *      Fuel Surcharge.
+     */
+
+    /**
+     * Accepts Priced Shipment and compares with
+     * what we expect, raising errors if appropriate
+     *
+     * @param type $target
+     * @param type $prices
+     */
+    public function checkMatch($quoted, $prices, $text = '')
+    {
+
+        // Save data so that it is available to the custom error fn
+        $this->quoted = $quoted;
+        $this->prices = $prices;
+
+        $display = "\n" . $text . " " . $this->buildError($this->quoted, $this->prices);
+
+        $this->assertEquals($this->quoted['shipping_cost'], $this->prices['shipping_cost'], $display . ' - Costs do not match', 0.005);
+        $this->assertEquals($this->quoted['shipping_charge'], $this->prices['shipping_charge'], $display . ' - Sales do not match', 0.005);
+    }
+
+    /*
+     * ************************************
+     *             Carrier IFS
+     * ************************************
+     */
+
+    public function buildError($quoted, $prices)
+    {
+
+        $error = "\n    Original - Cost : " . $quoted['shipping_cost'] . " Sales : " . $quoted['shipping_charge'] . " ";
+        $error .= "\n    Repriced - Cost : " . $prices['shipping_cost'] . " Sales : " . $prices['shipping_charge'];
+
+        return $error;
     }
 
 }
