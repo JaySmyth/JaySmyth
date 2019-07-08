@@ -37,7 +37,6 @@ class ApiShipmentAvailabilityTest extends TestCase
 
     public function testHeading()
     {
-
         echo "\n******************************************";
         echo "\n             Feature Test";
         echo "\n     Checking Service Availability";
@@ -57,7 +56,6 @@ class ApiShipmentAvailabilityTest extends TestCase
 
     public function test_availability_NI48_Shipment()
     {
-
         $availableServices = CarrierAPI::getAvailableServices(json_decode($this->niAddress, true), $this->mode);
         $this->checkAvailability('2', $availableServices, 'NI48');
     }
@@ -103,21 +101,18 @@ class ApiShipmentAvailabilityTest extends TestCase
 
     public function test_availability_UK48_Shipment()
     {
-
         $availableServices = CarrierAPI::getAvailableServices(json_decode($this->ukAddress, true), $this->mode);
         $this->checkAvailability('19', $availableServices, 'UK48');
     }
 
     public function test_availability_Fedex_EU_IP_Shipment()
     {
-
         $availableServices = CarrierAPI::getAvailableServices(json_decode($this->euAddress, true), $this->mode);
         $this->checkAvailability('10', $availableServices, 'Fedex IP EU');
     }
 
     public function test_availability_Fedex_US_IP_Shipment()
     {
-
         $availableServices = CarrierAPI::getAvailableServices(json_decode($this->usAddress, true), $this->mode);
         $this->checkAvailability('10', $availableServices, 'Fedex IP US');
     }
@@ -130,28 +125,24 @@ class ApiShipmentAvailabilityTest extends TestCase
 
     public function test_availability_UK24_Shipment()
     {
-
         $availableServices = CarrierAPI::getAvailableServices(json_decode($this->ukAddress, true), $this->mode);
         $this->checkAvailability('16', $availableServices, 'Fedex UK24');
     }
 
     public function test_availability_UPS_EU_std_Shipment()
     {
-
         $availableServices = CarrierAPI::getAvailableServices(json_decode($this->euAddress, true), $this->mode);
         $this->checkAvailability('12', $availableServices, 'UPS STD EU');
     }
 
     public function test_availability_UPS_EU_IP_Shipment()
     {
-
         $availableServices = CarrierAPI::getAvailableServices(json_decode($this->euAddress, true), $this->mode);
         $this->checkAvailability('11', $availableServices, 'UPS IP EU');
     }
 
     public function test_availability_UPS_US_IP_Shipment()
     {
-
         $availableServices = CarrierAPI::getAvailableServices(json_decode($this->euAddress, true), $this->mode);
         $this->checkAvailability('11', $availableServices, 'UPS UP US');
     }
@@ -164,7 +155,6 @@ class ApiShipmentAvailabilityTest extends TestCase
 
     public function test_availability_DHL_US_IP_Shipment()
     {
-
         $availableServices = CarrierAPI::getAvailableServices(json_decode($this->usAddress, true), $this->mode);
         $this->checkAvailability('27', $availableServices, 'DHL IP US');
     }
