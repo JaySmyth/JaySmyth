@@ -85,7 +85,7 @@ class ImportTntPurchaseInvoices extends Command
             while (false !== ($file = readdir($handle))) {
                 if (!is_dir($file) && $file != $this->archiveDirectory) {
                     $this->processFile($file);
-                    $this->archiveFile($file);
+                  //  $this->archiveFile($file);
                 }
             }
 
@@ -172,7 +172,7 @@ class ImportTntPurchaseInvoices extends Command
 
                     if (is_numeric($row['Net Amount (VAT)']) && $row['Net Amount (VAT)'] > 0) {
                         $vat += $row['Net Amount (VAT)'];
-                        $totalTaxable += $purchaseInvoiceLine->charges->sum('billed_amount');
+                        $totalTaxable += $purchaseInvoiceLine->charges->where('code', '!=', 'CDV')->sum('billed_amount');
                     } else {
                         $totalNonTaxable += $purchaseInvoiceLine->charges->sum('billed_amount');
                     }
