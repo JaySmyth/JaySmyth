@@ -179,7 +179,7 @@ class PurchaseInvoiceLine extends Model
      */
     public function getTotalAttribute()
     {
-        return round($this->charges->where('code', '!=', 173)->sum('billed_amount'), 2);
+        return round($this->charges->whereNotIn('code', [173, 'CDV'])->sum('billed_amount'), 2);
     }
 
     /**
