@@ -85,7 +85,7 @@ class ImportTntPurchaseInvoices extends Command
             while (false !== ($file = readdir($handle))) {
                 if (!is_dir($file) && $file != $this->archiveDirectory) {
                     $this->processFile($file);
-                  //  $this->archiveFile($file);
+                    $this->archiveFile($file);
                 }
             }
 
