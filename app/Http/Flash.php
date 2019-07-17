@@ -2,10 +2,17 @@
 
 namespace App\Http;
 
+use Illuminate\Support\Arr;
+
 class Flash
 {
 
     protected $key = 'flash';
+
+    public function info($title, $message = null, $overlay = false, $html = false)
+    {
+        return $this->create('info', $title, $message, $overlay, $html);
+    }
 
     public function create($type, $title, $message = null, $overlay = false, $html = false)
     {
@@ -16,15 +23,10 @@ class Flash
         session()->flash($this->key, [
             'type' => $type,
             'title' => $title,
-            'message' => $message,
+            'message' => is_array($message) ? Arr::flatten($message) : $message,
             'overlay' => $overlay,
             'html' => $html
         ]);
-    }
-
-    public function info($title, $message = null, $overlay = false, $html = false)
-    {
-        return $this->create('info', $title, $message, $overlay, $html);
     }
 
     public function success($title, $message = null, $overlay = false, $html = false)
