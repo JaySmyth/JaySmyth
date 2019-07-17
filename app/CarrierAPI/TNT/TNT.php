@@ -10,7 +10,7 @@ class TNT
 
     private $shipment;
     private $conref;
-    private $express_connect_url = "http://iconnection.tnt.com:81/ShipperGate2.asp";
+    private $express_connect_url = "https://express.tnt.com/expressconnect/shipping/ship";
     private $express_label_url = 'https://express.tnt.com/expresslabel/documentation/getlabel';
     private $username;
     private $password;
