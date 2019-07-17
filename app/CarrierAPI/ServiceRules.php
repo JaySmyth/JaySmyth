@@ -520,7 +520,20 @@ class ServiceRules
 
     private function account_number_regex($shipment, $serviceDetails)
     {
-        return true;
+        if (empty($shipment['bill_shipping_account']) || empty($shipment['bill_tax_duty_account'])) {
+            return true;
+        }
+
+        if (strlen($shipment['bill_shipping_account']) > 0 && strlen($shipment['bill_tax_duty_account']) == 0) {
+            return preg_match($serviceDetails['account_number_regex'], $shipment['bill_shipping_account']);
+        }
+
+        if (strlen($shipment['bill_tax_duty_account']) > 0 && strlen($shipment['bill_shipping_account']) == 0) {
+            return preg_match($serviceDetails['account_number_regex'], $shipment['bill_tax_duty_account']);
+        }
+
+        return (preg_match($serviceDetails['account_number_regex'], $shipment['bill_shipping_account']) && preg_match($serviceDetails['account_number_regex'], $shipment['bill_tax_duty_account']));
+
     }
 
 
