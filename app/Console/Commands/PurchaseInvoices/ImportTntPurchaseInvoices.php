@@ -69,7 +69,7 @@ class ImportTntPurchaseInvoices extends Command
 
         $this->sftpDirectory = '/home/tntinv/invoices/';
         $this->archiveDirectory = 'archive';
-        $this->fields = array('Pick Up Date', 'Account Number', 'Invoice Number', 'Invoice Date', 'Consignment Number', 'Customer Reference', 'Company Name', 'Address 1', 'Country', 'Delivery Company Name', 'Delivery Contact 1', 'Delivery Contact 2', 'Delivery Address 1', 'Delivery Address 2', 'Delivery Address 3', 'Delivery Post Code', 'Delivery Country', 'Product Description', 'Division and Product codes', 'Total Pieces', 'Billed Weight', 'Total Charges', 'Consignment Net Value (excl. VAT)', 'Net Amount (FRT)', 'Net Amount', 'Description', 'Net Amount', 'Description', 'Net Amount', 'Description', 'Net Amount', 'Description', 'Net Amount', 'Description', 'Net Amount', 'Description', 'Net Amount', 'Description', 'Net Amount', 'Description', 'Net Amount (VAT)');
+        $this->fields = array('Pick Up Date', 'Account Number', 'Invoice Number', 'Invoice Date', 'Consignment Number', 'Customer Reference', 'Company Name', 'Address 1', 'Country', 'Delivery Company Name', 'Delivery Contact 1', 'Delivery Contact 2', 'Delivery Address 1', 'Delivery Address 2', 'Delivery Address 3', 'Delivery Post Code', 'Delivery Country', 'Product Description', 'Division and Product codes', 'Total Pieces', 'Billed Weight', 'Total Charges', 'Consignment Net Value (excl. VAT)', 'Net Amount (FRT)', 'Net Amount (FSC)', 'Description', 'Net Amount (INS)', 'Description', 'Net Amount (RES)', 'Description', 'Net Amount (ADH)', 'Description', 'Net Amount', 'Description', 'Net Amount', 'Description', 'Net Amount', 'Description', 'Net Amount', 'Description', 'Net Amount (VAT)');
     }
 
     /**
@@ -159,15 +159,18 @@ class ImportTntPurchaseInvoices extends Command
                     $purchaseInvoiceLine->save();
 
                     $this->applyCharge($row['Net Amount (FRT)'], 'FRT', 'FREIGHT CHARGE', $purchaseInvoiceLine->id);
-                    $this->applyCharge($row['Net Amount1'], 'FSC', 'FUEL SURCHARGE', $purchaseInvoiceLine->id);
+                    $this->applyCharge($row['Net Amount (FSC)'], 'FSC', 'FUEL SURCHARGE', $purchaseInvoiceLine->id);
+                    $this->applyCharge($row['Net Amount (INS)'], 'INS', 'INSURANCE', $purchaseInvoiceLine->id);
+                    $this->applyCharge($row['Net Amount (RES)'], 'RES', 'RESIDENTIAL SURCHARGE', $purchaseInvoiceLine->id);
+                    $this->applyCharge($row['Net Amount (ADH)'], 'ADH', 'RESIDENTIAL SURCHARGE', $purchaseInvoiceLine->id);
                     $this->applyCharge($row['Net Amount (VAT)'], 'CDV', 'Great Britain VAT', $purchaseInvoiceLine->id);
 
                     /*
                      * Other charges.
                     */
 
-                    for ($i = 2; $i <= 8; $i++) {
-                        $this->applyCharge($row["Net Amount$i"], 'ADD', $row["Description$i"], $purchaseInvoiceLine->id);
+                    for ($i = 1; $i <= 4; $i++) {
+                        $this->applyCharge($row["Net Amount$i"], 'MIS', $row["Description$i"], $purchaseInvoiceLine->id);
                     }
 
                     if (is_numeric($row['Net Amount (VAT)']) && $row['Net Amount (VAT)'] > 0) {

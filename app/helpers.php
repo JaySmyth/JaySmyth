@@ -527,6 +527,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
                 'FRT' => 'FRT - Freight',
                 'FSC' => 'FSC - Fuel Surcharge',
                 'HAZ' => 'HAZ - Hazardous Surcharge',
+                'INS' => 'INS - Insurance',
                 'LPS' => 'LPS - Large Package Surcharge',
                 'MIS' => 'MIS - Miscellaneous Charge',
                 'OOA' => 'OOA - Out of Delivery Area',
