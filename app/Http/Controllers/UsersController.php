@@ -288,16 +288,18 @@ class UsersController extends Controller
 
         if ($company) {
             return response()->json([
-                'name' => $user->name,
-                'company_name' => $company->company_name,
-                'address1' => $company->address1,
-                'address2' => $company->address2,
-                'city' => $company->city,
-                'state' => $company->state,
-                'postcode' => $company->postcode,
-                'country_code' => $company->country_code,
-                'email' => $user->email,
-                'telephone' => $user->telephone
+                'body' => [
+                    'name' => $user->name,
+                    'company_name' => $company->company_name,
+                    'address1' => $company->address1,
+                    'address2' => $company->address2,
+                    'city' => $company->city,
+                    'state' => $company->state,
+                    'postcode' => $company->postcode,
+                    'country_code' => $company->country_code,
+                    'email' => $user->email,
+                    'telephone' => $user->telephone
+                ]
             ]);
         }
 
