@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\User;
 use App\Role;
+use App\Company;
 
 class UsersController extends Controller
 {
@@ -273,27 +274,36 @@ class UsersController extends Controller
      * @param Request $request
      * @return array|\Illuminate\Http\JsonResponse
      */
-    public function validate(Request $request)
+    public function validateUser(Request $request)
     {
         $this->validate($request, ['company_code' => 'required|size:6']);
 
         $user = $request->user();
 
         if ($user->hasIfsRole()) {
-            $company = Company::where('company_code', $request->get('company_code'))->first();
+            $company = Company::where('company_code', $request->get('company_code'))->where('enabled', 1)->first();
         } else {
-            $company = $user->companies->where('company_code', $request->get('company_code'))->first();
+            $company = $user->companies->where('company_code', $request->get('company_code'))->where('enabled', 1)->first();
         }
 
         if ($company) {
-
             return response()->json([
                 'name' => $user->name,
-                'company_name' => $company->company_name
+                'company_name' => $company->company_name,
+                'address1' => $company->address1,
+                'address2' => $company->address2,
+                'city' => $company->city,
+                'state' => $company->state,
+                'postcode' => $company->postcode,
+                'country_code' => $company->country_code,
+                'email' => $user->email,
+                'telephone' => $user->telephone
             ]);
-
         }
 
+        return response()->json([
+            'error' => 'Unauthenticated.'
+        ], 401);
     }
 
 
