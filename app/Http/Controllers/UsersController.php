@@ -288,18 +288,16 @@ class UsersController extends Controller
 
         if ($company) {
             return response()->json([
-                'body' => [
-                    'name' => $user->name,
-                    'company_name' => $company->company_name,
-                    'address1' => $company->address1,
-                    'address2' => $company->address2,
-                    'city' => $company->city,
-                    'state' => $company->state,
-                    'postcode' => $company->postcode,
-                    'country_code' => $company->country_code,
-                    'email' => $user->email,
-                    'telephone' => $user->telephone
-                ]
+                'name' => $user->name,
+                'company_name' => $company->company_name,
+                'address1' => $company->address1,
+                'address2' => $company->address2,
+                'city' => $company->city,
+                'state' => $company->state,
+                'postcode' => $company->postcode,
+                'country_code' => $company->country_code,
+                'email' => $user->email,
+                'telephone' => $user->telephone
             ]);
         }
 
@@ -324,11 +322,11 @@ class UsersController extends Controller
         $allowedCompanyIds = $request->user()->getAllowedCompanyIds()->toArray();
 
         $query = User::orderBy('name')
-                ->filter($request->filter)
-                ->hasEnabled($request->enabled)
-                ->hasRole($request->role)
-                ->restrictByCompany($allowedCompanyIds)
-                ->with('companies');
+            ->filter($request->filter)
+            ->hasEnabled($request->enabled)
+            ->hasRole($request->role)
+            ->restrictByCompany($allowedCompanyIds)
+            ->with('companies');
 
         // if have been passed and company id and user has permission for it
         if (is_numeric($request->company) && in_array($request->company, $allowedCompanyIds)) {
