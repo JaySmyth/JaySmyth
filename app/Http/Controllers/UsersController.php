@@ -36,8 +36,8 @@ class UsersController extends Controller
     /**
      * Lists user accounts.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function index(Request $request)
     {
@@ -51,8 +51,8 @@ class UsersController extends Controller
     /**
      * Displays a user record.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function show($id)
     {
@@ -66,8 +66,8 @@ class UsersController extends Controller
     /**
      * Displays new user form.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function create()
     {
@@ -81,8 +81,8 @@ class UsersController extends Controller
     /**
      * Saves a new user to the database.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function store(UserRequest $request)
     {
@@ -123,8 +123,8 @@ class UsersController extends Controller
     /**
      * Displays edit user form.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function edit($id)
     {
@@ -140,8 +140,8 @@ class UsersController extends Controller
     /**
      * Updates an existing user.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function update(UserRequest $request, $id)
     {
@@ -170,8 +170,8 @@ class UsersController extends Controller
     /**
      * Displays add company to user page.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function addCompany($id)
     {
@@ -185,8 +185,8 @@ class UsersController extends Controller
     /**
      * Saves a user/company relation.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function storeCompany(Request $request, $id)
     {
@@ -204,8 +204,8 @@ class UsersController extends Controller
     /**
      * Detach a company from user.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function removeCompany($userId, $companyId)
     {
@@ -227,8 +227,8 @@ class UsersController extends Controller
     /**
      * Display reset password form.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function resetPassword($id)
     {
@@ -242,8 +242,8 @@ class UsersController extends Controller
     /**
      * Updates user's password.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function updatePassword(Request $request, $id)
     {
@@ -266,6 +266,37 @@ class UsersController extends Controller
         return redirect('users');
     }
 
+
+    /**
+     * Validates an api token/company code and returns the user/company details.
+     *
+     * @param Request $request
+     * @return array|\Illuminate\Http\JsonResponse
+     */
+    public function validate(Request $request)
+    {
+        $this->validate($request, ['company_code' => 'required|size:6']);
+
+        $user = $request->user();
+
+        if ($user->hasIfsRole()) {
+            $company = Company::where('company_code', $request->get('company_code'))->first();
+        } else {
+            $company = $user->companies->where('company_code', $request->get('company_code'))->first();
+        }
+
+        if ($company) {
+
+            return response()->json([
+                'name' => $user->name,
+                'company_name' => $company->company_name
+            ]);
+
+        }
+
+    }
+
+
     /*
      * User search.
      * 
@@ -287,7 +318,7 @@ class UsersController extends Controller
                 ->restrictByCompany($allowedCompanyIds)
                 ->with('companies');
 
-        // if have been passed and company id and user has permission for it      
+        // if have been passed and company id and user has permission for it
         if (is_numeric($request->company) && in_array($request->company, $allowedCompanyIds)) {
             $query->where('company_user.company_id', '=', $request->company);
         }

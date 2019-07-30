@@ -19,6 +19,11 @@ Route::post('{version}/shipments', 'APIController@createShipment');
 Route::delete('{version}/shipments/{ifs_consignment_number}/{company_code}', 'APIController@deleteShipment');
 
 
+Route::group(['middleware' => 'auth:api'], function () {
+    Route::get('users/validate', 'UsersController@validate');
+});
+
+
 /*
   |--------------------------------------------------------------------------
   | Easypost
