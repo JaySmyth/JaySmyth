@@ -316,17 +316,17 @@ class FedexSettings
             $mult = $this->mult[$uom][$this->fldno[$key]];
         }
 
+        if ($mult > 0 && !is_numeric($value)) {
+            $msg = "uom: $uom, key: $key, value: $value, mode: $mode";
+            mail('it@antrim.ifsgroup.com', "Error in CarrierAPI\FedexSettings - multiplier", $msg);
+        }
+
         if ($mult > 0) {
             if ($mode == "enable") {
                 $value = $value * $mult;
             } else {
                 $value = $value / $mult;
             }
-        }
-
-        if ($mult > 0 && !is_numeric($value)) {
-            $msg = "uom: $uom, key: $key, value: $value, mode: $mode";
-            mail('it@antrim.ifsgroup.com', "Error in CarrierAPI\FedexSettings - multiplier", $msg);
         }
 
         return $value;
