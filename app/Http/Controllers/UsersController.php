@@ -292,6 +292,7 @@ class UsersController extends Controller
                 'company_name' => $company->company_name,
                 'address1' => $company->address1,
                 'address2' => $company->address2,
+                'address3' => $company->address3,
                 'city' => $company->city,
                 'state' => $company->state,
                 'postcode' => $company->postcode,
