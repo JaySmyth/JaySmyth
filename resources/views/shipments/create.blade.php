@@ -478,7 +478,7 @@
                                 <div class="form-group row">
                                     <label class="col-md-5 col-form-label">Value for Insurance</label>
                                     <div class="col-md-6">
-                                        {!! Form::Text('insurance_value', old('insurance_value'), ['id' => 'insurance_value', 'class' =>'form-control form-control-sm numeric-only', 'maxlength' => '4']) !!}
+                                        {!! Form::Text('insurance_value', old('insurance_value'), ['id' => 'insurance_value', 'class' =>'form-control form-control-sm numeric-only', 'maxlength' => '6']) !!}
                                     </div>
                                 </div>
 
