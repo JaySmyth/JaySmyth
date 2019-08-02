@@ -2,28 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\UserRequest;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use App\User;
 use App\Role;
-use App\Company;
+use Illuminate\Http\Request;
+use App\Http\Requests\UserRequest;
+use Illuminate\Support\Facades\Mail;
 
 class UsersController extends Controller
 {
-    /*
-      |--------------------------------------------------------------------------
-      | Users Controller
-      |--------------------------------------------------------------------------
-      |
-      | This controller handles
-      |
-      |
-      |
-     */
-
     /**
      * Create a new controller instance.
      *

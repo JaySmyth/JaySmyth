@@ -27,7 +27,6 @@ use App\Company;
 use App\CompanyPackagingType;
 use App\CompanyService;
 use App\CompanyUser;
-use App\Http\Requests\Request;
 use App\Postcode;
 use App\Pricing\Facades\Pricing;
 use App\Scan;
@@ -37,7 +36,7 @@ use Auth;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Input;
 
-// use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 
 class APIController extends Controller
 {
