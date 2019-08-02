@@ -945,8 +945,7 @@ class APIController extends Controller
         }
     }
 
-    public
-    function test1()
+    public function test1()
     {
 
         $quotedRate['min_discount'] = 0;
@@ -963,8 +962,7 @@ class APIController extends Controller
      * @param string Carrier Code
      * @return Carrier
      */
-    private
-    function getCarrier($carrierCode)
+    private function getCarrier($carrierCode)
     {
 
         $carrierCode = Carrier::where('code', $carrierCode)->first();
@@ -979,8 +977,7 @@ class APIController extends Controller
      * @param array $data
      * @return Response
      */
-    private
-    function formatResponse($data, $format)
+    private function formatResponse($data, $format)
     {
         switch ($format) {
             case 'JSON':
@@ -991,6 +988,79 @@ class APIController extends Controller
         }
 
         return $response;
+    }
+
+
+    /**
+     * Returns the user/company details for a valid api_token/company_code.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return array|\Illuminate\Http\JsonResponse
+     */
+    public function validateUser(Request $request)
+    {
+        $this->validate($request, ['company_code' => 'required|size:6']);
+
+        $company = Company::where('company_code', $request->get('company_code'))->where('enabled', 1)->first();
+
+        if ($company) {
+
+            // Ensure user has permissions to this company record
+            $this->authorize('view', $company);
+
+            $user = $request->user();
+
+            return response()->json([
+                'name' => $user->name,
+                'company_name' => $company->company_name,
+                'address1' => $company->address1,
+                'address2' => $company->address2,
+                'address3' => $company->address3,
+                'city' => $company->city,
+                'state' => $company->state,
+                'postcode' => $company->postcode,
+                'country_code' => $company->country_code,
+                'email' => $user->email,
+                'telephone' => $user->telephone
+            ]);
+        }
+
+        return response()->json([
+            'error' => 'Unauthenticated.'
+        ], 401);
+    }
+
+    /**
+     * Cancel shipment endpoint using referemce (required for linnworks).
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return mixed
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function cancelShipment(Request $request)
+    {
+        $this->validate($request, ['company_code' => 'required|size:6', 'shipment_reference' => 'required']);
+
+        $company = Company::where('company_code', $request->company_code)->first();
+
+        $shipment = Shipment::where('shipment_reference', $request->shipment_reference)->where('company_id', $company->id)->orderBy('id', 'desc')->first();
+
+        if ($shipment) {
+            // Ensure user has permissions to this shipment
+            $this->authorize('cancel', $shipment);
+
+            $shipment->setCancelled($request->user()->id);
+
+            return response()->json([
+                'message' => 'Shipment ' . $shipment->consignment_number . ' cancelled'
+            ], 200);
+        }
+
+        return response()->json([
+            'error' => 'Unable to cancel shipment.'
+        ], 422);
+
     }
 
 }

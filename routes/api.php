@@ -20,7 +20,8 @@ Route::delete('{version}/shipments/{ifs_consignment_number}/{company_code}', 'AP
 
 
 Route::group(['middleware' => 'auth:api'], function () {
-    Route::get('users/validate', 'UsersController@validateUser');
+    Route::get('{version}/users/validate', 'APIController@validateUser');
+    Route::post('{version}/shipments/cancel', 'APIController@cancelShipment');
 });
 
 

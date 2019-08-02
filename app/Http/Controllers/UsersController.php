@@ -49,6 +49,26 @@ class UsersController extends Controller
         return view('users.index', compact('users'));
     }
 
+    private function search($request)
+    {
+        // get an array of company IDs that the user has permission for
+        $allowedCompanyIds = $request->user()->getAllowedCompanyIds()->toArray();
+
+        $query = User::orderBy('name')
+            ->filter($request->filter)
+            ->hasEnabled($request->enabled)
+            ->hasRole($request->role)
+            ->restrictByCompany($allowedCompanyIds)
+            ->with('companies');
+
+        // if have been passed and company id and user has permission for it
+        if (is_numeric($request->company) && in_array($request->company, $allowedCompanyIds)) {
+            $query->where('company_user.company_id', '=', $request->company);
+        }
+
+        return $query->groupBy('id')->paginate(50);
+    }
+
     /**
      * Displays a user record.
      *
@@ -240,6 +260,15 @@ class UsersController extends Controller
         return view('users.password', compact('user'));
     }
 
+    /*
+     * User search.
+     * 
+     * @param   $request
+     * @param   $paginate
+     * 
+     * @return
+     */
+
     /**
      * Updates user's password.
      *
@@ -265,76 +294,6 @@ class UsersController extends Controller
         flash()->success('Password Reset!', 'Password changed successfully.');
 
         return redirect('users');
-    }
-
-
-    /**
-     * Validates an api token/company code and returns the user/company details.
-     *
-     * @param Request $request
-     * @return array|\Illuminate\Http\JsonResponse
-     */
-    public function validateUser(Request $request)
-    {
-        $this->validate($request, ['company_code' => 'required|size:6']);
-
-        $user = $request->user();
-
-        if ($user->hasIfsRole()) {
-            $company = Company::where('company_code', $request->get('company_code'))->where('enabled', 1)->first();
-        } else {
-            $company = $user->companies->where('company_code', $request->get('company_code'))->where('enabled', 1)->first();
-        }
-
-        if ($company) {
-            return response()->json([
-                'name' => $user->name,
-                'company_name' => $company->company_name,
-                'address1' => $company->address1,
-                'address2' => $company->address2,
-                'address3' => $company->address3,
-                'city' => $company->city,
-                'state' => $company->state,
-                'postcode' => $company->postcode,
-                'country_code' => $company->country_code,
-                'email' => $user->email,
-                'telephone' => $user->telephone
-            ]);
-        }
-
-        return response()->json([
-            'error' => 'Unauthenticated.'
-        ], 401);
-    }
-
-
-    /*
-     * User search.
-     * 
-     * @param   $request
-     * @param   $paginate
-     * 
-     * @return
-     */
-
-    private function search($request)
-    {
-        // get an array of company IDs that the user has permission for
-        $allowedCompanyIds = $request->user()->getAllowedCompanyIds()->toArray();
-
-        $query = User::orderBy('name')
-            ->filter($request->filter)
-            ->hasEnabled($request->enabled)
-            ->hasRole($request->role)
-            ->restrictByCompany($allowedCompanyIds)
-            ->with('companies');
-
-        // if have been passed and company id and user has permission for it
-        if (is_numeric($request->company) && in_array($request->company, $allowedCompanyIds)) {
-            $query->where('company_user.company_id', '=', $request->company);
-        }
-
-        return $query->groupBy('id')->paginate(50);
     }
 
 }
