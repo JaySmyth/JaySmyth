@@ -1030,7 +1030,7 @@ class APIController extends Controller
     }
 
     /**
-     * Cancel shipment endpoint using referemce (required for linnworks).
+     * Cancel shipment endpoint using order number (required for linnworks).
      *
      * @param \Illuminate\Http\Request $request
      * @return mixed

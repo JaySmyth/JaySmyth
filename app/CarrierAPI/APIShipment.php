@@ -49,7 +49,7 @@ class APIShipment
     public function __construct()
     {
         // Initialize Object (Base level fields)
-        $this->fields = 'transaction_id,company_code,collection_date,carrier,carrier_pickup_required,service_code,country_of_destination,shipment_reference,ship_reason,special_instructions';
+        $this->fields = 'transaction_id,company_code,collection_date,carrier,carrier_pickup_required,service_code,country_of_destination,shipment_reference,order_number,ship_reason,special_instructions';
         $this->fields .= 'pieces,weight,volumetric_weight,weight_uom,bill_shipping,bill_tax_duty,bill_shipping_account,bill_tax_duty_account';
         $this->fields .= 'customs_value,currency_code,goods_description,insurance_value,lithium_batteries,terms_of_sale,commercial_invoice_contents';
         $this->fields .= 'shipper,recipient,broker,packages,options,alerts,hazardous,alcohol,commodities,label_specification';
@@ -72,6 +72,7 @@ class APIShipment
         $this->txlt["dimension_uom"] = "dims_uom";
         $this->txlt["country_of_destination"] = "country_of_destination";
         $this->txlt["shipment_reference"] = "shipment_reference";
+        $this->txlt["order_number"] = "order_number";
         $this->txlt["ship_reason"] = "ship_reason";
         $this->txlt["special_instructions"] = "special_instructions";
         $this->txlt["currency_code"] = "customs_value_currency_code";

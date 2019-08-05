@@ -21,6 +21,7 @@ class Shipment extends Model
         'carrier_consignment_number',
         'carrier_tracking_number',
         'shipment_reference',
+        'order_number',
         'token',
         'source',
         'pieces',
