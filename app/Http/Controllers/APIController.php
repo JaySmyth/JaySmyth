@@ -1039,11 +1039,11 @@ class APIController extends Controller
      */
     public function cancelShipment(Request $request)
     {
-        $this->validate($request, ['company_code' => 'required|size:6', 'shipment_reference' => 'required']);
+        $this->validate($request, ['company_code' => 'required|size:6', 'order_number' => 'required']);
 
         $company = Company::where('company_code', $request->company_code)->first();
 
-        $shipment = Shipment::where('shipment_reference', $request->shipment_reference)->where('company_id', $company->id)->orderBy('id', 'desc')->first();
+        $shipment = Shipment::where('order_number', $request->order_number)->where('company_id', $company->id)->orderBy('id', 'desc')->first();
 
         if ($shipment) {
             // Ensure user has permissions to this shipment
