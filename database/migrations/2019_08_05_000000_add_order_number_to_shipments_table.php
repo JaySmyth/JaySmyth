@@ -15,6 +15,7 @@ class AddOrderNumberToShipmentsTable extends Migration
     {
         Schema::table('shipments', function (Blueprint $table) {
             $table->string('order_number')->nullable()->after('shipment_reference');
+
         });
     }
 
