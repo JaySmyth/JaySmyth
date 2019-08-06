@@ -45,7 +45,11 @@ class UpdateScsJobNumbersOnPurchaseInvoiceLines extends Command
 
         foreach ($purchaseInvoices as $purchaseInvoice) {
 
+            $this->line('Updating SCS job numbers on invoice with ID: ' . $purchaseInvoice->id);
+
             foreach ($purchaseInvoice->lines as $line) {
+
+                $this->info('Carrier tracking number:' .  $line->carrier_tracking_number);
 
                 if (!$line->scs_job_number && $line->carrier_tracking_number) {
 
