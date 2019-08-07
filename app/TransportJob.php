@@ -162,6 +162,28 @@ class TransportJob extends Model
     }
 
     /**
+     * Set the from postcode .
+     *
+     * @param string $value
+     * @return string
+     */
+    public function setFromPostcodeAttribute($value)
+    {
+        $this->attributes['from_postcode'] = strtoupper($value);
+    }
+
+    /**
+     * Set the from postcode .
+     *
+     * @param string $value
+     * @return string
+     */
+    public function setToPostcodeAttribute($value)
+    {
+        $this->attributes['to_postcode'] = strtoupper($value);
+    }
+
+    /**
      * Scope filter.
      *
      * @return
