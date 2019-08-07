@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Multifreight\JobHdr;
-use App\PurchaseInvoice;
 use App\Shipment;
+use App\PurchaseInvoice;
+use App\Multifreight\JobHdr;
 use Illuminate\Console\Command;
 
 class UpdateScsJobNumbersOnPurchaseInvoiceLines extends Command
@@ -49,7 +49,7 @@ class UpdateScsJobNumbersOnPurchaseInvoiceLines extends Command
 
             foreach ($purchaseInvoice->lines as $line) {
 
-                $this->info('Carrier tracking number:' .  $line->carrier_tracking_number);
+                $this->info('Carrier tracking number:' . $line->carrier_tracking_number);
 
                 if (!$line->scs_job_number && $line->carrier_tracking_number) {
 
@@ -77,8 +77,7 @@ class UpdateScsJobNumbersOnPurchaseInvoiceLines extends Command
                     }
 
                     // Check job_header for SCS job number
-                    $withHypen = substr($line->carrier_tracking_number, 0, 3).'-'.substr($line->carrier_tracking_number,
-                            3);
+                    $withHypen = substr($line->carrier_tracking_number, 0, 3) . '-' . substr($line->carrier_tracking_number, 3);
 
                     $jobHdr = JobHdr::select('job_disp')
                         ->orWhere('hawb_char', $line->carrier_tracking_number)
