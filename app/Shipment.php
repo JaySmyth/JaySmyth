@@ -9,6 +9,7 @@ use App\Pricing\Pricing;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
+use \Spatie\PdfToImage\Pdf;
 
 class Shipment extends Model
 {
@@ -1448,4 +1449,44 @@ class Shipment extends Model
         return $this->belongsToMany(Document::class)->orderBy('id', 'DESC');
     }
 
+
+    /**
+     * Returns shipment PDF label document as separate base64 encode PNG files.
+     *
+     * @return array
+     */
+    public function getPngLabels()
+    {
+        $pngArray = [];
+
+        if ($this->label) {
+
+            // Save the base64 string as PDF document in the temp directory
+            $pdfPath = storage_path('app/temp/' . $this->token . str_random(6) . '.pdf');
+            $decodedFile = base64_decode($this->label->base64);
+            file_put_contents($pdfPath, $decodedFile);
+
+            // Convert the PDF to png images
+            $pdf = new \Spatie\PdfToImage\Pdf($pdfPath);
+            $numberOfPages = $pdf->getNumberOfPages();
+
+            foreach (range(1, $numberOfPages) as $pageNumber) {
+
+                $key = ($numberOfPages > $this->pieces && count($png) == 0) ? 'master' : 'package';
+                $pngPath = storage_path('app/temp/' . str_random(3) . time() . '.png');
+                $pdf->setPage($pageNumber)->saveImage($pngPath);
+
+                if (file_exists($pngPath)) {
+                    $img = file_get_contents($pngPath);
+                    $pngArray[$key][] = base64_encode($img);
+                    unlink($pngPath);
+                }
+            }
+
+            unlink($pdfPath);
+
+        }
+
+        return $pngArray;
+    }
 }

@@ -1062,4 +1062,26 @@ class APIController extends Controller
 
     }
 
+    /**
+     * Get shipment labels as base64 PNGs (required for linnworks).
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function labelPng(Request $request)
+    {
+        $this->validate($request, ['token' => 'required']);
+
+        $shipment = Shipment::whereToken($request->token)->first();
+
+        if ($shipment) {
+            return response()->json($shipment->getPngLabels(), 200);
+        }
+
+        return response()->json([
+            'error' => 'Labels unavailable.'
+        ], 422);
+    }
+
 }
