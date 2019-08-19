@@ -290,8 +290,10 @@ class ProcessFiles extends Command
         } else {
             $datetime = str_replace('/', '.', $datetime);
             $datetime = \Carbon\Carbon::createFromTimestamp(strtotime($datetime))->toDateTimeString();
-            $datetime = gmtToCarbonUtc($datetime);
         }
+
+        $datetime = gmtToCarbonUtc($datetime);
+
         return $datetime;
     }
 
