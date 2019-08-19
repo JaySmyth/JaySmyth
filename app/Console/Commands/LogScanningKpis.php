@@ -30,16 +30,14 @@ class LogScanningKpis extends Command
      *
      * @var string
      */
-    //protected $recipient = 'scharlton@antrim.ifsgroup.com';
-    protected $recipient = 'dshannon@antrim.ifsgroup.com';
+    protected $recipient = 'scharlton@antrim.ifsgroup.com';
 
     /**
      * Default cc.
      *
      * @var string
      */
-    //protected $cc = ['transport@antrim.ifsgroup.com', 'shaunf@antrim.ifsgroup.com', 'it@antrim.ifsgroup.com', 'ghanna@antrim.ifsgroup.com'];
-    protected $cc = [];
+    protected $cc = ['transport@antrim.ifsgroup.com', 'shaunf@antrim.ifsgroup.com', 'it@antrim.ifsgroup.com', 'ghanna@antrim.ifsgroup.com'];
 
     /**
      * Create a new command instance.
@@ -92,10 +90,12 @@ class LogScanningKpis extends Command
             ->whereNotIn('shipments.service_id', [7, 18, 20, 39, 44, 45, 48, 50])
             ->where('sender_postcode', 'LIKE', 'BT%')
             ->with('shipment')
+            ->orderBy('sender_company_name')
+            ->orderBy('shipments.id')
+            ->orderBy('packages.index')
             ->get();
 
         $totals = ['expected' => $packages->count(), 'collection' => 0, 'receipt' => 0, 'route' => 0, 'receipt_missed' => 0, 'route_missed' => 0];
-
         $receiptMissed = [];
         $routeMissed = [];
 
@@ -109,12 +109,12 @@ class LogScanningKpis extends Command
 
                 if (!$package->true_receipt_scan) {
                     inc($totals['receipt_missed'], 1);
-                    $receiptMissed[] = $package->id;
+                    $receiptMissed[] = $package;
                 }
 
                 if (!$package->loaded) {
                     inc($totals['route_missed'], 1);
-                    $routeMissed[] = $package->id;
+                    $routeMissed[] = $package;
                 }
             }
         }
@@ -132,14 +132,10 @@ class LogScanningKpis extends Command
             'route_missed' => $totals['route_missed'],
         ]);
 
-
-        $receiptScans = Package::whereIn('id', $receiptMissed)->get();
-        $routeScans = Package::whereIn('id', $routeMissed)->get();
-
         // Only send the email when start date option has not been supplied
-        //if (!$this->option('start-date')) {
-        Mail::to($this->recipient)->cc($this->cc)->send(new \App\Mail\MissedScans($receiptScans, $routeScans, 'Missed Scans (receipt: ' . $totals['receipt_missed'] . ' / route: ' . $totals['route_missed'] . ') - ' . $date));
-        //}
+        if (!$this->option('start-date')) {
+            Mail::to($this->recipient)->cc($this->cc)->send(new \App\Mail\MissedScans($receiptMissed, $routeMissed, 'Missed Scans (receipt: ' . $totals['receipt_missed'] . ' / route: ' . $totals['route_missed'] . ') - ' . $date));
+        }
     }
 
 }

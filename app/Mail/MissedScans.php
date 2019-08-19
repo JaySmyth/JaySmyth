@@ -12,8 +12,9 @@ class MissedScans extends Mailable
     use Queueable,
         SerializesModels;
 
-    protected $packages;
     public $subject;
+    public $receiptScans;
+    public $routeScans;
 
     /**
      * Create a new message instance.
@@ -34,10 +35,7 @@ class MissedScans extends Mailable
      */
     public function build()
     {
-
-        return $this->view('emails.shipments.missed_scans')
-                        ->subject($this->subject)
-                        ->with(['subject' => $this->subject, 'receiptScans' => $this->receiptScans, 'routeScans' => $this->routeScans]);
+        return $this->view('emails.shipments.missed_scans')->subject($this->subject);
     }
 
 }
