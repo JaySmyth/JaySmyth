@@ -137,9 +137,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:open-driver-manifests')->dailyAt('06:00');
         $schedule->command('ifs:close-stagnant-transport-jobs')->dailyAt('04:35');
         $schedule->command('ifs:correct-status-on-transport-jobs')->dailyAt('04:38');
-        $schedule->command('ifs:notify-transport-department-pod-required')->weekdays()->dailyAt('08:30');
-        $schedule->command('ifs:log-scanning-kpis')->weekdays()->dailyAt('09:30');
-        $schedule->command('ifs:send-scanning-report-email --last-weekday')->weekdays()->dailyAt('08:30');
+        $schedule->command('ifs:notify-transport-department-pod-required')->weekdays()->dailyAt('08:20');
+        $schedule->command('ifs:log-scanning-kpis')->weekdays()->dailyAt('08:30');
 
         /*
          * Multifreight

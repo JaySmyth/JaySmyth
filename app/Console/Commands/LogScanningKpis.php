@@ -2,8 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\Package;
 use Carbon\Carbon;
+use App\ScanningKpi;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Mail;
 
 class LogScanningKpis extends Command
 {
@@ -13,14 +16,30 @@ class LogScanningKpis extends Command
      *
      * @var string
      */
-    protected $signature = 'ifs:log-scanning-kpis {--start-date=} {--finish-date=}';
+    protected $signature = 'ifs:log-scanning-kpis {--start-date=}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Inserts or updates scanning KPIs for a given date range (defaults to today)';
+    protected $description = 'Inserts or updates scanning KPIs for a given date range (defaults to today) and send email report';
+
+    /**
+     * The default recipient.
+     *
+     * @var string
+     */
+    //protected $recipient = 'scharlton@antrim.ifsgroup.com';
+    protected $recipient = 'dshannon@antrim.ifsgroup.com';
+
+    /**
+     * Default cc.
+     *
+     * @var string
+     */
+    //protected $cc = ['transport@antrim.ifsgroup.com', 'shaunf@antrim.ifsgroup.com', 'it@antrim.ifsgroup.com', 'ghanna@antrim.ifsgroup.com'];
+    protected $cc = [];
 
     /**
      * Create a new command instance.
@@ -39,8 +58,8 @@ class LogScanningKpis extends Command
      */
     public function handle()
     {
-        $startDate = ($this->option('start-date')) ? Carbon::parse($this->option('start-date')) : Carbon::today();
-        $finishDate = ($this->option('finish-date')) ? Carbon::parse($this->option('start-date')) : Carbon::today();
+        $startDate = ($this->option('start-date')) ? Carbon::parse($this->option('start-date')) : Carbon::today()->modify("last weekday");
+        $finishDate = Carbon::today()->modify("last weekday");
 
         $this->info('** Logging Scanning KPIs **');
 
@@ -58,24 +77,27 @@ class LogScanningKpis extends Command
 
     /**
      * Insert KPI record.
-     * 
+     *
      * @param type $date
      * @return boolean
      */
     protected function logKpis($date)
     {
         // Load package records for date specified
-        $packages = \App\Package::select('packages.*')
-                ->join('shipments', 'packages.shipment_id', '=', 'shipments.id')
-                ->whereBetween('ship_date', [Carbon::parse($date)->startOfDay(), Carbon::parse($date)->endOfDay()])
-                ->where('shipments.depot_id', 1)
-                ->whereNotIn('shipments.status_id', [1, 7])
-                ->whereNotIn('shipments.service_id', [7, 18, 20, 39, 44, 45, 48, 50])
-                ->where('sender_postcode', 'LIKE', 'BT%')
-                ->with('shipment')
-                ->get();
+        $packages = Package::select('packages.*')
+            ->join('shipments', 'packages.shipment_id', '=', 'shipments.id')
+            ->whereBetween('ship_date', [Carbon::parse($date)->startOfDay(), Carbon::parse($date)->endOfDay()])
+            ->where('shipments.depot_id', 1)
+            ->whereNotIn('shipments.status_id', [1, 7])
+            ->whereNotIn('shipments.service_id', [7, 18, 20, 39, 44, 45, 48, 50])
+            ->where('sender_postcode', 'LIKE', 'BT%')
+            ->with('shipment')
+            ->get();
 
         $totals = ['expected' => $packages->count(), 'collection' => 0, 'receipt' => 0, 'route' => 0, 'receipt_missed' => 0, 'route_missed' => 0];
+
+        $receiptMissed = [];
+        $routeMissed = [];
 
         // Loop through each package and increment relevant counter
         foreach ($packages as $package) {
@@ -87,18 +109,18 @@ class LogScanningKpis extends Command
 
                 if (!$package->true_receipt_scan) {
                     inc($totals['receipt_missed'], 1);
-                    $receipt_missed[] = $package->id;
+                    $receiptMissed[] = $package->id;
                 }
 
                 if (!$package->loaded) {
                     inc($totals['route_missed'], 1);
-                    $route_missed[] = $package->id;
+                    $routeMissed[] = $package->id;
                 }
             }
         }
 
         // Insert or update KPI
-        \App\ScanningKpi::firstOrCreate(['date' => $date])->update([
+        ScanningKpi::firstOrCreate(['date' => $date])->update([
             'expected' => $totals['expected'],
             'collection' => $totals['collection'],
             'collection_percentage' => ($totals['expected'] > 0 && $totals['collection'] > 0) ? round((100 / $totals['expected']) * $totals['collection'], 1) : 0,
@@ -109,6 +131,15 @@ class LogScanningKpis extends Command
             'receipt_missed' => $totals['receipt_missed'],
             'route_missed' => $totals['route_missed'],
         ]);
+
+
+        $receiptScans = Package::whereIn('id', $receiptMissed)->get();
+        $routeScans = Package::whereIn('id', $routeMissed)->get();
+
+        // Only send the email when start date option has not been supplied
+        //if (!$this->option('start-date')) {
+        Mail::to($this->recipient)->cc($this->cc)->send(new \App\Mail\MissedScans($receiptScans, $routeScans, 'Missed Scans (receipt: ' . $totals['receipt_missed'] . ' / route: ' . $totals['route_missed'] . ') - ' . $date));
+        //}
     }
 
 }
