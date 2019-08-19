@@ -286,13 +286,12 @@ class ProcessFiles extends Command
     protected function parseDateTime($datetime)
     {
         if (empty($datetime)) {
-            $datetime = \Carbon\Carbon::now()->toDateTimeString();
+            $datetime = \Carbon\Carbon::now();
         } else {
             $datetime = str_replace('/', '.', $datetime);
             $datetime = \Carbon\Carbon::createFromTimestamp(strtotime($datetime))->toDateTimeString();
+            $datetime = gmtToCarbonUtc($datetime);
         }
-
-        $datetime = gmtToCarbonUtc($datetime);
 
         return $datetime;
     }
