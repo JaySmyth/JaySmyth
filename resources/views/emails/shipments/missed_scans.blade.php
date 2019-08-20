@@ -55,7 +55,6 @@
             <th>Consignment</th>
             <th>Carrier</th>
             <th>Package</th>
-            <th>Date/Time</th>
             <th>Carrier</th>
             <th>Service</th>
             <th>Outbound Route</th>
