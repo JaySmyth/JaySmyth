@@ -928,6 +928,8 @@ class ShipmentsController extends Controller
      */
     public function test()
     {
+        phpinfo();
+
         dd(getTimezone('US', 'NY', 'New York'));
     }
 
