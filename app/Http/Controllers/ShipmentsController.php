@@ -928,7 +928,7 @@ class ShipmentsController extends Controller
      */
     public function test()
     {
-        dispatch(new LogScanningKpis('18-01-2019'));
+        dd(getTimezone('US', 'NY', 'New York'));
     }
 
 }
