@@ -134,7 +134,7 @@ class LogScanningKpis extends Command
 
         // Only send the email when start date option has not been supplied
         if (!$this->option('start-date')) {
-            Mail::to($this->recipient)->cc($this->cc)->send(new \App\Mail\MissedScans($receiptMissed, $routeMissed, 'Missed Scans (receipt: ' . $totals['receipt_missed'] . ' / route: ' . $totals['route_missed'] . ') - ' . $date));
+            Mail::to($this->recipient)->cc($this->cc)->send(new \App\Mail\MissedScans($receiptMissed, $routeMissed, 'Missed Scans (receipt: ' . $totals['receipt_missed'] . ' / route: ' . $totals['route_missed'] . ') - ' . $date->format('d-m-y')));
         }
     }
 
