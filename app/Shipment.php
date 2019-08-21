@@ -1472,7 +1472,7 @@ class Shipment extends Model
 
             foreach (range(1, $numberOfPages) as $pageNumber) {
 
-                $key = ($numberOfPages > $this->pieces && count($png) == 0) ? 'master' : 'package';
+                $key = ($numberOfPages > $this->pieces && $pageNumber == 1) ? 'master' : 'package';
                 $pngPath = storage_path('app/temp/' . str_random(3) . time() . '.png');
                 $pdf->setPage($pageNumber)->saveImage($pngPath);
 
