@@ -58,6 +58,8 @@ class ReportsController extends Controller
 
         if ($request->manifest_id) {
             $manifest = Manifest::findOrFail($request->manifest_id);
+        } else {
+            $manifest = null;
         }
 
         // decode the criteria
@@ -441,7 +443,6 @@ class ReportsController extends Controller
         $totalDays = 0;
 
         for ($i = 0; $i < $date->daysInMonth; $i++) {
-
             $shipmentsGroupedByCompany = Shipment::orderBy('id')
                 ->traffic($request->traffic)
                 ->hasCarrier($request->carrier)
@@ -727,7 +728,6 @@ class ReportsController extends Controller
         $day = Carbon::now()->dayOfWeekIso;
 
         foreach ($companies as $company) {
-
             $settings = $company->getCollectionSettingsForDay($day);
 
             if ($settings instanceof \App\CollectionSetting) {
@@ -787,5 +787,4 @@ class ReportsController extends Controller
 
         return view('reports.scanning_kpis', compact('report', 'kpis', 'collectionPercentageForMonth', 'receiptPercentageForMonth', 'routePercentageForMonth', 'totalReceiptMissed', 'totalRouteMissed', 'averageReceiptMissed', 'averageRouteMissed'));
     }
-
 }
