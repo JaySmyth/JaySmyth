@@ -934,7 +934,7 @@ class ShipmentsController extends Controller
 
         header('Content-Disposition: attachment;filename="test.png"');
         header('Content-Type: application/force-download');
-        echo base64_decode($response['package'][1]);
+        echo base64_decode($response['package'][0]);
 
     }
 
