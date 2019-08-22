@@ -1478,7 +1478,7 @@ class Shipment extends Model
 
                 if (file_exists($pngPath)) {
                     $imagick = new \Imagick(realpath($pngPath));
-                    $imagick->resizeImage(384, 576, \Imagick::FILTER_LANCZOS, 0.9, TRUE);
+                    // $imagick->resizeImage(384, 576, \Imagick::FILTER_LANCZOS, 0.9, TRUE);
                     $img = $imagick->getimageblob();
                     $imagick->clear();
                     $pngArray[$key][] = base64_encode($img);
