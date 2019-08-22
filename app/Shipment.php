@@ -1477,7 +1477,6 @@ class Shipment extends Model
                 $pdf->setPage($pageNumber)->setCompressionQuality(100)->saveImage($pngPath);
 
                 if (file_exists($pngPath)) {
-
                     $imagick = new \Imagick(realpath($pngPath));
                     $imagick->resizeImage(384, 576, \Imagick::FILTER_LANCZOS, 0.9, TRUE);
                     $img = $imagick->getimageblob();
