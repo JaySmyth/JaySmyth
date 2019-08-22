@@ -926,8 +926,15 @@ class ShipmentsController extends Controller
      *
      * @return type
      */
-    public function test()
+    public function test($id)
     {
+        $shipment = Shipment::find($id);
+
+        $response = $shipment->getPngLabels();
+
+        header('Content-Disposition: attachment;filename="test.png"');
+        header('Content-Type: application/force-download');
+        echo base64_decode($response['package'][0]);
 
     }
 
