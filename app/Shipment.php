@@ -1471,21 +1471,16 @@ class Shipment extends Model
             $numberOfPages = $pdf->getNumberOfPages();
 
             foreach (range(1, $numberOfPages) as $pageNumber) {
-
                 $key = ($numberOfPages > $this->pieces && $pageNumber == 1) ? 'master' : 'package';
                 $pngPath = storage_path('app/temp/' . str_random(3) . time() . '.png');
-                $pdf->setPage($pageNumber)->setCompressionQuality(100)->saveImage($pngPath);
+                $pdf->setPage($pageNumber)->setCompressionQuality(100)->setResolution(300)->setOutputFormat('png')->saveImage($pngPath);
 
                 if (file_exists($pngPath)) {
-                    $imagick = new \Imagick(realpath($pngPath));
-                    // $imagick->resizeImage(384, 576, \Imagick::FILTER_LANCZOS, 0.9, TRUE);
-                    $img = $imagick->getimageblob();
-                    $imagick->clear();
+                    $img = file_get_contents($pngPath);
                     $pngArray[$key][] = base64_encode($img);
                     unlink($pngPath);
                 }
             }
-
             unlink($pdfPath);
 
         }
