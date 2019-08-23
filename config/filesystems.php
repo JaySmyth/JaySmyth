@@ -51,6 +51,16 @@ return [
         'salesinvoices' => [
             'driver' => 'local',
             'root' => '/home/ifssalesinv/invoices/',
+            'permissions' => [
+                'file' => [
+                    'public' => 0774,
+                    'private' => 0600,
+                ],
+                'dir' => [
+                    'public' => 0775,
+                    'private' => 0700,
+                ],
+            ],
         ],
 
         'public' => [
