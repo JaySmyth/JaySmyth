@@ -7,6 +7,8 @@ use App\PurchaseInvoice;
 use App\PurchaseInvoiceLine;
 use App\PurchaseInvoiceCharge;
 use Illuminate\Support\Facades\Mail;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Sftp\SftpAdapter;
 
 class ImportUpsPurchaseInvoices extends Command
 {
@@ -52,11 +54,11 @@ class ImportUpsPurchaseInvoices extends Command
         $this->archiveDirectory = 'archive';
         $this->invoices = array();
 
-        $this->ftpHost = 'ftp2.ups.com';
-        $this->ftpPort = '21';
-        $this->ftpUsername = 'global0513';
-        $this->ftpPassword = 'qs8zha4';
-        $this->ftpWorkingDirectory = 'in/';
+        $this->host = 'ftp2.ups.com';
+        $this->port = '10022';
+        $this->username = 'global0513';
+        $this->password = 'qs8zha4';
+
 
         $this->numberOfSummaryFields = 27;
         $this->numberOfDetailFields = 152;
@@ -77,7 +79,7 @@ class ImportUpsPurchaseInvoices extends Command
      */
     public function handle()
     {
-        // Download the files from remote FTP site
+        // Download the files from remote SFTP site
         $this->downloadFiles();
 
         $this->info('Checking ' . $this->directory . ' for files to process');
@@ -98,49 +100,75 @@ class ImportUpsPurchaseInvoices extends Command
     }
 
     /**
-     * Download files from UPS ftp site.
+     * Download files from UPS SFTP site.
      *
      * @return void
      */
     private function downloadFiles()
     {
-        $this->info("Attempting to download files from remote FTP site");
+        $this->line("Attempting to download files from remote SFTP site");
 
-        $connection = ftp_ssl_connect($this->ftpHost);
-        $loginResult = ftp_login($connection, $this->ftpUsername, $this->ftpPassword);
-
-        // Turn on passive mode
-        ftp_pasv($connection, true);
+        // Connect to the remote host
+        $filesystem = $this->connect();
 
         // Check connection was made
-        if ((!$connection) || (!$loginResult)) {
-            $this->error("Unable to connect to FTP host -> " . $this->ftpHost);
-            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Failed to download UPS purchase invoice', $loginResult));
+        if (!$filesystem) {
+            $this->error("Unable to connect to SFTP host -> " . $this->host);
+            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Failed to download UPS purchase invoice'));
             return false;
         }
 
-        $this->info("Connection established to FTP host -> " . $this->ftpHost);
+        $this->info("Connection established to SFTP host -> " . $this->host);
 
-        // Get the file list for /
-        $fileList = ftp_rawlist($connection, $this->ftpWorkingDirectory);
-
-        // Remove the first element (directory summary)
-        unset($fileList[0]);
+        $fileList = $filesystem->listContents();
 
         foreach ($fileList as $file):
 
-            if ($filename = $this->validateFile($file)) {
+            if ($this->validateFile($file['basename'])) {
 
                 // Open a local file to write to
-                $handle = fopen($this->directory . '/' . $filename, 'w');
+                $handle = fopen($this->directory . '/' . $file['basename'], 'w');
 
-                // Download file
-                ftp_fget($connection, $handle, $this->ftpWorkingDirectory . $filename, FTP_ASCII, 0);
+                $contents = $filesystem->read($file["path"]);
+
+                fwrite($handle, $contents);
+
+                fclose($handle);
             }
 
         endforeach;
 
-        ftp_close($connection);
+    }
+
+    /**
+     * Upload file to host.
+     *
+     * @param type $filePath
+     * @param type $host
+     * @return type
+     */
+    protected function connect()
+    {
+        $this->line("Connecting to remote host: " . $this->host . ":" . $this->port);
+
+        $adapter = new SftpAdapter([
+            'host' => $this->host,
+            'port' => $this->port,
+            'username' => $this->username,
+            'password' => $this->password,
+            'root' => '/in',
+            'timeout' => 10,
+            'directoryPerm' => 755
+        ]);
+
+        try {
+            $filesystem = new Filesystem($adapter);
+        } catch (\Exception $exc) {
+            $this->error($exc->getMessage());
+            return false;
+        }
+
+        return $filesystem;
     }
 
     /**
@@ -149,53 +177,13 @@ class ImportUpsPurchaseInvoices extends Command
      * @param type $string
      * @return string filename
      */
-    private function validateFile($string)
+    private function validateFile($filename)
     {
-        // Obtain the file name from the string returned from ftp_rawlist
-        $pieces = explode(' ', $string);
-
-        // Last array element
-        $filename = end($pieces);
-
         // Check the current directory and the archive directory to see if the file has already been downloaded
         if (file_exists($this->directory . '/' . $filename) || file_exists($this->directory . $this->archiveDirectory . '/' . $filename)) {
             $this->error("File $filename has already been downloaded");
             return false;
         }
-
-        return $filename;
-    }
-
-    /**
-     * Save and set the purchase invoice.
-     *
-     * @param type $line
-     */
-    private function createPurchaseInvoice($summary)
-    {
-        $invoiceNumber = $summary['Inv No'];
-
-        $this->purchaseInvoice = PurchaseInvoice::whereInvoiceNumber($invoiceNumber)->whereCarrierId(3)->first();
-
-        if ($this->purchaseInvoice) {
-            $this->error("Invoice $invoiceNumber skipped (already exists)");
-            return false;
-        }
-
-        $this->purchaseInvoice = PurchaseInvoice::create([
-                    'invoice_number' => $invoiceNumber,
-                    'account_number' => $summary['Acct No'],
-                    'total' => $summary['Total Inv Amt'],
-                    'total_taxable' => $summary['Total Taxable Amt'],
-                    'total_non_taxable' => $summary['Total NonTax Amt'],
-                    'vat' => $summary['VAT Amt'],
-                    'currency_code' => $summary['Currency Code'],
-                    'type' => $this->getInvoiceType($summary['Inv Type']),
-                    'carrier_id' => 3,
-                    'date' => strtotime($summary['Inv Date'])
-        ]);
-
-        $this->invoices[] = $invoiceNumber;
 
         return true;
     }
@@ -220,9 +208,9 @@ class ImportUpsPurchaseInvoices extends Command
                     if ($details['Inv No'] == $summary['Inv No'] && $details['Acct No'] == $summary['Acct No']) {
 
                         $purchaseInvoiceLine = PurchaseInvoiceLine::firstOrcreate([
-                                    'carrier_consignment_number' => ($details['Tracking number']) ? $details['Tracking number'] : strtoupper(str_random(18)),
-                                    'carrier_tracking_number' => ($details['Tracking number']) ? $details['Tracking number'] : strtoupper(str_random(18)),
-                                    'purchase_invoice_id' => $this->purchaseInvoice->id
+                            'carrier_consignment_number' => ($details['Tracking number']) ? $details['Tracking number'] : strtoupper(str_random(18)),
+                            'carrier_tracking_number' => ($details['Tracking number']) ? $details['Tracking number'] : strtoupper(str_random(18)),
+                            'purchase_invoice_id' => $this->purchaseInvoice->id
                         ]);
 
                         if (strlen($details['Tracking number']) <= 0 && strlen($details['Inv related charge description']) > 0 && !$purchaseInvoiceLine->carrier_service) {
@@ -284,17 +272,17 @@ class ImportUpsPurchaseInvoices extends Command
                                 }
 
                                 $purchaseInvoiceCharge = PurchaseInvoiceCharge::firstOrCreate([
-                                            'code' => $chargeType,
-                                            'amount' => $details[$charge['amount']],
-                                            'currency_code' => $summary['Currency Code'],
-                                            'exchange_rate' => 1,
-                                            'billed_amount' => $details[$charge['amount']],
-                                            'billed_amount_currency_code' => $summary['Currency Code'],
-                                            'vat_applied' => $vatAppliedToCharge,
-                                            'vat' => ($vatAppliedToCharge) ? ($details[$charge['amount']] / 100) * 20 : 0,
-                                            'vat_rate' => ($vatAppliedToCharge) ? 20 : 0,
-                                            'purchase_invoice_id' => $this->purchaseInvoice->id,
-                                            'purchase_invoice_line_id' => $purchaseInvoiceLine->id
+                                    'code' => $chargeType,
+                                    'amount' => $details[$charge['amount']],
+                                    'currency_code' => $summary['Currency Code'],
+                                    'exchange_rate' => 1,
+                                    'billed_amount' => $details[$charge['amount']],
+                                    'billed_amount_currency_code' => $summary['Currency Code'],
+                                    'vat_applied' => $vatAppliedToCharge,
+                                    'vat' => ($vatAppliedToCharge) ? ($details[$charge['amount']] / 100) * 20 : 0,
+                                    'vat_rate' => ($vatAppliedToCharge) ? 20 : 0,
+                                    'purchase_invoice_id' => $this->purchaseInvoice->id,
+                                    'purchase_invoice_line_id' => $purchaseInvoiceLine->id
                                 ]);
 
                                 $purchaseInvoiceCharge->setCarrierChargeId();
@@ -366,6 +354,40 @@ class ImportUpsPurchaseInvoices extends Command
         $this->info("Finished reading file. File contained $i lines");
 
         return $invoice;
+    }
+
+    /**
+     * Save and set the purchase invoice.
+     *
+     * @param type $line
+     */
+    private function createPurchaseInvoice($summary)
+    {
+        $invoiceNumber = $summary['Inv No'];
+
+        $this->purchaseInvoice = PurchaseInvoice::whereInvoiceNumber($invoiceNumber)->whereCarrierId(3)->first();
+
+        if ($this->purchaseInvoice) {
+            $this->error("Invoice $invoiceNumber skipped (already exists)");
+            return false;
+        }
+
+        $this->purchaseInvoice = PurchaseInvoice::create([
+            'invoice_number' => $invoiceNumber,
+            'account_number' => $summary['Acct No'],
+            'total' => $summary['Total Inv Amt'],
+            'total_taxable' => $summary['Total Taxable Amt'],
+            'total_non_taxable' => $summary['Total NonTax Amt'],
+            'vat' => $summary['VAT Amt'],
+            'currency_code' => $summary['Currency Code'],
+            'type' => $this->getInvoiceType($summary['Inv Type']),
+            'carrier_id' => 3,
+            'date' => strtotime($summary['Inv Date'])
+        ]);
+
+        $this->invoices[] = $invoiceNumber;
+
+        return true;
     }
 
     /**
