@@ -238,6 +238,77 @@ class TransendOrderImport implements ShouldQueue
     }
 
     /**
+     * Get contact element.
+     *
+     * @param type $order
+     */
+    private function getContactDetail()
+    {
+        if ($this->transportJob->type == 'd') {
+            return [
+                'ContactEmailAddress' => $this->transportJob->to_email,
+                'ContactName' => $this->transportJob->to_name,
+                'ContactNumber' => $this->transportJob->to_telephone,
+            ];
+        }
+
+        return [
+            'ContactEmailAddress' => $this->transportJob->from_email,
+            'ContactName' => $this->transportJob->from_name,
+            'ContactNumber' => $this->transportJob->from_telephone,
+        ];
+    }
+
+    /**
+     * Planned time to arrive/depart.
+     *
+     * @param type $minutes
+     * @return string
+     */
+    protected function getPlannedTime($minutes = false)
+    {
+        $time = '12:00';
+
+        if ($this->transportJob->type == 'c') {
+            if (!empty($this->transportJob->routing['collection_time'])) {
+                $time = $this->transportJob->routing['collection_time'];
+            }
+        } else {
+            if (!empty($this->transportJob->routing['delivery_time'])) {
+                $time = $this->transportJob->routing['delivery_time'];
+            }
+        }
+
+        $time = Carbon::parse(date('Y-m-d') . " " . $time);
+
+        if ($minutes) {
+            return $time->addMinutes($minutes)->format("Y-m-d H:i:s");
+        }
+
+        return $time->format("Y-m-d H:i:s");
+    }
+
+    /**
+     * Get Transend job type code.
+     *
+     * @return string
+     */
+    protected function getJobTypeCode()
+    {
+        // Courier job, use the service code with appendage
+        if (!empty($this->shipment->service->code)) {
+            return strtoupper($this->shipment->service->code . $this->transportJob->type);
+        }
+
+        // For non courier jobs, use the transend code defined in the departments table with appendage
+        if (!empty($this->transportJob->department->transend_code)) {
+            return strtoupper($this->transportJob->department->transend_code . $this->transportJob->type);
+        }
+
+        return 'unknown';
+    }
+
+    /**
      * Add job details.
      *
      * @return collection
@@ -272,82 +343,27 @@ class TransendOrderImport implements ShouldQueue
             'Description' => substr(trim($this->transportJob->goods_description), 0, 40),
             'OrderedQty' => $this->transportJob->pieces,
             'OriginalDespatchQty' => $this->transportJob->pieces,
-            'SkuWeight' => $this->transportJob->weight,
-            'SkuCube' => $this->transportJob->volumetric_weight,
+            'SkuWeight' => $this->getTransportJobWeight('weight'),
+            'SkuCube' => $this->getTransportJobWeight('volumetric_weight')
         ];
 
         return $details;
     }
 
     /**
-     * Get contact element.
+     * For non courier jobs, calc peice weight.
      *
-     * @param type $order
+     * @return float|int
      */
-    private function getContactDetail()
+    private function getTransportJobWeight($field)
     {
-        if ($this->transportJob->type == 'd') {
-            return [
-                'ContactEmailAddress' => $this->transportJob->to_email,
-                'ContactName' => $this->transportJob->to_name,
-                'ContactNumber' => $this->transportJob->to_telephone,
-            ];
+
+        if ($this->transportJob->$field > 0 && $this->transportJob->pieces > 1) {
+            return $this->transportJob->$field / $this->transportJob->pieces;
         }
 
-        return [
-            'ContactEmailAddress' => $this->transportJob->from_email,
-            'ContactName' => $this->transportJob->from_name,
-            'ContactNumber' => $this->transportJob->from_telephone,
-        ];
-    }
+        return $this->transportJob->$field;
 
-    /**
-     * Get Transend job type code.
-     *
-     * @return string
-     */
-    protected function getJobTypeCode()
-    {
-        // Courier job, use the service code with appendage
-        if (!empty($this->shipment->service->code)) {
-            return strtoupper($this->shipment->service->code . $this->transportJob->type);
-        }
-
-        // For non courier jobs, use the transend code defined in the departments table with appendage
-        if (!empty($this->transportJob->department->transend_code)) {
-            return strtoupper($this->transportJob->department->transend_code . $this->transportJob->type);
-        }
-
-        return 'unknown';
-    }
-
-    /**
-     * Planned time to arrive/depart.
-     *
-     * @param type $minutes
-     * @return string
-     */
-    protected function getPlannedTime($minutes = false)
-    {
-        $time = '12:00';
-
-        if ($this->transportJob->type == 'c') {
-            if (!empty($this->transportJob->routing['collection_time'])) {
-                $time = $this->transportJob->routing['collection_time'];
-            }
-        } else {
-            if (!empty($this->transportJob->routing['delivery_time'])) {
-                $time = $this->transportJob->routing['delivery_time'];
-            }
-        }
-
-        $time = Carbon::parse(date('Y-m-d') . " " . $time);
-
-        if ($minutes) {
-            return $time->addMinutes($minutes)->format("Y-m-d H:i:s");
-        }
-
-        return $time->format("Y-m-d H:i:s");
     }
 
     /**
