@@ -66,9 +66,9 @@ class TransendOrderImport implements ShouldQueue
             exit();
         }
 
-        if ($this->getDepot() == 'TEST') {
-            echo "\n\n" . $jsonData . "\n\n";
-        }
+        // if ($this->getDepot() == 'TEST') {
+        echo "\n\n" . $jsonData . "\n\n";
+        //  }
 
         try {
 
