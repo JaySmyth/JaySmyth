@@ -66,9 +66,13 @@ class TransendOrderImport implements ShouldQueue
             exit();
         }
 
-        // if ($this->getDepot() == 'TEST') {
-        echo "\n\n" . $jsonData . "\n\n";
-        //  }
+        if ($this->getDepot() == 'TEST') {
+            echo "\n\n" . $jsonData . "\n\n";
+        }
+
+        if ($this->transportJob->goods_description == 'TEST') {
+            Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError($this->transportJob->number . ' JSON', $jsonData));
+        }
 
         try {
 
