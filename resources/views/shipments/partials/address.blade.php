@@ -153,7 +153,7 @@
                 </label>
 
                 <div class="col-md-9">
-                    {!! Form::Text($type . '_telephone', old($type . '_telephone'), ['id' => $type . '_telephone', 'class' =>'form-control form-control-sm', 'maxlength' => 35]) !!}
+                    {!! Form::Text($type . '_telephone', old($type . '_telephone'), ['id' => $type . '_telephone', 'class' =>'form-control form-control-sm', 'maxlength' => 25]) !!}
                 </div>
             </div>
 
