@@ -93,9 +93,9 @@ class Kernel extends ConsoleKernel
         /*
          * Transend
          */
-        $schedule->command('transend:send')->weekdays()->everyFiveMinutes()->between('6:10', '20:25');
-        $schedule->command('transend:cancel')->weekdays()->everyFiveMinutes()->between('6:10', '20:25');
-        $schedule->command('transend:process-files')->weekdays()->everyFiveMinutes()->between('7:00', '20:25');
+        $schedule->command('transend:send')->weekdays()->everyFiveMinutes()->between('6:10', '20:25')->withoutOverlapping();
+        $schedule->command('transend:cancel')->weekdays()->everyFiveMinutes()->between('6:10', '20:25')->withoutOverlapping();
+        $schedule->command('transend:process-files')->weekdays()->everyFiveMinutes()->between('7:00', '20:25')->withoutOverlapping();
 
         /*
          * Shipment related
@@ -103,7 +103,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:auto-manifest')->weekdays()->everyFiveMinutes();
         $schedule->command('ifs:cancel-old-shipments')->dailyAt('07:00');
         $schedule->command('ifs:update-stagnant-shipments')->dailyAt('07:05');
-        $schedule->command('ifs:process-shipment-uploads')->everyMinute();
+        $schedule->command('ifs:process-shipment-uploads')->everyMinute()->withoutOverlapping();
         $schedule->command('ifs:check-for-duplicate-shipments')->twiceDaily(12, 16);
         $schedule->command('ifs:update-shopify')->twiceDaily(10, 19);
 
@@ -125,8 +125,8 @@ class Kernel extends ConsoleKernel
         /*
          * Misc
          */
-        $schedule->command('ifs:upload-files')->everyMinute();
-        $schedule->command('ifs:check-job-queue')->everyFiveMinutes()->between('6:00', '22:00');
+        $schedule->command('ifs:upload-files')->everyMinute()->withoutOverlapping();
+        $schedule->command('ifs:check-job-queue')->everyFiveMinutes()->between('6:00', '22:00')->withoutOverlapping();
 
         /*
          * Transport
@@ -142,15 +142,15 @@ class Kernel extends ConsoleKernel
         /*
          * Multifreight
          */
-        $schedule->command('ifs:import-multifreight-files')->weekdays()->everyFiveMinutes();
-        $schedule->command('ifs:process-scs-collection-requests')->weekdays()->everyFiveMinutes();
+        $schedule->command('ifs:import-multifreight-files')->weekdays()->everyFiveMinutes()->withoutOverlapping();
+        $schedule->command('ifs:process-scs-collection-requests')->weekdays()->everyFiveMinutes()->withoutOverlapping();
         $schedule->command('ifs:update-scs-job-numbers-on-shipments --invoiced=1')->weekdays()->hourly()->between('09:00', '16:00');
         $schedule->command('ifs:update-scs-job-numbers-on-shipments --invoiced=0')->weekdays()->dailyAt('21:45');
 
         /*
          * Vendorvillage
          */
-        $schedule->command('ifs:process-vendorvillage-orders')->everyFiveMinutes();
+        $schedule->command('ifs:process-vendorvillage-orders')->everyFiveMinutes()->withoutOverlapping();
     }
 
 }
