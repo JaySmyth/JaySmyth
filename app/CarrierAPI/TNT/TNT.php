@@ -624,8 +624,10 @@ class TNT
             case '1' :
             case '15D' :
             case '15N' :
-            //case '15' :
                 return 'EX';
+                break;
+            case 'AM' :
+                return 'EX12';
                 break;
             case '15F' :
                 return 'XF';
