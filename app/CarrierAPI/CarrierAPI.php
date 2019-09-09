@@ -237,29 +237,6 @@ class CarrierAPI
 
     public function serviceAllowed($shipment, $prices, $serviceDetails)
     {
-        /**
-         * If a monthly limit has been defined on company_service, check that it has not been exceeded
-         */
-        if (isset($serviceDetails['pivot']['monthly_limit']) && $serviceDetails['pivot']['monthly_limit'] > 0) {
-
-            // Count the shipments for the month
-            $count = \App\Shipment::whereCompanyId($this->company->id)->whereBetween('ship_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->whereNotIn('status_id', [1, 7])->count();
-
-            // Limit has been exceeded, remove from array
-            if ($count >= $serviceDetails['pivot']['monthly_limit']) {
-                return false;
-            }
-        }
-
-        /**
-         * If a max weight limit has been defined on company_service, check that it has not been exceeded
-         */
-        if (isset($serviceDetails['pivot']['max_weight_limit']) && $serviceDetails['pivot']['max_weight_limit'] > 0) {
-            if ($shipment['weight'] > $serviceDetails['pivot']['max_weight_limit']) {
-                return false;
-            }
-        }
-
         /*
          * ******************************************
          * Check to see if this service is acceptable
