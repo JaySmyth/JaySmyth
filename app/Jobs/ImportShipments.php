@@ -185,21 +185,6 @@ class ImportShipments implements ShouldQueue
             }
         }
 
-        // Count the number of shipments raised this month for bragan economy
-        if ($this->company->id == 993) {
-            $count = \App\Shipment::whereCompanyId(993)->whereBetween('ship_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->whereNotIn('status_id', [1, 7])->count();
-
-            if ($count >= 50) {
-                $this->setRowFailed($rowNumber, [0 => "Exceeded monthly shipment allowance for " . $this->company->company_name]);
-                return false;
-            }
-
-            if (!empty($this->row['weight']) && is_numeric($this->row['weight']) && $this->row['weight'] > 3) {
-                $this->setRowFailed($rowNumber, [0 => "Exceeded max weight for " . $this->company->company_name]);
-                return false;
-            }
-        }
-
         // Some validation
         $rules = [
             'recipient_name' => 'required_without:recipient_company_name|min:1|max:35',
