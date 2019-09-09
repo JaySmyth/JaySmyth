@@ -79,7 +79,7 @@ class Company extends Model
      */
     public function services()
     {
-        return $this->belongsToMany(Service::class)->withPivot('name', 'preference', 'account', 'scs_account', 'country_filter')->orderBy('preference')->orderBy('name');
+        return $this->belongsToMany(Service::class)->withPivot('name', 'preference', 'account', 'scs_account', 'country_filter', 'monthly_limit', 'max_weight_limit')->orderBy('preference')->orderBy('name');
     }
 
     /**
