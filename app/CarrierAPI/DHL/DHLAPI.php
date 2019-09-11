@@ -14,6 +14,7 @@ use DHL\Datatype\GB\Piece;
 use DHL\Datatype\GB\SpecialService;
 use DHL\Entity\GB\ShipmentRequest;
 use DHL\Entity\GB\ShipmentResponse;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * Description of DHLWebAPI
@@ -26,9 +27,95 @@ class DHLAPI extends CarrierBase
      *  Carrier Specific Variable declarations
      */
 
-    private $account;
     public $mode;
+    private $account;
     private $client;
+
+    public function createShipment($shipment)
+    {
+        $response = [];
+        $shipment = $this->preProcess($shipment);
+
+        $errors = $this->validateShipment($shipment);
+
+        if (empty($errors)) {
+
+            // DHL settings
+            $this->initCarrier($shipment);
+            $dhlShipment = $this->BuildDHLShipment($shipment);
+            $reply = $this->sendMessageToCarrier($dhlShipment, 'create_shipment');
+
+            // Check for errors
+            if (isset($reply['Response']['Status']['Condition']['ConditionCode']) && $reply['Response']['Status']['Condition']['ConditionCode'] > '') {
+
+                // Request unsuccessful - return errors
+                $errorMsg = 'Carrier Error : '
+                    . ((string)$reply['Response']['Status']['Condition']['ConditionCode']) . ' : '
+                    . str_replace(chr(10), ' - ', (string)$reply['Response']['Status']['Condition']['ConditionData']);
+
+                // Replace all references to DHL with IFS
+                $errorMsg = str_replace("DHL", "IFS", $errorMsg);
+
+                return $this->generateErrorResponse($response, $errorMsg);
+            } else {
+
+                // Request successful -  Calc Routing
+                $route_id = $this->calc_routing($shipment);
+
+                //                      Prepare Response
+                $response = $this->createShipmentResponse($reply, $shipment['service_code'], $route_id);
+                return $response;
+            }
+        } else {
+            return $this->generateErrorResponse($response, $errors);
+        }
+    }
+
+    public function preProcess($shipment)
+    {
+        if (!isset($shipment['recipient_company_name']) || $shipment['recipient_company_name'] == '') {
+            $shipment['recipient_company_name'] = $shipment['recipient_name'];
+            $shipment['recipient_name'] = '.';
+        }
+
+        if ($shipment['bill_shipping_account'] == '') {
+            $shipment['bill_shipping_account'] = Service::find($shipment['service_id'])->account;
+        }
+        if ($shipment['bill_tax_duty_account'] == '') {
+            $shipment['bill_tax_duty_account'] = Service::find($shipment['service_id'])->account;
+        }
+        return $shipment;
+    }
+
+    public function validateShipment($shipment)
+    {
+
+        /**
+         * Don't allow residential shipments to russia
+         */
+        $v = Validator::make($shipment, ['recipient_type' => 'required'], ['recipient_type.not_supported' => 'Residential address not supported']);
+
+        $v->sometimes('recipient_type', 'not_supported', function ($input) {
+            return (strtolower($input->recipient_type) == 'r' && strtolower($input->recipient_country_code) == 'ru');
+        });
+
+        if ($v->fails()) {
+            return $this->buildValidationErrors($v->errors());
+        }
+
+        /**
+         * Standard validation resumes
+         */
+        $rules['bill_shipping_account'] = 'required|digits:9';
+        $rules['bill_tax_duty_account'] = 'required|digits:9';
+        $rules['insurance_value'] = 'not_supported';
+        $rules['lithium_batteries'] = 'not_supported';
+
+        // Validate Shipment using the rules
+        $errors = $this->applyRules($rules, $shipment);
+
+        return $errors;
+    }
 
     function initCarrier()
     {
@@ -102,20 +189,6 @@ class DHLAPI extends CarrierBase
         foreach ($packages as $package) {
             $ptype = strtoupper(PackagingType::find($package->packaging_type_id)->code);
             $this->packageTypes[$ptype] = strtoupper($package->code);
-        }
-    }
-
-    public function getRegioncode($shipment)
-    {
-
-        if (strpos($this->ap, $shipment['sender_country_code']) !== false) {
-            return 'AP';
-        } else {
-            if (strpos($this->eu, $shipment['sender_country_code']) !== false) {
-                return 'EU';
-            } elseif (strpos($this->am, $shipment['sender_country_code']) !== false) {
-                return 'AM';
-            }
         }
     }
 
@@ -230,7 +303,7 @@ class DHLAPI extends CarrierBase
             $piece->PieceID = $pkg;
             $piece->PackageType = $this->packageTypes[strtoupper($package['packaging_code'])];
             $piece->Weight = $package['weight'];
-            $piece->DimWeight = (string) round($package['volumetric_weight'], 2);
+            $piece->DimWeight = (string)round($package['volumetric_weight'], 2);
             $piece->Width = $package['width'];
             $piece->Height = $package['height'];
             $piece->Depth = $package['length'];
@@ -265,16 +338,26 @@ class DHLAPI extends CarrierBase
         $dhlShipment->ShipmentDetails->CurrencyCode = $shipment['customs_value_currency_code'];
 
         // Is this a document shipment?
-        $dhlShipment->ShipmentDetails->IsDutiable = 'N';
         if ($dhlShipment->ShipmentDetails->PackageType == "EE") {
+            $dhlShipment->ShipmentDetails->IsDutiable = 'N';
         } else {
-
             $dhlShipment->ShipmentDetails->IsDutiable = 'Y';
             $dhlShipment->Dutiable->TermsOfTrade = strtoupper($shipment['terms_of_sale']);
         }
 
         $dhlShipment->Dutiable->DeclaredValue = number_format($shipment['customs_value'], 2, '.', '');
         $dhlShipment->Dutiable->DeclaredCurrency = $shipment['customs_value_currency_code'];
+        $dhlShipment->Dutiable->ShipperEIN = $shipment['eori'];
+
+        if ($this->pltIsAvailable()) {
+            $specialService = new SpecialService();
+            $specialService->SpecialServiceType = 'WY';
+            $dhlShipment->addSpecialService($specialService);
+
+            $dhlShipment->UseDHLInvoice = 'Y';
+        }
+
+
         /*
          *  Special Service Flags
          */
@@ -321,58 +404,28 @@ class DHLAPI extends CarrierBase
         return $dhlShipment;
     }
 
-    private function extract_errors($errorsFound)
+    public function getRegioncode($shipment)
     {
 
-        // Request failed with Errors
-        if (is_array($errorsFound)) {
-
-            // Multiple Errors
-            foreach ($errorsFound as $error) {
-                $errorString = preg_replace('!\s+!', ' ', $error);
-                $errors[] = str_replace('XML:Error', '', str_replace('DHL ', '', $errorString));
-            }
+        if (strpos($this->ap, $shipment['sender_country_code']) !== false) {
+            return 'AP';
         } else {
-
-            // Single Error
-            $errorString = preg_replace('!\s+!', ' ', $errorsFound);
-            $errors[] = str_replace('XML:Error', '', str_replace('DHL ', '', $errorString));
+            if (strpos($this->eu, $shipment['sender_country_code']) !== false) {
+                return 'EU';
+            } elseif (strpos($this->am, $shipment['sender_country_code']) !== false) {
+                return 'AM';
+            }
         }
-
-
-        return $errors;
     }
 
-    public function preProcess($shipment)
+    /**
+     * Check PLT availability.
+     *
+     * @return bool
+     */
+    private function pltIsAvailable()
     {
-        if (!isset($shipment['recipient_company_name']) || $shipment['recipient_company_name'] == '') {
-            $shipment['recipient_company_name'] = $shipment['recipient_name'];
-            $shipment['recipient_name'] = '.';
-        }
-
-        if ($shipment['bill_shipping_account'] == '') {
-            $shipment['bill_shipping_account'] = Service::find($shipment['service_id'])->account;
-        }
-        if ($shipment['bill_tax_duty_account'] == '') {
-            $shipment['bill_tax_duty_account'] = Service::find($shipment['service_id'])->account;
-        }
-        return $shipment;
-    }
-
-    public function validateShipment($shipment)
-    {
-
-        $errors = [];
-
-        $rules['bill_shipping_account'] = 'required|digits:9';
-        $rules['bill_tax_duty_account'] = 'required|digits:9';
-        $rules['insurance_value'] = 'not_supported';
-        $rules['lithium_batteries'] = 'not_supported';
-
-        // Validate Shipment using the rules
-        $errors = $this->applyRules($rules, $shipment);
-
-        return $errors;
+        return false;
     }
 
     private function sendMessageToCarrier($dhlShipment)
@@ -390,7 +443,7 @@ class DHLAPI extends CarrierBase
 
         // Log Message to be sent
         TransactionLog::create([
-            'carrier' => 'dhl', 'type' => 'MSG', 'direction' => 'O', 'msg' => 'v1 - '.$sentXML, 'mode' => $this->mode
+            'carrier' => 'dhl', 'type' => 'MSG', 'direction' => 'O', 'msg' => 'v1 - ' . $sentXML, 'mode' => $this->mode
         ]);
 
         // Send Message to DHL
@@ -412,56 +465,10 @@ class DHLAPI extends CarrierBase
         return $response;
     }
 
-    public function createShipment($shipment)
-    {
-        $response = [];
-        $shipment = $this->preProcess($shipment);
-
-        $errors = $this->validateShipment($shipment);
-
-        if (empty($errors)) {
-
-            // DHL settings
-            $this->initCarrier($shipment);
-            $dhlShipment = $this->BuildDHLShipment($shipment);
-            $reply = $this->sendMessageToCarrier($dhlShipment, 'create_shipment');
-
-            // Check for errors
-            if (isset($reply['Response']['Status']['Condition']['ConditionCode']) && $reply['Response']['Status']['Condition']['ConditionCode'] > '') {
-
-                // Request unsuccessful - return errors
-                $errorMsg = 'Carrier Error : '
-                    .((string) $reply['Response']['Status']['Condition']['ConditionCode']).' : '
-                    .str_replace(chr(10), ' - ', (string) $reply['Response']['Status']['Condition']['ConditionData']);
-
-                // Replace all references to DHL with IFS
-                $errorMsg = str_replace("DHL", "IFS", $errorMsg);
-
-                return $this->generateErrorResponse($response, $errorMsg);
-            } else {
-
-                // Request successful -  Calc Routing
-                $route_id = $this->calc_routing($shipment);
-
-                //                      Prepare Response
-                $response = $this->createShipmentResponse($reply, $shipment['service_code'], $route_id);
-                return $response;
-            }
-        } else {
-            return $this->generateErrorResponse($response, $errors);
-        }
-    }
-
     private function calc_routing($shipment)
     {
 
         return 1;
-    }
-
-    private function generatePdf($data, $serviceCode = '')
-    {
-        $label = new DHLLabel(null, $serviceCode, $data);
-        return $label->create();
     }
 
     private function createShipmentResponse($reply, $serviceCode, $route_id, $imageType = 'PDF', $labelSize = '6X4')
@@ -484,7 +491,7 @@ class DHLAPI extends CarrierBase
             for ($i = 0; $i < $response['pieces']; ++$i) {
                 $response['packages'][$i]['sequence_number'] = $reply['Pieces']['Piece'][$i]['PieceNumber'];
                 $response['packages'][$i]['carrier_tracking_code'] = $reply['Pieces']['Piece'][$i]['LicensePlate'];
-                $response['packages'][$i]['barcode'] = 'J'.$reply['Pieces']['Piece'][$i]['LicensePlate'];
+                $response['packages'][$i]['barcode'] = 'J' . $reply['Pieces']['Piece'][$i]['LicensePlate'];
                 $awbs[] = $response['packages'][$i]['carrier_tracking_code'];
             }
         } else {
@@ -493,7 +500,7 @@ class DHLAPI extends CarrierBase
             $response['pieces'] = 1;
             $response['packages'][0]['sequence_number'] = 1;
             $response['packages'][0]['carrier_tracking_code'] = $reply['Pieces']['Piece']['LicensePlate'];
-            $response['packages'][0]['barcode'] = 'J'.$reply['Pieces']['Piece']['LicensePlate'];
+            $response['packages'][0]['barcode'] = 'J' . $reply['Pieces']['Piece']['LicensePlate'];
             $awbs[] = $reply['Pieces']['Piece']['LicensePlate'];
         }
 
@@ -504,6 +511,34 @@ class DHLAPI extends CarrierBase
         $response['label_base64'][0]['base64'] = $this->generatePDF($reply, $serviceCode); // Reformat
 
         return $response;
+    }
+
+    private function generatePdf($data, $serviceCode = '')
+    {
+        $label = new DHLLabel(null, $serviceCode, $data);
+        return $label->create();
+    }
+
+    private function extract_errors($errorsFound)
+    {
+
+        // Request failed with Errors
+        if (is_array($errorsFound)) {
+
+            // Multiple Errors
+            foreach ($errorsFound as $error) {
+                $errorString = preg_replace('!\s+!', ' ', $error);
+                $errors[] = str_replace('XML:Error', '', str_replace('DHL ', '', $errorString));
+            }
+        } else {
+
+            // Single Error
+            $errorString = preg_replace('!\s+!', ' ', $errorsFound);
+            $errors[] = str_replace('XML:Error', '', str_replace('DHL ', '', $errorString));
+        }
+
+
+        return $errors;
     }
 
 }
