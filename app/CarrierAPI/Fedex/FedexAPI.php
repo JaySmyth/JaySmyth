@@ -378,7 +378,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
 
                 // Set splitServiceBox if Rughouse Economy UK48
                 $splitServiceBox = false;
-                if ($shipment['service_id'] == '19' && $shipment['company_id'] == '808') {
+                if (($shipment['service_id'] == '19' && $shipment['company_id'] == '808') || ($shipment['service_id'] == '19' && $shipment['company_id'] == '993')) {
                     $splitServiceBox = true;
                 }
 
