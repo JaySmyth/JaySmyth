@@ -237,10 +237,10 @@ class CompaniesController extends Controller
 
         // Check to see if Rate defined for Company
         $rate = CompanyRates::where('company_id', $companyId)->where('service_id', $serviceId)->first();
-        if (!$rate) {
-            $fuel_cap = 99.99;
-            $discount = 0;
-        }
+
+        // Defaults
+        $fuel_cap = 99.99;
+        $discount = 0;
 
         return view('rates.rate', compact('company', 'service', 'rate', 'fuel_cap', 'discount'));
     }
