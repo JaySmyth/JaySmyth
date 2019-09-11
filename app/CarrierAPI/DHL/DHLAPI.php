@@ -347,7 +347,7 @@ class DHLAPI extends CarrierBase
 
         $dhlShipment->Dutiable->DeclaredValue = number_format($shipment['customs_value'], 2, '.', '');
         $dhlShipment->Dutiable->DeclaredCurrency = $shipment['customs_value_currency_code'];
-        $dhlShipment->Dutiable->ShipperEIN = $shipment['eori'];
+        //$dhlShipment->Dutiable->ShipperEIN = $shipment['eori'];
 
         if ($this->pltIsAvailable()) {
             $specialService = new SpecialService();
