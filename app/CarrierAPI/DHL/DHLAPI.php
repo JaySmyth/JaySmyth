@@ -48,10 +48,11 @@ class DHLAPI extends CarrierBase
             // Check for errors
             if (isset($reply['Response']['Status']['Condition']['ConditionCode']) && $reply['Response']['Status']['Condition']['ConditionCode'] > '') {
 
-                // Request unsuccessful - return errors
-                $errorMsg = 'Carrier Error : '
-                    . ((string)$reply['Response']['Status']['Condition']['ConditionCode']) . ' : '
-                    . str_replace(chr(10), ' - ', (string)$reply['Response']['Status']['Condition']['ConditionData']);
+                if ($reply['Response']['Status']['Condition']['ConditionCode'] == 'SV011a') {
+                    $errorMsg = 'Area not covered by carrier. Please contact Courier department.';
+                } else {
+                    $errorMsg = 'Carrier Error : ' . ((string)$reply['Response']['Status']['Condition']['ConditionCode']) . ' : ' . str_replace(chr(10), ' - ', (string)$reply['Response']['Status']['Condition']['ConditionData']);
+                }
 
                 // Replace all references to DHL with IFS
                 $errorMsg = str_replace("DHL", "IFS", $errorMsg);
