@@ -8,13 +8,13 @@
         <tr class="active">
             <th>#</th>
             <th>Consignment</th>
-            <th>SCS Job Number</th>
+            <th>Job Number</th>
             <th>Carrier Number</th>
-            <th>Carrier Service</th>
-            <th>Ship Date</th>
+            <th>Service</th>
+            <th>Date</th>
             <th>Consignor</th>
-            <th>Costs Zone</th>
-            <th>Sales Zone</th>
+            <th>Costs</th>
+            <th>Sales</th>
             <th class="text-right">Weight</th>
             <th class="text-right">Volumetric Weight</th>
             <th class="text-right">Carrier Weight</th>
