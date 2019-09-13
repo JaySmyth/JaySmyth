@@ -228,6 +228,14 @@ Route::get('purchase-invoices/export-invoices', 'PurchaseInvoicesController@expo
 
 Route::resource('purchase-invoices', 'PurchaseInvoicesController');
 
+
+/*
+ *
+ */
+
+Route::view('dim-check', 'dim_check/upload');
+Route::post('dim-check', 'DimCheckController@processUpload');
+
 /*
   |--------------------------------------------------------------------------
   | Manifest Routes
