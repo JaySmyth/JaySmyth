@@ -35,10 +35,22 @@
                     <td class="text-right">{{ $result['carrier_weight'] }}</td>
                     <td class="text-right">{{ $result['volumetric_weight'] }}</td>
                     <td class="text-right">{{ $result['carrier_volumetric_weight'] }}</td>
-                    <td class="text-center">{{ $result['dims_updated'] }}</td>
-                    <td class="text-center">{{ $result['flag'] }}</td>
+                    <td class="text-center">
+                        @if($result['dims_updated'])
+                            Yes
+                        @else
+                            No
+                        @endif
+                    </td>
+                    <td class="text-center">
+                        @if($result['flag'])
+                            <i class="fas fa-check text-danger"></i>
+                        @else
+                            <i class="fas fa-times text-success"></i>
+                        @endif
+                    </td>
                 @else
-                    <td class="text-danger text-center font-weight-bold" colspan="10">{{ $result['carrier_consignment_number'] }} not found!</td>
+                    <td class="text-danger" colspan="10">{{ $result['carrier_consignment_number'] }} not found!</td>
                 @endif
 
             </tr>
