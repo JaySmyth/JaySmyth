@@ -12,8 +12,8 @@
             <th>Ship Date</th>
             <th>Consignor</th>
             <th class="text-right">Weight</th>
-            <th class="text-right">Carrier Weight</th>
             <th class="text-right">Volumetric Weight</th>
+            <th class="text-right">Carrier Weight</th>
             <th class="text-right">Carrier Volumetric Weight</th>
             <th class="text-center">DIMS Updated</th>
             <th class="text-center">Flag</th>
@@ -32,8 +32,8 @@
                     <td>{{ $result['ship_date'] }}</td>
                     <td>{{ $result['sender_company_name'] }}</td>
                     <td class="text-right">{{ $result['weight'] }}</td>
-                    <td class="text-right">{{ $result['carrier_weight'] }}</td>
                     <td class="text-right">{{ $result['volumetric_weight'] }}</td>
+                    <td class="text-right">{{ $result['carrier_weight'] }}</td>
                     <td class="text-right">{{ $result['carrier_volumetric_weight'] }}</td>
                     <td class="text-center">
                         @if($result['dims_updated'])
@@ -44,9 +44,9 @@
                     </td>
                     <td class="text-center">
                         @if($result['flag'])
-                            <i class="fas fa-check text-danger"></i>
+                            <span class="text-danger"><i class="fas fa-exclamation-triangle"></i> FLAGGED</span>
                         @else
-                            <i class="fas fa-times text-success"></i>
+                            <span class="text-success"><i class="fas fa-check"></i> OK</span>
                         @endif
                     </td>
                 @else
