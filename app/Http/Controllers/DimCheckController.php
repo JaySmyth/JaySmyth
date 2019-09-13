@@ -65,12 +65,17 @@ class DimCheckController extends Controller
                             'ship_date' => $shipment->ship_date->format('d-M-y'),
                             'sender_company_name' => $shipment->sender_company_name,
                             'consignment_number' => $shipment->consignment_number,
+                            'scs_job_number' => $shipment->scs_job_number,
                             'carrier_consignment_number' => $data[2],
                             'weight' => $shipment->weight,
                             'carrier_weight' => $dhlActualWeight,
                             'volumetric_weight' => $shipment->volumetric_weight,
                             'carrier_volumetric_weight' => $dhlVolWeight,
+                            'carrier_service' => $data['3'],
                             'dims_updated' => ($shipment->supplied_weight) ? true : false,
+                            'difference' => abs(max($dhlActualWeight, $dhlVolWeight) - max($shipment->weight, $shipment->volumetric_weight)),
+                            'costs_zone' => (isset($shipment->quoted_array['costs_zone'])) ? $shipment->quoted_array['costs_zone'] : '',
+                            'sales_zone' => (isset($shipment->quoted_array['sales_zone'])) ? $shipment->quoted_array['sales_zone'] : '',
                             'flag' => (max($dhlActualWeight, $dhlVolWeight) >= max($shipment->weight, $shipment->volumetric_weight)) ? true : false
                         ];
                     } else {

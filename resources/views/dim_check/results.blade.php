@@ -8,13 +8,18 @@
         <tr class="active">
             <th>#</th>
             <th>Consignment</th>
+            <th>SCS Job Number</th>
             <th>Carrier Number</th>
+            <th>Carrier Service</th>
             <th>Ship Date</th>
             <th>Consignor</th>
+            <th>Costs Zone</th>
+            <th>Sales Zone</th>
             <th class="text-right">Weight</th>
             <th class="text-right">Volumetric Weight</th>
             <th class="text-right">Carrier Weight</th>
             <th class="text-right">Carrier Volumetric Weight</th>
+            <th class="text-right">Difference</th>
             <th class="text-center">DIMS Updated</th>
             <th class="text-center">Flag</th>
         </tr>
@@ -28,13 +33,18 @@
                     <td>
                         <a href="{{ url('/shipments', $result['shipment_id']) }}" class="consignment-number">{{ $result['consignment_number'] }}</a>
                     </td>
+                    <td>{{ $result['scs_job_number'] }}</td>
                     <td>{{ $result['carrier_consignment_number'] }}</td>
+                    <td>{{ $result['carrier_service'] }}</td>
                     <td>{{ $result['ship_date'] }}</td>
                     <td>{{ $result['sender_company_name'] }}</td>
+                    <td>{{ $result['costs_zone'] }}</td>
+                    <td>{{ $result['sales_zone'] }}</td>
                     <td class="text-right">{{ $result['weight'] }}</td>
                     <td class="text-right">{{ $result['volumetric_weight'] }}</td>
                     <td class="text-right">{{ $result['carrier_weight'] }}</td>
                     <td class="text-right">{{ $result['carrier_volumetric_weight'] }}</td>
+                    <td class="text-right">{{ $result['difference'] }}</td>
                     <td class="text-center">
                         @if($result['dims_updated'])
                             Yes
