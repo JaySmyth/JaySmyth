@@ -26,7 +26,7 @@
 
                 @if($result['consignment_number'])
                     <td>
-                        <a href="{{ url('/shipments', $results['shipment_id']) }}" class="consignment-number">{{ $result['consignment_number'] }}</a>
+                        <a href="{{ url('/shipments', $result['shipment_id']) }}" class="consignment-number">{{ $result['consignment_number'] }}</a>
                     </td>
                     <td>{{ $result['carrier_consignment_number'] }}</td>
                     <td>{{ $result['ship_date'] }}</td>
