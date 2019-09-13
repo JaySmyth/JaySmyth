@@ -60,7 +60,7 @@
                         @endif
                     </td>
                 @else
-                    <td class="text-danger" colspan="10">{{ $result['carrier_consignment_number'] }} not found!</td>
+                    <td class="text-danger" colspan="15">{{ $result['carrier_consignment_number'] }} not found!</td>
                 @endif
 
             </tr>
