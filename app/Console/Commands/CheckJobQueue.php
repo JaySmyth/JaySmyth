@@ -53,7 +53,7 @@ class CheckJobQueue extends Command
 
     /**
      * Number of times an alarm has been raised
-     * Starts at zero so first alarm does not 
+     * Starts at zero so first alarm does not
      * send an email
      *
      * @var string
@@ -159,7 +159,8 @@ class CheckJobQueue extends Command
             // Execute bash script to restart job queue
             $resp = exec('/usr/local/bin/restart_job_queue');
             $message .= "Response received:\n\n";
-            if ($resp <> []) {
+
+            if (is_array($resp)) {
                 foreach ($resp as $line) {
                     $message .= $line . "\n";
                 }
