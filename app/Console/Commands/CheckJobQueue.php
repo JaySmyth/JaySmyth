@@ -157,7 +157,7 @@ class CheckJobQueue extends Command
             $message .= "Trying now...\n\n";
 
             // Execute bash script to restart job queue
-            $resp = exec('/usr/local/bin/restart_job_queue');
+            $resp = exec('restart-job-queue');
             $message .= "Response received:\n\n";
 
             if (is_array($resp)) {
