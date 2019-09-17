@@ -61,9 +61,9 @@ class CheckForUnprocessedUploads extends Command
 
                     if (stristr($file, '.csv')) {
 
-                        $time = Carbon::createFromTimestamp(filemtime($file));
+                        $time = Carbon::createFromTimestamp(filemtime($shipmentUpload->directory . '/' . $file));
 
-                        if (Carbon::now()->diffInMinutes($time) >= 10) {
+                        if (Carbon::now()->diffInMinutes($time) >= 30) {
                             $oldFiles[] = $file;
                         }
 
