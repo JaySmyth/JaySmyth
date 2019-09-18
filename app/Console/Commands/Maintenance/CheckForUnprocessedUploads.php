@@ -79,7 +79,7 @@ class CheckForUnprocessedUploads extends Command
 
         if ($filecount > 0) {
 
-            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError($filecount . ' unprocessed shipment upload files', $filecount . ' files detected for processing in ' . $shipmentUpload->directory));
+            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Warning: ' . $filecount . ' unprocessed shipment upload files', $filecount . ' files detected for processing in ' . $shipmentUpload->directory . '. These files are uploaded via SFTP by customer to create shipments. This directory should be empty. This program will attempt to restart the job queue. This process runs every 30 minutes. If you receive no further notificiations the issue has been resolved.'));
 
             exec('restart-job-queue');
         }
