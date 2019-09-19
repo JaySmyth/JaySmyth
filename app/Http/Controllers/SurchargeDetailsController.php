@@ -171,10 +171,7 @@ class SurchargeDetailsController extends Controller
      */
     public function update(SurchargeDetail $surcharge, SurchargeDetailRequest $request)
     {
-
         $this->authorize('index', new Surcharge);
-
-        dd($surcharge);
 
         $surchargeDetails = SurchargeDetail::where('code', $request->code)
             ->where('surcharge_id', $request->surcharge_id)
