@@ -378,17 +378,15 @@
             </div>
         </div>
 
-        @if(Auth::user()->hasRole('ifsa'))
-            <div class="form-group row">
-                <label class="col-sm-4  col-form-label">
-                    Carrier Choice: <abbr title="This information is required.">*</abbr>
-                </label>
+        <div class="form-group row">
+            <label class="col-sm-4  col-form-label">
+                Carrier Choice: <abbr title="This information is required.">*</abbr>
+            </label>
 
-                <div class="col-sm-6">
-                    {!! Form::select('carrier_choice', dropDown('carrierChoice'), old('carrier_choice'), array('id' => 'carrier_choice', 'class' => 'form-control')) !!}
-                </div>
+            <div class="col-sm-6">
+                {!! Form::select('carrier_choice', dropDown('carrierChoice'), old('carrier_choice'), array('id' => 'carrier_choice', 'class' => 'form-control')) !!}
             </div>
-        @endif
+        </div>
 
     </div>
 
