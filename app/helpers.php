@@ -547,7 +547,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             }
             break;
         case 'carrierChoice':
-            $result = ['cost' => 'Cost to IFS', 'sales' => 'Cost to Customer', 'debug' => 'Debug Cost/Sales'];
+            $result = ['cost' => 'Cost to IFS', 'sales' => 'Cost to Customer', 'debug' => 'User selection'];
             break;
         default:
             $result = [];

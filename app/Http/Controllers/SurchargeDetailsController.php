@@ -130,7 +130,7 @@ class SurchargeDetailsController extends Controller
         $surchargeDetails = SurchargeDetail::where('code', $request->code)
             ->where('surcharge_id', $request->surcharge_id)
             ->where('company_id', $request->company_id)
-            ->where('to_date','>=',$request->from_date)
+            ->where('to_date', '>=', $request->from_date)
             ->first();
 
         if ($surchargeDetails) {
@@ -171,20 +171,17 @@ class SurchargeDetailsController extends Controller
      */
     public function update(SurchargeDetail $surcharge, SurchargeDetailRequest $request)
     {
-
         $this->authorize('index', new Surcharge);
-
-        dd($surcharge);
 
         $surchargeDetails = SurchargeDetail::where('code', $request->code)
             ->where('surcharge_id', $request->surcharge_id)
             ->where('company_id', $request->company_id)
-            ->where('to_date','>=',$request->from_date)
+            ->where('to_date', '>=', $request->from_date)
             ->first();
 
         // Close old Record
         if ($surchargeDetails) {
-            $surchargeDetails->to_date = Carbon\Carbon::createFromformat('d-m-Y',$request->to_date)->addDay(-1)->format('Y-m-d');
+            $surchargeDetails->to_date = Carbon::createFromformat('d-m-Y', $request->to_date)->addDay(-1)->format('Y-m-d');
             $surchargeDetails->save();
         }
 
@@ -204,7 +201,7 @@ class SurchargeDetailsController extends Controller
      * @param
      * @return
      */
-    public function destroy(SurchargeDetail $surcharge)
+    public function destroy(SurchargeDetail $surcharge, Request $request)
     {
         $this->authorize('index', new Surcharge);
 

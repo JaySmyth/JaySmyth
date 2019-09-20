@@ -118,7 +118,7 @@ class PurchaseInvoiceCharge extends Model
      */
     function hasDescription($description)
     {
-        if (stristr($this->carrierChargeCode->description, $description)) {
+        if ($this->carrierChargeCode && stristr($this->carrierChargeCode->description, $description)) {
             return true;
         }
         return false;
