@@ -6,7 +6,7 @@
 
 <p>Transport Department,</p>
 
-<p>{{verboseCollectionDelivery($transportJob->type)}} Request {{$transportJob->number}} has been reinstated (cancellation reversed).</p>
+<p>{{verboseCollectionDelivery($transportJob->type)}} Request {{$transportJob->number}} / {{ $transportJob->reference }} has been reinstated (cancellation reversed).</p>
 <p>Full details on this request can be <a href="{{ url('/transport-jobs/' . $transportJob->id) }}">viewed here</a>.</p>
 
 @if($transportJob->type == 'c')
