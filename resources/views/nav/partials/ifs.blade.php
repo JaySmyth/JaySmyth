@@ -51,13 +51,15 @@
     <div class="dropdown-menu">
         @can('view_purchase_invoice')<a class="dropdown-item" href="{{url('/purchase-invoices')}}">Purchase Invoices</a>@endcan
         @can('view_invoice_run')<a class="dropdown-item" href="{{url('/invoice-runs')}}">Sales Invoice Runs</a>@endcan
-        <a class="dropdown-item" href="{{url('/dim-check')}}">DIM Check Upload</a>
         @can('view_invoice_run')<a class="dropdown-item" href="{{url('/rates')}}">Master Rate Sheets</a>@endcan
         @can('view_surcharges')<a class="dropdown-item" href="{{url('/surcharges')}}">Surcharges</a>@endcan
         @can('currency_admin')<a class="dropdown-item" href="{{url('/currencies')}}">Currencies</a>@endcan
         @can('view_carrier_charge_codes')<a class="dropdown-item" href="{{url('/carrier-charge-codes')}}">Carrier Charge Codes</a>@endcan
         @can('view_fuel_surcharge')<a class="dropdown-item" href="{{url('/fuel-surcharges')}}">Fuel Surcharges</a>@endcan
         @can('create_fuel_surcharge')<a class="dropdown-item" href="{{url('/fuel-surcharges/upload')}}">Fuel Surcharges Upload</a>@endcan
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item" href="{{url('/shipments/update-dims')}}">Update DIMs</a>
+        <a class="dropdown-item" href="{{url('/dim-check')}}">DIM Check Upload</a>
     </div>
 </li>
 
