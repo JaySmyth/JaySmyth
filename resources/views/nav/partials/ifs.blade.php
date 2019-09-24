@@ -49,14 +49,15 @@
 <li class="nav-item dropdown ml-sm-2">
     <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Accounts</a>
     <div class="dropdown-menu">
-        @can('view_purchase_invoice')<a class="dropdown-item" href="{{url('/purchase-invoices')}}">Purchase Invoices</a>@endcan             
+        @can('view_purchase_invoice')<a class="dropdown-item" href="{{url('/purchase-invoices')}}">Purchase Invoices</a>@endcan
         @can('view_invoice_run')<a class="dropdown-item" href="{{url('/invoice-runs')}}">Sales Invoice Runs</a>@endcan
+        <a class="dropdown-item" href="{{url('/dim-check')}}">DIM Check Upload</a>n
         @can('view_invoice_run')<a class="dropdown-item" href="{{url('/rates')}}">Master Rate Sheets</a>@endcan
         @can('view_surcharges')<a class="dropdown-item" href="{{url('/surcharges')}}">Surcharges</a>@endcan
         @can('currency_admin')<a class="dropdown-item" href="{{url('/currencies')}}">Currencies</a>@endcan
-        @can('view_carrier_charge_codes')<a class="dropdown-item" href="{{url('/carrier-charge-codes')}}">Carrier Charge Codes</a>@endcan   
+        @can('view_carrier_charge_codes')<a class="dropdown-item" href="{{url('/carrier-charge-codes')}}">Carrier Charge Codes</a>@endcan
         @can('view_fuel_surcharge')<a class="dropdown-item" href="{{url('/fuel-surcharges')}}">Fuel Surcharges</a>@endcan
-        @can('create_fuel_surcharge')<a class="dropdown-item" href="{{url('/fuel-surcharges/upload')}}">Fuel Surcharges Upload</a>@endcan   
+        @can('create_fuel_surcharge')<a class="dropdown-item" href="{{url('/fuel-surcharges/upload')}}">Fuel Surcharges Upload</a>@endcan
     </div>
 </li>
 
@@ -72,7 +73,7 @@
         @can('view_unmanifested_jobs')<a class="dropdown-item" href="{{url('/transport-jobs/unmanifested')}}">Unmanifested Jobs</a>@endcan
         @can('close_transport_job')<a class="dropdown-item" href="{{url('/transport-jobs/close')}}">POD/Close Jobs</a>@endcan
         <div class="dropdown-divider"></div>
-        @can('create_postcode')<a class="dropdown-item" href="{{url('/postcodes')}}">Postcodes</a>@endcan        
+        @can('create_postcode')<a class="dropdown-item" href="{{url('/postcodes')}}">Postcodes</a>@endcan
         @can('update_dims')<a class="dropdown-item" href="{{url('/shipments/update-dims')}}">Update Dims</a>@endcan
         @can('create_transport_job')<a class="dropdown-item" href="{{url('/transport-jobs/create')}}">Collection Request</a>@endcan
     </div>
