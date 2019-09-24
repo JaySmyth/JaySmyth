@@ -51,7 +51,7 @@
     <div class="dropdown-menu">
         @can('view_purchase_invoice')<a class="dropdown-item" href="{{url('/purchase-invoices')}}">Purchase Invoices</a>@endcan
         @can('view_invoice_run')<a class="dropdown-item" href="{{url('/invoice-runs')}}">Sales Invoice Runs</a>@endcan
-        <a class="dropdown-item" href="{{url('/dim-check')}}">DIM Check Upload</a>n
+        <a class="dropdown-item" href="{{url('/dim-check')}}">DIM Check Upload</a>
         @can('view_invoice_run')<a class="dropdown-item" href="{{url('/rates')}}">Master Rate Sheets</a>@endcan
         @can('view_surcharges')<a class="dropdown-item" href="{{url('/surcharges')}}">Surcharges</a>@endcan
         @can('currency_admin')<a class="dropdown-item" href="{{url('/currencies')}}">Currencies</a>@endcan
