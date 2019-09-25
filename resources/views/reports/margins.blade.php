@@ -57,14 +57,14 @@
                 <tr class="success">
                     <th>Consignment</th>
                     <th>Service</th>
-                    <th>Shipper</th>                    
+                    <th>Shipper</th>
                     <th>Account</th>
                     <th class="text-right">Pieces</th>
                     <th class="text-right">Weight</th>
                     <th class="text-center">Cost Zone</th>
-                    <th class="text-center">Sales Zone</th>                                        
+                    <th class="text-center">Sales Zone</th>
                     <th class="text-right">Cost</th>
-                    <th class="text-right">Sales</th>                    
+                    <th class="text-right">Sales</th>
                     <th class="text-right">Profit/Loss</th>
                     <th class="text-right">Margin</th>
                 </tr>
@@ -80,32 +80,32 @@
 
                     <td><a href="{{ url('/shipments', $shipment->id) }}" class="consignment-number">{{$shipment->carrier_consignment_number}}</a></td>
                     <td class="text-truncate">{{$shipment->service->carrier_name}}</td>
-                    <td class="text-truncate"><a href="{{ url('/companies', $shipment->company->id) }}">{{$shipment->company->company_name}}</a></td>                                    
+                    <td class="text-truncate"><a href="{{ url('/companies', $shipment->company->id) }}">{{$shipment->company->company_name}}</a></td>
                     <td class="text-uppercase">
                         @if($shipment->bill_shipping_account)
                         {{$shipment->bill_shipping_account}}
                         @else
                         <span class="text-muted">null</span>
-                        @endif                        
+                        @endif
                     </td>
                     <td class="align-middle text-right">{{$shipment->pieces}}</td>
                     <td class="text-right">{{$shipment->chargeable_weight}} {{$shipment->weight_uom}}</td>
-                    <td class="text-center text-uppercase">                           
+                    <td class="text-center text-uppercase">
                         @if(is_array($shipment->quoted_array) && isset($shipment->quoted_array['costs_zone']))
 
                         @if(isset($shipment->quoted_array['costs_model']))
                         {{$shipment->quoted_array['costs_model']}}
                         @endif
 
-                        {{$shipment->quoted_array['costs_zone']}} 
-               
+                        {{$shipment->quoted_array['costs_zone']}}
+
                         @else
                         <span class="text-muted">null</span>
-                        @endif                 
-                                                
+                        @endif
+
                     </td>
 
-                    <td class="text-center text-uppercase">                           
+                    <td class="text-center text-uppercase">
                         @if(is_array($shipment->quoted_array) && isset($shipment->quoted_array['sales_zone']))
                         @if(isset($shipment->quoted_array['sales_model']))
                         {{$shipment->quoted_array['sales_model']}}
@@ -114,15 +114,22 @@
                         {{$shipment->quoted_array['sales_zone']}}
                         @else
                         <span class="text-muted">null</span>
-                        @endif                 
+                        @endif
                     </td>
 
                     <td class="text-right" title="Cost">{{number_format($shipment->shipping_cost, 2)}}</td>
-                    <td class="text-right" title="Sales">{{number_format($shipment->shipping_charge, 2)}}</td>                                
-                    <td class="text-right" title="Profit/Loss"><span class="{{$shipment->margin_styling_class}}">{{$shipment->profit_formatted}}</span></td>  
+                    <td class="text-right" title="Sales">{{number_format($shipment->shipping_charge, 2)}}</td>
+                    <td class="text-right" title="Profit/Loss"><span class="{{$shipment->margin_styling_class}}">{{$shipment->profit_formatted}}</span></td>
                     <td class="text-right" title="Margin"><span class="{{$shipment->margin_styling_class}}">{{$shipment->margin}}</span></td>
                 </tr>
                 @endforeach
+                    <tr class="font-weight-bold">
+                        <td colspan="8" class="text-muted">Totals for {{ $shipments->total() }} shipments (includes shipments on subsequent pages)</td>
+                        <td class="text-right">{{ number_format($shipments->sum('shipping_cost'), 2) }}</td>
+                        <td class="text-right">{{ number_format($shipments->sum('shipping_charge'), 2) }}</td>
+                        <td class="text-right">{{ number_format($shipments->sum('profit'), 2) }}</td>
+                        <td class="text-right">{{ number_format(($shipments->sum('shipping_charge') - $shipments->sum('shipping_cost')) / $shipments->sum('shipping_charge') * 100, 2) }}%</td>
+                    </tr>
             </tbody>
         </table>
 
