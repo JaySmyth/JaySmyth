@@ -5,7 +5,7 @@
 <div class="clearfix">
     <h2 class="float-left"><span class="fas fa-fw fa-user mr-sm-3" aria-hidden="true"></span> {{$user->name}}</h2>
     <h2 class="float-right">
-        @if(!$user->enabled)                
+        @if(!$user->enabled)
         <span class="badge badge-disabled float-right">Disabled</span>
         @elseif(!$user->isConfigured())
         <span class="badge badge-warning float-right">Not Configured</span>
@@ -36,6 +36,12 @@
                     <div class="col-sm-4 text-truncate"><span class="fas fa-print fa-fw mr-sm-2" aria-hidden="true"></span> <strong>Label Size</strong></div>
                     <div class="col-sm-7">{{$user->printFormat->name ?? 'A4'}}</div>
                 </div>
+                @if(Auth::user()->hasRole('ifsa'))
+                <div class="row mb-2">
+                    <div class="col-sm-4 text-truncate"><span class="fas fa-fw fa-key mr-sm-2" aria-hidden="true"></span> <strong>API Token</strong></div>
+                    <div class="col-sm-7">{{$user->api_token}}</div>
+                </div>
+                @endif
                 <div class="row mb-2">
                     <div class="col-sm-4 text-truncate"><span class="fas fa-fw fa-copy mr-sm-2" aria-hidden="true"></span> <strong>Extra Label Copies</strong></div>
                     <div class="col-sm-7">{{$user->label_copies}}</div>
@@ -55,7 +61,7 @@
                     </div>
                 </div>
             </div>
-        </div>        
+        </div>
     </div>
 
     <div class="col-sm-5">
@@ -75,7 +81,7 @@
 
                         @can('update_user')
                         <a class="dropdown-item" href="{{ url('/users/' . $user->id . '/edit') }}" title="Edit User"><span class="fas fa-edit mr-sm-2" aria-hidden="true"></span> Edit User</a>
-                        @endcan     
+                        @endcan
 
                         @can('add_company')
                         <a class="dropdown-item" href="{{ url('/users/' . $user->id . '/add-company') }}" title="Add Company"><span class="fas fa-plus-circle mr-sm-2" aria-hidden="true"></span> Add Company</a>
@@ -91,7 +97,7 @@
             </div>
             <div class="card-body text-large">
                 <ul>
-                    @foreach ($user->roles as $role)               
+                    @foreach ($user->roles as $role)
                     <span class="badge badge-primary mr-sm-5">{{$role->label}}</span>
                     @endforeach
                 </ul>
@@ -100,7 +106,7 @@
 
         <div class="card">
             <div class="card-header">User Agent</div>
-            <div class="card-body text-large">
+            <div class="card-body text-large" style="padding:1.8rem;">
                 <div class="row mb-2">
                     <div class="col-sm-4 text-truncate"><span class="fas fa-fw fa-edge mr-sm-2" aria-hidden="true"></span> <strong>Browser</strong></div>
                     <div class="col-sm-7">{{$user->browser}}</div>
@@ -126,27 +132,27 @@
     <thead>
         <tr>
             <th>#</th>
-            <th>Company</th> 
-            <th>Address</th>                                                               
+            <th>Company</th>
+            <th>Address</th>
             <th>Telephone</th>
             <th class="text-center">Depot</th>
-            <th class="text-center">Users</th>                                                
+            <th class="text-center">Users</th>
             <th class="text-center">Mode</th>
-            <th class="text-center">Status</th> 
+            <th class="text-center">Status</th>
             @can('remove_company')<th></th>@endcan
         </tr>
     </thead>
-    <tbody>            
+    <tbody>
         @foreach ($user->companies as $key => $company)
-        <tr>        
+        <tr>
             <td>{{$key + 1}}</td>
-            <td>@can('view_company')<a href="{{ url('/companies', $company->id) }}">@endcan{{$company->company_name}}@can('show_company')</a>@endcan</td>      
-            <td>{{$company->address1}}, {{$company->city}}, {{$company->state}}, {{$company->postcode}}</td>                               
+            <td>@can('view_company')<a href="{{ url('/companies', $company->id) }}">@endcan{{$company->company_name}}@can('show_company')</a>@endcan</td>
+            <td>{{$company->address1}}, {{$company->city}}, {{$company->state}}, {{$company->postcode}}</td>
             <td>{{$company->telephone}}</td>
             <td class="text-center"><span class="badge badge-secondary" data-placement="bottom" data-toggle="tooltip" data-original-title="{{$company->depot->name}}">{{$company->depot->code}}</span></td>
-            <td class="text-center">{{$company->users->count()}}</td>                
+            <td class="text-center">{{$company->users->count()}}</td>
             <td class="text-center">@if($company->testing)<span class="text-danger">Testing</span>@else<span class="text-success">Live</span>@endif</td>
-            <td class="text-center">@if($company->enabled)<span class="text-success">Enabled</span>@else<span class="text-danger">Disabled</span>@endif</td>                
+            <td class="text-center">@if($company->enabled)<span class="text-success">Enabled</span>@else<span class="text-danger">Disabled</span>@endif</td>
             @can('remove_company')<td class="text-center"><a href="{{ url('/users/' . $user->id . '/remove-company/' . $company->id) }}" title="Remove Company" class="delete-company"><span class="fas fa-fw fa-times" aria-hidden="true"></span></a></td>@endcan
         </tr>
         @endforeach
