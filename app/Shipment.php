@@ -91,6 +91,7 @@ class Shipment extends Model
         'invoice_type',
         'ultimate_destination_country_code',
         'eori',
+        //'consignee_ein',
         'commercial_invoice_comments',
         'bill_shipping',
         'bill_tax_duty',

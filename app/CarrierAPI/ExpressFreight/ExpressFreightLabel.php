@@ -70,7 +70,7 @@ class ExpressFreightLabel extends \App\CarrierAPI\CarrierLabel
             // Package Number
             $x = 6;
             $this->pdf->SetFont($this->font, 'B', 8);
-            $this->pdf->Text($x, 34, 'XE 086 4023 4 IE'); // 'XE 086 4023 4 IE'
+            $this->pdf->Text($x, 34, 'XE ' . $this->data['packages'][$pkg]['barcode'] . ' IE'); // 'XE 086 4023 4 IE'
 
             $y = 39;
             $this->pdf->Text(6, $y, 'Attempted');
@@ -78,7 +78,7 @@ class ExpressFreightLabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->Text(80, $y, 'Sig Req');
 
             // Barcode
-            $this->pdf->write1DBarcode($this->data['packages'][$pkg]['barcode'], 'C128', 13, 43, '', 34, 0.6, $this->getBarcodeStyle(false), 'N');
+            $this->pdf->write1DBarcode($this->data['packages'][$pkg]['barcode'], 'C128', 19, 43, '', 34, 0.6, $this->getBarcodeStyle(false), 'N');
 
             $y = 78;
             $this->pdf->Text(6, $y, 'Delivery');

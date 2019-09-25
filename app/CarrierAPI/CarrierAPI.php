@@ -28,6 +28,7 @@ use App\CarrierAPI\Fedex\FedexAPI;
 use App\CarrierAPI\DHL\DHLAPI;
 use App\CarrierAPI\UPS\UPSAPI;
 use App\CarrierAPI\TNT\TNTAPI;
+use App\CarrierAPI\ExpressFreight\ExpressFreightAPI;
 use App\CarrierAPI\PrimaryFreight\PrimaryFreightAPI;
 use App\CarrierAPI\IFS\IFSAPI;
 use App\CarrierAPI\CWide\CWideAPI;
@@ -85,6 +86,10 @@ class CarrierAPI
 
             case 'tnt':
                 $this->carrier = new TNTAPI($this->mode);
+                break;
+
+            case 'exp':
+                $this->carrier = new ExpressFreightAPI($this->mode);
                 break;
 
             case 'pri':
