@@ -109,19 +109,21 @@ class ExpressFreightAPI extends \App\CarrierAPI\CarrierBase
     public function addAdditionalInfo($shipment)
     {
         $data['consignment_number'] = nextAvailable('CONSIGNMENT');                     // Generate an IFS Consignment Number
-        $data['carrier_consignment_number'] = $data['consignment_number'];              // Use it for the Carrier number
         $data['pieces'] = $shipment['pieces'];
 
         for ($i = 0; $i < $data['pieces']; $i++) {
 
-            $trackingNumber = $data['consignment_number'] . sprintf('%04d', $i + 1);    // concatenate consignment no with package no
-            $trackingNumber .= mod10CheckDigit($trackingNumber);                        // Then add check digit
+            $trackingNumber = nextAvailable('EXPCONSIGNMENT'); // express freight sequence (required at piece level)
 
-            if ($i == 0) {
-                $data['carrier_tracking_number'] = $trackingNumber;                     // If 1st Package set master tracking no
-            }
+            //$trackingNumber .= mod10CheckDigit($trackingNumber);                        // Then add check digit
+
             $data['packages'][$i]['carrier_tracking_number'] = $trackingNumber;         // Store tracking no for package
             $data['packages'][$i]['barcode'] = $trackingNumber;                         // Store tracking no for package
+
+            if ($i == 0) {
+                $data['carrier_consignment_number'] = $trackingNumber;              // Use it for the Carrier number
+                $data['carrier_tracking_number'] = $trackingNumber;                     // If 1st Package set master tracking no
+            }
         }
 
         return $data;
