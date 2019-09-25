@@ -33,7 +33,7 @@ class DimCheckController extends Controller
         }
 
         // Validate the request
-        $this->validate($request, ['file' => 'required|mimes:csv,txt'], ['file.mimes' => 'Not a valid CSV file - please check for unsupported characters', 'file.required' => 'Please select a file to upload.']);
+        $this->validate($request, ['file' => 'required'], ['file.mimes' => 'Not a valid CSV file - please check for unsupported characters', 'file.required' => 'Please select a file to upload.']);
 
         // Upload the file to the temp directory
         $path = $request->file('file')->storeAs('temp', 'dimcheck' . time() . '.csv');
