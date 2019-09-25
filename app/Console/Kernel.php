@@ -49,7 +49,7 @@ class Kernel extends ConsoleKernel
         Commands\ManifestUnmanifestedShipments::class,
         Commands\ImportMultifreightFiles::class,
         Commands\UpdateScsJobNumbersOnShipments::class,
-        Commands\UploadShipmentsToPrimaryFreight::class,
+        Commands\UploadShipmentsToExpressFreight::class,
         Commands\CheckForDuplicateShipments::class,
         Commands\ProcessScsCollectionRequests::class,
         Commands\SendTrackingNumbers::class,
