@@ -124,7 +124,7 @@
                 </tr>
                 @endforeach
                     <tr class="font-weight-bold">
-                        <td colspan="8" class="text-muted">Totals for {{ $shipments->total() }} shipments (includes shipments on subsequent pages)</td>
+                        <td colspan="8" class="text-muted text-right">Totals for this page:</td>
                         <td class="text-right">{{ number_format($shipments->sum('shipping_cost'), 2) }}</td>
                         <td class="text-right">{{ number_format($shipments->sum('shipping_charge'), 2) }}</td>
                         <td class="text-right">{{ number_format($shipments->sum('profit'), 2) }}</td>
