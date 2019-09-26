@@ -113,9 +113,12 @@ class ExpressFreightAPI extends \App\CarrierAPI\CarrierBase
 
         for ($i = 0; $i < $data['pieces']; $i++) {
 
-            $trackingNumber = nextAvailable('EXPCONSIGNMENT'); // express freight sequence (required at piece level)
-
-            //$trackingNumber .= mod10CheckDigit($trackingNumber);                        // Then add check digit
+            // Build the tracking number
+            $trackingNumber = nextAvailable('EXPCONSIGNMENT');  // express freight sequence (required at piece level)
+            $trackingNumber .= mod11CheckDigit((string)$trackingNumber);                        // Then add check digit
+            $trackingNumber = str_pad($trackingNumber, 8, 0, STR_PAD_LEFT);
+            $trackingNumber .= strtoupper($shipment['recipient_country_code']);
+            $trackingNumber = 'XE' . $trackingNumber;
 
             $data['packages'][$i]['carrier_tracking_number'] = $trackingNumber;         // Store tracking no for package
             $data['packages'][$i]['barcode'] = $trackingNumber;                         // Store tracking no for package
