@@ -107,7 +107,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:update-stagnant-shipments')->dailyAt('07:05');
         $schedule->command('ifs:process-shipment-uploads')->everyMinute()->withoutOverlapping();
         $schedule->command('ifs:check-for-duplicate-shipments')->twiceDaily(12, 16);
-        $schedule->command('ifs:update-shopify')->twiceDaily(10, 19);
+        //$schedule->command('ifs:update-shopify')->twiceDaily(10, 19);
 
         /*
          * Primary Logistics
