@@ -31,12 +31,11 @@ class UploadShipmentsToExpressFreight extends Command
     protected $shipments;
 
     /**
-     * File path.
+     * Filename.
      *
-     * @var string
+     * @var
      */
     protected $fileName;
-
     /**
      * File path.
      *
@@ -58,8 +57,9 @@ class UploadShipmentsToExpressFreight extends Command
     {
         parent::__construct();
 
-        $this->fileName = 'ef' . time() . '.csv';
-        $this->filePath = '/home/expressfreight/unprocessed/' . $this->fileName;
+        $this->fileName = 'express_freight_' . time() . '.csv';
+        $this->filePath = storage_path('app/temp/' . $this->fileName);
+
     }
 
     /**
@@ -79,7 +79,7 @@ class UploadShipmentsToExpressFreight extends Command
 
         // Send notification
         if (count($this->validShipments) > 0) {
-            Mail::to('ASteenson@expressfreight.co.uk')->cc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight File Upload (' . count($this->validShipments) . ' shipments)', 'Please see attached file', $this->filePath));
+            Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight File Upload (' . count($this->validShipments) . ' shipments)', 'Please see attached file', $this->filePath));
         }
     }
 
@@ -90,29 +90,36 @@ class UploadShipmentsToExpressFreight extends Command
      */
     private function createFile()
     {
-        if (file_exists($this->filePath)) {
-            return true;
-        }
+        $handle = fopen($this->filePath, "w");
+
+        // Add heading row
+        fputcsv($handle, ['Consignment', 'IFS Reference', 'Piece', 'Weight', 'Ship Date', 'Name', 'Company', 'Address 1', 'Address 2', 'City', 'County', 'Postcode', 'Country Code']);
 
         foreach ($this->shipments as $shipment) :
 
             if ($this->isValid($shipment)) {
 
-                $line = [
-                    $shipment->consignment_number,
-                    $shipment->carrier_consignment_number,
-                    strtoupper($shipment->shipment_reference),
-                    $shipment->pieces,
-                    $shipment->ship_date->format('d-m-Y'),
-                    $shipment->recipient_name,
-                    $shipment->recipient_company_name,
-                    $shipment->recipient_address1,
-                    $shipment->recipient_address2,
-                    $shipment->recipient_city,
-                    $shipment->recipient_state,
-                    $shipment->recipient_postcode,
-                    $shipment->recipient_country_code
-                ];
+                foreach ($shipment->packages as $package):
+
+                    $line = [
+                        $package->carrier_tracking_number,
+                        $shipment->consignment_number,
+                        'Pkg ' . $package->index . ' of ' . $shipment->pieces,
+                        $package->weight,
+                        $shipment->ship_date->format('d/m/Y'),
+                        $shipment->recipient_name,
+                        $shipment->recipient_company_name,
+                        $shipment->recipient_address1,
+                        $shipment->recipient_address2,
+                        $shipment->recipient_city,
+                        $shipment->recipient_state,
+                        $shipment->recipient_postcode,
+                        $shipment->recipient_country_code
+                    ];
+
+                    fputcsv($handle, $line);
+
+                endforeach;
 
                 // Add to array of valid shipments
                 $this->validShipments[] = $shipment->id;
@@ -120,7 +127,7 @@ class UploadShipmentsToExpressFreight extends Command
 
         endforeach;
 
-        // fputcsv
+        fclose($handle);
     }
 
     /**
