@@ -15,18 +15,18 @@ class CompanyRates extends Model
     public $tableFormat;
 
     /**
-     * Retrieve Rate Table.
-     *
-     * Note: Rates are service agnostic but discounts are not
-     *      (although using an international table for domestic
-     *      shipments will not work due to zone incompatibilities)
-     *
-     * @param type $companyId
-     * @param type Rate
-     * @param type $shipDate
-     * @param type Service
-     *
-     */
+    * Retrieve Rate Table.
+    *
+    * Note: Rates are service agnostic but discounts are not
+    *      (although using an international table for domestic
+    *      shipments will not work due to zone incompatibilities)
+    *
+    * @param type $companyId
+    * @param type Rate
+    * @param type $shipDate
+    * @param type Service
+    *
+    */
     public function getRateTable($companyId, $rate, $service = '', $shipDate = '')
     {
         if ($service == '') {
@@ -55,36 +55,36 @@ class CompanyRates extends Model
     }
 
     /**
-     * Format table appropriately for output
-     *
-     * @param type $rate
-     * @param type $discount
-     * @param type $rateTable
-     * @return type
-     */
+    * Format table appropriately for output
+    *
+    * @param type $rate
+    * @param type $discount
+    * @param type $rateTable
+    * @return type
+    */
     public function formatRateTable($rate, $discount, $rateTable)
     {
         switch ($rate->model) {
             case 'domestic':
-                $table = $this->formatDomesticTable($rateTable, $discount);
-                break;
+            $table = $this->formatDomesticTable($rateTable, $discount);
+            break;
 
             default:
-                $table = $this->formatIntlTable($rateTable, $discount);
-                break;
+            $table = $this->formatIntlTable($rateTable, $discount);
+            break;
         }
 
         return $table;
     }
 
     /**
-     * Format Domestic table applying any discounts
-     * from the company_rates table
-     *
-     * @param type $rateTable
-     * @param type $discount
-     * @return type
-     */
+    * Format Domestic table applying any discounts
+    * from the company_rates table
+    *
+    * @param type $rateTable
+    * @param type $discount
+    * @return type
+    */
     public function formatDomesticTable($rateTable, $discount = 0)
     {
         $table = [];
@@ -108,13 +108,13 @@ class CompanyRates extends Model
     }
 
     /**
-     * Format Intl table applying any discounts
-     * from the company_rates table
-     *
-     * @param type $rateTable
-     * @param type $discount
-     * @return type
-     */
+    * Format Intl table applying any discounts
+    * from the company_rates table
+    *
+    * @param type $rateTable
+    * @param type $discount
+    * @return type
+    */
     public function formatIntlTable($rateTable, $discount)
     {
         $rate = [];
@@ -174,16 +174,16 @@ class CompanyRates extends Model
     }
 
     /**
-     * Calc the max and min discount %'s applied to the
-     * to a custom rate
-     *
-     * @param type $companyId
-     * @param type $rateId
-     * @param type $serviceCode
-     * @param type $effectiveDate
-     * @param type $queryType
-     * @return type
-     */
+    * Calc the max and min discount %'s applied to the
+    * to a custom rate
+    *
+    * @param type $companyId
+    * @param type $rateId
+    * @param type $serviceCode
+    * @param type $effectiveDate
+    * @param type $queryType
+    * @return type
+    */
     public function getMinMaxDiscount($companyId, $rateId, $serviceId = '', $effectiveDate = '', $queryType)
     {
         $serviceCode = $this->getServiceCode($serviceId);
@@ -200,39 +200,39 @@ class CompanyRates extends Model
         switch ($rateType) {
             case 'domestic':
                 $value = DB::table('domestic_rate_discounts')
-                        ->where('company_id', $companyId)
-                        ->where('rate_id', $rateId)
-                        ->where('service', $serviceCode)
-                        ->where('from_date', '<=', $effectiveDate)
-                        ->where('to_date', '>=', $effectiveDate);
-                break;
+                ->where('company_id', $companyId)
+                ->where('rate_id', $rateId)
+                ->where('service', $serviceCode)
+                ->where('from_date', '<=', $effectiveDate)
+                ->where('to_date', '>=', $effectiveDate);
+            break;
 
             default:
                 $value = DB::table('rate_discounts')
-                        ->where('company_id', $companyId)
-                        ->where('rate_id', $rateId)
-                        ->where('from_date', '<=', $effectiveDate)
-                        ->where('to_date', '>=', $effectiveDate);
-                break;
+                ->where('company_id', $companyId)
+                ->where('rate_id', $rateId)
+                ->where('from_date', '<=', $effectiveDate)
+                ->where('to_date', '>=', $effectiveDate);
+            break;
         }
 
         // Complete and execute query
         switch (strtolower($queryType)) {
             case 'min':
-                if ($rateType == 'domestic') {
-                    return ($value->min('first_discount')) ?: 0;
-                } else {
-                    return ($value->min('consignment_discount')) ?: 0;
-                }
-                break;
+            if ($rateType == 'domestic') {
+                return ($value->min('first_discount')) ?: 0;
+            } else {
+                return ($value->min('consignment_discount')) ?: 0;
+            }
+            break;
 
             default:
-                if ($rateType == 'domestic') {
-                    return ($value->max('first_discount')) ?: 0;
-                } else {
-                    return ($value->max('consignment_discount')) ?: 0;
-                }
-                break;
+            if ($rateType == 'domestic') {
+                return ($value->max('first_discount')) ?: 0;
+            } else {
+                return ($value->max('consignment_discount')) ?: 0;
+            }
+            break;
         }
     }
 
@@ -245,61 +245,61 @@ class CompanyRates extends Model
 
                 case 'domestic':
                     $this->rateDetail = new DomesticRate();
-                    break;
+                break;
 
                 default:
                     $this->rateDetail = new RateDetail();
-                    break;
+                break;
             }
         }
     }
 
     /**
-     * Checks Domestic & Non domestic and deletes matching rates
-     *
-     * @param type $companyId
-     * @param type $rateId
-     * @param type $effectiveDate
-     */
+    * Checks Domestic & Non domestic and deletes matching rates
+    *
+    * @param type $companyId
+    * @param type $rateId
+    * @param type $effectiveDate
+    */
     public function clearExistingRate($companyId, $rateId, $serviceId, $effectiveDate = '')
     {
 
         // Get empty DomesticRate object
-        $this->rateDetail = new DomesticRate();
-
-        // Delete existing Domestic Rates
         if ($this->rateDetail) {
+            $this->rateDetail = new DomesticRate();
+
+            // Delete existing Domestic Rates
             $this->rateDetail->clearExistingRate($companyId, $rateId, $serviceId, $effectiveDate);
-        }
 
-        // Get empty Non DomesticRate object
-        $this->rateDetail = new RateDetail();
+            // Get empty Non DomesticRate object
+            $this->rateDetail = new RateDetail();
 
-        // Delete existing Non Domestic Rates
-        if ($this->rateDetail) {
-            $this->rateDetail->clearExistingRate($companyId, $rateId, '', $effectiveDate);
+            // Delete existing Non Domestic Rates
+            if ($this->rateDetail) {
+                $this->rateDetail->clearExistingRate($companyId, $rateId, '', $effectiveDate);
+            }
         }
     }
 
-    public function setDiscount($companyId, $rateId, $serviceId, $discount, $effectiveDate = '')
+    public function setDiscount($discount = 0, $effectiveDate = '')
     {
 
         // Get correct empty RateDetail object
-        $this->getRateDetailObject($rateId);
+        $this->getRateDetailObject($this->rate_id);
 
         // Add Discounts
         if ($this->rateDetail) {
-            $this->rateDetail->setRateDiscounts($companyId, $rateId, $serviceId, $discount, $effectiveDate);
+            $this->rateDetail->setRateDiscounts($this->company_id, $this->rate_id, $this->service_id, $discount, $effectiveDate);
         }
     }
 
     /**
-     * Checks Domestic & Non domestic and deletes matching discounts
-     *
-     * @param type $companyId
-     * @param type $rateId
-     * @param type $effectiveDate
-     */
+    * Checks Domestic & Non domestic and deletes matching discounts
+    *
+    * @param type $companyId
+    * @param type $rateId
+    * @param type $effectiveDate
+    */
     public function deleteDiscount($companyId, $rateId = '', $serviceId = '', $effectiveDate = '')
     {
 

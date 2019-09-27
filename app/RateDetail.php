@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Mail;
 
 class RateDetail extends Model
 {
-
     protected $fillable = [
         'rate_id',
         'residential',
@@ -53,50 +52,49 @@ class RateDetail extends Model
     }
 
     /**
-     * Given shipment details, retrieve one or more lines
-     * from the rate tariff (whilst applying any appropriate
-     * company specific discounts) depending on whether asked
-     * for a rate or a table
-     * 
-     * @param type $companyId
-     * @param type $rateId
-     * @param type $residential
-     * @param type $packagingType
-     * @param type $pieces
-     * @param type $weight
-     * @param type $zone
-     * @param type $shipDate
-     * @return type
-     */
+    * Given shipment details, retrieve one or more lines
+    * from the rate tariff (whilst applying any appropriate
+    * company specific discounts) depending on whether asked
+    * for a rate or a table
+    *
+    * @param type $companyId
+    * @param type $rateId
+    * @param type $residential
+    * @param type $packagingType
+    * @param type $pieces
+    * @param type $weight
+    * @param type $zone
+    * @param type $shipDate
+    * @return type
+    */
     public function getRateDetails($companyId, $rateId, $serviceId, $residential = false, $packageType = '', $pieces = '', $weight = '', $zone = '', $shipDate = '', $limit = false, $precision = 2)
     {
-
-        $SQL = "SELECT  rate_details.rate_id AS rate_id, 
-                    rate_details.residential AS residential, 
-                    rate_details.piece_limit AS piece_limit, 
-                    rate_details.package_type AS package_type, 
-                    rate_details.zone AS zone,
-                    rate_details.break_point AS break_point,
-                    ROUND(rate_details.weight_rate - COALESCE((rate_details.weight_rate * weight_discount)/100,0), :weight_precision) AS weight_rate,
-                    ROUND(rate_details.package_rate - COALESCE((rate_details.package_rate * package_discount)/100,0), :package_precision) AS package_rate,
-                    ROUND(rate_details.consignment_rate - COALESCE((rate_details.consignment_rate * consignment_discount)/100,0), :consignment_precision) AS consignment_rate,
-                    rate_details.weight_increment AS weight_increment, 
-                    rate_details.weight_units AS weight_units,
-                    rate_details.from_date AS from_date, 
-                    rate_details.to_date AS to_date
-                FROM rate_details 
-                LEFT JOIN rate_discounts 
-                    ON  rate_discounts.rate_id = rate_details.rate_id
-                    AND rate_discounts.service_id = :serviceId
-                    AND rate_discounts.company_id = :companyId
-                    AND rate_discounts.residential = rate_details.residential
-                    AND rate_discounts.piece_limit = rate_details.piece_limit
-                    AND rate_discounts.package_type = rate_details.package_type 
-                    AND rate_discounts.zone = rate_details.zone 
-                    AND rate_discounts.break_point = rate_details.break_point 
-                    AND rate_discounts.from_date <= :fromDate1 
-                    AND rate_discounts.to_date >= :toDate1
-                WHERE   rate_details.rate_id = :rateId ";
+        $SQL = "SELECT  rate_details.rate_id AS rate_id,
+        rate_details.residential AS residential,
+        rate_details.piece_limit AS piece_limit,
+        rate_details.package_type AS package_type,
+        rate_details.zone AS zone,
+        rate_details.break_point AS break_point,
+        ROUND(rate_details.weight_rate - COALESCE((rate_details.weight_rate * weight_discount)/100,0), :weight_precision) AS weight_rate,
+        ROUND(rate_details.package_rate - COALESCE((rate_details.package_rate * package_discount)/100,0), :package_precision) AS package_rate,
+        ROUND(rate_details.consignment_rate - COALESCE((rate_details.consignment_rate * consignment_discount)/100,0), :consignment_precision) AS consignment_rate,
+        rate_details.weight_increment AS weight_increment,
+        rate_details.weight_units AS weight_units,
+        rate_details.from_date AS from_date,
+        rate_details.to_date AS to_date
+        FROM rate_details
+        LEFT JOIN rate_discounts
+        ON  rate_discounts.rate_id = rate_details.rate_id
+        AND rate_discounts.service_id = :serviceId
+        AND rate_discounts.company_id = :companyId
+        AND rate_discounts.residential = rate_details.residential
+        AND rate_discounts.piece_limit = rate_details.piece_limit
+        AND rate_discounts.package_type = rate_details.package_type
+        AND rate_discounts.zone = rate_details.zone
+        AND rate_discounts.break_point = rate_details.break_point
+        AND rate_discounts.from_date <= :fromDate1
+        AND rate_discounts.to_date >= :toDate1
+        WHERE   rate_details.rate_id = :rateId ";
 
         $PARAMS = [
             'weight_precision' => $precision,
@@ -133,15 +131,14 @@ class RateDetail extends Model
         $PARAMS['fromDate2'] = date('Y-m-d', strtotime($shipDate));
         $PARAMS['toDate2'] = date('Y-m-d', strtotime($shipDate));
         $SQL .= "AND rate_details.from_date <= :fromDate2 "
-                . "AND rate_details.to_date >= :toDate2 "
-                . "ORDER BY rate_details.residential,rate_details.piece_limit,rate_details.package_type,rate_details.break_point,rate_details.zone";
+        . "AND rate_details.to_date >= :toDate2 "
+        . "ORDER BY rate_details.residential,rate_details.piece_limit,rate_details.package_type,rate_details.break_point,rate_details.zone";
 
         if ($limit) {
             $SQL .= " LIMIT 1";
         }
 
-            if ($this->debug) {
-
+        if ($this->debug) {
             $message = rawToSql($SQL, $PARAMS) . ';';
             mail("debug@antrim.ifsgroup.com", "Pricing Analysis", $message);
         }
@@ -154,13 +151,12 @@ class RateDetail extends Model
     {
 
         /*
-         * ***********************************
-         *  Check for Customer specific Tariff
-         * ***********************************
-         */
+        * ***********************************
+        *  Check for Customer specific Tariff
+        * ***********************************
+        */
         // If a Residential address then look for a rate for a residential address
         if (strtolower($recipientType) == 'r') {
-
             $rate = $this->getRateDetails($companyId, $rateId, $serviceId, true, $packagingType, $pieces, $weight, $zone, $shipDate, true);
             if ($rate) {
                 return $rate[0];
@@ -169,20 +165,18 @@ class RateDetail extends Model
 
         // If Commercial address or no rate found then look for a rate for a commercial address
         if (empty($rate)) {
-
             $rate = $this->getRateDetails($companyId, $rateId, $serviceId, false, $packagingType, $pieces, $weight, $zone, $shipDate, true);
             if ($rate) {
                 return $rate[0];
             }
         }
         /*
-         * ***********************************
-         *  Check for standard Tariff
-         * ***********************************
-         */
+        * ***********************************
+        *  Check for standard Tariff
+        * ***********************************
+        */
         // If a Residential address then look for a rate for a residential address
         if (strtolower($recipientType) == 'r') {
-
             $rate = $this->getRateDetails('0', $rateId, $serviceId, true, $packagingType, $pieces, $weight, $zone, $shipDate, true);
             if ($rate) {
                 return $rate[0];
@@ -199,50 +193,50 @@ class RateDetail extends Model
     }
 
     /**
-     * Retrieves base rate table and applies any discounts
-     * 
-     * @param type $companyId
-     * @param type $rate
-     * @param type $shipDate
-     * @return type Collection
-     */
+    * Retrieves base rate table and applies any discounts
+    *
+    * @param type $companyId
+    * @param type $rate
+    * @param type $shipDate
+    * @return type Collection
+    */
     public function getRateTable($companyId, $rateId, $serviceId, $shipDate = '', $precision = 4)
     {
-
         if ($shipDate == '') {
-
             $shipDate = date('Y-m-d');
         }
 
-        return DB::select(DB::raw("
-                SELECT  rate_details.rate_id AS rate_id, 
-                    rate_details.residential AS residential, 
-                    rate_details.piece_limit AS piece_limit, 
-                    rate_details.package_type AS package_type, 
-                    rate_details.zone AS zone,
-                    rate_details.break_point AS break_point,
-                    ROUND(rate_details.weight_rate, $precision) - ROUND(COALESCE((rate_details.weight_rate * weight_discount)/100,0), $precision) AS weight_rate,
-                    ROUND(rate_details.package_rate, $precision) - ROUND(COALESCE((rate_details.package_rate * package_discount)/100,0), $precision) AS package_rate,
-                    ROUND(rate_details.consignment_rate, $precision) - ROUND(COALESCE((rate_details.consignment_rate * consignment_discount)/100,0), $precision) AS consignment_rate,
-                    rate_details.weight_increment AS weight_increment, 
-                    rate_details.weight_units AS weight_units,
-                    rate_details.from_date AS from_date, 
-                    rate_details.to_date AS to_date
-                FROM rate_details 
-                LEFT JOIN rate_discounts 
-                    ON  rate_discounts.rate_id = rate_details.rate_id
-                    AND rate_discounts.company_id = :companyId
-                    AND rate_discounts.service_id = :serviceId
-                    AND rate_discounts.residential = rate_details.residential
-                    AND rate_discounts.piece_limit = rate_details.piece_limit
-                    AND rate_discounts.package_type = rate_details.package_type 
-                    AND rate_discounts.zone = rate_details.zone 
-                    AND rate_discounts.break_point = rate_details.break_point 
-                    AND rate_discounts.from_date <= :fromDate1 
-                    AND rate_discounts.to_date >= :toDate1
-                WHERE rate_details.rate_id = :rateId AND rate_details.from_date <= :fromDate2 AND rate_details.to_date >= :toDate2
-                ORDER BY rate_details.residential,rate_details.piece_limit,rate_details.package_type,rate_details.break_point,rate_details.zone
-                "), ['companyId' => $companyId, 'serviceId' => $serviceId, 'fromDate1' => $shipDate, 'toDate1' => $shipDate, 'rateId' => $rateId, 'fromDate2' => $shipDate, 'toDate2' => $shipDate]
+        return DB::select(
+            DB::raw("
+            SELECT  rate_details.rate_id AS rate_id,
+            rate_details.residential AS residential,
+            rate_details.piece_limit AS piece_limit,
+            rate_details.package_type AS package_type,
+            rate_details.zone AS zone,
+            rate_details.break_point AS break_point,
+            ROUND(rate_details.weight_rate, $precision) - ROUND(COALESCE((rate_details.weight_rate * weight_discount)/100,0), $precision) AS weight_rate,
+            ROUND(rate_details.package_rate, $precision) - ROUND(COALESCE((rate_details.package_rate * package_discount)/100,0), $precision) AS package_rate,
+            ROUND(rate_details.consignment_rate, $precision) - ROUND(COALESCE((rate_details.consignment_rate * consignment_discount)/100,0), $precision) AS consignment_rate,
+            rate_details.weight_increment AS weight_increment,
+            rate_details.weight_units AS weight_units,
+            rate_details.from_date AS from_date,
+            rate_details.to_date AS to_date
+            FROM rate_details
+            LEFT JOIN rate_discounts
+            ON  rate_discounts.rate_id = rate_details.rate_id
+            AND rate_discounts.company_id = :companyId
+            AND rate_discounts.service_id = :serviceId
+            AND rate_discounts.residential = rate_details.residential
+            AND rate_discounts.piece_limit = rate_details.piece_limit
+            AND rate_discounts.package_type = rate_details.package_type
+            AND rate_discounts.zone = rate_details.zone
+            AND rate_discounts.break_point = rate_details.break_point
+            AND rate_discounts.from_date <= :fromDate1
+            AND rate_discounts.to_date >= :toDate1
+            WHERE rate_details.rate_id = :rateId AND rate_details.from_date <= :fromDate2 AND rate_details.to_date >= :toDate2
+            ORDER BY rate_details.residential,rate_details.piece_limit,rate_details.package_type,rate_details.break_point,rate_details.zone
+            "),
+            ['companyId' => $companyId, 'serviceId' => $serviceId, 'fromDate1' => $shipDate, 'toDate1' => $shipDate, 'rateId' => $rateId, 'fromDate2' => $shipDate, 'toDate2' => $shipDate]
         );
     }
 
@@ -251,13 +245,13 @@ class RateDetail extends Model
 
         // Get Zones used by this rate. Use orderByRaw to get a natural sort of zones
         return $this->distinct()->where('rate_id', $rate->id)
-                        ->where('from_date', '<=', $shipDate)
-                        ->where('to_date', '>=', $shipDate)
-                        ->orderByRaw("LENGTH(zone)")
-                        ->orderBy('zone')
-                        ->groupBy('zone')
-                        ->get()
-                        ->pluck('zone');
+        ->where('from_date', '<=', $shipDate)
+        ->where('to_date', '>=', $shipDate)
+        ->orderByRaw("LENGTH(zone)")
+        ->orderBy('zone')
+        ->groupBy('zone')
+        ->get()
+        ->pluck('zone');
     }
 
     public function buildQuery($query, $companyId, $rateId, $serviceId = '', $effectiveDate = '', $action = 'get')
@@ -270,18 +264,18 @@ class RateDetail extends Model
 
         // Build query
         $sql = $query->when($companyId, function ($query) use ($companyId) {
-                    return $query->where('company_id', $companyId);
-                })
-                ->when($rateId, function ($query) use ($rateId) {
-                    return $query->where('rate_id', $rateId);
-                })
-                ->when($serviceId, function ($query) use ($serviceId) {
-                    return $query->where('service_id', $serviceId);
-                })
-                ->when($effectiveDate, function ($query) use ($effectiveDate) {
-                    return $query->where('from_date', '<=', $effectiveDate);
-                })
-                ->when($effectiveDate, function ($query) use ($effectiveDate) {
+            return $query->where('company_id', $companyId);
+        })
+        ->when($rateId, function ($query) use ($rateId) {
+            return $query->where('rate_id', $rateId);
+        })
+        // ->when($serviceId, function ($query) use ($serviceId) {
+        //     return $query->where('service_id', $serviceId);
+        // })
+        ->when($effectiveDate, function ($query) use ($effectiveDate) {
+            return $query->where('from_date', '<=', $effectiveDate);
+        })
+        ->when($effectiveDate, function ($query) use ($effectiveDate) {
             return $query->where('to_date', '>=', $effectiveDate);
         });
 
@@ -290,15 +284,16 @@ class RateDetail extends Model
 
     public function setRateDiscounts($companyId, $rateId, $serviceId = '', $discount = '0', $effectiveDate = '')
     {
+        $rateDiscounts = [];
+
+        if ($effectiveDate == '') {
+            $effectiveDate = date('Y-m-d');
+        }
 
         // Get Copy of Rate table so we can make a discount for each record
         $rateDetail = $this->buildQuery(new RateDetail(), '', $rateId, $serviceId, $effectiveDate, 'get');
-        $discounts = [];
-
-        // Now to create matching discounts
         foreach ($rateDetail as $rate) {
-
-            $discounts[] = [
+            $rateDiscounts[] = [
                 'company_id' => $companyId,
                 'rate_id' => $rateId,
                 'service_id' => $serviceId,
@@ -310,19 +305,19 @@ class RateDetail extends Model
                 'weight_discount' => $discount,
                 'package_discount' => $discount,
                 'consignment_discount' => $discount,
-                'from_date' => $rate->from_date,
+                'from_date' => $effectiveDate,
                 'to_date' => $rate->to_date,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ];
         }
 
-        if ($discounts != []) {
-            RateDiscount::create([$discounts]);
+        if ($rateDiscounts != []) {
+            RateDiscount::insert($discounts);
         }
     }
 
-    function deleteRateDiscounts($companyId, $rateId = '', $serviceId = '', $effectiveDate = '')
+    public function deleteRateDiscounts($companyId, $rateId = '', $serviceId = '', $effectiveDate = '')
     {
         $this->buildQuery(new RateDiscount(), $companyId, $rateId, $serviceId, $effectiveDate, 'delete');
     }
@@ -334,18 +329,18 @@ class RateDetail extends Model
     }
 
     /**
-     * Checks that the new rate is in the same format as the previous rate.
-     * If so it then calculates what discoults need to be applied to the
-     * standard rate to create the rate we have uploaded.
-     * 
-     * @param type $companyId
-     * @param type $serviceId
-     * @param type $rateId
-     * @param type $currentRate
-     * @param type $uploadedRate
-     * @param type $effectiveDate
-     * @return string
-     */
+    * Checks that the new rate is in the same format as the previous rate.
+    * If so it then calculates what discoults need to be applied to the
+    * standard rate to create the rate we have uploaded.
+    *
+    * @param type $companyId
+    * @param type $serviceId
+    * @param type $rateId
+    * @param type $currentRate
+    * @param type $uploadedRate
+    * @param type $effectiveDate
+    * @return string
+    */
     public function doRateUpload($companyId, $serviceId, $rateId, $currentRate, $uploadedRate, $effectiveDate = '')
     {
 
@@ -361,26 +356,24 @@ class RateDetail extends Model
 
                 // RateDiscount::insert($discounts);
                 foreach (array_chunk($discounts, 1000) as $t) {
-
                     DB::table('rate_discounts')->insert($t);
                 }
             }
-            
         } else {
             return "Tables do not match";
         }
     }
 
     /**
-     * Checks to see if any discounts are in place for the specified date.
-     * If so, then depending on their "from_date" it will either delete them
-     * or close them on the previous day.
-     * 
-     * @param type $companyId
-     * @param type $rateId
-     * @param type $serviceId
-     * @param type $effectiveDate
-     */
+    * Checks to see if any discounts are in place for the specified date.
+    * If so, then depending on their "from_date" it will either delete them
+    * or close them on the previous day.
+    *
+    * @param type $companyId
+    * @param type $rateId
+    * @param type $serviceId
+    * @param type $effectiveDate
+    */
     public function closeRateDiscounts($companyId, $rateId = '', $serviceId = '', $effectiveDate = '')
     {
 
@@ -388,7 +381,6 @@ class RateDetail extends Model
         $discounts = $this->buildQuery(new RateDiscount(), $companyId, $rateId, $serviceId, $effectiveDate, 'get');
 
         if ($discounts) {
-
             foreach ($discounts as $discount) {
 
                 // If Rate only just defined or in the future - remove it so we can replace it.
@@ -406,16 +398,15 @@ class RateDetail extends Model
     }
 
     /**
-     * Check Keys of both arrays are identical
-     * And if so return an array of discounts
-     * 
-     * @param type $currentRate
-     * @param type $uploadedRate
-     * @return type
-     */
+    * Check Keys of both arrays are identical
+    * And if so return an array of discounts
+    *
+    * @param type $currentRate
+    * @param type $uploadedRate
+    * @return type
+    */
     public function buildDiscounts($currentKeys, $uploadedKeys, $companyId, $serviceId, $effectiveDate = '')
     {
-
         $discounts = [];
         if ($effectiveDate == '') {
             $effectiveDate = date('Y-m-d');                                     // If not specified then effective today
@@ -447,32 +438,29 @@ class RateDetail extends Model
     }
 
     /**
-     * Given rate details, converts rate into an array
-     * with a composite key of the key fields
-     *  
-     * @param type $rateTable
-     * @param type $companyId
-     * @return type
-     */
+    * Given rate details, converts rate into an array
+    * with a composite key of the key fields
+    *
+    * @param type $rateTable
+    * @param type $companyId
+    * @return type
+    */
     public function buildCurrentKeys($rateTable)
     {
-
         $keys = [];
         foreach ($rateTable as $row) {
-
             $key = '';
             $keyFields = ['residential', 'piece_limit', 'package_type', 'break_point'];
             foreach ($keyFields as $keyField) {
                 if (isset($row->$keyField)) {
-
                     switch ($keyField) {
                         case 'break_point':
-                            $key .= number_format(floatval($row->$keyField), 2) . "*";
-                            break;
+                        $key .= number_format(floatval($row->$keyField), 2) . "*";
+                        break;
 
                         default:
-                            $key .= $row->$keyField . "*";
-                            break;
+                        $key .= $row->$keyField . "*";
+                        break;
                     }
                 }
             }
@@ -498,78 +486,72 @@ class RateDetail extends Model
     }
 
     /**
-     * Given rate details, converts rate into an array
-     * with a composite key of the key fields
-     * 
-     * @param type $rateTable
-     * @return type
-     */
+    * Given rate details, converts rate into an array
+    * with a composite key of the key fields
+    *
+    * @param type $rateTable
+    * @return type
+    */
     public function buildUploadedKeys($rateTable)
     {
-
         $keys = [];
         $status = ['N' => 0, 'Y' => 1];
         foreach ($rateTable as $row) {
-
             $key = '';
             $keyFields = ['residential', 'piece_limit', 'package_type', 'break_point'];
             foreach ($keyFields as $keyField) {
-
                 if (isset($row[$keyField])) {
                     switch ($keyField) {
 
                         case "residential":
-                            $key .= $status[$row[$keyField]] . "*";
-                            break;
+                        $key .= $status[$row[$keyField]] . "*";
+                        break;
 
                         case "break_point":
-                            $breakPoint = '';
-                            if (in_array(substr($row[$keyField], -3), ['/ea', '/kg'])) {
-                                $breakPoint .= substr($row[$keyField], 0, strlen($row[$keyField]) - 3) . "*";
-                            } else {
-                                $breakPoint .= $row[$keyField] . "*";
-                            }
-                            $key .= number_format(floatval($breakPoint), 2) . "*";
-                            break;
+                        $breakPoint = '';
+                        if (in_array(substr($row[$keyField], -3), ['/ea', '/kg'])) {
+                            $breakPoint .= substr($row[$keyField], 0, strlen($row[$keyField]) - 3) . "*";
+                        } else {
+                            $breakPoint .= $row[$keyField] . "*";
+                        }
+                        $key .= number_format(floatval($breakPoint), 2) . "*";
+                        break;
 
                         default:
-                            $key .= $row[$keyField] . "*";
-                            break;
+                        $key .= $row[$keyField] . "*";
+                        break;
                     }
                 }
             }
 
             if ($key > '') {
-
                 $fields = array_keys($row);
 
                 foreach ($fields as $field) {
-
                     if (substr($field, 0, 5) == 'zone_') {
-
                         $zoneString = strtoupper(substr($field, 5));
                         $keyString = $key . $zoneString;
                         switch (substr($row['break_point'], -3)) {
                             case '/kg':
-                                $keys[$keyString]['zone'] = $zoneString;
-                                $keys[$keyString]['weight_rate'] = $row[$field];
-                                $keys[$keyString]['package_rate'] = 0;
-                                $keys[$keyString]['consignment_rate'] = 0;
-                                break;
+                            $keys[$keyString]['zone'] = $zoneString;
+                            $keys[$keyString]['weight_rate'] = $row[$field];
+                            $keys[$keyString]['package_rate'] = 0;
+                            $keys[$keyString]['consignment_rate'] = 0;
+                            break;
 
                             case '/ea':
-                                $keys[$keyString]['zone'] = $zoneString;
-                                $keys[$keyString]['weight_rate'] = 0;
-                                $keys[$keyString]['package_rate'] = $row[$field];
-                                $keys[$keyString]['consignment_rate'] = 0;
-                                break;
+                            $keys[$keyString]['zone'] = $zoneString;
+                            $keys[$keyString]['weight_rate'] = 0;
+                            $keys[$keyString]['package_rate'] = $row[$field];
+                            $keys[$keyString]['consignment_rate'] = 0;
+                            break;
 
                             default:
-                                $keys[$keyString]['zone'] = $zoneString;
-                                $keys[$keyString]['weight_rate'] = 0;
-                                $keys[$keyString]['package_rate'] = 0;
-                                $keys[$keyString]['consignment_rate'] = $row[$field];
-                                break;
+                            $keys[$keyString]['zone'] = $zoneString;
+                            $keys[$keyString]['weight_rate'] = 0;
+                            $keys[$keyString]['package_rate'] = 0;
+                            $keys[$keyString]['consignment_rate'] = $row[$field];
+                            break;
                         }
                     }
                 }
@@ -578,5 +560,4 @@ class RateDetail extends Model
 
         return $keys;
     }
-
 }

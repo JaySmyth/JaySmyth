@@ -178,7 +178,6 @@ class Shipment extends Model
         $timeInTransit = 0;
 
         if ($this->received || $this->delivered || $this->mode_id == 2) {
-
             $startTime = strtotime($this->ship_date);
 
             // Delivery date is before ship date (not scanned at IFS) - use created_at + 8hrs
@@ -187,7 +186,6 @@ class Shipment extends Model
             }
 
             if ($startTime > 0) {
-
                 if (!$this->delivery_date && in_array($this->status_id, [3, 4, 5, 8])) {
                     $finishTime = time();
                 } else {
@@ -341,11 +339,11 @@ class Shipment extends Model
             case 5:
                 $url = "http://www.dhl.co.uk/en/express/tracking.html?AWB=$this->carrier_tracking_number&brand=DHL";
                 break;
-            // USPS                
+            // USPS
             case 11:
                 $url = "https://tools.usps.com/go/TrackConfirmAction?tRef=fullpage&tLc=2&text28777=&tLabels=$this->carrier_tracking_number";
                 break;
-            // Primary Freight                
+            // Primary Freight
             case 12:
                 if (substr($this->carrier_tracking_number, 0, 2) == '1Z') {
                     $url = "http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=$this->carrier_tracking_number";
@@ -728,7 +726,6 @@ class Shipment extends Model
     public function getDeliveryDate($format = 'd-m-Y H:i', $timezone = false)
     {
         if ($this->delivery_date) {
-
             if (!$timezone) {
                 $timezone = $this->destination_timezone;
             }
@@ -910,7 +907,6 @@ class Shipment extends Model
         $status = Status::whereCode($statusCode)->first();
 
         if ($status) {
-
             if (!$message) {
                 $message = $status->description;
             }
@@ -1177,7 +1173,6 @@ class Shipment extends Model
 
         // Reinstate transport jobs
         if ($this->transportJobs) {
-
             $collection = $this->transportJobs->where('type', 'c')->first();
 
             if ($collection) {
@@ -1197,7 +1192,6 @@ class Shipment extends Model
             $delivery = $this->transportJobs->where('type', 'd')->first();
 
             if ($delivery) {
-
                 $delivery->unmanifest();
 
                 // Notify transport
@@ -1289,8 +1283,9 @@ class Shipment extends Model
      * @param type $toBeSaved
      * @return array Pricing breakdown offor costs and sales
      */
-    public function price($toBeSaved = true)
+    public function price($toBeSaved = true, $debug = false)
     {
+
         // Build Packages Array
         $packages = [];
         foreach ($this->packages as $package) {
@@ -1303,6 +1298,7 @@ class Shipment extends Model
 
         // Reprice Shipment with new dims etc.
         $pricing = new Pricing();
+        $pricing->debug = $debug;
         $price = $pricing->price($shipmentArray, $shipmentArray['service_id']);
 
         if ($price['errors'] == []) {
@@ -1483,7 +1479,6 @@ class Shipment extends Model
                 }
             }
             unlink($pdfPath);
-
         }
 
         return $pngArray;
