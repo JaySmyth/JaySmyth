@@ -94,7 +94,13 @@ class DHLAPI extends CarrierBase
         /**
          * Don't allow residential shipments to russia
          */
-        $v = Validator::make($shipment, ['recipient_type' => 'required'], ['recipient_type.not_supported' => 'Residential address not supported']);
+        $v = Validator::make($shipment, [
+            'recipient_type' => 'required',
+            'recipient_country_code' => 'required|not_in:IR,KP,CU'
+        ], [
+            'recipient_type.not_supported' => 'Residential address not supported',
+            'recipient_country_code.not_in' => 'Recipient country not supported. Please contact Courier department',
+        ]);
 
         $v->sometimes('recipient_type', 'not_supported', function ($input) {
             return (strtolower($input->recipient_type) == 'r' && strtolower($input->recipient_country_code) == 'ru');

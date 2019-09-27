@@ -441,6 +441,12 @@
                                         {!! Form::Text('eori', old('eori'), ['id' => 'eori', 'class' =>'form-control form-control-sm']) !!}
                                     </div>
                                 </div>
+                                <div class="form-group row">
+                                    {!! Form::Label('Consignee EIN:', null, array('class' => 'col-md-5 col-form-label')) !!}
+                                    <div class="col-md-7">
+                                        {!! Form::Text('consignee_ein', old('consignee_ein'), ['id' => 'consignee_ein', 'class' =>'form-control form-control-sm']) !!}
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="col-md-7">
