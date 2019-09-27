@@ -40,7 +40,7 @@ class ExpressFreightLabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->Cell(96, 123, '', 1);
 
             // Express Freight logo
-            $this->pdf->Image('/images/express_freight_logo.png', 4, 14, 24, 18, 'png');
+            $this->pdf->Image(storage_path('app/images/express_freight_logo.png'), 4, 14, 24, 18, 'png');
             $this->pdf->SetFont($this->font, 'B', 14);
             $this->pdf->Text(28, 14, 'Express Freight');
             $this->pdf->SetFont($this->font, 'B', 27);

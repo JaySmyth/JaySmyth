@@ -67,7 +67,7 @@ class IFSLabel extends \App\CarrierAPI\CarrierLabel {
             $this->pdf->SetLineWidth(0.3);
             $this->pdf->Line(0, 28, 110, 28); //horizontal
             // IFS logo
-            $this->pdf->Image('/images/ifs_logo_bw.png', 64, 2, 34.2, 24.8, 'png');
+            $this->pdf->Image(storage_path('app/images/ifs_logo_bw.png'), 64, 2, 34.2, 24.8, 'png');
 
             $x = 3;
             $y = 2;
