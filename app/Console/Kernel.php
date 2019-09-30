@@ -69,7 +69,7 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      *
-     * @param  Schedule  $schedule
+     * @param Schedule $schedule
      * @return void
      */
     protected function schedule(Schedule $schedule)
@@ -95,9 +95,9 @@ class Kernel extends ConsoleKernel
         /*
          * Transend
          */
-        $schedule->command('transend:send')->weekdays()->everyFiveMinutes()->between('6:10', '20:25')->withoutOverlapping();
-        $schedule->command('transend:cancel')->weekdays()->everyFiveMinutes()->between('6:10', '20:25')->withoutOverlapping();
-        $schedule->command('transend:process-files')->weekdays()->everyFiveMinutes()->between('7:00', '20:25')->withoutOverlapping();
+        $schedule->command('transend:send')->weekdays()->everyFiveMinutes()->between('6:10', '20:25')->withoutOverlapping(5);
+        $schedule->command('transend:cancel')->weekdays()->everyFiveMinutes()->between('6:10', '20:25')->withoutOverlapping(5);
+        $schedule->command('transend:process-files')->weekdays()->everyFiveMinutes()->between('7:00', '20:25')->withoutOverlapping(5);
 
         /*
          * Shipment related
@@ -105,7 +105,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:auto-manifest')->weekdays()->everyFiveMinutes();
         $schedule->command('ifs:cancel-old-shipments')->dailyAt('07:00');
         $schedule->command('ifs:update-stagnant-shipments')->dailyAt('07:05');
-        $schedule->command('ifs:process-shipment-uploads')->everyMinute()->withoutOverlapping();
+        $schedule->command('ifs:process-shipment-uploads')->withoutOverlapping(2);
         $schedule->command('ifs:check-for-duplicate-shipments')->twiceDaily(12, 16);
         //$schedule->command('ifs:update-shopify')->twiceDaily(10, 19);
 
@@ -121,14 +121,14 @@ class Kernel extends ConsoleKernel
         /*
          * RF server
          */
-        $schedule->command('ifs:start-rfserver')->everyMinute()->between('8:00', '22:00')->withoutOverlapping();
-        $schedule->command('ifs:check-rfserver')->everyMinute()->between('8:00', '22:00')->withoutOverlapping();
+        $schedule->command('ifs:start-rfserver')->between('8:00', '22:00')->withoutOverlapping(1);
+        $schedule->command('ifs:check-rfserver')->between('8:00', '22:00')->withoutOverlapping(1);
 
         /*
          * Misc
          */
-        $schedule->command('ifs:upload-files')->everyMinute()->withoutOverlapping();
-        $schedule->command('ifs:check-job-queue')->everyFiveMinutes()->between('6:00', '22:00')->withoutOverlapping();
+        $schedule->command('ifs:upload-files')->withoutOverlapping(5);
+        $schedule->command('ifs:check-job-queue')->everyFiveMinutes()->between('6:00', '22:00')->withoutOverlapping(2);
 
         /*
          * Transport
@@ -144,15 +144,15 @@ class Kernel extends ConsoleKernel
         /*
          * Multifreight
          */
-        $schedule->command('ifs:import-multifreight-files')->weekdays()->everyFiveMinutes()->withoutOverlapping();
-        $schedule->command('ifs:process-scs-collection-requests')->weekdays()->everyFiveMinutes()->withoutOverlapping();
+        $schedule->command('ifs:import-multifreight-files')->weekdays()->everyFiveMinutes()->withoutOverlapping(10);
+        $schedule->command('ifs:process-scs-collection-requests')->weekdays()->everyFiveMinutes()->withoutOverlapping(5);
         $schedule->command('ifs:update-scs-job-numbers-on-shipments --invoiced=1')->weekdays()->hourly()->between('09:00', '16:00');
         $schedule->command('ifs:update-scs-job-numbers-on-shipments --invoiced=0')->weekdays()->dailyAt('21:45');
 
         /*
          * Vendorvillage
          */
-        $schedule->command('ifs:process-vendorvillage-orders')->everyFiveMinutes()->withoutOverlapping();
+        $schedule->command('ifs:process-vendorvillage-orders')->everyFiveMinutes()->withoutOverlapping(5);
     }
 
 }
