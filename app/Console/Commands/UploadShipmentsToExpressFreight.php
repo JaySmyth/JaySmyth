@@ -58,7 +58,7 @@ class UploadShipmentsToExpressFreight extends Command
         parent::__construct();
 
         $this->fileName = 'express_freight_' . time() . '.csv';
-        $this->filePath = storage_path('app/temp/' . $this->fileName);
+        $this->filePath = '/home/expressfreight/manifests/' . $this->fileName;
 
     }
 

@@ -115,8 +115,9 @@ class ExpressFreightAPI extends \App\CarrierAPI\CarrierBase
 
             // Build the tracking number
             $trackingNumber = nextAvailable('EXPCONSIGNMENT');  // express freight sequence (required at piece level)
-            $trackingNumber .= mod11CheckDigit((string)$trackingNumber);                        // Then add check digit
             $trackingNumber = str_pad($trackingNumber, 8, 0, STR_PAD_LEFT);
+            $trackingNumber .= mod11CheckDigit((string)$trackingNumber);                        // Then add check digit
+
             $trackingNumber .= strtoupper($shipment['recipient_country_code']);
             $trackingNumber = 'XE' . $trackingNumber;
 

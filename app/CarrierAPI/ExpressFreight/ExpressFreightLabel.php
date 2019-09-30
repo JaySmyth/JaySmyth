@@ -151,7 +151,7 @@ class ExpressFreightLabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->SetFont($this->font, 'U', 9);
             $this->pdf->Text($x, $y += 7, 'Weight (Kg)');
             $this->pdf->SetFont($this->font, '', 9);
-            $this->pdf->Text($x, $y += 6, $this->shipment['weight']);
+            $this->pdf->Text($x, $y += 6, $package['weight']);
 
             $y = 131;
             $this->pdf->SetFont($this->font, 'B', 9);
