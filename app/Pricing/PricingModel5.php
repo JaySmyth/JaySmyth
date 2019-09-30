@@ -11,16 +11,17 @@ namespace App\Pricing;
 
 use App\CarrierPackagingType;
 use App\Company;
+use App\DhlEas;
 
 class PricingModel5 extends PricingModel
 {
     /*
      * *************************************
-     * Class contains Carrier specific 
+     * Class contains Carrier specific
      * extensions for the PricingModel class
-     * 
+     *
      * Available functions
-     * 
+     *
      *      price($shipment, $rate, $priceType)
      *      getZone()
      *      getPackagingType($pkgNo = 0)
@@ -37,7 +38,6 @@ class PricingModel5 extends PricingModel
 
     public function __construct()
     {
-
         parent::__construct();
 
         $this->maxStdDimension = 120;
@@ -58,8 +58,16 @@ class PricingModel5 extends PricingModel
         }
 
         parent::getPackagingType();
+    }
 
+    public function isEAS()
+    {
+        $eas = new DhlEas();
+        // Implemented at child level
+        $this->log("   Using Country: " . $this->shipment['recipient_country_code']);
+        $this->log("   City: " . $this->shipment['recipient_city']);
+        $this->log("   Postcode: " . $this->shipment['recipient_postcode']);
+
+        return $eas->isEas($this->shipment['recipient_country_code'], $this->shipment['recipient_city'], $this->shipment['recipient_postcode']);
     }
 }
-
-?>

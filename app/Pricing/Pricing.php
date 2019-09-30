@@ -4,9 +4,9 @@
  * ****************************************************
  *                        Notes:
  * ****************************************************
- * 
- * To add new Carrier Pricing the minimum required is to 
- * 
+ *
+ * To add new Carrier Pricing the minimum required is to
+ *
  *  1   Add the Carrier to $this->buildmodel()
  *  2   Define the model in PricingModel::__Construct()
  *  3   Create a class PricingModel{carrier_id}
@@ -42,7 +42,6 @@ use App\Pricing\PricingModel6;
  */
 class Pricing
 {
-
     private $service = '';
     private $serviceId;
     private $costs;
@@ -50,36 +49,37 @@ class Pricing
     private $errors;
     private $salesRate;
     private $costRate;
-    private $debug = false;
+    public $debug = false;
+    public $log = [];
 
     public function __construct($id = null)
     {
-
         if ($id) {
             $this->load($id);
         }
     }
 
+    public function log($msg)
+    {
+        $this->log[] = $msg;
+    }
+
     public function load($id)
     {
-
         $shipment = Shipment::find($id);
 
         if ($shipment) {
-
             $shipmentArray = $shipment->toArray();
             $shipmentArray['packages'] = Package::where('shipment_id', $id)->get()->toArray();
 
             return $this->price($shipmentArray, $shipmentArray['service_id']);
         } else {
-
             return null;
         }
     }
 
     public function price($shipment, $serviceId = '')
     {
-
         $this->shipment = $shipment;
         $this->serviceId = $serviceId;
 
@@ -89,8 +89,19 @@ class Pricing
         // Calculate Costs
         $this->calcCosts();
 
+        if (isset($this->model)) {
+            $this->log[] = $this->model->log;
+        } else {
+            $this->log[] = 'Rate Not Defined';
+        }
+
         // Calculate Sales
         $this->calcSales();
+        if (isset($this->model)) {
+            $this->log[] = $this->model->log;
+        } else {
+            $this->log[] = 'Rate Not Defined';
+        }
 
         return $this->createResponse();
     }
@@ -104,13 +115,11 @@ class Pricing
      */
     public function preProcess()
     {
-
         if ($this->serviceId != '') {
 
             // Use specified Service/ Carrier
             $this->service = Service::find($this->serviceId);
         } else {
-
             $this->service = Service::find($this->shipment['service_id']);
         }
 
@@ -160,10 +169,8 @@ class Pricing
 
     public function sumCharges($charges, $chargeCode = '')
     {
-
         $total = 0;
         if (is_array($charges)) {
-
             foreach ($charges as $charge) {
                 if ($chargeCode == '') {
                     $total += $charge['value'];
@@ -181,11 +188,9 @@ class Pricing
 
     public function createResponse()
     {
-
         $errors = $this->mergeErrors($this->costs['errors'], $this->sales['errors']);
 
         if (empty($errors)) {
-
             $response['shipping_cost'] = round($this->sumCharges($this->costs['charges']), 2);
             $response['shipping_charge'] = round($this->sumCharges($this->sales['charges']), 2);
             $response['fuel_cost'] = round($this->sumCharges($this->costs['charges'], 'FUEL'), 2);
@@ -236,7 +241,8 @@ class Pricing
         $response['errors'] = $errors;
 
         if ($this->debug) {
-            mail("debug@antrim.ifsgroup.com", "Pricing Analysis - Errors", json_encode($errors));
+            $response['Pricinglog'] = $this->log;
+            mail("debug@antrim.ifsgroup.com", "Pricing Analysis - Errors", json_encode($errors) . "/n" . json_encode($this->log));
         }
 
         return $response;
@@ -291,13 +297,17 @@ class Pricing
         // Get Cost Rate - No Fuel Cap on costs
         $this->costRate = Company::find($this->shipment['company_id'])->costRateForService($this->shipment['service_id']);
         $this->costRate['fuel_cap'] = 999;
+        $this->log("Fuel Cap: ". $this->costRate['fuel_cap']);
 
-        // Price Shiment
+        // Price Shipment
         $this->costs = $this->getPrice($this->costRate, 'Costs');
 
         // Calculate Vat
-        $vat = calcVat($this->shipment['recipient_country_code'], $this->sumCharges($this->costs['charges']),
-            $this->shipment['vat_exempt']);
+        $vat = calcVat(
+            $this->shipment['recipient_country_code'],
+            $this->sumCharges($this->costs['charges']),
+            $this->shipment['vat_exempt']
+        );
         $this->costs['vat_amount'] = $vat['vat_amount'];
         $this->costs['vat_code'] = $vat['vat_code'];
 
@@ -318,8 +328,11 @@ class Pricing
         $this->sales = $this->getPrice($this->salesRate, 'Sales');
 
         // Calculate Vat
-        $vat = calcVat($this->shipment['recipient_country_code'], $this->sumCharges($this->sales['charges']),
-            $this->shipment['vat_exempt']);
+        $vat = calcVat(
+            $this->shipment['recipient_country_code'],
+            $this->sumCharges($this->sales['charges']),
+            $this->shipment['vat_exempt']
+        );
         $this->sales['vat_amount'] = $vat['vat_amount'];
         $this->sales['vat_code'] = $vat['vat_code'];
 
@@ -332,7 +345,6 @@ class Pricing
 
     public function getPrice($rate, $priceType)
     {
-
         $response['errors'] = [];
         $response['zone'] = '';
         $response['model'] = '';
@@ -341,7 +353,6 @@ class Pricing
 
         // If we know how to process this shipment and it is valid for the old system
         if (isset($rate['model'])) {
-
             $this->buildModel($rate['model']);
 
             $response = $this->model->price($this->shipment, $rate, $priceType);
@@ -352,7 +363,6 @@ class Pricing
 
                 // Allow Zero Costs
             } else {
-
                 $response['errors'][] = "$priceType Rate Table not found";
             }
         }
@@ -367,10 +377,8 @@ class Pricing
 
     public function show($var, $desc = 'Debug')
     {
-
         echo "$desc : <pre>";
         print_r($var);
         echo "</pre><br>";
     }
-
 }

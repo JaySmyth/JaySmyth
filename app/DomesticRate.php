@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class DomesticRate extends Model
 {
-
     protected $guarded = ['id'];
     public $timestamps = true;
     public $debug = false;
@@ -19,7 +18,7 @@ class DomesticRate extends Model
      * from the rate tariff (having applied any appropriate
      * company specific discounts) depending on whether asked
      * for a rate or a table
-     * 
+     *
      * @param type $companyId
      * @param type $rateId
      * @param type $shipDate
@@ -30,25 +29,24 @@ class DomesticRate extends Model
      */
     public function getRateDetails($companyId, $rateId, $serviceCode = '', $shipDate = '', $packagingCode = '', $area = '')
     {
-
-        $SQL = "SELECT  domestic_rates.rate_id AS rate_id, 
+        $SQL = "SELECT  domestic_rates.rate_id AS rate_id,
                     domestic_rates.service AS service,
-                    domestic_rates.packaging_code AS packaging_code, 
+                    domestic_rates.packaging_code AS packaging_code,
                     domestic_rates.first -  COALESCE((domestic_rates.first * first_discount)/100,0) AS \"first\",
                     domestic_rates.others - COALESCE((domestic_rates.others * others_discount)/100,0) AS \"others\",
                     domestic_rates.notional_weight AS notional_weight,
                     domestic_rates.notional - COALESCE((domestic_rates.notional * notional_discount)/100,0) AS \"notional\",
                     domestic_rates.area AS area,
-                    domestic_rates.from_date AS from_date, 
+                    domestic_rates.from_date AS from_date,
                     domestic_rates.to_date AS to_date
-                FROM domestic_rates 
-                LEFT JOIN domestic_rate_discounts 
+                FROM domestic_rates
+                LEFT JOIN domestic_rate_discounts
                     ON domestic_rate_discounts.rate_id = domestic_rates.rate_id
-                    AND domestic_rate_discounts.company_id = :companyId 
-                    AND domestic_rate_discounts.service = domestic_rates.service 
-                    AND domestic_rate_discounts.packaging_code = domestic_rates.packaging_code 
-                    AND domestic_rate_discounts.area = domestic_rates.area 
-                    AND domestic_rate_discounts.from_date <= :fromDate1 
+                    AND domestic_rate_discounts.company_id = :companyId
+                    AND domestic_rate_discounts.service = domestic_rates.service
+                    AND domestic_rate_discounts.packaging_code = domestic_rates.packaging_code
+                    AND domestic_rate_discounts.area = domestic_rates.area
+                    AND domestic_rate_discounts.from_date <= :fromDate1
                     AND domestic_rate_discounts.to_date >= :toDate1
                 WHERE domestic_rates.rate_id = :rateId ";
 
@@ -81,7 +79,6 @@ class DomesticRate extends Model
                 ORDER BY domestic_rates.service, domestic_rates.packaging_code, domestic_rates.area";
 
         if ($this->debug) {
-
             $message = rawToSql($SQL, $PARAMS) . ';';
             mail("debug@antrim.ifsgroup.com", "Pricing Analysis", $message);
         }
@@ -91,14 +88,14 @@ class DomesticRate extends Model
 
     public function getServiceCode($serviceId)
     {
-
         $serviceCode = '';
 
         // If ServiceId defined then get Service code for the required service
         if ($serviceId > "") {
             $service = Service::find($serviceId);
-            if ($service)
+            if ($service) {
                 $serviceCode = $service->code;
+            }
         }
 
         return $serviceCode;
@@ -107,7 +104,7 @@ class DomesticRate extends Model
     /**
      * Returns appropriate line of the tariff for the
      * Given consignment details
-     * 
+     *
      * @param type $companyId
      * @param type $rateId
      * @param type $shipDate
@@ -118,26 +115,27 @@ class DomesticRate extends Model
      */
     public function getRate($companyId, $rateId, $serviceId = '', $shipDate, $packagingCode = '', $area = '')
     {
-
         $serviceCode = '';
 
         // As Domestic rates use service code instead of service_id, find it
         $service = Service::find($serviceId);
-        if ($service)
+        if ($service) {
             $serviceCode = $service->code;
+        }
 
         // Get Rate
         $rate = $this->getRateDetails($companyId, $rateId, $serviceCode, $shipDate, $packagingCode, $area);
 
-        if ($rate)
+        if ($rate) {
             return $rate['0'];
+        }
     }
 
     /**
      * Given the Rate Id and Company id gets rate and
      * applies any discounts before returning resultant
      * table array
-     * 
+     *
      * @param type $companyId
      * @param type $rate
      * @param type $shipDate
@@ -145,13 +143,11 @@ class DomesticRate extends Model
      */
     public function getRateTable($companyId, $rateId, $serviceCode, $shipDate = '')
     {
-
         if ($shipDate == '') {
-
             $shipDate = date('Y-m-d');
         }
 
-        // Get Rate Details for this Rate/ Service 
+        // Get Rate Details for this Rate/ Service
         $rate = $this->getRateDetails($companyId, $rateId, $serviceCode, $shipDate);
 
         return $rate;
@@ -171,14 +167,16 @@ class DomesticRate extends Model
 
     public function setRateDiscounts($companyId, $rateId = '', $serviceId, $discount = '0', $effectiveDate = '')
     {
+        $rateDiscounts = [];
 
-        // Build query
+        if ($effectiveDate == '') {
+            $effectiveDate = date('Y-m-d');
+        }
+
+        // Get Copy of Rate table so we can make a discount for each record
         $rateDetail = $this->buildQuery(new DomesticRate(), $companyId, $rateId, $serviceId, $effectiveDate, 'get');
-        $discounts = [];
-
         foreach ($rateDetail as $rate) {
-
-            $discounts[] = [
+            $rateDiscounts[] = [
                 'company_id' => $companyId,
                 'rate_id' => $rateId,
                 'service' => $rate->service,
@@ -187,21 +185,20 @@ class DomesticRate extends Model
                 'first_discount' => $discount,
                 'others_discount' => $discount,
                 'notional_discount' => $discount,
-                'from_date' => $rate->from_date,
+                'from_date' => $effectiveDate,
                 'to_date' => '2099-12-31',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ];
         }
 
-        if ($discounts != []) {
-            DomesticRateDiscount::create($discounts);
+        if ($rateDiscounts != []) {
+            DomesticRateDiscount::insert($rateDiscounts);
         }
     }
 
     public function deleteRateDiscounts($companyId, $rateId, $serviceId, $effectiveDate = '')
     {
-
         $this->buildQuery(new DomesticRateDiscount(), $companyId, $rateId, $serviceId, $effectiveDate, 'delete');
     }
 
@@ -214,7 +211,6 @@ class DomesticRate extends Model
 
     public function buildQuery($query, $companyId, $rateId, $serviceId = '', $effectiveDate, $action = 'get')
     {
-
         // If No effective date set then use today
         if ($effectiveDate == '') {
             $effectiveDate = date('Y-m-d');
@@ -223,28 +219,28 @@ class DomesticRate extends Model
         $serviceCode = $this->getServiceCode($serviceId);
 
         return $query->when($rateId, function ($query) use ($rateId) {
-                            return $query->where('rate_id', $rateId);
-                        })
-                        ->when($companyId, function ($query) use ($companyId) {
-                            return $query->where('company_id', $companyId);
-                        })
-                        ->when($serviceCode, function ($query) use ($serviceCode) {
-                            return $query->where('service', $serviceCode);
-                        })
-                        ->when($effectiveDate, function ($query) use ($effectiveDate) {
-                            return $query->where('from_date', '<=', $effectiveDate);
-                        })
-                        ->when($effectiveDate, function ($query) use ($effectiveDate) {
-                            return $query->where('to_date', '>=', $effectiveDate);
-                        })
-                        ->$action();
+            return $query->where('rate_id', $rateId);
+        })
+        // ->when($companyId, function ($query) use ($companyId) {
+        //     return $query->where('company_id', $companyId);
+        // })
+        // ->when($serviceCode, function ($query) use ($serviceCode) {
+        //     return $query->where('service', $serviceCode);
+        // })
+        ->when($effectiveDate, function ($query) use ($effectiveDate) {
+            return $query->where('from_date', '<=', $effectiveDate);
+        })
+        ->when($effectiveDate, function ($query) use ($effectiveDate) {
+            return $query->where('to_date', '>=', $effectiveDate);
+        })
+        ->$action();
     }
 
     /**
      * Checks that the new rate is in the same format as the previous rate.
      * If so it then calculates what discoults need to be applied to the
      * standard rate to create the rate we have uploaded.
-     * 
+     *
      * @param type $companyId
      * @param type $serviceId
      * @param type $rateId
@@ -265,7 +261,6 @@ class DomesticRate extends Model
             // Tables Match so build discounts
             $discounts = $this->buildDiscounts($currentKeys, $uploadedKeys, $companyId, $effectiveDate);
             if ($discounts != []) {
-
                 DomesticRateDiscount::insert($discounts);
             }
 
@@ -282,7 +277,7 @@ class DomesticRate extends Model
      * Checks to see if any discounts are in place for the specified date.
      * If so, then depending on their "from_date" it will either delete them
      * or close them on the previous day.
-     * 
+     *
      * @param type $companyId
      * @param type $rateId
      * @param type $serviceId
@@ -295,7 +290,6 @@ class DomesticRate extends Model
         $discounts = $this->buildQuery(new DomesticRateDiscount(), $companyId, $rateId, $serviceId, $effectiveDate, 'get');
 
         if ($discounts) {
-
             foreach ($discounts as $discount) {
 
                 // If Rate only just defined or in the future - remove it so we can replace it.
@@ -315,14 +309,13 @@ class DomesticRate extends Model
     /**
      * Check Keys of both arrays are identical
      * And if so return an array of discounts
-     * 
+     *
      * @param type $currentRate
      * @param type $uploadedRate
      * @return type
      */
     public function buildDiscounts($currentKeys, $uploadedKeys, $companyId, $effectiveDate = '')
     {
-
         $discounts = [];
         if ($effectiveDate == '') {
             $effectiveDate = date('Y-m-d');                                     // If not specified then effective today
@@ -353,17 +346,15 @@ class DomesticRate extends Model
     /**
      * Given rate details, converts rate into an array
      * with a composite key of the key fields
-     *  
+     *
      * @param type $rateTable
      * @param type $companyId
      * @return type
      */
     public function buildCurrentKeys($rateTable)
     {
-
         $keys = [];
         foreach ($rateTable as $row) {
-
             $key = '';
             $keyFields = ['service', 'packaging_code', 'area'];
             foreach ($keyFields as $keyField) {
@@ -391,16 +382,14 @@ class DomesticRate extends Model
     /**
      * Given rate details, converts rate into an array
      * with a composite key of the key fields
-     * 
+     *
      * @param type $rateTable
      * @return type
      */
     public function buildUploadedKeys($rateTable)
     {
-
         $keys = [];
         foreach ($rateTable as $row) {
-
             $key = '';
             $keyFields = ['service', 'packaging_code', 'area'];
             foreach ($keyFields as $keyField) {
@@ -418,5 +407,4 @@ class DomesticRate extends Model
 
         return $keys;
     }
-
 }

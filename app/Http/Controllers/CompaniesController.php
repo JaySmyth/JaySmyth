@@ -18,21 +18,21 @@ class CompaniesController extends Controller
 {
 
     /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
+    * Create a new controller instance.
+    *
+    * @return void
+    */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
     /**
-     * List company records.
-     *
-     * @param  
-     * @return 
-     */
+    * List company records.
+    *
+    * @param
+    * @return
+    */
     public function index(Request $request)
     {
         $this->authorize(new Company);
@@ -43,11 +43,11 @@ class CompaniesController extends Controller
     }
 
     /**
-     * Show a company record.
-     *
-     * @param  
-     * @return 
-     */
+    * Show a company record.
+    *
+    * @param
+    * @return
+    */
     public function show($id)
     {
         $company = Company::findOrFail($id);
@@ -60,11 +60,11 @@ class CompaniesController extends Controller
     }
 
     /**
-     * Display create company form.
-     *
-     * @param  
-     * @return 
-     */
+    * Display create company form.
+    *
+    * @param
+    * @return
+    */
     public function create()
     {
         $this->authorize(new Company);
@@ -73,11 +73,11 @@ class CompaniesController extends Controller
     }
 
     /**
-     * Store a new company record.
-     *
-     * @param  
-     * @return 
-     */
+    * Store a new company record.
+    *
+    * @param
+    * @return
+    */
     public function store(CompanyRequest $request)
     {
         $this->authorize(new Company);
@@ -95,11 +95,11 @@ class CompaniesController extends Controller
     }
 
     /**
-     * Display edit company form.
-     *
-     * @param  
-     * @return 
-     */
+    * Display edit company form.
+    *
+    * @param
+    * @return
+    */
     public function edit($id)
     {
         $company = Company::findOrFail($id);
@@ -110,11 +110,11 @@ class CompaniesController extends Controller
     }
 
     /**
-     * Update a company record. 
-     *
-     * @param  
-     * @return 
-     */
+    * Update a company record.
+    *
+    * @param
+    * @return
+    */
     public function update(CompanyRequest $request, $id)
     {
         $company = Company::findOrFail($id);
@@ -129,11 +129,11 @@ class CompaniesController extends Controller
     }
 
     /**
-     * Show the change status form.
-     *
-     * @param  
-     * @return 
-     */
+    * Show the change status form.
+    *
+    * @param
+    * @return
+    */
     public function status($id)
     {
         $company = Company::findOrFail($id);
@@ -144,11 +144,11 @@ class CompaniesController extends Controller
     }
 
     /**
-     * Change the company status (enabled/disabled).
-     *
-     * @param  
-     * @return 
-     */
+    * Change the company status (enabled/disabled).
+    *
+    * @param
+    * @return
+    */
     public function updateStatus(Request $request, $id)
     {
         $company = Company::findOrFail($id);
@@ -170,12 +170,12 @@ class CompaniesController extends Controller
     }
 
     /**
-     * Gets the the localisation settings for a company
-     * Expects all requests via ajax call.
-     *
-     * @param   Illuminate\Http\Request
-     * @return  json data array
-     */
+    * Gets the the localisation settings for a company
+    * Expects all requests via ajax call.
+    *
+    * @param   Illuminate\Http\Request
+    * @return  json data array
+    */
     public function getLocalisation(Request $request)
     {
         if ($request->ajax()) {
@@ -184,11 +184,11 @@ class CompaniesController extends Controller
     }
 
     /**
-     * 
-     *
-     * @param  
-     * @return 
-     */
+    *
+    *
+    * @param
+    * @return
+    */
     public function services($id)
     {
         $company = Company::findOrFail($id);
@@ -201,11 +201,11 @@ class CompaniesController extends Controller
     }
 
     /**
-     * 
-     *
-     * @param  
-     * @return 
-     */
+    *
+    *
+    * @param
+    * @return
+    */
     public function setServices(Request $request, $id)
     {
         $company = Company::findOrFail($id);
@@ -222,11 +222,11 @@ class CompaniesController extends Controller
     }
 
     /**
-     * 
-     *
-     * @param  
-     * @return 
-     */
+    *
+    *
+    * @param
+    * @return
+    */
     public function viewCompanyRates($companyId, $serviceId)
     {
         $company = Company::findOrFail($companyId);
@@ -242,15 +242,20 @@ class CompaniesController extends Controller
         $fuel_cap = 99.99;
         $discount = 0;
 
+        if ($rate) {
+            $fuel_cap = $rate->fuel_cap;
+            $discount = $rate->discount;
+        }
+
         return view('rates.rate', compact('company', 'service', 'rate', 'fuel_cap', 'discount'));
     }
 
     /**
-     * 
-     *
-     * @param  
-     * @return 
-     */
+    *
+    *
+    * @param
+    * @return
+    */
     public function setCompanyRates(Request $request, $id)
     {
         $company = Company::findOrFail($id);
@@ -270,17 +275,24 @@ class CompaniesController extends Controller
         $companyRates->deleteDiscount($company->id, $request->rate_id, $request->service_id, date('Y-m-d'));
 
         // Create/ Update Company Rate record and clear special_discount flag
+        $special = ($request->discount == 0) ? 0 : 1;
         $companyRate = CompanyRates::updateOrCreate(
-                        [
-                    'company_id' => $request->company_id,
-                    'service_id' => $request->service_id
-                        ], [
-                    'rate_id' => $request->rate_id,
-                    'special_discount' => 0,
-                    'discount' => $request->discount,
-                    'fuel_cap' => $request->fuel_cap
-                        ]
+            [
+                'company_id' => $request->company_id,
+                'service_id' => $request->service_id
+            ],
+            [
+                'rate_id' => $request->rate_id,
+                'special_discount' => $special,
+                'discount' => 0,
+                'fuel_cap' => $request->fuel_cap
+            ]
         );
+
+        // CompanyRate record created - now to apply a discount - effective today
+        if ($request->discount <> 0) {
+            $companyRate->setDiscount($request->discount, date('Y-m-d)'));
+        }
 
         // Log changes
         $action = 'Set Rate. Discount : ' . $request->discount . ' Fuel Cap : ' . $request->fuel_cap;
@@ -295,10 +307,10 @@ class CompaniesController extends Controller
     }
 
     /**
-     * 
-     * @param type $id
-     * @return type
-     */
+    *
+    * @param type $id
+    * @return type
+    */
     public function deleteCompanyRates($companyId, $serviceId)
     {
         $company = Company::findOrFail($companyId);
@@ -323,24 +335,24 @@ class CompaniesController extends Controller
     }
 
     /*
-     * Company search.
-     * 
-     * @param   $request
-     * @param   $paginate
-     * 
-     * @return
-     */
+    * Company search.
+    *
+    * @param   $request
+    * @param   $paginate
+    *
+    * @return
+    */
 
     private function search($request, $paginate = true)
     {
         $query = Company::orderBy('company_name')
-                ->filter($request->filter)
-                ->hasDepot($request->depot_id)
-                ->hasTesting($request->testing)
-                ->hasEnabled($request->enabled)
-                ->hasSalesperson($request->sale_id)
-                ->whereIn('id', $request->user()->getAllowedCompanyIds())
-                ->with('users', 'depot');
+        ->filter($request->filter)
+        ->hasDepot($request->depot_id)
+        ->hasTesting($request->testing)
+        ->hasEnabled($request->enabled)
+        ->hasSalesperson($request->sale_id)
+        ->whereIn('id', $request->user()->getAllowedCompanyIds())
+        ->with('users', 'depot');
 
         if (!$paginate) {
             return $query->get();
@@ -350,11 +362,11 @@ class CompaniesController extends Controller
     }
 
     /**
-     * Display the collection settings form.
-     *
-     * @param  
-     * @return 
-     */
+    * Display the collection settings form.
+    *
+    * @param
+    * @return
+    */
     public function collectionSettings($id)
     {
         $company = Company::findOrFail($id);
@@ -371,11 +383,11 @@ class CompaniesController extends Controller
     }
 
     /**
-     * Store the collection settings for the company.
-     *
-     * @param  
-     * @return 
-     */
+    * Store the collection settings for the company.
+    *
+    * @param
+    * @return
+    */
     public function storeCollectionSettings(Request $request, $id)
     {
         $company = Company::findOrFail($id);
@@ -385,7 +397,6 @@ class CompaniesController extends Controller
         if ($request->use_default) {
             \App\CollectionSetting::whereCompanyId($id)->delete();
         } else {
-
             $rules = [
                 'collection_time' => 'required',
                 'delivery_time' => 'required',
@@ -404,8 +415,8 @@ class CompaniesController extends Controller
 
             if (count($messageBags) > 0) {
                 return redirect('companies/' . $company->id . '/collection-settings')
-                                ->with('messageBags', $messageBags)
-                                ->withInput();
+                ->with('messageBags', $messageBags)
+                ->withInput();
             }
 
             // Save the records
@@ -429,11 +440,11 @@ class CompaniesController extends Controller
     }
 
     /**
-     * Download the result set to an Excel Document.
-     *
-     * @param  Request
-     * @return Excel document
-     */
+    * Download the result set to an Excel Document.
+    *
+    * @param  Request
+    * @return Excel document
+    */
     public function download(Request $request)
     {
         $this->authorize(new Company);
@@ -442,5 +453,4 @@ class CompaniesController extends Controller
 
         return Excel::download(new \App\Exports\CompaniesExport($companies), 'companies.xlsx');
     }
-
 }
