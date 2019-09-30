@@ -269,9 +269,9 @@ class RateDetail extends Model
         ->when($rateId, function ($query) use ($rateId) {
             return $query->where('rate_id', $rateId);
         })
-        // ->when($serviceId, function ($query) use ($serviceId) {
-        //     return $query->where('service_id', $serviceId);
-        // })
+        ->when($serviceId, function ($query) use ($serviceId) {
+            return $query->where('service_id', $serviceId);
+        })
         ->when($effectiveDate, function ($query) use ($effectiveDate) {
             return $query->where('from_date', '<=', $effectiveDate);
         })
@@ -379,7 +379,6 @@ class RateDetail extends Model
 
         // Get any domestic rates already defined
         $discounts = $this->buildQuery(new RateDiscount(), $companyId, $rateId, $serviceId, $effectiveDate, 'get');
-
         if ($discounts) {
             foreach ($discounts as $discount) {
 
