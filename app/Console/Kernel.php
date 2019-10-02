@@ -49,7 +49,8 @@ class Kernel extends ConsoleKernel
         Commands\ManifestUnmanifestedShipments::class,
         Commands\ImportMultifreightFiles::class,
         Commands\UpdateScsJobNumbersOnShipments::class,
-        Commands\UploadShipmentsToExpressFreight::class,
+        Commands\ExpressFreight\UploadShipmentsToExpressFreight::class,
+        Commands\ExpressFreight\ProcessExpressFreightTracking::class,
         Commands\CheckForDuplicateShipments::class,
         Commands\ProcessScsCollectionRequests::class,
         Commands\SendTrackingNumbers::class,
@@ -64,6 +65,7 @@ class Kernel extends ConsoleKernel
         Commands\LogScanningKpis::class,
         Commands\TntTotalVolume::class,
         Commands\NormaliseRates::class,
+        //Commands\GetTracking::class,
     ];
 
     /**
