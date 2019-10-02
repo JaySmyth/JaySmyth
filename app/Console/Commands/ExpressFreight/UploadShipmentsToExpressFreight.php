@@ -69,7 +69,8 @@ class UploadShipmentsToExpressFreight extends Command
      */
     public function handle()
     {
-        $this->shipments = \App\Shipment::whereCarrierId(14)->whereReceivedSent(0)->whereNotIn('status_id', [1, 7])->get();
+        // Load shipments that have been received at IFS
+        $this->shipments = \App\Shipment::whereCarrierId(14)->whereReceived(1)->whereReceivedSent(0)->whereNotIn('status_id', [1, 7])->get();
 
         // Create the file to upload
         $this->createFile();
@@ -93,7 +94,7 @@ class UploadShipmentsToExpressFreight extends Command
         $handle = fopen($this->filePath, "w");
 
         // Add heading row
-        fputcsv($handle, ['Consignment', 'IFS Reference', 'Piece', 'Weight', 'Ship Date', 'Name', 'Company', 'Address 1', 'Address 2', 'City', 'County', 'Postcode', 'Country Code']);
+        fputcsv($handle, ['Consignment', 'IFS Reference', 'Piece', 'Weight', 'Ship Date', 'Name', 'Company', 'Address 1', 'Address 2', 'City', 'County', 'Postcode', 'Country Code', 'Cancelled']);
 
         foreach ($this->shipments as $shipment) :
 
@@ -114,7 +115,8 @@ class UploadShipmentsToExpressFreight extends Command
                         $shipment->recipient_city,
                         $shipment->recipient_state,
                         $shipment->recipient_postcode,
-                        $shipment->recipient_country_code
+                        $shipment->recipient_country_code,
+                        0
                     ];
 
                     fputcsv($handle, $line);
