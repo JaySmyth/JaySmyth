@@ -145,7 +145,7 @@ class ExpressFreightAPI extends \App\CarrierAPI\CarrierBase
         $response['route_id'] = $route_id;
         $response['carrier'] = 'ifs';
         $response['ifs_consignment_number'] = $reply['consignment_number'];
-        $response['consignment_number'] = $reply['consignment_number'];
+        $response['consignment_number'] = $reply['carrier_consignment_number'];
         $response['carrier_consignment_number'] = $reply['carrier_consignment_number'];
         $response['volumetric_divisor'] = getVolumetricDivisor('IFS', $serviceCode);       // From Helper functions
 

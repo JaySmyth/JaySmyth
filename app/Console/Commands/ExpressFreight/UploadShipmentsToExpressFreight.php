@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\ExpressFreight;
 
 use App\Shipment;
 use Illuminate\Console\Command;
@@ -79,7 +79,7 @@ class UploadShipmentsToExpressFreight extends Command
 
         // Send notification
         if (count($this->validShipments) > 0) {
-            Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight File Upload (' . count($this->validShipments) . ' shipments)', 'Please see attached file', $this->filePath));
+            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight Manifest (' . count($this->validShipments) . ' shipments)', 'Please see attached file', $this->filePath));
         }
     }
 

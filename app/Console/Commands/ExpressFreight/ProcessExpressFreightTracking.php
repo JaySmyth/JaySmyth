@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\ExpressFreight;
 
 use Validator;
+use App\Tracking;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class ProcessExpressFreightTracking extends Command
@@ -41,21 +43,7 @@ class ProcessExpressFreightTracking extends Command
      *
      * @var array
      */
-    protected $fields = array('carrier_tracking_number', 'date', 'location', 'name', 'status');
-
-    /**
-     * Results array.
-     *
-     * @var array
-     */
-    protected $results;
-
-    /**
-     * Temp file.
-     *
-     * @var string
-     */
-    protected $tempFile;
+    protected $fields = array('carrier_tracking_number', 'status', 'datetime', 'location', 'name', 'attempted_status');
 
     /**
      * Create a new command instance.
@@ -98,19 +86,19 @@ class ProcessExpressFreightTracking extends Command
      */
     protected function processFile($file)
     {
-
         $this->info("Processing $file");
 
         $rowNumber = 1;
         $data = null;
 
         if (($handle = fopen($this->directory . $file, 'r')) !== false) {
-            while (($data = fgetcsv($handle, 1000, chr(9))) !== false) {
-                if ($rowNumber >= 2) {
-                    $this->processRow($rowNumber, $data);
-                }
+
+            while (($data = fgetcsv($handle, 1000)) !== false) {
+
+                $this->processRow($rowNumber, $data);
                 $rowNumber++;
             }
+
             fclose($handle);
         }
     }
@@ -137,10 +125,37 @@ class ProcessExpressFreightTracking extends Command
 
             if ($shipment) {
 
+                $datetime = Carbon::createFromformat('YmdHis', $row['datetime']);
+                $datetime = gmtToCarbonUtc($datetime);
+
+                $message = $row['status'];
+
+                if (strlen($row['attempted_status']) > 0 && $row['status'] != $row['attempted_status']) {
+                    $message . ' - ' . $row['attempted_status'];
+                }
+
+                Tracking::firstOrCreate([
+                    'message' => $message,
+                    'datetime' => $datetime,
+                    'local_datetime' => $datetime,
+                    'shipment_id' => $shipment->id,
+                    'carrier' => 'Express Freight',
+                    'city' => $row['location'],
+                    'country_code' => 'IE',
+                    'source' => 'Express Freight'
+                ]);
+
+                if (strtolower(trim($row['status'])) == 'delivered') {
+                    $shipment->setDelivered($datetime, $row['name']);
+                }
             }
 
+        } else {
+            $this->error('Could not find shipment with carrier tracking number: ' . $row['carrier_tracking_number']);
         }
+
     }
+
 
     /**
      * Read one line at a time and create an array of field names and values.
@@ -155,7 +170,7 @@ class ProcessExpressFreightTracking extends Command
 
         $i = 0;
         foreach ($this->fields as $field) {
-            $row[$field] = (isset($data[$i])) ? trim($data[$i]) : null;
+            $row[$field] = (isset($data[$i])) ? trim(preg_replace('/[[:^print:]]/', '', $data[$i])) : null;
             $i++;
         }
 
@@ -172,24 +187,8 @@ class ProcessExpressFreightTracking extends Command
      */
     protected function validateRow($rowNumber, $data, $row)
     {
-        return true;
         // First check for correct number of fields
         if (count($data) != count($this->fields)) {
-            $this->setRowFailed($rowNumber, $row, "Invalid number of fields detected. Detected " . count($data) . " fields. " . count($this->fields) . " required");
-            return false;
-        }
-
-        $rules = [
-            'ReferenceNumber' => 'required',
-            'TrackingNum' => 'required|string|min:6',
-            'ShipDate' => 'required|string',
-        ];
-
-        $validator = Validator::make($row, $rules);
-
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            $this->setRowFailed($rowNumber, $row, $errors->all());
             return false;
         }
 
