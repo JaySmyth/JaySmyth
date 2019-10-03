@@ -9,7 +9,7 @@ class RfController extends Controller
 {
 
     protected $cc;
-    protected $routes = ['ADHOC', 'ROAD', 'AIR', 'SEA', 'DHL', 'EUROR', 'FEDC', 'FEDL', 'FEDF', 'NI', 'RM', 'ROI', 'TNT', 'UK1', 'UK2', 'UK24', 'UPS', 'US', 'ALL'];
+    protected $routes = ['ADHOC', 'ROAD', 'AIR', 'SEA', 'DHL', 'EUROR', 'FEDC', 'FEDL', 'FEDF', 'NI', 'RM', 'ROI', 'TNT', 'UK1', 'UK2', 'UK24', 'UPS', 'US', 'EXP', 'ALL'];
     protected $route;
     protected $data;
 
@@ -24,7 +24,7 @@ class RfController extends Controller
 
     /**
      * Handles incoming data from nodeJs.
-     * 
+     *
      * @param Request $request
      * @return type
      */
@@ -55,8 +55,58 @@ class RfController extends Controller
     }
 
     /**
+     * Sets the display.
+     *
+     * @param mixed (string/array)    $body   Main screen display
+     * @param string $prompt Command prompt for user input
+     * @param mixed (string/boolean)  $error  Error message display / bell sound
+     *
+     * @return  string
+     */
+    protected function getDisplay($body, $prompt = false, $error = false)
+    {
+        // Clear the screen
+        $display = $this->cc['cls'];
+        $route = ($this->route) ? $this->route : 'NO ROUTE!';
+
+        // Output centered title
+        $display .= $this->center("* RECEIPTS *");
+        $display .= $this->cc['dl'];
+        $display .= $this->center("== $route ==");
+        $display .= $this->cc['dl'];
+        $display .= $this->center($body);
+
+        if ($error) {
+            // Sound bell
+            $display .= $this->cc['err'];
+        }
+
+        if ($prompt) {
+            $display .= $this->cc['dl'];
+            $display .= $prompt . ': ';
+        }
+        echo $display;
+        exit;
+    }
+
+    /**
+     * Center align a string for scanner output.
+     *
+     * @param type $string
+     * @return string
+     */
+    protected function center($string)
+    {
+        if (strlen($string) < 30) {
+            return str_pad($string, 30, ' ', STR_PAD_BOTH);
+        } else {
+            return $string;
+        }
+    }
+
+    /**
      * Scan a package.
-     * 
+     *
      * @return type
      */
     protected function scanPackage()
@@ -102,56 +152,6 @@ class RfController extends Controller
 
         // Successful scan
         return $this->getDisplay("Pkg $scanCount scanned!", 'Scan Package');
-    }
-
-    /**
-     * Sets the display.
-     *     
-     * @param   mixed (string/array)    $body   Main screen display  
-     * @param   string                  $prompt Command prompt for user input
-     * @param   mixed (string/boolean)  $error  Error message display / bell sound
-     * 
-     * @return  string
-     */
-    protected function getDisplay($body, $prompt = false, $error = false)
-    {
-        // Clear the screen
-        $display = $this->cc['cls'];
-        $route = ($this->route) ? $this->route : 'NO ROUTE!';
-
-        // Output centered title
-        $display .= $this->center("* RECEIPTS *");
-        $display .= $this->cc['dl'];
-        $display .= $this->center("== $route ==");
-        $display .= $this->cc['dl'];
-        $display .= $this->center($body);
-
-        if ($error) {
-            // Sound bell
-            $display .= $this->cc['err'];
-        }
-
-        if ($prompt) {
-            $display .= $this->cc['dl'];
-            $display .= $prompt . ': ';
-        }
-        echo $display;
-        exit;
-    }
-
-    /**
-     * Center align a string for scanner output.
-     * 
-     * @param type $string
-     * @return string
-     */
-    protected function center($string)
-    {
-        if (strlen($string) < 30) {
-            return str_pad($string, 30, ' ', STR_PAD_BOTH);
-        } else {
-            return $string;
-        }
     }
 
 }
