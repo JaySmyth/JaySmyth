@@ -9,7 +9,7 @@ class RfController extends Controller
 {
 
     protected $cc;
-    protected $routes = ['ADHOC', 'ROAD', 'AIR', 'SEA', 'DHL', 'EUROR', 'FEDC', 'FEDL', 'FEDF', 'NI', 'RM', 'ROI', 'TNT', 'UK1', 'UK2', 'UK24', 'UPS', 'US', 'EXP', 'ALL'];
+    protected $routes = ['ADHOC', 'ROAD', 'AIR', 'SEA', 'DHL', 'EUROR', 'FEDC', 'FEDL', 'FEDF', 'NI', 'RM', 'ROI', 'TNT', 'UK1', 'UK2', 'UK24', 'UPS', 'US', 'ALL'];
     protected $route;
     protected $data;
 
