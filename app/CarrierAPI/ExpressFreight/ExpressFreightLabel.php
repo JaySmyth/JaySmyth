@@ -94,7 +94,7 @@ class ExpressFreightLabel extends \App\CarrierAPI\CarrierLabel
             $x = 6;
             $y = 92;
 
-            $this->pdf->SetFont($this->font, 'B', 9);
+            $this->pdf->SetFont($this->font, 'B', 8);
             if (isset($this->shipment['recipient_name']) && ($this->shipment['recipient_name'] > ""))
                 $this->pdf->Text($x, $y, strtoupper($this->shipment['recipient_name'] ? $this->shipment['recipient_name'] : ''));
 
@@ -158,10 +158,10 @@ class ExpressFreightLabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->Text(6, $y, 'Tel - 028 38322100');
             $this->pdf->Text($x, $y, 'Fax - 028 38323005');
 
-            $x = 5.5;
+            $x = 7;
             $y = 141;
-            $this->pdf->SetFont($this->font, 'B', 15);
-            $this->pdf->Text($x, $y, 'IFS CONSIGNMENT#: ' . $this->data['consignment_number']);
+            $this->pdf->SetFont($this->font, 'B', 14);
+            $this->pdf->Text($x, $y, 'IFS CONSIGNMENT#: ' . $this->data['ifs_consignment_number']);
             $pkg++;
         }
 
