@@ -189,6 +189,7 @@ class ProcessExpressFreightTracking extends Command
     {
         // First check for correct number of fields
         if (count($data) != count($this->fields)) {
+            $this->error('invalid number of fields detected');
             return false;
         }
 
