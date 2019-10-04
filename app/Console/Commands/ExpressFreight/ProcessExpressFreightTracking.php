@@ -141,7 +141,7 @@ class ProcessExpressFreightTracking extends Command
                     'shipment_id' => $shipment->id,
                     'carrier' => 'Express Freight',
                     'city' => $row['location'],
-                    'country_code' => 'IE',
+                    'country_code' => ($row['location'] == 'CRAIGAVON') ? 'GB' : 'IE',
                     'source' => 'Express Freight'
                 ]);
 
