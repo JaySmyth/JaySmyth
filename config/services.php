@@ -51,4 +51,10 @@ return [
         'api_user' => env('CARTROVER_API_USER'),
         'api_key' => env('CARTROVER_API_KEY'),
     ],
+    'ups' => [
+        'user' => env('UPS_API_USER'),
+        'password' => env('UPS_API_PASSWORD'),
+        'key' => env('UPS_API_KEY'),
+        'url' => env('UPS_API_URL'),
+    ],
 ];

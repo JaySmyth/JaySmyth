@@ -1483,4 +1483,16 @@ class Shipment extends Model
 
         return $pngArray;
     }
+
+    /**
+     * Call the carrier tracking API and insert/update tracking events.
+     */
+    public function updateTracking()
+    {
+        $className = "\App\Tracking\\" . $this->carrier->name;
+
+        $tracking = new $className($this);
+
+        return $tracking->update();
+    }
 }

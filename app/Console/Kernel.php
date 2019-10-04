@@ -65,7 +65,7 @@ class Kernel extends ConsoleKernel
         Commands\LogScanningKpis::class,
         Commands\TntTotalVolume::class,
         Commands\NormaliseRates::class,
-        //Commands\GetTracking::class,
+        Commands\GetTracking::class,
     ];
 
     /**
@@ -109,7 +109,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:update-stagnant-shipments')->dailyAt('07:05');
         $schedule->command('ifs:process-shipment-uploads')->withoutOverlapping(2);
         $schedule->command('ifs:check-for-duplicate-shipments')->twiceDaily(12, 16);
-        //$schedule->command('ifs:update-shopify')->twiceDaily(10, 19);
+        //$schedule->command('ifs:get-tracking')->everyThirtyMinutes()->withoutOverlapping(10);
 
         /*
          * Primary Logistics
@@ -146,8 +146,8 @@ class Kernel extends ConsoleKernel
         /**
          * Express Freight
          */
-        $schedule->command('ifs:upload-shipments-to-express-freight')->weekdays()->dailyAt('16:35');
-        $schedule->command('ifs:process-express-freight-tracking')->weekdays()->hourly()->between('08:00', '16:00');
+        $schedule->command('ifs:upload-shipments-to-express-freight')->weekdays()->dailyAt('16:45');
+        $schedule->command('ifs:process-express-freight-tracking')->weekdays()->hourly()->between('07:00', '18:00');
 
         /*
          * Multifreight
