@@ -145,9 +145,12 @@ class ProcessExpressFreightTracking extends Command
                     'source' => 'Express Freight'
                 ]);
 
+                $shipment->setStatus('in_transit', 0, false, false);
+
                 if (strtolower(trim($row['status'])) == 'delivered') {
                     $shipment->setDelivered($datetime, $row['name']);
                 }
+
             }
 
         } else {
