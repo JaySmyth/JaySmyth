@@ -27,10 +27,15 @@ abstract class Tracking
      */
     public function update()
     {
-        $events = $this->getEvents();
+        if ($this->shipment->tracking) {
+            $lastEvent = $this->shipment->tracking->first();
 
-        //$events = Arr::dot($events);
-        //dd($events);
+            if ($lastEvent->source == 'easypost') {
+                return true;
+            }
+        }
+
+        $events = $this->getEvents();
 
         foreach ($events as $event) {
 

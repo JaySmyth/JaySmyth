@@ -109,7 +109,12 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:update-stagnant-shipments')->dailyAt('07:05');
         $schedule->command('ifs:process-shipment-uploads')->withoutOverlapping(2);
         $schedule->command('ifs:check-for-duplicate-shipments')->twiceDaily(12, 16);
-        //$schedule->command('ifs:get-tracking')->everyThirtyMinutes()->withoutOverlapping(10);
+
+        /*
+         * Tracking updates
+         */
+        $schedule->command('ifs:get-tracking --active=1')->everyThirtyMinutes()->withoutOverlapping(10);
+        $schedule->command('ifs:get-tracking --active=0')->twiceDaily(7, 21);
 
         /*
          * Primary Logistics

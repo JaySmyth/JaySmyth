@@ -131,6 +131,16 @@ class UPS extends Tracking
             // Flatten using dot notation
             $activity = Arr::dot($activity);
 
+            $message = null;
+
+            if (!empty($activity['Status.Description'])) {
+                $message = $activity['Status.Description'];
+
+                if (!empty($activity['ActivityLocation.SignedForByName'])) {
+                    $message .= ': ' . $activity['ActivityLocation.Description'];
+                }
+            }
+
             $events[] = [
                 'status' => $this->getStatus($activity),
                 'status_detail' => (!empty($activity['Status.Description'])) ? $activity['Status.Description'] : null,
@@ -141,7 +151,7 @@ class UPS extends Tracking
                 'datetime' => Carbon::createFromformat('YmdHis', $activity['Date'] . $activity['Time'])->subHour(1),
                 'carrier' => 'UPS',
                 'source' => 'UPS',
-                'message' => (!empty($activity['Status.Description'])) ? $activity['Status.Description'] : null,
+                'message' => $message,
                 'signed_by' => (!empty($activity['ActivityLocation.SignedForByName'])) ? $activity['ActivityLocation.SignedForByName'] : null,
             ];
 
