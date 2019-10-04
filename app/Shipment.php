@@ -354,6 +354,10 @@ class Shipment extends Model
                     $url = false;
                 }
                 break;
+            // Express Freight
+            case 14:
+                $url = "https://track.anpost.ie/TrackingResults.aspx?rtt=1&items=$this->carrier_tracking_number";
+                break;
             default:
                 break;
         }
