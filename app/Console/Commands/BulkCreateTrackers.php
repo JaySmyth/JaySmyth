@@ -47,14 +47,14 @@ class BulkCreateTrackers extends Command
 
             $this->info('createing trackers for carrier ' . $this->option('carrier-id'));
 
-            $shipments = Shipment::whereBetween('ship_date', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($finishDate)->endOfDay()])->isActive()->hasCarrier($this->option('carrier-id'))->get();
+            $shipments = Shipment::whereBetween('created_at', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($finishDate)->endOfDay()])->hasCarrier($this->option('carrier-id'))->get();
 
         } else {
 
             if ($this->option('received')) {
-                $shipments = Shipment::whereBetween('ship_date', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($finishDate)->endOfDay()])->isActive()->hasStatus('received')->get();
+                $shipments = Shipment::whereBetween('created_at', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($finishDate)->endOfDay()])->isActive()->get();
             } else {
-                $shipments = Shipment::whereBetween('ship_date', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($finishDate)->endOfDay()])->isActive()->get();
+                $shipments = Shipment::whereBetween('created_at', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($finishDate)->endOfDay()])->get();
             }
 
         }
