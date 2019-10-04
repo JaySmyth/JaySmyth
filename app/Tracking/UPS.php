@@ -128,32 +128,36 @@ class UPS extends Tracking
 
         foreach ($activities as $activity) {
 
-            // Flatten using dot notation
-            $activity = Arr::dot($activity);
+            if (is_array($activity)) {
 
-            $message = null;
+                // Flatten using dot notation
+                $activity = Arr::dot($activity);
 
-            if (!empty($activity['Status.Description'])) {
-                $message = $activity['Status.Description'];
+                $message = null;
 
-                if (!empty($activity['ActivityLocation.SignedForByName'])) {
-                    $message .= ': ' . $activity['ActivityLocation.Description'];
+                if (!empty($activity['Status.Description'])) {
+                    $message = $activity['Status.Description'];
+
+                    if (!empty($activity['ActivityLocation.SignedForByName'])) {
+                        $message .= ': ' . $activity['ActivityLocation.Description'];
+                    }
                 }
-            }
 
-            $events[] = [
-                'status' => $this->getStatus($activity),
-                'status_detail' => (!empty($activity['Status.Description'])) ? $activity['Status.Description'] : null,
-                'city' => (!empty($activity['ActivityLocation.Address.City'])) ? $activity['ActivityLocation.Address.City'] : null,
-                'country_code' => (!empty($activity['ActivityLocation.Address.CountryCode'])) ? $activity['ActivityLocation.Address.CountryCode'] : null,
-                'postcode' => (!empty($activity['ActivityLocation.Address.PostalCode'])) ? $activity['ActivityLocation.Address.PostalCode'] : null,
-                'local_datetime' => Carbon::createFromformat('YmdHis', $activity['Date'] . $activity['Time'])->subHour(1),
-                'datetime' => Carbon::createFromformat('YmdHis', $activity['Date'] . $activity['Time'])->subHour(1),
-                'carrier' => 'UPS',
-                'source' => 'UPS',
-                'message' => $message,
-                'signed_by' => (!empty($activity['ActivityLocation.SignedForByName'])) ? $activity['ActivityLocation.SignedForByName'] : null,
-            ];
+                $events[] = [
+                    'status' => $this->getStatus($activity),
+                    'status_detail' => (!empty($activity['Status.Description'])) ? $activity['Status.Description'] : null,
+                    'city' => (!empty($activity['ActivityLocation.Address.City'])) ? $activity['ActivityLocation.Address.City'] : null,
+                    'country_code' => (!empty($activity['ActivityLocation.Address.CountryCode'])) ? $activity['ActivityLocation.Address.CountryCode'] : null,
+                    'postcode' => (!empty($activity['ActivityLocation.Address.PostalCode'])) ? $activity['ActivityLocation.Address.PostalCode'] : null,
+                    'local_datetime' => Carbon::createFromformat('YmdHis', $activity['Date'] . $activity['Time'])->subHour(1),
+                    'datetime' => Carbon::createFromformat('YmdHis', $activity['Date'] . $activity['Time'])->subHour(1),
+                    'carrier' => 'UPS',
+                    'source' => 'UPS',
+                    'message' => $message,
+                    'signed_by' => (!empty($activity['ActivityLocation.SignedForByName'])) ? $activity['ActivityLocation.SignedForByName'] : null,
+                ];
+
+            }
 
         }
 
