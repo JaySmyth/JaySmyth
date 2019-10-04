@@ -113,8 +113,8 @@ class Kernel extends ConsoleKernel
         /*
          * Tracking updates
          */
-        $schedule->command('ifs:get-tracking --active=1')->everyThirtyMinutes()->withoutOverlapping(10);
-        $schedule->command('ifs:get-tracking --active=0')->twiceDaily(7, 21);
+        //$schedule->command('ifs:get-tracking --active=1')->everyThirtyMinutes()->withoutOverlapping(10);
+        //$schedule->command('ifs:get-tracking --active=0')->twiceDaily(7, 21);
 
         /*
          * Primary Logistics
