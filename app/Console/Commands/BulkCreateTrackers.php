@@ -14,7 +14,7 @@ class BulkCreateTrackers extends Command
      *
      * @var string
      */
-    protected $signature = 'ifs:bulk-create-trackers {--start-date=} {--finish-date=} {--received}';
+    protected $signature = 'ifs:bulk-create-trackers {--start-date=} {--finish-date=} {--received} {--carrier-id=}';
 
     /**
      * The console command description.
@@ -43,10 +43,20 @@ class BulkCreateTrackers extends Command
         $startDate = $this->option('start-date');
         $finishDate = $this->option('finish-date');
 
-        if ($this->option('received')) {
-            $shipments = Shipment::whereBetween('ship_date', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($finishDate)->endOfDay()])->isActive()->hasStatus('received')->get();
+        if ($this->option('carrier-id')) {
+
+            $this->info('createing trackers for carrier ' . $this->option('carrier-id'));
+
+            $shipments = Shipment::whereBetween('ship_date', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($finishDate)->endOfDay()])->isActive()->hasCarrier($this->option('carrier-id'))->get();
+
         } else {
-            $shipments = Shipment::whereBetween('ship_date', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($finishDate)->endOfDay()])->isActive()->get();
+
+            if ($this->option('received')) {
+                $shipments = Shipment::whereBetween('ship_date', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($finishDate)->endOfDay()])->isActive()->hasStatus('received')->get();
+            } else {
+                $shipments = Shipment::whereBetween('ship_date', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($finishDate)->endOfDay()])->isActive()->get();
+            }
+
         }
 
         $count = $shipments->count();
