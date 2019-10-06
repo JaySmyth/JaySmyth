@@ -92,7 +92,7 @@ class ExpressFreightAPI extends \App\CarrierAPI\CarrierBase
         // Add additional info eg IFS consignment no
         $response = $this->addAdditionalInfo($shipment);
 
-        // Log Response
+        // Log Response *
         TransactionLog::create(['carrier' => 'exp', 'type' => $msgType, 'direction' => 'I', 'msg' => json_encode($response), 'mode' => $this->mode]);
 
         // Return Response
