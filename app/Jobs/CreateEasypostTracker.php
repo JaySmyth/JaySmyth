@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Shipment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Queue\SerializesModels;
@@ -40,6 +41,14 @@ class CreateEasypostTracker implements ShouldQueue
     {
         if ($this->carrier == '***') {
             return null;
+        }
+
+        // Update unused field to show that shipment is being tracked by easypost
+        $shipment = Shipment::where('carrier_tracking_number', $this->trackingCode)->orderBy('id', 'desc')->first();
+
+        if($shipment){
+            $shipment->external_tracking_url = 'easypost';
+            $shipment->save();
         }
 
         try {
