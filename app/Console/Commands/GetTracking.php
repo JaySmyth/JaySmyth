@@ -50,30 +50,31 @@ class GetTracking extends Command
     {
 
         /*
-        $shipments = Shipment::whereIn('carrier_tracking_number', ['1Z922E2A0494616080'])->get();
+                $shipments = Shipment::whereIn('carrier_tracking_number', ['1Z922E2A0491143748'])->get();
 
-        foreach ($shipments as $shipment) {
+                foreach ($shipments as $shipment) {
 
-            $this->info('Getting tracking updates for ' . $shipment->carrier->name . ' shipment: ' . $shipment->carrier_consignment_number);
+                    $this->info('Getting tracking updates for ' . $shipment->carrier->name . ' shipment: ' . $shipment->carrier_consignment_number);
 
-            $shipment->updateTracking();
+                    $shipment->updateTracking();
 
-        }
-*/
+
+                }
+        */
 
         $active = $this->option('active');
 
         if (!$active) {
 
             // Shipments that have not been marked as received - wait 10 hours before trying to track them
-            foreach (Shipment::whereIn('carrier_id', $this->enabledCarriers)->where('created_at', '<', Carbon::now()->subHours(10))->orderBy('id', 'asc')->cursor() as $shipment) {
+            foreach (Shipment::whereIn('carrier_id', $this->enabledCarriers)->where('external_tracking_url', '!=', 'easypost')->where('created_at', '<', Carbon::now()->subHours(10))->orderBy('id', 'asc')->cursor() as $shipment) {
                 $shipment->updateTracking();
             }
 
         } else {
 
             // Shipments that have been received
-            foreach (Shipment::whereIn('carrier_id', $this->enabledCarriers)->isActive()->orderBy('id', 'asc')->cursor() as $shipment) {
+            foreach (Shipment::whereIn('carrier_id', $this->enabledCarriers)->where('external_tracking_url', '!=', 'easypost')->isActive()->orderBy('id', 'asc')->cursor() as $shipment) {
                 $shipment->updateTracking();
             }
 

@@ -5,6 +5,7 @@ namespace App\Tracking;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Mail;
 use GuzzleHttp\Exception\GuzzleException;
 
 class UPS extends Tracking
@@ -39,6 +40,9 @@ class UPS extends Tracking
 
         } catch (GuzzleException $exception) {
 
+            if ($exception->hasResponse()) {
+                Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Get UPS tracking exception', Psr7\str($exception->getResponse())));
+            }
 
         }
     }
@@ -157,6 +161,8 @@ class UPS extends Tracking
                     'signed_by' => (!empty($activity['ActivityLocation.SignedForByName'])) ? $activity['ActivityLocation.SignedForByName'] : null,
                 ];
 
+            } else {
+                Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Get UPS tracking ' . $this->trackingNumber . ' - array expected', json_encode($activities)));
             }
 
         }

@@ -20,6 +20,7 @@ abstract class Tracking
         $this->trackingNumber = $shipment->carrier_tracking_number;
     }
 
+
     /**
      * Request tracking events from carrier and update shipment accordingly.
      *
@@ -27,13 +28,6 @@ abstract class Tracking
      */
     public function update()
     {
-        if ($this->shipment->tracking) {
-            $lastEvent = $this->shipment->tracking->first();
-
-            if ($lastEvent->source == 'easypost') {
-                return true;
-            }
-        }
 
         $events = $this->getEvents();
 
@@ -50,6 +44,7 @@ abstract class Tracking
         }
 
         return true;
+
     }
 
     protected abstract function getEvents();
