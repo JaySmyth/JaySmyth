@@ -66,6 +66,8 @@ class GetTracking extends Command
 
         if (!$active) {
 
+            $this->info('Getting tracking updates for inactive shipments');
+
             // Shipments that have not been marked as received - wait 10 hours before trying to track them
             foreach (Shipment::whereIn('carrier_id', $this->enabledCarriers)->where('external_tracking_url', '!=', 'easypost')->where('created_at', '<', Carbon::now()->subHours(10))->orderBy('id', 'asc')->cursor() as $shipment) {
                 $shipment->updateTracking();
@@ -73,12 +75,19 @@ class GetTracking extends Command
 
         } else {
 
+            $this->info('Getting tracking updates for active shipments');
+
             // Shipments that have been received
             foreach (Shipment::whereIn('carrier_id', $this->enabledCarriers)->where('external_tracking_url', '!=', 'easypost')->isActive()->orderBy('id', 'asc')->cursor() as $shipment) {
+
+                $this->info('Getting tracking updates for shipment: ' . $shipment->carrier_consignment_number);
+
                 $shipment->updateTracking();
             }
 
         }
+
+        $this->info('Finished');
 
     }
 
