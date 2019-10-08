@@ -102,6 +102,13 @@ class UPS extends Tracking
         //$response = Arr::dot($response);
         //dd($response);
 
+        // Error encountered
+        if (isset($response['Fault'])) {
+            $response = Arr::dot($response);
+            Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Get UPS tracking ' . $this->trackingNumber . ' - fault', $response['Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description']));
+            return [];
+        }
+
         if ($this->shipment->pieces > 1) {
 
             $events = [];
@@ -128,21 +135,26 @@ class UPS extends Tracking
      */
     protected function processActivities($activities)
     {
+        // Flatten using dot notation
+        //$activities = Arr::dot($activities);
+        //dd($activities);
+
         $events = [];
 
-        foreach ($activities as $activity) {
+        if (isset($activities[0])) {
 
-            if (is_array($activity)) {
+            foreach ($activities as $activity) {
 
                 // Flatten using dot notation
                 $activity = Arr::dot($activity);
 
+                //dd($activity);
                 $message = null;
 
                 if (!empty($activity['Status.Description'])) {
                     $message = $activity['Status.Description'];
 
-                    if (!empty($activity['ActivityLocation.SignedForByName'])) {
+                    if (!empty($activity['ActivityLocation.SignedForByName']) && !empty($activity['ActivityLocation.Description'])) {
                         $message .= ': ' . $activity['ActivityLocation.Description'];
                     }
                 }
@@ -161,10 +173,7 @@ class UPS extends Tracking
                     'signed_by' => (!empty($activity['ActivityLocation.SignedForByName'])) ? $activity['ActivityLocation.SignedForByName'] : null,
                 ];
 
-            } else {
-                Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Get UPS tracking ' . $this->trackingNumber . ' - array expected', json_encode($activities)));
             }
-
         }
 
         return $events;
