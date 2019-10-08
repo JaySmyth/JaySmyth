@@ -78,7 +78,7 @@ class GetTracking extends Command
             $this->info('Getting tracking updates for active shipments');
 
             // Shipments that have been received
-            foreach (Shipment::whereIn('carrier_id', $this->enabledCarriers)->where('external_tracking_url', '!=', 'easypost')->isActive()->orderBy('id', 'asc')->cursor() as $shipment) {
+            foreach (Shipment::whereIn('carrier_id', $this->enabledCarriers)->where('external_tracking_url', '!=', 'easypost')->isActive()->orderBy('id', 'dasc')->cursor() as $shipment) {
 
                 $this->info('Getting tracking updates for shipment: ' . $shipment->carrier_consignment_number);
 
