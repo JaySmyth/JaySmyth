@@ -292,6 +292,8 @@ class RateDetail extends Model
 
         // Get Copy of Rate table so we can make a discount for each record
         $rateDetail = $this->buildQuery(new RateDetail(), '', $rateId, '', $effectiveDate, 'get');
+
+        // As some tables are very large, insert records 20 rows at a time
         foreach ($rateDetail as $rate) {
             $rateDiscounts[] = [
                 'company_id' => $companyId,
@@ -310,6 +312,11 @@ class RateDetail extends Model
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ];
+
+            if (count($rateDiscounts) == 20) {
+                RateDiscount::insert($rateDiscounts);
+                $rateDiscounts = [];
+            }
         }
 
         if ($rateDiscounts != []) {
