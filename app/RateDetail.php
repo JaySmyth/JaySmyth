@@ -291,7 +291,7 @@ class RateDetail extends Model
         }
 
         // Get Copy of Rate table so we can make a discount for each record
-        $rateDetail = $this->buildQuery(new RateDetail(), '', $rateId, $serviceId, $effectiveDate, 'get');
+        $rateDetail = $this->buildQuery(new RateDetail(), '', $rateId, '', $effectiveDate, 'get');
         foreach ($rateDetail as $rate) {
             $rateDiscounts[] = [
                 'company_id' => $companyId,
@@ -313,7 +313,7 @@ class RateDetail extends Model
         }
 
         if ($rateDiscounts != []) {
-            RateDiscount::insert($discounts);
+            RateDiscount::insert($rateDiscounts);
         }
     }
 
