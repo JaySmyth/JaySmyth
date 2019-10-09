@@ -5,14 +5,14 @@ namespace App\CarrierAPI\ExpressFreightNI;
 use TCPDI;
 use App\TransactionLog;
 use Illuminate\Support\Facades\Validator;
-use App\CarrierAPI\IFS\ExpressFreightNILabel;
+use App\CarrierAPI\ExpressFreightNI\ExpressFreightNILabel;
 
 /**
  * Description of IFSWebAPI
  *
  * @author gmcbroom
  */
-class ExpressFreightNI extends \App\CarrierAPI\CarrierBase
+class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
 {
     /*
      *  Carrier Specific Variable declarations

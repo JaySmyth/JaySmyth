@@ -1,6 +1,6 @@
 <?php
 
-namespace App\CarrierAPI\IFS;
+namespace App\CarrierAPI\ExpressFreightNI;
 
 use App\Service;
 use App\Route;

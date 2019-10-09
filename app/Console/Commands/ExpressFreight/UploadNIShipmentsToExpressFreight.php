@@ -21,7 +21,7 @@ class UploadNIShipmentsToExpressFreight extends Command
      *
      * @var string
      */
-    protected $description = 'Upload shipments to express freight';
+    protected $description = 'Upload NI shipments to express freight';
 
     /**
      * Collection of shipments.
@@ -70,7 +70,7 @@ class UploadNIShipmentsToExpressFreight extends Command
     public function handle()
     {
         // Load shipments that have been received at IFS
-        $this->shipments = \App\Shipment::whereCarrierId(14)->whereReceived(1)->whereReceivedSent(0)->whereNotIn('status_id', [1, 7])->get();
+        $this->shipments = \App\Shipment::whereCarrierId(15)->whereReceived(1)->whereReceivedSent(0)->whereNotIn('status_id', [1, 7])->get();
 
         // Create the file to upload
         $this->createFile();
@@ -80,7 +80,7 @@ class UploadNIShipmentsToExpressFreight extends Command
 
         // Send notification
         if (count($this->validShipments) > 0) {
-            Mail::to('ASteenson@expressfreight.co.uk')->cc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight NI Manifest (' . count($this->validShipments) . ' shipments)', 'Please see attached file', $this->filePath));
+            //Mail::to('ASteenson@expressfreight.co.uk')->cc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight NI Manifest (' . count($this->validShipments) . ' shipments)', 'Please see attached file', $this->filePath));
         }
     }
 
@@ -101,21 +101,30 @@ class UploadNIShipmentsToExpressFreight extends Command
             if ($this->isValid($shipment)) {
 
                 $line = [
-
                     $shipment->consignment_number,
                     $shipment->ship_date->format('d/m/Y'),
-                    'Pkg ' . $package->index . ' of ' . $shipment->pieces,
-                    $package->weight,
-                    $shipment->ship_date->format('d/m/Y'),
                     $shipment->recipient_name,
-                    $shipment->recipient_company_name,
-                    $shipment->recipient_address1,
+                    $shipment->recipient_company_name . ' - ' . $shipment->recipient_address1,
                     $shipment->recipient_address2,
                     $shipment->recipient_city,
                     $shipment->recipient_state,
                     $shipment->recipient_postcode,
-                    $shipment->recipient_country_code,
-                    0
+                    null,
+                    $shipment->special_instructions,
+                    $shipment->recipient_telephone,
+                    $shipment->pieces,
+                    $shipment->weight,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    null,
+                    null,
+                    'STANDARD',
+                    $shipment->recipient_name
                 ];
 
                 // Remove any commas
@@ -146,6 +155,10 @@ class UploadNIShipmentsToExpressFreight extends Command
     {
         // Already uploaded
         if (stristr($shipment->source, '.csv')) {
+            return false;
+        }
+
+        if (strtoupper(substr($this->shipment['recipient_postcode'], 0, 2)) != 'BT') {
             return false;
         }
 
