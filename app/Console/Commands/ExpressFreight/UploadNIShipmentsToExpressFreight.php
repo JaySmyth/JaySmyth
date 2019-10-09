@@ -94,42 +94,39 @@ class UploadNIShipmentsToExpressFreight extends Command
         $handle = fopen($this->filePath, "w");
 
         // Add heading row
-        fputcsv($handle, ['Consignment', 'IFS Reference', 'Piece', 'Weight', 'Ship Date', 'Name', 'Company', 'Address 1', 'Address 2', 'City', 'County', 'Postcode', 'Country Code', 'Cancelled']);
+        fputcsv($handle, ['Consignment Number', 'Despatch Date', 'Consignee Name', 'Street 1', 'Street 2', 'City/Town', 'County', 'Postcode', 'Location', 'Instructions', 'Contact Number', 'Number Of Cartons', 'Carton Weight', 'Number Of Pallets', 'Pallet Weight', 'Number Of Others', 'Other Weight', 'Number Of Sets', 'Set Weight', 'COD Amount', 'COD Currency', 'Parcel number', 'Service Type', 'Contact Name']);
 
         foreach ($this->shipments as $shipment) :
 
             if ($this->isValid($shipment)) {
 
-                foreach ($shipment->packages as $package):
+                $line = [
 
-                    $line = [
-                        $package->carrier_tracking_number,
-                        $shipment->consignment_number,
-                        'Pkg ' . $package->index . ' of ' . $shipment->pieces,
-                        $package->weight,
-                        $shipment->ship_date->format('d/m/Y'),
-                        $shipment->recipient_name,
-                        $shipment->recipient_company_name,
-                        $shipment->recipient_address1,
-                        $shipment->recipient_address2,
-                        $shipment->recipient_city,
-                        $shipment->recipient_state,
-                        $shipment->recipient_postcode,
-                        $shipment->recipient_country_code,
-                        0
-                    ];
+                    $shipment->consignment_number,
+                    $shipment->ship_date->format('d/m/Y'),
+                    'Pkg ' . $package->index . ' of ' . $shipment->pieces,
+                    $package->weight,
+                    $shipment->ship_date->format('d/m/Y'),
+                    $shipment->recipient_name,
+                    $shipment->recipient_company_name,
+                    $shipment->recipient_address1,
+                    $shipment->recipient_address2,
+                    $shipment->recipient_city,
+                    $shipment->recipient_state,
+                    $shipment->recipient_postcode,
+                    $shipment->recipient_country_code,
+                    0
+                ];
 
-                    // Remove any commas
-                    $line = array_map(
-                        function ($str) {
-                            return str_replace(',', '', $str);
-                        },
-                        $line
-                    );
+                // Remove any commas
+                $line = array_map(
+                    function ($str) {
+                        return str_replace(',', '', $str);
+                    },
+                    $line
+                );
 
-                    fputcsv($handle, $line);
-
-                endforeach;
+                fputcsv($handle, $line);
 
                 // Add to array of valid shipments
                 $this->validShipments[] = $shipment->id;
