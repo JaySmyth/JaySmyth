@@ -119,6 +119,14 @@ class UploadShipmentsToExpressFreight extends Command
                         0
                     ];
 
+                    // Remove any commas
+                    $line = array_map(
+                        function ($str) {
+                            return str_replace(',', '', $str);
+                        },
+                        $line
+                    );
+
                     fputcsv($handle, $line);
 
                 endforeach;
