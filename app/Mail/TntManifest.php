@@ -36,9 +36,8 @@ class TntManifest extends Mailable
         }
 
         return $this->to('courier@antrim.ifsgroup.com')
-                        ->cc('it@antrim.ifsgroup.com')
-                        ->subject('TNT Summary Manifest')
-                        ->view('emails.manifests.tnt');
+            ->subject('TNT Summary Manifest')
+            ->view('emails.manifests.tnt');
     }
 
 }
