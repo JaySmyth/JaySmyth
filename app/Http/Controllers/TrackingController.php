@@ -206,8 +206,12 @@ class TrackingController extends Controller
 
             if (isset($result['carrier'])) {
 
-                // Load the carrier
-                $carrier = Carrier::whereEasypost($result['carrier'])->firstOrFail();
+                if ($result['carrier'] == 'UPS') {
+                    $carrier = Carrier::find(3);
+                } else {
+                    // Load the carrier
+                    $carrier = Carrier::whereEasypost($result['carrier'])->firstOrFail();
+                }
 
                 // Load the shipment from the tracking code and carrier
                 $shipment = Shipment::whereCarrierTrackingNumber($result['tracking_code'])->firstOrFail();
