@@ -35,7 +35,7 @@ abstract class Tracking
 
             if (!$this->ignoreEvent($event)) {
 
-                $tracking = \App\Tracking::firstOrCreate(['message' => $event['message'], 'status' => $event['status'], 'datetime' => $event['datetime'], 'shipment_id' => $this->shipment->id])->update($event);
+                $tracking = \App\Tracking::firstOrCreate(['message' => $event['message'], 'status' => $event['status'], 'shipment_id' => $this->shipment->id])->update($event);
 
                 if ($tracking) {
                     $this->processEvent($event);
