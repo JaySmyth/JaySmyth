@@ -158,7 +158,7 @@ class UploadNIShipmentsToExpressFreight extends Command
             return false;
         }
 
-        if (strtoupper(substr($this->shipment['recipient_postcode'], 0, 2)) != 'BT') {
+        if (strtoupper(substr($shipment->recipient_postcode, 0, 2)) != 'BT') {
             return false;
         }
 

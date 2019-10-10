@@ -50,6 +50,7 @@ class Kernel extends ConsoleKernel
         Commands\ImportMultifreightFiles::class,
         Commands\UpdateScsJobNumbersOnShipments::class,
         Commands\ExpressFreight\UploadShipmentsToExpressFreight::class,
+        Commands\ExpressFreight\UploadNIShipmentsToExpressFreight::class,
         Commands\ExpressFreight\ProcessExpressFreightTracking::class,
         Commands\CheckForDuplicateShipments::class,
         Commands\ProcessScsCollectionRequests::class,

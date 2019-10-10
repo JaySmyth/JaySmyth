@@ -66,8 +66,17 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel {
             }
             $this->pdf->SetLineWidth(0.3);
             $this->pdf->Line(0, 28, 110, 28); //horizontal
-            // IFS logo
-            $this->pdf->Image(storage_path('app/images/ifs_logo_bw.png'), 64, 2, 34.2, 24.8, 'png');
+
+
+            // Express Freight logo                                                x  y   w   h
+            $this->pdf->Image(storage_path('app/images/express_freight_logo.png'), 52, 10, 18, 12, 'png');
+            $this->pdf->SetFont($this->font, 'B', 11);
+            $this->pdf->Text(69, 10, 'Express Freight');
+            $this->pdf->SetFont($this->font, 'B', 19);
+            $this->pdf->Text(65, 10, '..................');
+            $this->pdf->SetFont($this->font, 'BI', 8);
+            $this->pdf->Text(63, 18, 'Quality in distribution');
+
 
             $x = 3;
             $y = 2;
