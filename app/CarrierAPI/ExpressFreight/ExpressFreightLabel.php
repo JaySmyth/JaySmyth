@@ -153,6 +153,10 @@ class ExpressFreightLabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->SetFont($this->font, '', 9);
             $this->pdf->Text($x, $y += 6, $package['weight']);
 
+            // Display sender
+            $this->pdf->SetFont($this->font, 'B', 8);
+            $this->pdf->Text(6, 125, 'Sender: ' . $this->shipment['sender_company_name']);
+
             $y = 131;
             $this->pdf->SetFont($this->font, 'B', 9);
             $this->pdf->Text(6, $y, 'Tel - 028 38322100');
