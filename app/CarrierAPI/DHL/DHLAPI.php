@@ -359,18 +359,16 @@ class DHLAPI extends CarrierBase
             if ($this->pltIsAvailable($shipment['recipient_country_code'], $shipment['customs_value'], $shipment['customs_value_currency_code'])) {
 
                 $dhlShipment->UseDHLInvoice = 'Y';
+                $dhlShipment->UseIFSInvoice = 'N';
                 $dhlShipment->DHLInvoiceLanguageCode = 'en';
-                $dhlShipment->DHLInvoiceType = (isset($shipment['invoice_type']) && strtoupper($shipment['invoice_type']) == 'P') ? 'PI' : 'CMI';
+                $dhlShipment->DHLInvoiceType = (isset($shipment['invoice_type']) && strtoupper($shipment['invoice_type']) == 'P') ? 'PFI' : 'CMI';
                 $dhlShipment->RequestArchiveDoc == 'N';
 
                 $specialService = new SpecialService();
                 $specialService->SpecialServiceType = 'WY';
                 $dhlShipment->addSpecialService($specialService);
 
-            } else {
-                // Notify courier department that manual invoice is required
             }
-
         }
 
 
@@ -441,8 +439,6 @@ class DHLAPI extends CarrierBase
      */
     private function pltIsAvailable($recipientCountryCode, $customsValue, $currency)
     {
-        return false;
-
         $countriesNotSupportingPlt = ['PH', 'VN', 'BD', 'PK', 'ID', 'IN', 'CR', 'GT', 'CL', 'HN', 'BR', 'NI', 'PE', 'SV', 'AM', 'AZ', 'BY', 'GE', 'KZ', 'KG', 'MD', 'RU', 'TJ', 'UA', 'UZ', 'EG', 'KW', 'YE', 'QA', 'LB', 'IQ', 'IR', 'SY', 'MA', 'TN', 'AF', 'DZ', 'LY'];
 
         if (in_array(strtoupper($recipientCountryCode), $countriesNotSupportingPlt)) {
