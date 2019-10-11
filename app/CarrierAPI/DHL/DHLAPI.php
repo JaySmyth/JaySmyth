@@ -4,6 +4,7 @@ namespace App\CarrierAPI\DHL;
 
 use App\Carrier;
 use App\CarrierAPI\CarrierBase;
+use App\Company;
 use App\Country;
 use App\PackagingType;
 use App\Service;
@@ -90,7 +91,6 @@ class DHLAPI extends CarrierBase
 
     public function validateShipment($shipment)
     {
-
         /**
          * Don't allow residential shipments to russia
          */
@@ -201,7 +201,6 @@ class DHLAPI extends CarrierBase
 
     public function buildDHLShipment($shipment)
     {
-
         // Test a ShipmentRequest using DHL XML API
         $dhlShipment = new ShipmentRequest();
 
@@ -272,9 +271,9 @@ class DHLAPI extends CarrierBase
                 $dhlShipment->addSpecialService($specialService);
             }
 
-            $shipment['contents'] = null;
             if (!empty($shipment['contents'])) {
                 foreach ($shipment['contents'] as $content) {
+
                     if ($content['commodity_code'] > "") {
                         $dhlShipment->Commodity->CommodityCode = $content['commodity_code'];
                     } else {
@@ -344,24 +343,34 @@ class DHLAPI extends CarrierBase
         $dhlShipment->ShipmentDetails->PackageType = $this->packageTypes[$shipment['packages'][0]['packaging_code']];
         $dhlShipment->ShipmentDetails->CurrencyCode = $shipment['customs_value_currency_code'];
 
+
+        $dhlShipment->Dutiable->DeclaredValue = number_format($shipment['customs_value'], 2, '.', '');
+        $dhlShipment->Dutiable->DeclaredCurrency = $shipment['customs_value_currency_code'];
+
         // Is this a document shipment?
         if ($dhlShipment->ShipmentDetails->PackageType == "EE") {
             $dhlShipment->ShipmentDetails->IsDutiable = 'N';
         } else {
+
             $dhlShipment->ShipmentDetails->IsDutiable = 'Y';
             $dhlShipment->Dutiable->TermsOfTrade = strtoupper($shipment['terms_of_sale']);
-        }
+            $dhlShipment->Dutiable->ShipperEIN = Company::find($shipment['company_id'])->eori;
 
-        $dhlShipment->Dutiable->DeclaredValue = number_format($shipment['customs_value'], 2, '.', '');
-        $dhlShipment->Dutiable->DeclaredCurrency = $shipment['customs_value_currency_code'];
-        //$dhlShipment->Dutiable->ShipperEIN = $shipment['eori'];
+            if ($this->pltIsAvailable($shipment['recipient_country_code'], $shipment['customs_value'], $shipment['customs_value_currency_code'])) {
 
-        if ($this->pltIsAvailable()) {
-            $specialService = new SpecialService();
-            $specialService->SpecialServiceType = 'WY';
-            $dhlShipment->addSpecialService($specialService);
+                $dhlShipment->UseDHLInvoice = 'Y';
+                $dhlShipment->DHLInvoiceLanguageCode = 'en';
+                $dhlShipment->DHLInvoiceType = (isset($shipment['invoice_type']) && strtoupper($shipment['invoice_type']) == 'P') ? 'PI' : 'CMI';
+                $dhlShipment->RequestArchiveDoc == 'N';
 
-            $dhlShipment->UseDHLInvoice = 'Y';
+                $specialService = new SpecialService();
+                $specialService->SpecialServiceType = 'WY';
+                $dhlShipment->addSpecialService($specialService);
+
+            } else {
+                // Notify courier department that manual invoice is required
+            }
+
         }
 
 
@@ -430,9 +439,26 @@ class DHLAPI extends CarrierBase
      *
      * @return bool
      */
-    private function pltIsAvailable()
+    private function pltIsAvailable($recipientCountryCode, $customsValue, $currency)
     {
         return false;
+
+        $countriesNotSupportingPlt = ['PH', 'VN', 'BD', 'PK', 'ID', 'IN', 'CR', 'GT', 'CL', 'HN', 'BR', 'NI', 'PE', 'SV', 'AM', 'AZ', 'BY', 'GE', 'KZ', 'KG', 'MD', 'RU', 'TJ', 'UA', 'UZ', 'EG', 'KW', 'YE', 'QA', 'LB', 'IQ', 'IR', 'SY', 'MA', 'TN', 'AF', 'DZ', 'LY'];
+
+        if (in_array(strtoupper($recipientCountryCode), $countriesNotSupportingPlt)) {
+            return false;
+        }
+
+        $countriesSupportingPltWithLimit = ['RS' => ['limit' => 50, 'currency_code' => 'EUR'], 'SA' => ['limit' => 200, 'currency_code' => 'USD'], 'BH' => ['limit' => 1300, 'currency_code' => 'USD'], 'OM' => ['limit' => 2590, 'currency_code' => 'USD'], 'JO' => ['limit' => 1000, 'currency_code' => 'USD'], 'AE' => ['limit' => 13623, 'currency_code' => 'USD'],];
+
+        if (array_key_exists($recipientCountryCode, $countriesSupportingPltWithLimit)) {
+            $limit = $countriesSupportingPltWithLimit[$recipientCountryCode]['limit'];
+            if ($customsValue > $limit) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function sendMessageToCarrier($dhlShipment)
@@ -443,6 +469,8 @@ class DHLAPI extends CarrierBase
 
         // Call the DHL service and display the XML result
         $sentXML = $dhlShipment->toXML();
+
+        // dd($sentXML);
 
         $sentXML = str_replace('9.880000000000001', '9.88', $sentXML);
 
