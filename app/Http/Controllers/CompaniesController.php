@@ -268,7 +268,7 @@ class CompaniesController extends Controller
 
         // Remove any entries for the old Company/ rate/ service from the Discount table
         if ($oldCompanyRate) {
-            $companyRates->deleteDiscount($company->id, $oldCompanyRate->rate_id, $request->service_id, date('Y-m-d'));
+            $companyRates->closeRateDiscounts($company->id, $oldCompanyRate->rate_id, $request->service_id, date('Y-m-d'));
         }
 
         // Remove any entries for the new Company/ rate/ service from the Discount table
