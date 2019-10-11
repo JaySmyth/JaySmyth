@@ -439,6 +439,9 @@ class DHLAPI extends CarrierBase
      */
     private function pltIsAvailable($recipientCountryCode, $customsValue, $currency)
     {
+
+        return false;
+
         $countriesNotSupportingPlt = ['PH', 'VN', 'BD', 'PK', 'ID', 'IN', 'CR', 'GT', 'CL', 'HN', 'BR', 'NI', 'PE', 'SV', 'AM', 'AZ', 'BY', 'GE', 'KZ', 'KG', 'MD', 'RU', 'TJ', 'UA', 'UZ', 'EG', 'KW', 'YE', 'QA', 'LB', 'IQ', 'IR', 'SY', 'MA', 'TN', 'AF', 'DZ', 'LY'];
 
         if (in_array(strtoupper($recipientCountryCode), $countriesNotSupportingPlt)) {
