@@ -293,6 +293,18 @@ class CompanyRates extends Model
         }
     }
 
+    public function closeRateDiscounts($companyId, $rateId = '', $serviceId = '', $effectiveDate = '')
+    {
+
+        // Get correct empty RateDetail object
+        $this->getRateDetailObject($this->rate_id);
+
+        // Close Discounts
+        if ($this->rateDetail) {
+            $this->rateDetail->closeRateDiscounts($this->company_id, $this->rate_id, $this->service_id, $discount, $effectiveDate);
+        }
+    }
+
     /**
     * Checks Domestic & Non domestic and deletes matching discounts
     *
