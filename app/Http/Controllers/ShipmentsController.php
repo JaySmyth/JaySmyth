@@ -926,16 +926,10 @@ class ShipmentsController extends Controller
      *
      * @return type
      */
-    public function test($id)
+    public function test(Request $request)
     {
-        $shipment = Shipment::find($id);
 
-        $response = $shipment->getPngLabels();
-
-        header('Content-Disposition: attachment;filename="test.png"');
-        header('Content-Type: application/force-download');
-        echo base64_decode($response['package'][0]);
-
+        return response()->json([$request->all()], 200);
     }
 
 }
