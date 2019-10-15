@@ -946,7 +946,7 @@ class Pdf
             $this->pdf->SetXY(95, $y);
             $this->pdf->Cell(5, 5, $item->country_of_manufacture, 0, 0, 'L', false);
             $this->pdf->SetXY(102, $y);
-            $this->pdf->Cell(10, 5, ($item->harmonized_code) ? $item->harmonized_code : $item->commodity_code, 0, 0, 'L', false);
+            $this->pdf->Cell(10, 5, (strlen($item->harmonized_code) > 5) ? $item->harmonized_code : $item->commodity_code, 0, 0, 'L', false);
             $this->pdf->SetXY(126, $y);
             $this->pdf->Cell(5, 5, $item->uom, 0, 0, 'C', false);
             $this->pdf->SetXY(132, $y);
