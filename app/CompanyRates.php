@@ -239,7 +239,6 @@ class CompanyRates extends Model
     public function getRateDetailObject($rateId)
     {
         $rate = Rate::find($rateId);
-
         if ($rate) {
             switch (strtolower($rate->model)) {
 
@@ -295,13 +294,12 @@ class CompanyRates extends Model
 
     public function closeRateDiscounts($companyId, $rateId = '', $serviceId = '', $effectiveDate = '')
     {
-
         // Get correct empty RateDetail object
-        $this->getRateDetailObject($this->rate_id);
+        $this->getRateDetailObject($rateId);
 
         // Close Discounts
         if ($this->rateDetail) {
-            $this->rateDetail->closeRateDiscounts($this->company_id, $this->rate_id, $this->service_id, $discount, $effectiveDate);
+            $this->rateDetail->closeRateDiscounts($companyId, $rateId, $serviceId, $effectiveDate);
         }
     }
 

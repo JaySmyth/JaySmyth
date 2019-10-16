@@ -383,21 +383,20 @@ class RateDetail extends Model
     */
     public function closeRateDiscounts($companyId, $rateId = '', $serviceId = '', $effectiveDate = '')
     {
-
         // Get any domestic rates already defined
         $discounts = $this->buildQuery(new RateDiscount(), $companyId, $rateId, $serviceId, $effectiveDate, 'get');
         if ($discounts) {
             foreach ($discounts as $discount) {
 
                 // If Rate only just defined or in the future - remove it so we can replace it.
-                if ($discount->from_date >= date('Y-m-d')) {
+                if ($discount->from_date->format('Y-m-d') >= date('Y-m-d')) {
                     $discount->delete();
                 }
 
                 // If pre-existing rate - close it.
-                if ($discount->from_date < date('Y-m-d') && $discount->to_date >= date('Y-m-d')) {
+                if ($discount->from_date->format('Y-m-d') < date('Y-m-d') && $discount->to_date->format('Y-m-d')  >= date('Y-m-d')) {
                     $discount->to_date = date('Y-m-d', strtotime($effectiveDate . ' -1 day'));
-                    $discount->update();
+                    $discount->save();
                 }
             }
         }
