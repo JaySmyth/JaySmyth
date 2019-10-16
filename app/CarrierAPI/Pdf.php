@@ -100,12 +100,6 @@ class Pdf
         $this->pdf->Cell(9, 6, 'SVC', 1, 0, 'C', true);
         $this->pdf->Cell(9, 6, 'PCS', 1, 0, 'R', true);
         $this->pdf->Cell(9, 6, 'WGT', 1, 0, 'R', true);
-
-        if ($manifest->carrier->id == 2) {
-            $this->pdf->Cell(7, 6, 'COL', 1, 0, 'C', true);
-            $totalCollect = 0;
-        }
-
         $this->pdf->Ln();
 
         $this->pdf->SetFont($this->font, '', 6);
@@ -119,15 +113,6 @@ class Pdf
             $this->pdf->Cell(9, 6, strtoupper($shipment->service->code), 1, 0, 'C', true);
             $this->pdf->Cell(9, 6, $shipment->pieces, 1, 0, 'R', true);
             $this->pdf->Cell(9, 6, $shipment->weight, 1, 0, 'R', true);
-
-            if ($manifest->carrier->id == 2) {
-                $collect = (strtolower($shipment->bill_shipping) == 'recipient') ? 'Y' : 'N';
-                $this->pdf->Cell(7, 6, $collect, 1, 0, 'C', true);
-                if ($collect == 'Y') {
-                    $totalCollect++;
-                }
-            }
-
             $this->pdf->Ln();
             $totalShipments++;
             $totalPieces += $shipment->pieces;
@@ -137,18 +122,9 @@ class Pdf
         // Add Totals
         $this->pdf->Ln();
 
-        if ($manifest->carrier->id == 2) {
-            $this->pdf->Cell(50, 6, "Total Collect Shipments : " . $totalCollect, 1, 0, 'R', true);
-            $this->pdf->Cell(49, 6, "Total Shipments : " . $totalShipments, 1, 0, 'R', true);
-            $this->pdf->Cell(49, 6, "Total Pieces : " . $totalPieces, 1, 0, 'R', true);
-            $this->pdf->Cell(45, 6, "Total Weight : " . $totalWeight . " kgs", 1, 0, 'R', true);
-        } else {
-            $this->pdf->Cell(65, 6, "Total Shipments : " . $totalShipments, 1, 0, 'R', true);
-            $this->pdf->Cell(65, 6, "Total Pieces : " . $totalPieces, 1, 0, 'R', true);
-            $this->pdf->Cell(63, 6, "Total Weight : " . $totalWeight . " kgs", 1, 0, 'R', true);
-        }
-
-
+        $this->pdf->Cell(65, 6, "Total Shipments : " . $totalShipments, 1, 0, 'R', true);
+        $this->pdf->Cell(65, 6, "Total Pieces : " . $totalPieces, 1, 0, 'R', true);
+        $this->pdf->Cell(63, 6, "Total Weight : " . $totalWeight . " kgs", 1, 0, 'R', true);
         $this->pdf->Ln();
         $this->pdf->Ln();
         $this->pdf->Cell(65, 6, "Received in good condition by :", 0, 0, 'L', true);
