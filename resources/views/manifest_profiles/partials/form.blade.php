@@ -11,7 +11,7 @@
                 {!! Form::Text('name', old('name'), ['id' => 'name', 'class' => 'form-control', 'maxlength' => '50']) !!}
 
                 @if ($errors->has('name'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('name') }}</strong>
                 </span>
                 @endif
@@ -28,14 +28,14 @@
                 {!! Form::Text('prefix', old('prefix'), ['id' => 'prefix', 'class' => 'form-control', 'maxlength' => '4']) !!}
 
                 @if ($errors->has('prefix'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('prefix') }}</strong>
                 </span>
                 @endif
             </div>
         </div>
 
-        <div class="form-group row{{ $errors->has('depot_id') ? ' has-danger' : '' }}">          
+        <div class="form-group row{{ $errors->has('depot_id') ? ' has-danger' : '' }}">
             <label class="col-sm-3  col-form-label">
                 Depot: <abbr title="This information is required.">*</abbr>
             </label>
@@ -44,7 +44,7 @@
                 {!! Form::select('depot_id', dropDown('depots'), old('depot_id'), array('id' => 'depot_id', 'class' => 'form-control')) !!}
 
                 @if ($errors->has('depot_id'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('depot_id') }}</strong>
                 </span>
                 @endif
@@ -62,7 +62,7 @@
                 {!! Form::select('mode_id', dropDown('modes', 'Please select'), old('mode_id'), array('id' => 'carrier_id', 'class' => 'form-control')) !!}
 
                 @if ($errors->has('mode_id'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('mode_id') }}</strong>
                 </span>
                 @endif
@@ -80,7 +80,7 @@
                 {!! Form::select('carrier_id', dropDown('carriers', 'Please select'), old('carrier_id'), array('id' => 'carrier_id', 'class' => 'form-control')) !!}
 
                 @if ($errors->has('carrier_id'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('carrier_id') }}</strong>
                 </span>
                 @endif
@@ -98,8 +98,45 @@
                 {!! Form::select('route_id', dropDown('routes', 'Please select'), old('route_id'), array('id' => 'route_id', 'class' => 'form-control')) !!}
 
                 @if ($errors->has('route_id'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('route_id') }}</strong>
+                </span>
+                @endif
+
+            </div>
+        </div>
+
+
+        <div class="form-group row{{ $errors->has('collect_shipments_only') ? ' has-danger' : '' }}">
+
+            <label class="col-sm-3  col-form-label">
+                Collect Shipments Only: <abbr title="This information is required.">*</abbr>
+            </label>
+
+            <div class="col-sm-8">
+                {!! Form::select('collect_shipments_only', dropDown('boolean', 'Please select'), old('collect_shipments_only'), array('id' => 'collect_shipments_only', 'class' => 'form-control')) !!}
+
+                @if ($errors->has('collect_shipments_only'))
+                    <span class="form-text">
+                    <strong>{{ $errors->first('collect_shipments_only') }}</strong>
+                </span>
+                @endif
+
+            </div>
+        </div>
+
+        <div class="form-group row{{ $errors->has('exclude_collect_shipments') ? ' has-danger' : '' }}">
+
+            <label class="col-sm-3  col-form-label">
+                Exclude Collect Shipments: <abbr title="This information is required.">*</abbr>
+            </label>
+
+            <div class="col-sm-8">
+                {!! Form::select('exclude_collect_shipments', dropDown('boolean', 'Please select'), old('exclude_collect_shipments'), array('id' => 'exclude_collect_shipments', 'class' => 'form-control')) !!}
+
+                @if ($errors->has('exclude_collect_shipments'))
+                    <span class="form-text">
+                    <strong>{{ $errors->first('exclude_collect_shipments') }}</strong>
                 </span>
                 @endif
 
@@ -117,7 +154,7 @@
                 {!! Form::select('auto', dropDown('boolean', 'Please select'), old('auto'), array('id' => 'auto', 'class' => 'form-control')) !!}
 
                 @if ($errors->has('auto'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('auto') }}</strong>
                 </span>
                 @endif
@@ -134,7 +171,7 @@
                 {!! Form::Text('time', old('time'), ['id' => 'prefix', 'class' => 'form-control', 'maxlength' => '5']) !!}
 
                 @if ($errors->has('time'))
-                <span class="form-text">
+                    <span class="form-text">
                     <strong>{{ $errors->first('time') }}</strong>
                 </span>
                 @endif
@@ -145,7 +182,7 @@
             <div class="col-sm-3">&nbsp;</div>
             <div class="col-sm-8">
                 <a class="back btn btn-secondary" role="button">Cancel</a>
-                <button type="submit" class="btn btn-primary">{{ $submitButtonText }}</button>   
+                <button type="submit" class="btn btn-primary">{{ $submitButtonText }}</button>
             </div>
         </div>
 
@@ -157,12 +194,12 @@
             <div class="card-header">Services</div>
             <div class="card-body">
                 @foreach ($services->sortBy('carrier_name') as $service)
-                <div class="checkbox text-large">
-                    <label>
-                        {!! Form::checkbox('services[]', $service->id) !!}
-                        {{$service->carrier_name}} - {{$service->carrier_code}} - {{$service->name}}
-                    </label>
-                </div>
+                    <div class="checkbox text-large">
+                        <label>
+                            {!! Form::checkbox('services[]', $service->id) !!}
+                            {{$service->carrier_name}} - {{$service->carrier_code}} - {{$service->name}}
+                        </label>
+                    </div>
                 @endforeach
             </div>
         </div>
@@ -175,12 +212,12 @@
             <div class="card-header">Countries</div>
             <div class="card-body">
                 @foreach ($countries as $country)
-                <div class="checkbox text-large">
-                    <label>
-                        {!! Form::checkbox('countries[]', $country->id) !!}
-                        {{$country->country}}
-                    </label>
-                </div>
+                    <div class="checkbox text-large">
+                        <label>
+                            {!! Form::checkbox('countries[]', $country->id) !!}
+                            {{$country->country}}
+                        </label>
+                    </div>
                 @endforeach
             </div>
         </div>

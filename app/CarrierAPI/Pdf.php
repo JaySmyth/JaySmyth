@@ -92,7 +92,7 @@ class Pdf
         $this->pdf->SetY(12);
         $this->pdf->SetFont($this->font, 'I', 7);
         $this->pdf->SetFillColor(221, 221, 221);
-        $this->pdf->Cell(25, 6, 'CONSIGNMENT#', 1, 0, 'L', true);
+        $this->pdf->Cell(22, 6, 'CONSIGNMENT', 1, 0, 'L', true);
         $this->pdf->Cell(27, 6, 'CARRIER#', 1, 0, 'L', true);
         $this->pdf->Cell(57, 6, 'SHIPPER', 1, 0, 'L', true);
         $this->pdf->Cell(42, 6, 'DESTINATION', 1, 0, 'L', true);
@@ -105,7 +105,7 @@ class Pdf
         $this->pdf->SetFont($this->font, '', 6);
         $this->pdf->SetFillColor(255, 255, 255);
         foreach ($manifest->shipments as $shipment) {
-            $this->pdf->Cell(25, 6, $shipment->consignment_number, 1, 0, 'L', true);
+            $this->pdf->Cell(22, 6, $shipment->consignment_number, 1, 0, 'L', true);
             $this->pdf->Cell(27, 6, $shipment->carrier_consignment_number, 1, 0, 'L', true);
             $this->pdf->Cell(57, 6, $shipment->company->company_name, 1, 0, 'L', true);
             $this->pdf->Cell(42, 6, $shipment->recipient_city . ', ' . $shipment->recipient_country_code, 1, 0, 'L', true);
@@ -121,9 +121,10 @@ class Pdf
 
         // Add Totals
         $this->pdf->Ln();
-        $this->pdf->Cell(65, 6, "Total Shipments : " . $totalShipments, 1, 0, 'L', true);
-        $this->pdf->Cell(65, 6, "Total Pieces : " . $totalPieces, 1, 0, 'L', true);
-        $this->pdf->Cell(63, 6, "Total Weight : " . $totalWeight . " kgs", 1, 0, 'L', true);
+
+        $this->pdf->Cell(65, 6, "Total Shipments : " . $totalShipments, 1, 0, 'R', true);
+        $this->pdf->Cell(65, 6, "Total Pieces : " . $totalPieces, 1, 0, 'R', true);
+        $this->pdf->Cell(63, 6, "Total Weight : " . $totalWeight . " kgs", 1, 0, 'R', true);
         $this->pdf->Ln();
         $this->pdf->Ln();
         $this->pdf->Cell(65, 6, "Received in good condition by :", 0, 0, 'L', true);
@@ -921,7 +922,7 @@ class Pdf
             $this->pdf->SetXY(95, $y);
             $this->pdf->Cell(5, 5, $item->country_of_manufacture, 0, 0, 'L', false);
             $this->pdf->SetXY(102, $y);
-            $this->pdf->Cell(10, 5, ($item->harmonized_code) ? $item->harmonized_code : $item->commodity_code, 0, 0, 'L', false);
+            $this->pdf->Cell(10, 5, (strlen($item->harmonized_code) > 5) ? $item->harmonized_code : $item->commodity_code, 0, 0, 'L', false);
             $this->pdf->SetXY(126, $y);
             $this->pdf->Cell(5, 5, $item->uom, 0, 0, 'C', false);
             $this->pdf->SetXY(132, $y);

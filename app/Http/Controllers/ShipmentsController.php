@@ -929,7 +929,13 @@ class ShipmentsController extends Controller
     public function test(Request $request)
     {
 
-        return response()->json([$request->all()], 200);
+        $trackingNumber = '47312482';
+
+        $trackingNumber = str_pad($trackingNumber, 8, 0, STR_PAD_LEFT);
+        $trackingNumber .= mod11CheckDigit((string)$trackingNumber);                        // Then add check digit
+
+        dd($trackingNumber);
+
     }
 
 }

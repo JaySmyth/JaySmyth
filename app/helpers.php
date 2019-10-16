@@ -832,12 +832,30 @@ function mod11CheckDigit($number)
     // Mod 11
     $remainder = $sum % 11;
 
-    switch ($remainder) {
-        case 0:
+    // Subtract the remainder from 11
+    $result = 11 - $remainder;
+
+    // – if the result falls within the range 1 to 9, use the result as the check digit;
+    // – if the result is 10, use 0 as the check digit;
+    // – if the result is 11, use 5 as the check digit.
+
+    switch ($result) {
         case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+            return $result;
+        case 10:
             return 0;
+        case 11:
+            return 5;
         default:
-            return 11 - $remainder;
+            return 0;
     }
 }
 
