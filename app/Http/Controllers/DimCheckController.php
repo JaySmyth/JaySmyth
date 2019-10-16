@@ -53,8 +53,8 @@ class DimCheckController extends Controller
 
                 if ($rowNumber >= 2) {
 
-                    $dhlActualWeight = $data[30];
-                    $dhlVolWeight = $data[31];
+                    $dhlActualWeight = (is_numeric($data[30])) ? $data[30] : 0;
+                    $dhlVolWeight = (is_numeric($data[31])) ? $data[31] : 0;
 
                     $shipment = Shipment::where('carrier_consignment_number', $data[2])->where('carrier_id', 5)->first();
 
@@ -78,6 +78,7 @@ class DimCheckController extends Controller
                             'sales_zone' => (isset($shipment->quoted_array['sales_zone'])) ? $shipment->quoted_array['sales_zone'] : '',
                             'flag' => (max($dhlActualWeight, $dhlVolWeight) >= max($shipment->weight, $shipment->volumetric_weight)) ? true : false
                         ];
+
                     } else {
                         $results[$rowNumber] = ['consignment_number' => false, 'carrier_consignment_number' => $data[2]];
                     }
