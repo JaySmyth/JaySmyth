@@ -2,15 +2,14 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
-use App\Service;
-use App\Sequence;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Database\Eloquent\Model;
 
 /*
  * Temporary code.
  */
+
 use App\CarrierAPI\TNT\TNTManifest;
 
 class ManifestProfile extends Model
@@ -27,7 +26,7 @@ class ManifestProfile extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'mode_id', 'carrier_id', 'route_id', 'depot_id', 'auto', 'time'];
+    protected $fillable = ['name', 'mode_id', 'carrier_id', 'route_id', 'depot_id', 'collect_shipments_only', 'exclude_collect_shipments', 'auto', 'time'];
 
     /**
      * The attributes that should be mutated to dates.
@@ -58,7 +57,7 @@ class ManifestProfile extends Model
 
     /**
      * A manifest profile belongs to a mode of transport (courier, air, etc.)
-     * 
+     *
      * @return
      */
     public function mode()
@@ -98,8 +97,8 @@ class ManifestProfile extends Model
 
     /**
      * Get an array of service IDs defined for the profile.
-     * 
-     * @return 
+     *
+     * @return
      */
     public function getServiceIds()
     {
@@ -108,8 +107,8 @@ class ManifestProfile extends Model
 
     /**
      * Get an array of service IDs defined for the profile.
-     * 
-     * @return 
+     *
+     * @return
      */
     public function getCountryCodes()
     {
@@ -118,7 +117,7 @@ class ManifestProfile extends Model
 
     /**
      * Get the total weight of available shipments.
-     * 
+     *
      * @return string
      */
     public function getWeightAvailableAttribute()
@@ -128,7 +127,7 @@ class ManifestProfile extends Model
 
     /**
      * Get the total weight of available shipments.
-     * 
+     *
      * @return string
      */
     public function getWeightHoldAttribute()
@@ -138,7 +137,7 @@ class ManifestProfile extends Model
 
     /**
      * Get the total viable shipments on hold.
-     * 
+     *
      * @return string
      */
     public function getOnHoldAttribute()
@@ -148,7 +147,7 @@ class ManifestProfile extends Model
 
     /**
      * Get the total viable shipments on hold.
-     * 
+     *
      * @return string
      */
     public function getAvailableAttribute()
@@ -163,14 +162,22 @@ class ManifestProfile extends Model
     public function getShipments($onHold = 0, $companyId = false)
     {
         $query = Shipment::OrderBy('ship_date', 'desc')
-                ->orderBy('service_id', 'DESC')
-                ->availableForManifesting()
-                ->hasMode($this->mode_id)
-                ->hasDepot($this->depot_id)
-                ->hasCarrier($this->carrier_id)
-                ->hasRoute($this->route_id)
-                ->hasCompany($companyId)
-                ->whereOnHold($onHold);                
+            ->orderBy('service_id', 'DESC')
+            ->availableForManifesting()
+            ->hasMode($this->mode_id)
+            ->hasDepot($this->depot_id)
+            ->hasCarrier($this->carrier_id)
+            ->hasRoute($this->route_id)
+            ->hasCompany($companyId)
+            ->whereOnHold($onHold);
+
+        if ($this->collect_shipments_only && $this->carrier_id == 2) {
+            $query->isFedexCollect($query);
+        }
+
+        if ($this->exclude_collect_shipments && $this->carrier_id == 2) {
+            $query->isNotFedexCollect($query);
+        }
 
         if ($this->services->count() > 0) {
             $query->whereIn('service_id', $this->getServiceIds());
@@ -179,22 +186,30 @@ class ManifestProfile extends Model
         if ($this->countries->count() > 0) {
             $query->whereIn('recipient_country_code', $this->getCountryCodes());
         }
-        
+
         return $query->with('carrier', 'depot', 'service', 'route', 'company')->get();
     }
 
     /**
      * Determine if a shipment is viable for a profile
-     * 
+     *
      * @param type $shipmentId
      * @return boolean
      */
     public function isShipmentViable($shipmentId)
     {
         $query = Shipment::whereId($shipmentId)
-                ->hasDepot($this->depot_id)
-                ->hasCarrier($this->carrier_id)
-                ->hasRoute($this->route_id);
+            ->hasDepot($this->depot_id)
+            ->hasCarrier($this->carrier_id)
+            ->hasRoute($this->route_id);
+
+        if ($this->collect_shipments_only && $this->carrier_id == 2) {
+            $query->scopeIsFedexCollect($query);
+        }
+
+        if ($this->exclude_collect_shipments && $this->carrier_id == 2) {
+            $query->scopeIsNotFedexCollect($query);
+        }
 
         if ($this->services->count() > 0) {
             $query->whereIn('service_id', $this->getServiceIds());
@@ -233,11 +248,11 @@ class ManifestProfile extends Model
 
             // create a new manifest
             $manifest = Manifest::create([
-                        'number' => $manifestNumber,
-                        'mode_id' => $this->mode_id,
-                        'depot_id' => $this->depot_id,
-                        'carrier_id' => $this->carrier_id,
-                        'manifest_profile_id' => $this->id,
+                'number' => $manifestNumber,
+                'mode_id' => $this->mode_id,
+                'depot_id' => $this->depot_id,
+                'carrier_id' => $this->carrier_id,
+                'manifest_profile_id' => $this->id,
             ]);
         }
 
@@ -274,7 +289,7 @@ class ManifestProfile extends Model
 
     /**
      * Generate a manifest number.
-     * 
+     *
      * @return string
      */
     private function getManifestNumber()
@@ -297,7 +312,7 @@ class ManifestProfile extends Model
 
     /**
      * Get the last run time for a manifest profile.
-     * 
+     *
      * @param type $timeZone
      * @param type $format
      * @return string
@@ -312,14 +327,14 @@ class ManifestProfile extends Model
 
     /**
      * Update the hold flag on all shipments for a given company.
-     * 
+     *
      * @param type $hold
      * @param type $companyId
      */
     public function bulkHold($hold, $companyId)
     {
         $shipments = $this->getShipments($hold, $companyId);
-        
+
         if ($shipments->count() > 0) {
             // Set the source field on all shipments to that of the filename
             \App\Shipment::whereIn('id', $shipments->pluck('id'))->update([
