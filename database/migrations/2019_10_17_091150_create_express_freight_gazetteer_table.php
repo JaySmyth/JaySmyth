@@ -16,7 +16,7 @@ class CreateExpressFreightGazetteerTable extends Migration
         Schema::create('express_freight_gazetteer', function (Blueprint $table) {
             $table->increments('id');
             $table->string('postcode', 10);
-            $table->integer('bay');
+            $table->string('bay', 20);
         });
     }
 
