@@ -89,15 +89,14 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
         $currentConsignmentNumber = nextAvailable('EXPNICONSIGNMENT');
         $currentConsignmentNumber = str_pad($currentConsignmentNumber, 3, 0, STR_PAD_LEFT);
 
+        $trackingNumber = 'I012' . date('dmy', strtotime($shipment['ship_date'])) . $currentConsignmentNumber;
+
+        // Set the carrier consignment and tracking numbers
+        $data['carrier_consignment_number'] = $trackingNumber;
+        $data['carrier_tracking_number'] = $trackingNumber;
+
         for ($i = 0; $i < $data['pieces']; $i++) {
-
-            $trackingNumber = 'I012' . date('dmy', strtotime($shipment['ship_date'])) . $currentConsignmentNumber . str_pad($i + 1, 3, 0, STR_PAD_LEFT);
-
-            if ($i == 0) {
-                $data['carrier_consignment_number'] = $trackingNumber;                  // Use it for the Carrier number
-                $data['carrier_tracking_number'] = $trackingNumber;                     // If 1st Package set master tracking no
-            }
-
+            $trackingNumber .= str_pad($i + 1, 3, 0, STR_PAD_LEFT);                      // Append the package number
             $data['packages'][$i]['carrier_tracking_number'] = $trackingNumber;         // Store tracking no for package
             $data['packages'][$i]['barcode'] = $trackingNumber;                         // Store tracking no for package
         }
@@ -166,7 +165,7 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
         $response['route_id'] = $route_id;
         $response['carrier'] = 'ifs';
         $response['ifs_consignment_number'] = $reply['consignment_number'];
-        $response['consignment_number'] = $reply['consignment_number'];
+        $response['consignment_number'] = $reply['carrier_consignment_number'];
         $response['carrier_consignment_number'] = $reply['carrier_consignment_number'];
         $response['volumetric_divisor'] = getVolumetricDivisor('IFS', $serviceCode);       // From Helper functions
 
