@@ -2,6 +2,8 @@
 
 namespace App\CarrierAPI\ExpressFreight;
 
+use App\ExpressFreightGazetteer;
+
 class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
 {
     /**
@@ -58,7 +60,7 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->Cell(22, 22, '', 1);
 
             $this->pdf->SetFont($this->font, 'B', 48);
-            $this->pdf->Text(78, 10, '24');
+            $this->pdf->Text(78, 10, $this->getBayNumber($this->shipment['recipient_postcode']));
 
             // Package Number
             $x = 6;
@@ -162,6 +164,26 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
         }
 
         return $this->output();
+    }
+
+
+    /**
+     * Lookup the bay number from the EF gazetteer
+     *
+     * @param $postcode
+     * @return int
+     */
+    protected function getBayNumber($postcode)
+    {
+        $postcode = trim(str_replace(' ', '', $postcode));
+
+        $gaz = ExpressFreightGazetteer::where('postcode', $postcode)->first();
+
+        if ($gaz) {
+            return $gaz->bay;
+        }
+
+        return null;
     }
 
 }
