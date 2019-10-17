@@ -1,6 +1,6 @@
 <?php
 
-namespace App\CarrierAPI\ExpressFreight;
+namespace App\CarrierAPI\ExpressFreightNI;
 
 use App\ExpressFreightGazetteer;
 
@@ -59,8 +59,16 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->SetLineWidth(0.3);
             $this->pdf->Cell(22, 22, '', 1);
 
-            $this->pdf->SetFont($this->font, 'B', 48);
-            $this->pdf->Text(78, 10, $this->getBayNumber($this->shipment['recipient_postcode']));
+
+            $bay = $this->getBayNumber($this->shipment['recipient_postcode']);
+
+            if (strlen($bay) > 2) {
+                $this->pdf->SetFont($this->font, 'B', 28);
+                $this->pdf->Text(78, 17, $bay);
+            } else {
+                $this->pdf->SetFont($this->font, 'B', 40);
+                $this->pdf->Text(78, 14, $bay);
+            }
 
             // Package Number
             $x = 6;
@@ -180,7 +188,7 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
         $gaz = ExpressFreightGazetteer::where('postcode', $postcode)->first();
 
         if ($gaz) {
-            return $gaz->bay;
+            return strtoupper($gaz->bay);
         }
 
         return null;

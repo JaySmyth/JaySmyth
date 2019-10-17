@@ -18,11 +18,8 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
      *  Carrier Specific Variable declarations
      */
 
-    private $account;
-    private $pdf;
-    private $tpl;
     public $mode;
-    private $client;
+
 
     function initCarrier()
     {
@@ -31,13 +28,7 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
 
     public function buildCarrierShipment($shipment)
     {
-
         return $shipment;
-    }
-
-    private function extract_errors($errorsFound)
-    {
-
     }
 
     public function preProcess($shipment)
@@ -55,8 +46,6 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
 
     private function sendMessageToCarrier($shipment)
     {
-
-        $response = [];
         $msgType = 'MSG';
 
         // Call the IFS service and display the XML result
@@ -102,7 +91,7 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
 
         for ($i = 0; $i < $data['pieces']; $i++) {
 
-            $trackingNumber = 'I012' . date('dmY', strtotime($shipment['ship_date'])) . $currentConsignmentNumber . str_pad($i + 1, 3, 0, STR_PAD_LEFT);
+            $trackingNumber = 'I012' . date('dmy', strtotime($shipment['ship_date'])) . $currentConsignmentNumber . str_pad($i + 1, 3, 0, STR_PAD_LEFT);
 
             if ($i == 0) {
                 $data['carrier_consignment_number'] = $trackingNumber;                  // Use it for the Carrier number
