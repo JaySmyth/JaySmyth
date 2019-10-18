@@ -106,9 +106,7 @@ class ImportExpressFreightPurchaseInvoices extends Command
 
         $rowNumber = 1;
 
-        $vat = 0;
         $totalTaxable = 0;
-        $totalNonTaxable = 0;
 
         if (($handle = fopen($this->sftpDirectory . $file, 'r')) !== false) {
 
@@ -161,12 +159,7 @@ class ImportExpressFreightPurchaseInvoices extends Command
                     $this->applyCharge($row['Line Amount Excl. VAT'], 'FRT', 'FREIGHT CHARGE', $purchaseInvoiceLine->id);
                     $this->applyCharge($row['Fuel Surcharge Amount'], 'FSC', 'FUEL SURCHARGE', $purchaseInvoiceLine->id);
 
-                    if (is_numeric($row['Net Amount (VAT)']) && $row['Net Amount (VAT)'] > 0) {
-                        $vat += $row['Net Amount (VAT)'];
-                        $totalTaxable += $purchaseInvoiceLine->charges->where('code', '!=', 'CDV')->sum('billed_amount');
-                    } else {
-                        $totalNonTaxable += $purchaseInvoiceLine->charges->sum('billed_amount');
-                    }
+                    $totalTaxable += $purchaseInvoiceLine->charges->sum('billed_amount');
 
                 }
 
@@ -181,8 +174,8 @@ class ImportExpressFreightPurchaseInvoices extends Command
             $purchaseInvoice = PurchaseInvoice::find($this->purchaseInvoice->id);
             $purchaseInvoice->setAdditionalValues();
             $purchaseInvoice->total_taxable = $totalTaxable;
-            $purchaseInvoice->total_non_taxable = $totalNonTaxable;
-            $purchaseInvoice->vat = $vat;
+            $purchaseInvoice->total_non_taxable = 0;
+            $purchaseInvoice->vat = 0;
             $purchaseInvoice->save();
         }
     }
