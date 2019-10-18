@@ -25,7 +25,7 @@ class ImportExpressFreightPurchaseInvoices extends Command
     protected $description = 'Reads purchase files (pushed via FTP by Express Freight) and populates purchase invoice tables';
 
     /**
-     * The SFTP directory that TNT upload invoice files.
+     * The SFTP directory that Express Freight upload invoice files.
      *
      * @var string
      */
@@ -69,7 +69,7 @@ class ImportExpressFreightPurchaseInvoices extends Command
 
         $this->sftpDirectory = '/home/expressfreight/invoices/';
         $this->archiveDirectory = 'archive';
-        $this->fields = array('Consignment Note No.', 'Return', 'Dispatch Date', 'City', 'Type', 'No.', 'Description', 'Quantity', 'Consignee', 'Unit of Measure', 'Code', 'Fuel Surcharge Amount', 'Line Amount Excl. VAT', 'Deferral Code', 'Consignment Note No.', 'Post Code');
+        $this->fields = array('Consignment Number', 'Return', 'Dispatch Date', 'City', 'Type', 'No.', 'Description', 'Quantity', 'Consignee', 'Unit of Measure Code', 'Fuel Surcharge Amount', 'Line Amount Excl. VAT', 'Deferral Code', 'Consignment2', 'Post Code');
     }
 
     /**
@@ -85,7 +85,7 @@ class ImportExpressFreightPurchaseInvoices extends Command
             while (false !== ($file = readdir($handle))) {
                 if (!is_dir($file) && $file != $this->archiveDirectory) {
                     $this->processFile($file);
-                    $this->archiveFile($file);
+                    //$this->archiveFile($file);
                 }
             }
 
@@ -121,12 +121,12 @@ class ImportExpressFreightPurchaseInvoices extends Command
                     $this->createPurchaseInvoice($row);
 
                     // Lookup shipment
-                    $shipment = \App\Shipment::whereCarrierConsignmentNumber($row['Consignment Number'])->whereIn('carrier_id', [14, 15])->first();
+                    $shipment = \App\Shipment::whereCarrierConsignmentNumber($row['Consignment Number'])->whereIn('carrier_id', [14])->first();
 
                     $purchaseInvoiceLine = new PurchaseInvoiceLine();
                     $purchaseInvoiceLine->purchase_invoice_id = $this->purchaseInvoice->id;
-                    $purchaseInvoiceLine->carrier_consignment_number = $row['Consignment Number'];
-                    $purchaseInvoiceLine->carrier_tracking_number = $row['Consignment Number'];
+                    $purchaseInvoiceLine->carrier_consignment_number = ($shipment) ? $shipment->carrier_consignment_number : null;
+                    $purchaseInvoiceLine->carrier_tracking_number = ($shipment) ? $shipment->carrier_tracking_number : null;
                     $purchaseInvoiceLine->sender_name = ($shipment) ? $shipment->sender_name : null;
                     $purchaseInvoiceLine->sender_company_name = ($shipment) ? $shipment->sender_company_name : null;
                     $purchaseInvoiceLine->sender_address1 = ($shipment) ? $shipment->sender_address1 : null;
@@ -136,31 +136,30 @@ class ImportExpressFreightPurchaseInvoices extends Command
                     $purchaseInvoiceLine->sender_postcode = ($shipment) ? $shipment->sender_postcode : null;
                     $purchaseInvoiceLine->sender_country_code = ($shipment) ? $shipment->sender_country_code : null;
                     $purchaseInvoiceLine->sender_account_number = ($shipment) ? $shipment->sender_account_number : null;
-                    $purchaseInvoiceLine->recipient_name = ($shipment) ? $shipment->recipient_name : $row['Delivery Contact 1'];
-                    $purchaseInvoiceLine->recipient_company_name = ($shipment) ? $shipment->recipient_company_name : $row['Delivery Company Name'];
-                    $purchaseInvoiceLine->recipient_address1 = ($shipment) ? $shipment->recipient_address1 : $row['Delivery Address 1'];
-                    $purchaseInvoiceLine->recipient_address2 = ($shipment) ? $shipment->recipient_address2 : $row['Delivery Address 2'];
-                    $purchaseInvoiceLine->recipient_city = ($shipment) ? $shipment->recipient_city : $row['Delivery Address 3'];
+                    $purchaseInvoiceLine->recipient_name = ($shipment) ? $shipment->recipient_name : $row['Consignee'];
+                    $purchaseInvoiceLine->recipient_company_name = ($shipment) ? $shipment->recipient_company_name : null;
+                    $purchaseInvoiceLine->recipient_address1 = ($shipment) ? $shipment->recipient_address1 : null;
+                    $purchaseInvoiceLine->recipient_address2 = ($shipment) ? $shipment->recipient_address2 : null;
+                    $purchaseInvoiceLine->recipient_city = ($shipment) ? $shipment->recipient_city : null;
                     $purchaseInvoiceLine->recipient_state = ($shipment) ? $shipment->recipient_state : null;
-                    $purchaseInvoiceLine->recipient_postcode = ($shipment) ? $shipment->recipient_postcode : $row['Delivery Post Code'];
-                    $purchaseInvoiceLine->recipient_country_code = ($shipment) ? $shipment->recipient_country_code : $row['Delivery Country'];
+                    $purchaseInvoiceLine->recipient_postcode = ($shipment) ? $shipment->recipient_postcode : $row['Post Code'];
+                    $purchaseInvoiceLine->recipient_country_code = ($shipment) ? $shipment->recipient_country_code : null;
                     $purchaseInvoiceLine->ship_date = strtotime(str_replace('/', '.', $row['Pick Up Date']));
-                    $purchaseInvoiceLine->shipment_reference = $row['Customer Reference'];
-                    $purchaseInvoiceLine->carrier_service = $row['Product Description'];
-                    $purchaseInvoiceLine->carrier_packaging_code = null;
+                    $purchaseInvoiceLine->shipment_reference = ($shipment) ? $shipment->shipment_reference : null;
+                    $purchaseInvoiceLine->carrier_service = $row['Description'];
+                    $purchaseInvoiceLine->carrier_packaging_code = $row['Unit of Measure Code'];
                     $purchaseInvoiceLine->carrier_pay_code = null;
-                    $purchaseInvoiceLine->account_number1 = $row['Account Number'];
+                    $purchaseInvoiceLine->account_number1 = null;
                     $purchaseInvoiceLine->account_number2 = null;
-                    $purchaseInvoiceLine->pieces = $row['Total Pieces'];
-                    $purchaseInvoiceLine->weight = ($shipment) ? $shipment->weight : $row['Billed Weight'];
+                    $purchaseInvoiceLine->pieces = $row['Quantity'];
+                    $purchaseInvoiceLine->weight = ($shipment) ? $shipment->weight : null;
                     $purchaseInvoiceLine->weight_uom = 'kg';
-                    $purchaseInvoiceLine->billed_weight = $row['Billed Weight'];
+                    $purchaseInvoiceLine->billed_weight = ($shipment) ? $shipment->weight : null;
                     $purchaseInvoiceLine->pod_signature = ($shipment) ? $shipment->pod_signature : null;
                     $purchaseInvoiceLine->save();
 
                     $this->applyCharge($row['Line Amount Excl. VAT'], 'FRT', 'FREIGHT CHARGE', $purchaseInvoiceLine->id);
                     $this->applyCharge($row['Fuel Surcharge Amount'], 'FSC', 'FUEL SURCHARGE', $purchaseInvoiceLine->id);
-
 
                     if (is_numeric($row['Net Amount (VAT)']) && $row['Net Amount (VAT)'] > 0) {
                         $vat += $row['Net Amount (VAT)'];
@@ -212,7 +211,7 @@ class ImportExpressFreightPurchaseInvoices extends Command
      */
     private function createPurchaseInvoice($row)
     {
-        $invoiceNumber = $row['Invoice Number'];
+        $invoiceNumber = 'EXP' . date('dmY', time());
 
         $this->purchaseInvoice = PurchaseInvoice::whereInvoiceNumber($invoiceNumber)->whereCarrierId(14)->first();
 
@@ -223,15 +222,15 @@ class ImportExpressFreightPurchaseInvoices extends Command
 
         $this->purchaseInvoice = PurchaseInvoice::create([
             'invoice_number' => $invoiceNumber,
-            'account_number' => $row['Account Number'],
-            'total' => $row['Total Charges'],
+            'account_number' => 'I012',
+            'total' => 0,
             'total_taxable' => 0,
             'total_non_taxable' => 0,
             'vat' => 0,
             'currency_code' => 'GBP',
             'type' => 'F',
-            'carrier_id' => 4,
-            'date' => strtotime(str_replace('/', '.', $row['Invoice Date']))
+            'carrier_id' => 14,
+            'date' => time()
         ]);
 
         $this->invoices[] = $invoiceNumber;

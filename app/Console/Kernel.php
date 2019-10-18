@@ -27,6 +27,7 @@ class Kernel extends ConsoleKernel
         Commands\PurchaseInvoices\ImportDhlPurchaseInvoices::class,
         Commands\PurchaseInvoices\ImportPrimaryFreightPurchaseInvoices::class,
         Commands\PurchaseInvoices\ImportTntPurchaseInvoices::class,
+        Commands\PurchaseInvoices\ImportExpressFreightPurchaseInvoices::class,
         Commands\Transend\SendJobs::class,
         Commands\Transend\CancelJobs::class,
         Commands\Transend\ProcessFiles::class,
