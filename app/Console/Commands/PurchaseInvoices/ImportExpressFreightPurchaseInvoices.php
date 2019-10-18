@@ -85,7 +85,7 @@ class ImportExpressFreightPurchaseInvoices extends Command
             while (false !== ($file = readdir($handle))) {
                 if (!is_dir($file) && $file != $this->archiveDirectory) {
                     $this->processFile($file);
-                    //$this->archiveFile($file);
+                    $this->archiveFile($file);
                 }
             }
 
@@ -104,8 +104,9 @@ class ImportExpressFreightPurchaseInvoices extends Command
     {
         $this->info("Processing file $file");
 
-        $rowNumber = 1;
+        $this->createPurchaseInvoice($file);
 
+        $rowNumber = 1;
         $totalTaxable = 0;
 
         if (($handle = fopen($this->sftpDirectory . $file, 'r')) !== false) {
@@ -116,10 +117,8 @@ class ImportExpressFreightPurchaseInvoices extends Command
 
                     $row = $this->assignFieldNames($data);
 
-                    $this->createPurchaseInvoice($row);
-
                     // Lookup shipment
-                    $shipment = \App\Shipment::whereCarrierConsignmentNumber($row['Consignment Number'])->whereIn('carrier_id', [14])->first();
+                    $shipment = \App\Shipment::whereConsignmentNumber($row['Consignment Number'])->whereIn('carrier_id', [14])->first();
 
                     $purchaseInvoiceLine = new PurchaseInvoiceLine();
                     $purchaseInvoiceLine->purchase_invoice_id = $this->purchaseInvoice->id;
@@ -202,9 +201,9 @@ class ImportExpressFreightPurchaseInvoices extends Command
      *
      * @param type $line
      */
-    private function createPurchaseInvoice($row)
+    private function createPurchaseInvoice($file)
     {
-        $invoiceNumber = 'EXP' . date('dmY', time());
+        $invoiceNumber = 'EXP' . str_replace(['.csv', ''], '', $file);
 
         $this->purchaseInvoice = PurchaseInvoice::whereInvoiceNumber($invoiceNumber)->whereCarrierId(14)->first();
 
