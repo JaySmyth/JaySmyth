@@ -144,7 +144,7 @@ class ImportExpressFreightPurchaseInvoices extends Command
                     $purchaseInvoiceLine->recipient_state = ($shipment) ? $shipment->recipient_state : null;
                     $purchaseInvoiceLine->recipient_postcode = ($shipment) ? $shipment->recipient_postcode : $row['Post Code'];
                     $purchaseInvoiceLine->recipient_country_code = ($shipment) ? $shipment->recipient_country_code : null;
-                    $purchaseInvoiceLine->ship_date = strtotime(str_replace('/', '.', $row['Pick Up Date']));
+                    $purchaseInvoiceLine->ship_date = strtotime(str_replace('/', '.', $row['Dispatch Date']));
                     $purchaseInvoiceLine->shipment_reference = ($shipment) ? $shipment->shipment_reference : null;
                     $purchaseInvoiceLine->carrier_service = $row['Description'];
                     $purchaseInvoiceLine->carrier_packaging_code = $row['Unit of Measure Code'];
