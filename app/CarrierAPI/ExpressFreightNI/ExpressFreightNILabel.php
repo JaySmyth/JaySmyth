@@ -70,10 +70,10 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
                 $this->pdf->Text(78, 14, $bay);
             }
 
-            // Package Number
+            // Consignment number
             $x = 6;
             $this->pdf->SetFont($this->font, 'B', 8);
-            $this->pdf->Text($x, 34, $this->data['packages'][$pkg]['barcode']); // 'XE 086 4023 4 IE'
+            $this->pdf->Text($x, 34, substr($this->data['packages'][$pkg]['barcode'], 0, -3));
 
             $y = 39;
             $this->pdf->Text(6, $y, 'Attempted');

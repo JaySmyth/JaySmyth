@@ -151,6 +151,9 @@ class PurchaseInvoice extends Model
                 return '0101610'; // DHL
             case 12:
                 return '0193035'; // Primary Freight
+            case 14:
+            case 15:
+                return '0171994'; // Express Freight
             default:
                 return 'UNKNOWN';
         }
