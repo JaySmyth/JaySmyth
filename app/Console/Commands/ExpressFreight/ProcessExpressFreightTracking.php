@@ -121,7 +121,7 @@ class ProcessExpressFreightTracking extends Command
         if ($this->validateRow($rowNumber, $data, $row)) {
 
             // Load the shipment record
-            $shipment = \App\Shipment::where('carrier_tracking_number', $row['carrier_tracking_number'])->where('carrier_id', 14)->first();
+            $shipment = \App\Shipment::where('carrier_tracking_number', $row['carrier_tracking_number'])->whereIn('carrier_id', [14, 15])->first();
 
             if ($shipment) {
 
@@ -141,7 +141,7 @@ class ProcessExpressFreightTracking extends Command
                     'shipment_id' => $shipment->id,
                     'carrier' => 'Express Freight',
                     'city' => $row['location'],
-                    'country_code' => ($row['location'] == 'CRAIGAVON') ? 'GB' : 'IE',
+                    'country_code' => ($row['location'] == 'CRAIGAVON') ? 'GB' : $shipment->recipient_country_code,
                     'source' => 'Express Freight'
                 ]);
 
