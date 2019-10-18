@@ -170,12 +170,14 @@ class ImportExpressFreightPurchaseInvoices extends Command
             /**
              * Update additional information after the invoice has been imported.
              */
+
+            $vat = ($totalTaxable / 100) * 20;
             $purchaseInvoice = PurchaseInvoice::find($this->purchaseInvoice->id);
             $purchaseInvoice->setAdditionalValues();
-            $purchaseInvoice->total = $totalTaxable;
+            $purchaseInvoice->total = $totalTaxable + $vat;
             $purchaseInvoice->total_taxable = $totalTaxable;
             $purchaseInvoice->total_non_taxable = 0;
-            $purchaseInvoice->vat = 0;
+            $purchaseInvoice->vat = $vat;
             $purchaseInvoice->save();
         }
     }
