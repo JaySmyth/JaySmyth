@@ -49,6 +49,7 @@ class Kernel extends ConsoleKernel
         Commands\ManifestUnmanifestedShipments::class,
         Commands\ImportMultifreightFiles::class,
         Commands\UpdateScsJobNumbersOnShipments::class,
+        Commands\ExpressFreight\ResetExpressFreightConsignmentNumberSequence::class,
         Commands\ExpressFreight\UploadShipmentsToExpressFreight::class,
         Commands\ExpressFreight\UploadNIShipmentsToExpressFreight::class,
         Commands\ExpressFreight\ProcessExpressFreightTracking::class,
@@ -152,7 +153,9 @@ class Kernel extends ConsoleKernel
         /**
          * Express Freight
          */
+        $schedule->command('ifs:reset-express-freight-consignment-number-sequence')->dailyAt('23:00');
         $schedule->command('ifs:upload-shipments-to-express-freight')->weekdays()->dailyAt('16:45');
+        $schedule->command('ifs:upload-ni-shipments-to-express-freight')->weekdays()->dailyAt('16:45');
         $schedule->command('ifs:process-express-freight-tracking')->weekdays()->hourly()->between('07:00', '18:00');
 
         /*
