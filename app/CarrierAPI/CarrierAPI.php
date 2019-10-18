@@ -47,7 +47,6 @@ use Exception;
  */
 class CarrierAPI
 {
-
     private $company;
     private $carrier;
     private $mode;
@@ -61,12 +60,10 @@ class CarrierAPI
 
     public function __construct()
     {
-        
     }
 
     public function buildCarrier($carrier_code = 'fedex')
     {
-
         $this->carrier = null;
         switch (strtolower($carrier_code)) {
             case 'fedex':
@@ -152,8 +149,11 @@ class CarrierAPI
 
                 case 'price':
                 case 'cost':
-                    $availableServices = $this->getCheapestService($suitableServices, $this->company->carrier_choice,
-                        $collect);
+                    $availableServices = $this->getCheapestService(
+                        $suitableServices,
+                        $this->company->carrier_choice,
+                        $collect
+                    );
                     break;
 
                 case 'dest':
@@ -174,7 +174,6 @@ class CarrierAPI
              * ***************************************************
              */
             if ($collect) {
-
                 foreach ($availableServices as $key => $availableService) {
                     $availableServices[$key]['cost'] = [];
                     $availableServices[$key]['cost_currency'] = '';
@@ -210,14 +209,13 @@ class CarrierAPI
      */
     private function getAllSuitableServices($shipment, $carrierServiceArray)
     {
-
         $cnt = 0;
         $possibleServices = array();
         $serviceRules = new ServiceRules();
 
         /*
          * *********************************************
-         * Loop through all services configured for this 
+         * Loop through all services configured for this
          * Customer/ mode.
          * *********************************************
          */
@@ -278,7 +276,6 @@ class CarrierAPI
 
         // If this is a collect shipment
         if ($this->isCollect($shipment)) {
-
             if ($serviceDetails['carrier_id'] == 2) {
 
                 // Fedex Collect Shipments are allowed
@@ -304,7 +301,6 @@ class CarrierAPI
         $frtSales = 0;
 
         if (isset($prices['sales'])) {
-
             foreach ($prices['sales'] as $key => $val) {
                 if ($val['code'] == 'FRT' && $val['value'] > 0) {
                     $frtSales = $val['value'];
@@ -345,16 +341,14 @@ class CarrierAPI
          */
 
         if (isset($shipment['bill_shipping']) && $shipment['bill_shipping'] == 'recipient') {
-
-            return TRUE;
+            return true;
         }
 
-        return FALSE;
+        return false;
     }
 
     public function zeroPrices($prices)
     {
-
         $prices['shipping_cost'] = 0;
         $prices['shipping_charge'] = 0;
         $prices['cost_currency'] = '';
@@ -367,7 +361,6 @@ class CarrierAPI
 
     public function formatService($cnt, $serviceDetails, $prices)
     {
-
         $service = $serviceDetails;
         $service['cost'] = $prices['shipping_cost'];
         $service['cost_currency'] = $prices['cost_currency'];
@@ -377,8 +370,9 @@ class CarrierAPI
         $service['price_detail'] = $prices['sales'];
 
         // If Company specific name exists for this service then use it.
-        if (isset($service['pivot']["name"]) && $service['pivot']["name"] > "")
+        if (isset($service['pivot']["name"]) && $service['pivot']["name"] > "") {
             $service['name'] = $service['pivot']["name"];
+        }
 
         return $service;
     }
@@ -393,9 +387,8 @@ class CarrierAPI
      *
      * @return array Chosen Service
      */
-    public function getCheapestService($possibleServices, $carrier_choice, $collect = FALSE)
+    public function getCheapestService($possibleServices, $carrier_choice, $collect = false)
     {
-
         $chosenService = [];
 
         // Definition of cheapest defined by $carrier_choice - price or cost
@@ -403,15 +396,12 @@ class CarrierAPI
 
             // Show unpriced option if Collect using Fedex
             if ($collect && $serviceDetails['carrier_id'] == 2) {
-
                 $chosenService[] = $serviceDetails;
             } else {
 
                 // Only use if we can price it
                 if ($serviceDetails['price'] > 0) {
-
                     if (isset($chosenService[$serviceDetails['code']])) {
-
                         if ($serviceDetails[$carrier_choice] < $chosenService[$serviceDetails['code']][$carrier_choice]) {
 
                             // This Service cheaper than Previous ones
@@ -426,7 +416,6 @@ class CarrierAPI
 
                     // Show unpriced option if IPF or AIR shipment
                     if (in_array($serviceDetails['code'], $this->nonPricedServices)) {
-
                         $chosenService[$serviceDetails['code']] = $serviceDetails;
                     }
                 }
@@ -438,7 +427,6 @@ class CarrierAPI
 
     private function getServiceByDest($shipment, $possibleServices)
     {
-
         return $possibleServices;
     }
 
@@ -451,7 +439,6 @@ class CarrierAPI
      */
     private function setBillToAcct($shipment, $account_type)
     {
-
         if (isset($shipment[$account_type . "_account"])) {
             $account = $shipment[$account_type . "_account"];
         } else {
@@ -461,7 +448,6 @@ class CarrierAPI
         // If account not defined or blank and payment is "Bill to Sender" - use service default
         if (!isset($account) || $account == '') {
             if (!isset($shipment[$account_type]) || $shipment[$account_type] == 'sender') {
-
                 $service = $this->company
                         ->getServicesForMode($shipment['mode_id'])
                         ->where('code', $shipment['service_code'])
@@ -469,7 +455,6 @@ class CarrierAPI
                         ->first();
 
                 if (!empty($service)) {
-
                     if (!empty($service->pivot->account)) {
 
                         // Use Companies own account if defined
@@ -497,7 +482,6 @@ class CarrierAPI
      */
     private function getServiceAcct($companyId, $carrierId, $serviceId)
     {
-
         $account = $this->company->services()
                         ->where('carrier_id', $carrierId)
                         ->where('service_id', $serviceId)
@@ -521,7 +505,6 @@ class CarrierAPI
      */
     private function preProcessAddShipment($data)
     {
-
         if (!empty($data['alcohol'])) {
             $data['alcohol_type'] = (isset($data['alcohol']['type'])) ? $data['alcohol']['type'] : '';
             $data['alcohol_packaging'] = (isset($data['alcohol']['packaging'])) ? $data['alcohol']['packaging'] : '';
@@ -576,7 +559,6 @@ class CarrierAPI
         DB::beginTransaction();
 
         try {
-
             if (isset($data['shipment_id']) && is_numeric($data['shipment_id'])) {
                 $shipment = Shipment::find($data['shipment_id']);
                 $data['consignment_number'] = $shipment->consignment_number; // hack
@@ -711,7 +693,7 @@ class CarrierAPI
 
             mail($to, $subject, $message, $headers);
 
-            return NULL; // Return null to signify problem
+            return null; // Return null to signify problem
         }
 
 
@@ -756,7 +738,6 @@ class CarrierAPI
      */
     public function getShipmentToken()
     {
-
         $getNewToken = true;
 
         while ($getNewToken) {
@@ -811,8 +792,9 @@ class CarrierAPI
             // Identify Department
             $department_code = identifyDepartment($shipment);
             $department = Department::where('code', $department_code)->first();
-            if ($department)
+            if ($department) {
                 $shipment['department_id'] = $department->id;
+            }
 
             // Set Depot
             $shipment['depot_id'] = $this->company->depot_id;
@@ -820,13 +802,11 @@ class CarrierAPI
             // Set Carrier and Service details
             $service = Service::find($shipment['service_id']);
             if ($service) {
-
                 $shipment['carrier_id'] = $service->carrier_id;
                 $shipment['carrier_code'] = $service->carrier->code;
                 $shipment['service_code'] = $service->code;
                 $shipment['volumetric_divisor'] = $service->volumetric_divisor;
             } else {
-
                 $shipment['carrier_id'] = '';
                 $shipment['carrier_code'] = '';
                 $shipment['service_code'] = '';
@@ -871,10 +851,8 @@ class CarrierAPI
 
                 // If Commodity set then use first commodity description
                 if (isset($shipment['contents'][0]['description']) && $shipment['contents'][0]['description'] > "") {
-
                     $shipment['goods_description'] = $shipment['contents'][0]['description'];
                 } elseif (!isset($shipment['goods_description']) || $shipment['goods_description'] == '') {
-
                     $shipment['goods_description'] = 'Miscellaneous Goods';
                 }
             }
@@ -1001,7 +979,10 @@ class CarrierAPI
 
                 // Calc Volumetric weight
                 $shipment['packages'][$cnt]['volumetric_weight'] = calcVolume(
-                        $shipment['packages'][$cnt]['length'], $shipment['packages'][$cnt]['width'], $shipment['packages'][$cnt]['height'], $shipment['volumetric_divisor']
+                    $shipment['packages'][$cnt]['length'],
+                    $shipment['packages'][$cnt]['width'],
+                    $shipment['packages'][$cnt]['height'],
+                    $shipment['volumetric_divisor']
                 );
 
                 $volumetric_weight += $shipment['packages'][$cnt]['volumetric_weight'];
@@ -1027,13 +1008,12 @@ class CarrierAPI
 
     /**
      * Checks addresses and performs any necessary Overrides
-     * 
+     *
      * @param type $shipment
      * @return string
      */
     public function checkAddresses($shipment)
     {
-
         if (isset($this->company->shipper_type_override) && $this->company->shipper_type_override > "") {
             $shipment['shipper_type'] = $this->company->shipper_type_override;
         }
@@ -1120,7 +1100,7 @@ class CarrierAPI
          */
         $response = [];
         $this->setEnvironment($mode);
-        //$data = trimData($data);                                                 // Remove any leading/ trailing spaces etc.        
+        //$data = trimData($data);                                                 // Remove any leading/ trailing spaces etc.
         $data = fixShipmentCase($data);                                         // Ensure all fields use correct case and Flags are boolean
         $data = $this->preProcess($data);                                       // Complete any missing fields where possible
         $apiShipment = new APIShipment();                                       // Shipment object with validation rules etc.
@@ -1178,11 +1158,10 @@ class CarrierAPI
             }
 
             // Write shipment to Database
-            $shipmentCreated = FALSE;
+            $shipmentCreated = false;
             $shipment = $this->writeShipment($data, $charges, $response);
             if (isset($shipment) && $shipment) {
-
-                $shipmentCreated = TRUE;
+                $shipmentCreated = true;
             }
 
             // Add Carrier Consignment details to response
@@ -1194,7 +1173,6 @@ class CarrierAPI
 
     public function completeResponse($response, $data, $shipmentCreated)
     {
-
         if (strtolower($this->mode) == 'test' || $shipmentCreated) {
 
             // Everything good so return token, consignment number and tracking URL for shipment
@@ -1234,18 +1212,15 @@ class CarrierAPI
 
     public function setPricingFields($data, $charges = [])
     {
-
         if ($charges == []) {
-
-            $data['quoted'] = NULL;
-            $data['shipping_cost'] = NULL;
-            $data['shipping_charge'] = NULL;
-            $data['fuel_cost'] = NULL;
-            $data['fuel_charge'] = NULL;
+            $data['quoted'] = null;
+            $data['shipping_cost'] = null;
+            $data['shipping_charge'] = null;
+            $data['fuel_cost'] = null;
+            $data['fuel_charge'] = null;
             $data['cost_currency'] = 'GBP';
             $data['sales_currency'] = 'GBP';
         } else {
-
             $data['quoted'] = json_encode($charges);
             $data['shipping_cost'] = $charges['shipping_cost'];
             $data['shipping_charge'] = $charges['shipping_charge'];
@@ -1260,7 +1235,6 @@ class CarrierAPI
 
     public function setResponsePricingFields($response, $charges)
     {
-
         $response['pricing']['charges'] = $charges['sales'];
         $response['pricing']['vat_code'] = $charges['sales_vat_code'];
         $response['pricing']['vat_amount'] = $charges['sales_vat_amount'];
@@ -1279,7 +1253,6 @@ class CarrierAPI
      */
     public function deleteShipment($data, $mode = '')
     {
-
         $response = [];
         $this->setEnvironment($mode);
 
@@ -1289,9 +1262,7 @@ class CarrierAPI
                 ->first();
 
         if ($shipment) {
-
             if ($shipment->isCancellable()) {
-
                 $this->setEnvironment();
                 $this->buildCarrier($shipment->carrier->code);         // Create Carrier Object
                 $response = $this->carrier->deleteShipment($shipment);                  // Send Shipment to Carrier
@@ -1300,11 +1271,9 @@ class CarrierAPI
                     $shipment->setCancelled($data['user_id']);
                 }
             } else {
-
                 $response['errors'][] = 'Shipment cannot be cancelled';
             }
         } else {
-
             $response['errors'][] = 'Shipment not found';
         }
 
@@ -1338,12 +1307,10 @@ class CarrierAPI
      */
     public function getLabels($shipments, $size = 'A4', $output = 'S', $labelType = '')
     {
-
         if ($shipments) {
-
             $doc = new TCPDI();
-            $doc->setPrintHeader(FALSE);
-            $doc->setPrintFooter(FALSE);
+            $doc->setPrintHeader(false);
+            $doc->setPrintFooter(false);
             $hasContent = false;
             foreach ($shipments as $shipment) {
 
@@ -1351,7 +1318,6 @@ class CarrierAPI
                 $originalPdf = $this->getLabel($shipment, $size, 'S', false, $labelType);
 
                 if ($originalPdf != 'not found') {
-
                     $hasContent = true;
                     $pageCount = $doc->setSourceData($originalPdf);
 
@@ -1409,7 +1375,7 @@ class CarrierAPI
 
     /**
      * Create a despatch note.
-     * 
+     *
      * @param type $token
      * @param type $size
      * @param type $output
@@ -1420,5 +1386,4 @@ class CarrierAPI
         $pdf = new Pdf($size, $output);
         return $pdf->createDespatchNote($token);
     }
-
 }
