@@ -82,7 +82,7 @@ class UploadNIShipmentsToExpressFreight extends Command
 
             // Send notification
             if (count($this->validShipments) > 0) {
-                //Mail::to('ASteenson@expressfreight.co.uk')->cc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight NI Manifest (' . count($this->validShipments) . ' shipments)', 'Please see attached file', $this->filePath));
+                Mail::to('ASteenson@expressfreight.co.uk')->cc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight NI Manifest (' . count($this->validShipments) . ' shipments)', 'Please see attached file', $this->filePath));
             }
         }
 
