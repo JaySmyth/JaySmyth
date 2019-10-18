@@ -8,6 +8,7 @@ use App\Http\Requests\CompanyRequest;
 use Illuminate\Http\Request;
 use App\Company;
 use App\Service;
+use App\Rate;
 use App\CompanyRates;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -272,17 +273,14 @@ class CompaniesController extends Controller
         }
 
         // Remove any entries for the new Company/ rate/ service from the Discount table
-        $companyRates->deleteDiscount($company->id, $request->rate_id, $request->service_id, date('Y-m-d'));
+        $companyRates->closeRateDiscounts($company->id, $request->rate_id, $request->service_id, date('Y-m-d'));
 
         // Create/ Update Company Rate record and clear special_discount flag
+        // $criteria = $this->buildCriteria($request->rate_id, $company->id, $request->service_id);
         $special = ($request->discount == 0) ? 0 : 1;
         $companyRate = CompanyRates::updateOrCreate(
-            [
-                'company_id' => $request->company_id,
-                'service_id' => $request->service_id
-            ],
-            [
-                'rate_id' => $request->rate_id,
+            ['company_id' => $company->id, 'service_id' => $request->service_id],
+            ['rate_id' => $request->rate_id,
                 'special_discount' => $special,
                 'discount' => 0,
                 'fuel_cap' => $request->fuel_cap
@@ -290,9 +288,7 @@ class CompaniesController extends Controller
         );
 
         // CompanyRate record created - now to apply a discount - effective today
-        if ($request->discount <> 0) {
-            $companyRate->setDiscount($request->discount, date('Y-m-d)'));
-        }
+        $companyRate->setDiscount($request->discount, date('Y-m-d)'));
 
         // Log changes
         $action = 'Set Rate. Discount : ' . $request->discount . ' Fuel Cap : ' . $request->fuel_cap;
@@ -304,6 +300,21 @@ class CompaniesController extends Controller
         flash()->success('Rate Set!', 'Rate set successfully.');
 
         return redirect('companies/' . $company->id);
+    }
+
+    public function buildCriteria($rateId, $companyId, $serviceId)
+    {
+        $criteria = ['company_id' => $companyId, 'service_id' => $serviceId];
+        $rate = Rate::find($rateId);
+        if ($rate) {
+            if ($rate->model == "domestic") {
+                $criteria = [
+                    'company_id' => $companyId,
+                ];
+            }
+        }
+
+        return $criteria;
     }
 
     /**

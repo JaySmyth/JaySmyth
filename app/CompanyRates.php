@@ -282,14 +282,46 @@ class CompanyRates extends Model
 
     public function setDiscount($discount = 0, $effectiveDate = '')
     {
+        // If necessary add discounts
+        if ($discount <> 0) {
+            // Get correct empty RateDetail object
+            $this->getRateDetailObject($this->rate_id);
 
-        // Get correct empty RateDetail object
-        $this->getRateDetailObject($this->rate_id);
-
-        // Add Discounts
-        if ($this->rateDetail) {
-            $this->rateDetail->setRateDiscounts($this->company_id, $this->rate_id, $this->service_id, $discount, $effectiveDate);
+            // Add Discounts
+            if ($this->rateDetail) {
+                $this->rateDetail->setRateDiscounts($this->company_id, $this->rate_id, $this->service_id, $discount, $effectiveDate);
+            }
         }
+
+        // Update Company Rate record and set/ clear special_discount flag
+        $special = ($discount == 0) ? 0 : 1;
+        $companyRates = $this->getAffectedCompanyRates($this->rate_id, $this->company_id, $this->service_id);
+        if ($companyRates) {
+            foreach ($companyRates as $companyRate) {
+                $companyRate->update(
+                    [
+                        'rate_id' => $this->rate_id,
+                        'special_discount' => $special,
+                        'discount' => 0,
+                        'fuel_cap' => $this->fuel_cap
+                    ]
+                );
+            }
+        }
+    }
+
+    public function getAffectedCompanyRates($rateId, $companyId, $serviceId)
+    {
+        $rate = Rate::find($rateId);
+        if ($rate) {
+            if (strtolower($rate->model) == 'domestic') {
+                $companyrates = CompanyRates::where('company_id', $companyId)->where('rate_id', $rateId)->get();
+            } else {
+                $companyrates = CompanyRates::where('company_id', $companyId)->where('service_id', $serviceId)->get();
+            }
+        }
+
+        return $companyrates;
     }
 
     public function closeRateDiscounts($companyId, $rateId = '', $serviceId = '', $effectiveDate = '')
