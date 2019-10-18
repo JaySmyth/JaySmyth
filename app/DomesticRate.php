@@ -174,7 +174,7 @@ class DomesticRate extends Model
         }
 
         // Get Copy of Rate table so we can make a discount for each record
-        $rateDetail = $this->buildQuery(new DomesticRate(), $companyId, $rateId, $serviceId, $effectiveDate, 'get');
+        $rateDetail = $this->buildQuery(new DomesticRate(), "", $rateId, $serviceId, $effectiveDate, 'get');
         foreach ($rateDetail as $rate) {
             $rateDiscounts[] = [
                 'company_id' => $companyId,
@@ -211,6 +211,7 @@ class DomesticRate extends Model
 
     public function buildQuery($query, $companyId, $rateId, $serviceId = '', $effectiveDate, $action = 'get')
     {
+
         // If No effective date set then use today
         if ($effectiveDate == '') {
             $effectiveDate = date('Y-m-d');
@@ -221,11 +222,11 @@ class DomesticRate extends Model
         return $query->when($rateId, function ($query) use ($rateId) {
             return $query->where('rate_id', $rateId);
         })
-        // ->when($companyId, function ($query) use ($companyId) {
-        //     return $query->where('company_id', $companyId);
-        // })
+        ->when($companyId, function ($query) use ($companyId) {
+            return $query->where('company_id', $companyId);
+        })
         // ->when($serviceCode, function ($query) use ($serviceCode) {
-        //     return $query->where('service', $serviceCode);
+        //      return $query->where('service', $serviceCode);
         // })
         ->when($effectiveDate, function ($query) use ($effectiveDate) {
             return $query->where('from_date', '<=', $effectiveDate);
@@ -251,7 +252,6 @@ class DomesticRate extends Model
      */
     public function doRateUpload($companyId, $serviceId, $rateId, $currentRate, $uploadedRate, $effectiveDate = '')
     {
-
         // check old and new rates have same structure
         $currentKeys = $this->buildCurrentKeys($currentRate, $companyId);
         $uploadedKeys = $this->buildUploadedKeys($uploadedRate);
@@ -263,11 +263,6 @@ class DomesticRate extends Model
             if ($discounts != []) {
                 DomesticRateDiscount::insert($discounts);
             }
-
-            $rate = CompanyRates::where('company_id', $companyId)->where('service_id', $serviceId)->first();
-            $rate->discount = 0;
-            $rate->special_discount = 1;
-            $rate->save();
         } else {
             return "Tables do not match";
         }
@@ -285,10 +280,8 @@ class DomesticRate extends Model
      */
     public function closeRateDiscounts($companyId, $rateId = '', $serviceId = '', $effectiveDate = '')
     {
-
         // Get any domestic rates already defined
         $discounts = $this->buildQuery(new DomesticRateDiscount(), $companyId, $rateId, $serviceId, $effectiveDate, 'get');
-
         if ($discounts) {
             foreach ($discounts as $discount) {
 
@@ -298,9 +291,9 @@ class DomesticRate extends Model
                 }
 
                 // If pre-existing rate - close it.
-                if ($discount->from_date < date('Y-m-d') && $discount->to_date >= date('Y-m-d')) {
+                if ($discount->from_date->format('Y-m-d') < date('Y-m-d') && $discount->to_date->format('Y-m-d') >= date('Y-m-d')) {
                     $discount->to_date = date('Y-m-d', strtotime($effectiveDate . ' -1 day'));
-                    $discount->update();
+                    $discount->save();
                 }
             }
         }
