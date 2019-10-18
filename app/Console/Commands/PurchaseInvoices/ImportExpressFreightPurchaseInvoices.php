@@ -155,7 +155,7 @@ class ImportExpressFreightPurchaseInvoices extends Command
                     $purchaseInvoiceLine->pod_signature = ($shipment) ? $shipment->pod_signature : null;
                     $purchaseInvoiceLine->save();
 
-                    $this->applyCharge($row['Line Amount Excl. VAT'], 'FRT', 'FREIGHT CHARGE', $purchaseInvoiceLine->id);
+                    $this->applyCharge($row['Line Amount Excl. VAT'] - $row['Fuel Surcharge Amount'], 'FRT', 'FREIGHT CHARGE', $purchaseInvoiceLine->id);
                     $this->applyCharge($row['Fuel Surcharge Amount'], 'FSC', 'FUEL SURCHARGE', $purchaseInvoiceLine->id);
 
                     $totalTaxable += $purchaseInvoiceLine->charges->sum('billed_amount');
