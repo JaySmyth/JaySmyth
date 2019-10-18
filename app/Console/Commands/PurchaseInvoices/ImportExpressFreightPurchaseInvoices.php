@@ -172,6 +172,7 @@ class ImportExpressFreightPurchaseInvoices extends Command
              */
             $purchaseInvoice = PurchaseInvoice::find($this->purchaseInvoice->id);
             $purchaseInvoice->setAdditionalValues();
+            $purchaseInvoice->total = $totalTaxable;
             $purchaseInvoice->total_taxable = $totalTaxable;
             $purchaseInvoice->total_non_taxable = 0;
             $purchaseInvoice->vat = 0;
