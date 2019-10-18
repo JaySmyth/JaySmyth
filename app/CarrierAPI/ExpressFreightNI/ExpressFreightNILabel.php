@@ -2,13 +2,10 @@
 
 namespace App\CarrierAPI\ExpressFreightNI;
 
-use App\Service;
-use App\Route;
-use App\Mode;
-use App\Depot;
+use App\ExpressFreightGazetteer;
 
-class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel {
-
+class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
+{
     /**
      * Accepts Shipment and Carrier Response data
      * and stores these to use to generate labels
@@ -20,204 +17,181 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel {
 
     /**
      * Takes stored Shipment and Carrier Response data
-     * and uses it to create a PDF containing all the 
+     * and uses it to create a PDF containing all the
      * necessary labels in the following format :-
-     * 
+     *
      * No Master label, each Label is a package label
      */
     public function create()
     {
-        $service = Service::find($this->shipment['service_id']);
-        $depot = Depot::find($this->shipment['depot_id']);
-        $mode = Mode::find($this->shipment['mode_id']);
-        $route = Route::find($this->shipment['route_id']);
-
         $pkg = 0;
         foreach ($this->shipment['packages'] as $package) {
 
             $this->addPage();
 
-            // Sender Address
-            $x = 3;
-            $y = 2;
-            $this->pdf->SetFont($this->font, '', 8);
-            $this->pdf->Text($x, $y, 'Sender:');
-            $this->pdf->SetFont($this->font, '', 7);
-            if (isset($this->shipment['sender_name']) && ($this->shipment['sender_name'] > ""))
-                $this->pdf->Text($x, $y += 3.5, strtoupper($this->shipment['sender_name']));
+            // Outer Box
+            $this->pdf->SetXY(3, 13);
+            $this->pdf->SetLineWidth(0.3);
+            $this->pdf->Cell(96, 123, '', 1);
 
-            if (isset($this->shipment['sender_company_name']) && ($this->shipment['sender_company_name'] > ""))
-                $this->pdf->Text($x, $y += 3, strtoupper($this->shipment['sender_company_name']));
+            // Express Freight logo
+            $this->pdf->Image(storage_path('app/images/express_freight_logo.png'), 4, 14, 24, 18, 'png');
+            $this->pdf->SetFont($this->font, 'B', 14);
+            $this->pdf->Text(28, 14, 'Express Freight');
+            $this->pdf->SetFont($this->font, 'B', 27);
+            $this->pdf->Text(22, 14, '.................');
+            $this->pdf->SetFont($this->font, 'BI', 10);
+            $this->pdf->Text(20, 27, 'Quality in distribution');
 
-            if (isset($this->shipment['sender_address1']) && ($this->shipment['sender_address1'] > ""))
-                $this->pdf->Text($x, $y += 3, strtoupper($this->shipment['sender_address1']));
+            // Verticle text
+            $x = 66;
+            $y = 36;
+            $this->pdf->SetFont($this->font, 'B', 28);
+            $this->pdf->StartTransform();
+            $this->pdf->Rotate(90, $x, $y);
+            $this->pdf->Text($x, $y, 'EXP');
+            $this->pdf->StopTransform();
 
-            if (isset($this->shipment['sender_address2']) && ($this->shipment['sender_address2'] > ""))
-                $this->pdf->Text($x, $y += 3, strtoupper($this->shipment['sender_address2']));
+            // Create Box with Heading
+            $x = 77;
+            $y = 13;
+            $this->pdf->SetXY($x, $y);
+            $this->pdf->SetLineWidth(0.3);
+            $this->pdf->Cell(22, 22, '', 1);
 
-            if (isset($this->shipment['sender_city']) && ($this->shipment['sender_city'] > ""))
-                $this->pdf->Text($x, $y += 3, strtoupper($this->shipment['sender_city'] . ' ' . $this->shipment['sender_postcode']));
 
-            if (isset($this->shipment['sender_country_code']) && ($this->shipment['sender_country_code'] > ""))
-                $this->pdf->Text($x, $y += 3, strtoupper(getCountry($this->shipment['sender_country_code'])));
+            $bay = $this->getBayNumber($this->shipment['recipient_postcode']);
 
-            if (isset($this->shipment['sender_telephone']) && ($this->shipment['sender_telephone'] > "")) {
-                $this->pdf->Text($x, $y += 3.5, 'Tel: ' . strtoupper($this->shipment['sender_telephone']));
+            if (strlen($bay) > 2) {
+                $this->pdf->SetFont($this->font, 'B', 28);
+                $this->pdf->Text(78, 17, $bay);
+            } else {
+                $this->pdf->SetFont($this->font, 'B', 40);
+                $this->pdf->Text(78, 14, $bay);
             }
+
+            // Package Number
+            $x = 6;
+            $this->pdf->SetFont($this->font, 'B', 8);
+            $this->pdf->Text($x, 34, $this->data['packages'][$pkg]['barcode']); // 'XE 086 4023 4 IE'
+
+            $y = 39;
+            $this->pdf->Text(6, $y, 'Attempted');
+            $this->pdf->Text(40, $y, $this->data['packages'][$pkg]['barcode']);
+
+            // Barcode
+            $this->pdf->write1DBarcode($this->data['packages'][$pkg]['barcode'], 'C128', 12, 43, '', 34, 0.5, $this->getBarcodeStyle(false), 'N');
+
+            $y = 78;
+            $this->pdf->Text(6, $y, 'Delivery');
+            $this->pdf->Text(40, $y, $this->data['packages'][$pkg]['barcode']);
+
+
+            // Box for delivery address
+            $this->pdf->SetXY(5, 90);
             $this->pdf->SetLineWidth(0.3);
-            $this->pdf->Line(0, 28, 110, 28); //horizontal
-
-
-            // Express Freight logo                                                x  y   w   h
-            $this->pdf->Image(storage_path('app/images/express_freight_logo.png'), 52, 10, 18, 12, 'png');
-            $this->pdf->SetFont($this->font, 'B', 11);
-            $this->pdf->Text(69, 10, 'Express Freight');
-            $this->pdf->SetFont($this->font, 'B', 19);
-            $this->pdf->Text(65, 10, '..................');
-            $this->pdf->SetFont($this->font, 'BI', 8);
-            $this->pdf->Text(63, 18, 'Quality in distribution');
-
-
-            $x = 3;
-            $y = 2;
-
-            $this->pdf->SetLineWidth(0.3);
-            $this->pdf->Line($x + 49, $y + 26, $x + 49, $y + 69); //vertical
-            // Pieces and weight          
-            $y = 20;
-            $this->pdf->SetFont($this->font, '', 9);
-            $this->pdf->Text($x, $y += 9, 'Piece:');
-            $this->pdf->Text($x + 23, $y, 'Weight:');
-            $this->pdf->SetFont($this->font, 'B', 15);
-            $this->pdf->Text($x, $y += 4, $package['index'] . ' of ' . $this->shipment['pieces']);
-            $this->pdf->Text($x + 23, $y, $this->shipment['weight'] . ' ' . strtoupper($this->shipment['weight_uom']));
-            $this->pdf->SetLineWidth(0.3);
-            $this->pdf->Line(0, 41.5, 110, 41.5); //horizontal
-            // Service                
-            $x = 53;
-            $y = 28;
-            // Draw a black cell
-            $this->pdf->SetXY($x - 1, $y);
-            $this->pdf->Cell(55, 13.5, '', 0, 2, 'L', 1); //width,height,string
-            $this->pdf->SetTextColor(255, 255, 255); // White font
-            $this->pdf->SetFont($this->font, 'B', 40);
-            $this->pdf->Text($x, $y - 2, strtoupper($service->code));
-            $this->pdf->SetTextColor(0, 0, 0);  // Switch back to black font
-            // DIMS
-            $x = 3;
-            $y = 42.5;
-            $this->pdf->SetFont($this->font, '', 9);
-            $this->pdf->Text($x, $y, 'DIMS:');
-            $this->pdf->SetFont($this->font, '', 11);
-            $this->pdf->Text($x, $y += 4, $package['length'] . ' x ' . $package['width'] . ' x ' . $package['height'] . ' ' . strtoupper($this->shipment['dims_uom']));
-            $this->pdf->SetLineWidth(0.3);
-            $this->pdf->Line(0, 51.5, 110, 51.5); //horizontal
-            // Depot                
-            $y = 42.5;
-            $x = 53;
-            $this->pdf->SetFont($this->font, '', 9);
-            $this->pdf->Text($x, $y, 'Depot:');
-            $this->pdf->SetFont($this->font, 'B', 22);
-            $this->pdf->Text($x + 15, $y, $depot->code);
-
-            // Ship Date
-            $x = 3;
-            $y = 52.5;
-
-            $this->pdf->SetFont($this->font, '', 9);
-            $this->pdf->Text($x, $y, 'Volumetric Weight:');
-            $this->pdf->SetFont($this->font, '', 11);
-            $this->pdf->Text($x, $y += 4, $this->shipment['volumetric_weight'] . ' ' . strtoupper($this->shipment['weight_uom']));
-            $this->pdf->SetLineWidth(0.3);
-            $this->pdf->Line(0, 61, 110, 61); //horizontal
-            // Routing                
-            $x = 53;
-            $y = 52;
-
-            $this->pdf->SetFont($this->font, '', 9);
-            $this->pdf->Text($x, $y, 'Routing:');
-            $this->pdf->SetFont($this->font, 'B', 22);
-            $this->pdf->Text($x + 15, $y, $route->code);
-
-            // Ship Date
-            $x = 3;
-            $y = 61.5;
-
-            $this->pdf->SetFont($this->font, '', 9);
-            $this->pdf->Text($x, $y, 'Ship Date:');
-            $this->pdf->SetFont($this->font, '', 11);
-            $this->pdf->Text($x, $y += 4, $this->shipment['ship_date']);
-            $this->pdf->SetLineWidth(0.3);
-            $this->pdf->Line(0, 71, 110, 71); //horizontal
-            // Shipment Reference                
-            $x = 53;
-            $y = 61.5;
-
-            $this->pdf->SetFont($this->font, '', 9);
-            $this->pdf->Text($x, $y, 'Shipment Reference:');
-            $this->pdf->SetFont($this->font, '', 11);
-            $this->pdf->Text($x, $y += 4, $this->shipment['shipment_reference']);
+            $this->pdf->Cell(92, 40, '', 1);
 
             // Delivery Address
-            $y = 72;
-            $x = 3;
+            $x = 6;
+            $y = 92;
 
-            $this->pdf->SetFont($this->font, 'B', 11);
-            $this->pdf->Text($x, $y, 'SHIP TO:');
-            $this->pdf->SetFont($this->font, '', 11);
+            $this->pdf->SetFont($this->font, 'B', 8);
             if (isset($this->shipment['recipient_name']) && ($this->shipment['recipient_name'] > ""))
-                $this->pdf->Text($x + 3, $y += 5, strtoupper($this->shipment['recipient_name'] ? $this->shipment['recipient_name'] : ''));
+                $this->pdf->Text($x, $y, strtoupper($this->shipment['recipient_name'] ? $this->shipment['recipient_name'] : ''));
 
             if (isset($this->shipment['recipient_company_name']) && ($this->shipment['recipient_company_name'] > ""))
-                $this->pdf->Text($x + 3, $y += 4, strtoupper($this->shipment['recipient_company_name'] ? $this->shipment['recipient_company_name'] : ''));
+                $this->pdf->Text($x, $y += 4.1, strtoupper($this->shipment['recipient_company_name'] ? $this->shipment['recipient_company_name'] : ''));
 
             if (isset($this->shipment['recipient_address1']) && ($this->shipment['recipient_address1'] > ""))
-                $this->pdf->Text($x + 3, $y += 4, strtoupper($this->shipment['recipient_address1']));
+                $this->pdf->Text($x, $y += 4.1, strtoupper($this->shipment['recipient_address1']));
 
             if (isset($this->shipment['recipient_address2']) && ($this->shipment['recipient_address2'] > ""))
-                $this->pdf->Text($x + 3, $y += 4, strtoupper($this->shipment['recipient_address2']));
+                $this->pdf->Text($x, $y += 4.1, strtoupper($this->shipment['recipient_address2']));
 
             if (isset($this->shipment['recipient_city']) && ($this->shipment['recipient_city'] > ""))
-                $this->pdf->Text($x + 3, $y += 4, strtoupper($this->shipment['recipient_city']));
+                $this->pdf->Text($x, $y += 4.1, strtoupper($this->shipment['recipient_city']));
 
             if (isset($this->shipment['recipient_state']) && ($this->shipment['recipient_state'] > "")) {
-                
+
                 if (isset($this->shipment['recipient_postcode']) && ($this->shipment['recipient_postcode'] > "")) {
-                    $this->pdf->Text($x + 3, $y += 4, strtoupper($this->shipment['recipient_state'] . ', ' . $this->shipment['recipient_postcode']));
+                    $this->pdf->Text($x, $y += 4.1, strtoupper($this->shipment['recipient_state'] . ', ' . $this->shipment['recipient_postcode']));
                 } else {
-                    $this->pdf->Text($x + 3, $y += 4, strtoupper($this->shipment['recipient_state']));
+                    $this->pdf->Text($x, $y += 4.1, strtoupper($this->shipment['recipient_state']));
                 }
+
             } else {
-                
+
                 if (isset($this->shipment['recipient_postcode']) && ($this->shipment['recipient_postcode'] > "")) {
-                    $this->pdf->Text($x + 3, $y += 4, strtoupper($this->shipment['recipient_postcode']));
+                    $this->pdf->Text($x, $y += 4.1, strtoupper($this->shipment['recipient_postcode']));
                 }
             }
 
-            $this->pdf->SetFont($this->font, 'B', 13);
-            if (isset($this->shipment['recipient_country_code']) && ($this->shipment['recipient_country_code'] > ""))
-                $this->pdf->Text($x + 3, $y += 4, strtoupper(getCountry($this->shipment['recipient_country_code'])));
+            if (isset($this->shipment['recipient_country_code']) && ($this->shipment['recipient_country_code'] > "")) {
+                $this->pdf->Text($x, $y += 4.1, strtoupper(getCountry($this->shipment['recipient_country_code'])));
+            }
 
+            $this->pdf->SetLineWidth(0.3);
+            $this->pdf->Line(65, 90, 65, 130); //vertical
+
+            $x = 66;
+            $y = 92;
+            $this->pdf->SetFont($this->font, 'U', 9);
+            $this->pdf->Text($x, $y, 'Dispatch Date');
             $this->pdf->SetFont($this->font, '', 9);
-            if (isset($this->shipment['recipient_telephone']) && ($this->shipment['recipient_telephone'] > ""))
-                $this->pdf->Text($x + 63, $y + 1, 'Tel: ' . strtoupper($this->shipment['recipient_telephone']));
+            $this->pdf->Text($x, $y += 6, date('d/m/Y', strtotime($this->shipment['ship_date'])));
+            $this->pdf->SetLineWidth(0.3);
+            $this->pdf->Line(65, $y + 5, 97, $y + 5); //horizontal
 
-            //Consignment number
-            $x = 3;
-            $y = 109;
-            $this->pdf->Line(0, $y, 110, $y); //horizontal
-            $this->pdf->SetFont($this->font, 'B', 11);
-            $this->pdf->Text($x, $y += 2, 'CONSIGNMENT #:');
-            $this->pdf->SetFont($this->font, 'B', 20);
-            $this->pdf->Text($x + 36, $y - 2, $this->data['consignment_number']);
-            $this->pdf->Line(0, $y + 7, 110, $y + 7); //horizontal
-            // Barcode
-            $this->pdf->write1DBarcode($this->data['packages'][$pkg]['barcode'], 'C128', 20, 120, '', 30, 0.5, $this->getBarcodeStyle(), 'N');
+            $this->pdf->SetFont($this->font, 'U', 9);
+            $this->pdf->Text($x, $y += 7, 'Item No.s');
+            $this->pdf->SetFont($this->font, '', 9);
+            $this->pdf->Text($x, $y += 6, $package['index'] . ' of ' . $this->shipment['pieces']);
+            $this->pdf->SetLineWidth(0.3);
+            $this->pdf->Line(65, $y + 5, 97, $y + 5); //horizontal
 
+            $this->pdf->SetFont($this->font, 'U', 9);
+            $this->pdf->Text($x, $y += 7, 'Weight (Kg)');
+            $this->pdf->SetFont($this->font, '', 9);
+            $this->pdf->Text($x, $y += 6, $package['weight']);
+
+            // Display sender
+            $this->pdf->SetFont($this->font, 'B', 8);
+            $this->pdf->Text(6, 125, 'Sender: ' . $this->shipment['sender_company_name']);
+
+            $y = 131;
+            $this->pdf->SetFont($this->font, 'B', 9);
+            $this->pdf->Text(6, $y, 'Tel - 028 38322100');
+            $this->pdf->Text($x, $y, 'Fax - 028 38323005');
+
+            $x = 7;
+            $y = 141;
+            $this->pdf->SetFont($this->font, 'B', 14);
+            $this->pdf->Text($x, $y, 'IFS CONSIGNMENT#: ' . $this->data['ifs_consignment_number']);
             $pkg++;
         }
 
         return $this->output();
+    }
+
+
+    /**
+     * Lookup the bay number from the EF gazetteer
+     *
+     * @param $postcode
+     * @return int
+     */
+    protected function getBayNumber($postcode)
+    {
+        $postcode = trim(str_replace(' ', '', $postcode));
+
+        $gaz = ExpressFreightGazetteer::where('postcode', $postcode)->first();
+
+        if ($gaz) {
+            return strtoupper($gaz->bay);
+        }
+
+        return null;
     }
 
 }

@@ -57,7 +57,7 @@ class UploadNIShipmentsToExpressFreight extends Command
     {
         parent::__construct();
 
-        $this->fileName = 'express_freight_ni_' . time() . '.csv';
+        $this->fileName = 'exp_ni_' . time() . '.csv';
         $this->filePath = '/home/expressfreight/manifests/ni/' . $this->fileName;
 
     }
@@ -72,16 +72,20 @@ class UploadNIShipmentsToExpressFreight extends Command
         // Load shipments that have been received at IFS
         $this->shipments = \App\Shipment::whereCarrierId(15)->whereReceived(1)->whereReceivedSent(0)->whereNotIn('status_id', [1, 7])->get();
 
-        // Create the file to upload
-        $this->createFile();
+        if ($this->shipments->count() > 0) {
 
-        // Update the source flag
-        $this->setShipmentsToUploaded();
+            // Create the file to upload
+            $this->createFile();
 
-        // Send notification
-        if (count($this->validShipments) > 0) {
-            //Mail::to('ASteenson@expressfreight.co.uk')->cc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight NI Manifest (' . count($this->validShipments) . ' shipments)', 'Please see attached file', $this->filePath));
+            // Update the source flag
+            $this->setShipmentsToUploaded();
+
+            // Send notification
+            if (count($this->validShipments) > 0) {
+                //Mail::to('ASteenson@expressfreight.co.uk')->cc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight NI Manifest (' . count($this->validShipments) . ' shipments)', 'Please see attached file', $this->filePath));
+            }
         }
+
     }
 
     /**
@@ -101,7 +105,7 @@ class UploadNIShipmentsToExpressFreight extends Command
             if ($this->isValid($shipment)) {
 
                 $line = [
-                    $shipment->consignment_number,
+                    $shipment->carrier_consignment_number,
                     $shipment->ship_date->format('d/m/Y'),
                     $shipment->recipient_name,
                     $shipment->recipient_company_name . ' - ' . $shipment->recipient_address1,
@@ -109,7 +113,7 @@ class UploadNIShipmentsToExpressFreight extends Command
                     $shipment->recipient_city,
                     $shipment->recipient_state,
                     $shipment->recipient_postcode,
-                    null,
+                    'North Ireland',
                     $shipment->special_instructions,
                     $shipment->recipient_telephone,
                     $shipment->pieces,
@@ -122,7 +126,7 @@ class UploadNIShipmentsToExpressFreight extends Command
                     0,
                     0,
                     null,
-                    null,
+                    $shipment->consignment_number,
                     'STANDARD',
                     $shipment->recipient_name
                 ];

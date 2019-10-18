@@ -563,7 +563,6 @@ trait ShipmentScopes
     {
         return $query->where('bill_shipping', '!=', 'recipient')
             ->where('bill_shipping_account', 205691588)
-            ->where('bill_shipping_account', '')
             ->where('carrier_id', 2)
             ->whereIn('sender_country_code', getUkDomesticCountries())
             ->whereNotIn('recipient_country_code', getUkDomesticCountries());
