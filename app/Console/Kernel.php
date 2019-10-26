@@ -82,28 +82,28 @@ class Kernel extends ConsoleKernel
         /*
          * Maintenance
          */
-        $schedule->exec('/sbin/reboot')->dailyAt('21:30');
-        $schedule->command('ifs:empty-temp-storage')->dailyAt('03:30');
-        $schedule->command('ifs:delete-old-log-entries')->dailyAt('05:20');
+        $schedule->exec('/sbin/reboot')->dailyAt('22:30');
+        $schedule->command('ifs:empty-temp-storage')->dailyAt('04:30');
+        $schedule->command('ifs:delete-old-log-entries')->dailyAt('06:20');
         $schedule->command('ifs:check-for-unprocessed-uploads')->hourly();
 
         /*
          * Purchase Invoice imports
          */
-        $schedule->command('ifs:import-fedex-purchase-invoices')->weekdays()->hourly()->between('8:00', '16:00');
-        $schedule->command('ifs:import-ups-purchase-invoices')->weekdays()->hourly()->between('8:00', '16:00');
-        $schedule->command('ifs:import-dhl-purchase-invoices')->weekdays()->hourly()->between('8:00', '16:00');
-        $schedule->command('ifs:import-primary-freight-purchase-invoices')->weekdays()->hourly()->between('8:00', '16:00');
-        $schedule->command('ifs:import-tnt-purchase-invoices')->weekdays()->hourly()->between('8:00', '16:00');
-        $schedule->command('ifs:import-express-freight-purchase-invoices')->weekdays()->hourly()->between('8:00', '16:00');
-        $schedule->command('ifs:update-scs-job-numbers-on-purchase-invoice-lines')->weekdays()->twiceDaily(8, 14);
+        $schedule->command('ifs:import-fedex-purchase-invoices')->weekdays()->hourly()->between('9:00', '17:00');
+        $schedule->command('ifs:import-ups-purchase-invoices')->weekdays()->hourly()->between('9:00', '17:00');
+        $schedule->command('ifs:import-dhl-purchase-invoices')->weekdays()->hourly()->between('9:00', '17:00');
+        $schedule->command('ifs:import-primary-freight-purchase-invoices')->weekdays()->hourly()->between('9:00', '17:00');
+        $schedule->command('ifs:import-tnt-purchase-invoices')->weekdays()->hourly()->between('9:00', '17:00');
+        $schedule->command('ifs:import-express-freight-purchase-invoices')->weekdays()->hourly()->between('9:00', '17:00');
+        $schedule->command('ifs:update-scs-job-numbers-on-purchase-invoice-lines')->weekdays()->twiceDaily(9, 15);
 
         /*
          * Transend
          */
-        $schedule->command('transend:send')->weekdays()->everyFiveMinutes()->between('6:10', '20:25')->withoutOverlapping(5);
-        $schedule->command('transend:cancel')->weekdays()->everyFiveMinutes()->between('6:10', '20:25')->withoutOverlapping(5);
-        $schedule->command('transend:process-files')->weekdays()->everyFiveMinutes()->between('7:00', '20:25')->withoutOverlapping(5);
+        $schedule->command('transend:send')->weekdays()->everyFiveMinutes()->between('7:10', '21:25')->withoutOverlapping(5);
+        $schedule->command('transend:cancel')->weekdays()->everyFiveMinutes()->between('7:10', '21:25')->withoutOverlapping(5);
+        $schedule->command('transend:process-files')->weekdays()->everyFiveMinutes()->between('7:10', '21:25')->withoutOverlapping(5);
 
         /*
          * Shipment related
@@ -118,7 +118,7 @@ class Kernel extends ConsoleKernel
          * Tracking updates
          */
         $schedule->command('ifs:get-tracking --active=1')->everyThirtyMinutes()->withoutOverlapping(10);
-        $schedule->command('ifs:get-tracking --active=0')->twiceDaily(7, 21);
+        $schedule->command('ifs:get-tracking --active=0')->twiceDaily(8, 22);
 
         /*
          * Primary Logistics
@@ -126,8 +126,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('primary-logistics:create-orders')->hourly();
         $schedule->command('primary-logistics:cancel-orders')->hourly();
         $schedule->command('primary-logistics:get-tracking-numbers')->hourly();
-        $schedule->command('primary-logistics:get-inventory')->weekdays()->dailyAt('09:30');
-        $schedule->command('ifs:check-for-missing-primary-freight-details')->dailyAt(7, 00);
+        $schedule->command('primary-logistics:get-inventory')->weekdays()->dailyAt('10:30');
+        $schedule->command('ifs:check-for-missing-primary-freight-details')->dailyAt(8, 00);
 
         /*
          * RF server
@@ -139,26 +139,26 @@ class Kernel extends ConsoleKernel
          * Misc
          */
         $schedule->command('ifs:upload-files')->withoutOverlapping(5);
-        $schedule->command('ifs:check-job-queue')->everyFiveMinutes()->between('6:00', '22:00')->withoutOverlapping(2);
+        $schedule->command('ifs:check-job-queue')->everyFiveMinutes()->between('7:15', '22:00')->withoutOverlapping(2);
 
         /*
          * Transport
          *
          */
-        $schedule->command('ifs:close-driver-manifests')->dailyAt('20:00');
-        $schedule->command('ifs:open-driver-manifests')->dailyAt('06:00');
-        $schedule->command('ifs:close-stagnant-transport-jobs')->dailyAt('04:35');
-        $schedule->command('ifs:correct-status-on-transport-jobs')->dailyAt('04:38');
-        $schedule->command('ifs:notify-transport-department-pod-required')->weekdays()->dailyAt('08:20');
-        $schedule->command('ifs:log-scanning-kpis')->weekdays()->dailyAt('08:30');
+        $schedule->command('ifs:close-driver-manifests')->dailyAt('21:00');
+        $schedule->command('ifs:open-driver-manifests')->dailyAt('07:00');
+        $schedule->command('ifs:close-stagnant-transport-jobs')->dailyAt('05:35');
+        $schedule->command('ifs:correct-status-on-transport-jobs')->dailyAt('05:38');
+        $schedule->command('ifs:notify-transport-department-pod-required')->weekdays()->dailyAt('09:20');
+        $schedule->command('ifs:log-scanning-kpis')->weekdays()->dailyAt('09:30');
 
         /**
          * Express Freight
          */
         $schedule->command('ifs:reset-express-freight-consignment-number-sequence')->dailyAt('23:00');
-        $schedule->command('ifs:upload-shipments-to-express-freight')->weekdays()->dailyAt('16:45');
-        $schedule->command('ifs:upload-ni-shipments-to-express-freight')->weekdays()->dailyAt('16:45');
-        $schedule->command('ifs:process-express-freight-tracking')->weekdays()->hourly()->between('07:00', '18:00');
+        $schedule->command('ifs:upload-shipments-to-express-freight')->weekdays()->dailyAt('17:45');
+        $schedule->command('ifs:upload-ni-shipments-to-express-freight')->weekdays()->dailyAt('17:45');
+        $schedule->command('ifs:process-express-freight-tracking')->weekdays()->hourly()->between('08:00', '19:00');
 
         /*
          * Multifreight
@@ -173,5 +173,4 @@ class Kernel extends ConsoleKernel
          */
         $schedule->command('ifs:process-vendorvillage-orders')->everyFiveMinutes()->withoutOverlapping(5);
     }
-
 }
