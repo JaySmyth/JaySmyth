@@ -158,14 +158,14 @@ class PricingModel1 extends PricingModel
                             // Price notional packages
                             $charge['value'] += round($notionalPackages * round($this->rateDetail->notional, 2), 2);
                             $this->log("Notional: " . round($notionalPackages * round($this->rateDetail->notional, 2), 2));
-                        } else {
+                        } // else {
 
                             // Notional rate missing, so error out unless company_id == 550
-                            if ($this->shipment['company_id'] != 550) {
-                                $okToPrice = false;
-                                $this->log("Error - No Notional rate defined");
-                            }
-                        }
+                            // if ($this->shipment['company_id'] != 550) {
+                            //     $okToPrice = false;
+                            //     $this->log("Error - No Notional rate defined");
+                            // }
+                        // }
                     }
                 }
             }
