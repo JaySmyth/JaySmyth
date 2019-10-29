@@ -14,7 +14,7 @@ class AddFullDutyandvatFlagToCompaniesTable extends Migration
     public function up()
     {
         Schema::table('companies', function (Blueprint $table) {
-            $table->boolean('full_dutyandvat')->unsigned()->nullable()->after('commercial_invoice');
+            $table->boolean('full_dutyandvat')->unsigned()->default(0)->after('commercial_invoice');
         });
     }
 
