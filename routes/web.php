@@ -1,6 +1,6 @@
 <?php
 
-Route::get('env', function() {
+Route::get('env', function () {
     dd(env('APP_ENV'));
 });
 
@@ -357,6 +357,7 @@ Route::get('customs-entries/{customs_entry}/add-commodity', 'CustomsEntriesContr
 Route::post('customs-entries/{customs_entry}/add-commodity', 'CustomsEntriesController@storeCommodity');
 Route::get('customs-entries/download', 'CustomsEntriesController@download');
 Route::get('customs-entries/download-commodity', 'CustomsEntriesController@downloadByCommodity');
+Route::get('customs-entries/type/{company}', 'CustomsEntriesController@companyType');
 Route::resource('customs-entries', 'CustomsEntriesController');
 
 Route::get('customs-entry-commodity/{customs_entry_commodity}/edit', 'CustomsEntryCommoditiesController@edit');

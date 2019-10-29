@@ -4,15 +4,15 @@
 
 <div class="clearfix">
     <h2 class="float-left">
-        Customs Entry:        
+        Customs Entry:
         @if($customsEntry->number)
         {{$customsEntry->number}}
         @else
         {{$customsEntry->reference}}
-        @endif   
+        @endif
     </h2>
     <h2 class="float-right">
-        @if(!$customsEntry->isComplete())                
+        @if(!$customsEntry->isComplete())
         <span class="badge badge-warning float-right">Incomplete</span>
         @endif
     </h2>
@@ -29,38 +29,48 @@
                 <div class="col-sm-8">{{$customsEntry->reference}}</div>
             </div>
             <div class="row mb-2">
-                <div class="col-sm-4"><strong>Date</strong></div>
+                <div class="col-sm-4"><strong>Consignment</strong></div>
+                <div class="col-sm-8">{{$customsEntry->consignment_number}}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-sm-4"><strong>Additional Reference</strong></div>
+                <div class="col-sm-8">{{$customsEntry->additional_reference}}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-sm-4"><strong>Entry Date</strong></div>
                 <div class="col-sm-8">{{$customsEntry->date->timezone(Auth::user()->time_zone)->format(Auth::user()->date_format)}}</div>
             </div>
-            <div class="row mb-2">
-                <div class="col-sm-4"><strong>Commercial Invoice Value</strong></div>
-                <div class="col-sm-8">{{$customsEntry->commercial_invoice_value}} {{$customsEntry->commercial_invoice_value_currency_code}}</div>
-            </div>
-            <div class="row mb-2">
-                <div class="col-sm-4"><strong>Pieces</strong></div>
-                <div class="col-sm-8">{{$customsEntry->pieces}}</div>
-            </div>
-            <div class="row mb-2">
-                <div class="col-sm-4"><strong>Weight</strong></div>
-                <div class="col-sm-8">{{$customsEntry->weight}} KG</div>
-            </div>
-            @if($customsEntry->country_of_origin)
-            <div class="row mb-2">
-                <div class="col-sm-4"><strong>Country Of Origin</strong></div>
-                <div class="col-sm-8">
-                    {{getCountry($customsEntry->country_of_origin)}}
+            @if($fullDutyAndVat == 1)
+                <div class="row mb-2">
+                    <div class="col-sm-4"><strong>Commercial Invoice Value</strong></div>
+                    <div class="col-sm-8">{{$customsEntry->commercial_invoice_value}} {{$customsEntry->commercial_invoice_value_currency_code}}</div>
                 </div>
-            </div>
+                <div class="row mb-2">
+                    <div class="col-sm-4"><strong>Pieces</strong></div>
+                    <div class="col-sm-8">{{$customsEntry->pieces}}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-sm-4"><strong>Weight</strong></div>
+                    <div class="col-sm-8">{{$customsEntry->weight}} KG</div>
+                </div>
+                @if($customsEntry->country_of_origin)
+                <div class="row mb-2">
+                    <div class="col-sm-4"><strong>Country Of Origin</strong></div>
+                    <div class="col-sm-8">
+                        {{getCountry($customsEntry->country_of_origin)}}
+                    </div>
+                </div>
+                @endif
+                <div class="row mb-2">
+                    <div class="col-sm-4"><strong>Commodity Count</strong></div>
+                    <div class="col-sm-8">{{$customsEntry->commodity_count}}</div>
+                </div>
+                @can('create_customs_entry')
+                <div class="row mb-2">
+                    <div class="col-sm-4"><strong>SCS Job Number</strong></div>
+                    <div class="col-sm-8">{{$customsEntry->scs_job_number ?? 'Incomplete'}}</div>
+                </div>
             @endif
-            <div class="row mb-2">
-                <div class="col-sm-4"><strong>Commodity Count</strong></div>
-                <div class="col-sm-8">{{$customsEntry->commodity_count}}</div>
-            </div>
-            @can('create_customs_entry')
-            <div class="row mb-2">
-                <div class="col-sm-4"><strong>SCS Job Number</strong></div>
-                <div class="col-sm-8">{{$customsEntry->scs_job_number ?? 'Incomplete'}}</div>
-            </div>
             <div class="row mb-2">
                 <div class="col-sm-4"><strong>Created By</strong></div>
                 <div class="col-sm-8">{{$customsEntry->user->name ?? 'Unknown'}}</div>
@@ -70,6 +80,7 @@
 
     </div>
 
+    @if($fullDutyAndVat == 1)
     <div class="col-sm-4">
         <div class="card">
             <div class="card-header bg-secondary text-white">Duty / VAT Summary</div>
@@ -89,6 +100,7 @@
             </div>
         </div>
     </div>
+    @endif
 
 </div>
 

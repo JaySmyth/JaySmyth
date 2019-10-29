@@ -7,6 +7,7 @@ use App\Http\Requests\CustomsEntryRequest;
 use App\Http\Requests\CustomsEntryCommodityRequest;
 use Illuminate\Support\Facades\Storage;
 use App\CustomsEntry;
+use App\Company;
 use App\Document;
 use Auth;
 use Maatwebsite\Excel\Facades\Excel;
@@ -26,7 +27,7 @@ class CustomsEntriesController extends Controller
 
     /**
      * List customs entries.
-     * 
+     *
      * @param Request $request
      * @return type
      */
@@ -36,42 +37,46 @@ class CustomsEntriesController extends Controller
 
         $customsEntries = $this->search($request);
 
-        return view('customs_entries.index', compact('customsEntries'));
+        $fullDutyAndVat = $this->getDutyVatType($request);
+
+        return view('customs_entries.index', compact('customsEntries', 'fullDutyAndVat'));
     }
 
     /**
      * Display a customs entry.
-     * 
+     *
      * @param type $id
      * @return type
      */
     public function show($id)
     {
         $customsEntry = CustomsEntry::findOrFail($id);
+        $fullDutyAndVat = Company::findOrFail($customsEntry->company_id)->full_dutyandvat;
 
         $this->authorize($customsEntry);
 
-        return view('customs_entries.show', compact('customsEntry'));
+        return view('customs_entries.show', compact('customsEntry', 'fullDutyAndVat'));
     }
 
     /**
      * Displays new entry form.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function create()
     {
         $this->authorize(new CustomsEntry);
+        $fullDutyAndVat = 1;
 
-        return view('customs_entries.create');
+        return view('customs_entries.create', compact('fullDutyAndVat'));
     }
 
     /**
      * Save the customs entry.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function store(CustomsEntryRequest $request)
     {
@@ -87,23 +92,24 @@ class CustomsEntriesController extends Controller
     /**
      * Displays edit entry form.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function edit($id)
     {
         $customsEntry = CustomsEntry::findOrFail($id);
+        $fullDutyAndVat = Company::findOrFail($customsEntry->company_id)->full_dutyandvat;
 
         $this->authorize($customsEntry);
 
-        return view('customs_entries.edit', compact('customsEntry'));
+        return view('customs_entries.edit', compact('customsEntry', 'fullDutyAndVat'));
     }
 
     /**
      * Updates an existing entry.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function update(CustomsEntryRequest $request, $id)
     {
@@ -120,10 +126,10 @@ class CustomsEntriesController extends Controller
     }
 
     /**
-     * Displays add commodity form.     
-     * 
+     * Displays add commodity form.
+     *
      * @param int $id
-     * @return 
+     * @return
      */
     public function addCommodity($id)
     {
@@ -136,9 +142,9 @@ class CustomsEntriesController extends Controller
 
     /**
      * Saves the commodity line.
-     * 
+     *
      * @param Request $request
-     * @param int $id   
+     * @param int $id
      * @return void
      */
     public function storeCommodity(CustomsEntryCommodityRequest $request, $id)
@@ -162,11 +168,10 @@ class CustomsEntriesController extends Controller
      * Delete a customs entry, associated commodities and docs.
      *
      * @param  int $id
-     * @return 
+     * @return
      */
     public function destroy(CustomsEntry $customsEntry)
     {
-
         $this->authorize($customsEntry);
 
         /*
@@ -202,10 +207,10 @@ class CustomsEntriesController extends Controller
 
     /*
      * Customs entry search.
-     * 
+     *
      * @param   $request
      * @param   $paginate
-     * 
+     *
      * @return
      */
 
@@ -237,7 +242,9 @@ class CustomsEntriesController extends Controller
 
         $customsEntries = $this->search($request, false);
 
-        return Excel::download(new \App\Exports\CustomsEntriesExport($customsEntries), 'customs_entries.xlsx');
+        $fullDutyAndVat = $this->getDutyVatType($request);
+
+        return Excel::download(new \App\Exports\CustomsEntriesExport($customsEntries, $fullDutyAndVat), 'customs_entries.xlsx');
     }
 
     /**
@@ -252,7 +259,39 @@ class CustomsEntriesController extends Controller
 
         $customsEntries = $this->search($request, false);
 
-        return Excel::download(new \App\Exports\CustomsEntriesByCommodityExport($customsEntries), 'customs_entries.xlsx');
+        return Excel::download(new \App\Exports\CustomsEntriesByCommodityExport($customsEntries, $fullDutyAndVat), 'customs_entries.xlsx');
     }
 
+    /**
+    * Returns full_dutyandvat flag to ajax call
+    * on customs entry screen_resolution
+    *
+    * @param  Request
+    * @return Boolean
+    */
+    public function companyType(Company $company)
+    {
+        return $company->full_dutyandvat;
+    }
+
+    /**
+    * Returns true if any of the users companies ezmlm_has
+    * Access to full Duty and Vat reporting
+    *
+    * @param  Company
+    * @return Boolean
+    */
+    public function getDutyVatType($request)
+    {
+        $companyIds = $request->user()->getAllowedCompanyIds();
+        $fullDutyAndVat=false;
+        foreach ($companyIds as $companyId) {
+            if (Company::find($companyId)->full_dutyandvat == "1") {
+                $fullDutyAndVat = true;
+                break;
+            }
+        }
+
+        return $fullDutyAndVat;
+    }
 }

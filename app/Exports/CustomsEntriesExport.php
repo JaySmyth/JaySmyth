@@ -8,41 +8,55 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class CustomsEntriesExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
+    public $customsEntries;
+    public $fullDutyAndVat;
 
-    public function __construct($customsEntries)
+    public function __construct($customsEntries, $fullDutyAndVat)
     {
         $this->customsEntries = $customsEntries;
+        $this->fullDutyAndVat = $fullDutyAndVat;
     }
 
     /**
-     * 
+     *
      * @return array
      */
     public function headings(): array
     {
-        return [
-            'Entry Number',
-            'Date',
-            'Customer',
-            'Reference',
-            'Consignment Number',
-            'IFS Job Number',
-            'Pieces',
-            'Weight (KG)',
-            'Commodity Count',
-            'Commercial Invoice Value',
-            'Commercial Invoice Currency',
-            'Customs Value (GBP)',
-            'Duty (GBP)',
-            'VAT (GBP)',
-            'Vendor',
-            'CPC',
-            'Country Of Origin'
-        ];
+        if ($this->fullDutyAndVat) {
+            return [
+                'Entry Number',
+                'Date',
+                'Customer',
+                'Reference',
+                'Consignment Number',
+                'IFS Job Number',
+                'Pieces',
+                'Weight (KG)',
+                'Commodity Count',
+                'Commercial Invoice Value',
+                'Commercial Invoice Currency',
+                'Customs Value (GBP)',
+                'Duty (GBP)',
+                'VAT (GBP)',
+                'Vendor',
+                'CPC',
+                'Country Of Origin'
+            ];
+        } else {
+            return [
+                'Entry Number',
+                'Date',
+                'Customer',
+                'Reference',
+                'Addit. Reference',
+                'Consignment Number',
+            ];
+        }
     }
 
     /**
-     * 
+     *
      * @return type
      */
     public function collection()
@@ -52,16 +66,17 @@ class CustomsEntriesExport implements FromCollection, WithHeadings, ShouldAutoSi
         foreach ($this->customsEntries as $entry):
 
             $vendor = [];
-            $cpc = [];
+        $cpc = [];
 
-            foreach ($entry->customsEntryCommodity as $commodity) {
-                $vendor[$commodity->vendor] = $commodity->vendor;
-                $cpc[$commodity->customsProcedureCode->code] = $commodity->customsProcedureCode->code;
-            }
+        foreach ($entry->customsEntryCommodity as $commodity) {
+            $vendor[$commodity->vendor] = $commodity->vendor;
+            $cpc[$commodity->customsProcedureCode->code] = $commodity->customsProcedureCode->code;
+        }
 
-            $cpc = implode('|', $cpc);
-            $vendor = implode('|', $vendor);
+        $cpc = implode('|', $cpc);
+        $vendor = implode('|', $vendor);
 
+        if ($this->fullDutyAndVat) {
             $row = collect([
                 'Entry Number' => $entry->number,
                 'Date' => $entry->date->format('d-m-Y'),
@@ -81,12 +96,21 @@ class CustomsEntriesExport implements FromCollection, WithHeadings, ShouldAutoSi
                 'CPC' => $cpc,
                 'Country Of Origin' => $entry->country_of_origin
             ]);
+        } else {
+            $row = collect([
+                    'Entry Number' => $entry->number,
+                    'Date' => $entry->date->format('d-m-Y'),
+                    'Customer' => $entry->company->company_name,
+                    'Reference' => $entry->reference,
+                    'Addit. Reference' => $entry->additional_reference,
+                    'Consignment Number' => $entry->consignment_number
+                ]);
+        }
 
-            $collection->push($row);
+        $collection->push($row);
 
         endforeach;
 
         return $collection;
     }
-
 }

@@ -52,7 +52,7 @@ class CustomsEntry extends Model
 
     /**
      * A customs entry has many documents.
-     * 
+     *
      * @return
      */
     public function documents()
@@ -104,7 +104,7 @@ class CustomsEntry extends Model
     }
 
     /**
-     * 
+     *
      * @return int
      */
     public function getDutyAttribute()
@@ -113,7 +113,7 @@ class CustomsEntry extends Model
     }
 
     /**
-     * 
+     *
      * @return int
      */
     public function getVatAttribute()
@@ -157,7 +157,7 @@ class CustomsEntry extends Model
 
     /**
      * Scope company.
-     * 
+     *
      * @return
      */
     public function scopeHasCompany($query, $companyId)
@@ -169,7 +169,7 @@ class CustomsEntry extends Model
 
     /**
      * Scope restrict results by company.
-     * 
+     *
      * @param type $query
      * @param type $companyIds
      * @return type
@@ -181,7 +181,7 @@ class CustomsEntry extends Model
 
     /**
      * Scope filter.
-     * 
+     *
      * @return
      */
     public function scopeHasCpc($query, $cpcId)
@@ -201,8 +201,16 @@ class CustomsEntry extends Model
      */
     public function isComplete()
     {
+
         // Fields to check values of
-        $fields = ['company_id', 'number', 'reference', 'scs_job_number', 'commercial_invoice_value', 'commercial_invoice_value_currency_code', 'customs_value', 'pieces', 'commodity_count', 'weight'];
+        if (!empty($this->company_id)) {
+            $fullDutyAndVat = Company::find($this->company_id)->full_dutyandvat;
+            if ($fullDutyAndVat) {
+                $fields = ['company_id', 'number', 'reference', 'scs_job_number', 'commercial_invoice_value', 'commercial_invoice_value_currency_code', 'customs_value', 'pieces', 'commodity_count', 'weight'];
+            } else {
+                $fields = ['company_id', 'number', 'reference'];
+            }
+        }
 
         foreach ($fields as $field) {
             if (empty($this->$field) || $this->$field == '0.00') {
@@ -216,5 +224,4 @@ class CustomsEntry extends Model
 
         return true;
     }
-
 }
