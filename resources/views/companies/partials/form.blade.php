@@ -206,11 +206,6 @@
             </div>
         </div>
 
-    </div>
-
-
-    <div class="col-sm-6">
-
         <div class="form-group row{{ $errors->has('site_name') ? ' has-danger' : '' }}">
             <label class="col-sm-4  col-form-label">Site Name:
                 <abbr title="This information is required.">*</abbr></label>
@@ -226,6 +221,11 @@
 
             </div>
         </div>
+
+    </div>
+
+
+    <div class="col-sm-6">
 
         <div class="form-group row{{ $errors->has('depot_id') ? ' has-danger' : '' }}">
             <label class="col-sm-4  col-form-label">
@@ -365,6 +365,16 @@
 
             <div class="col-sm-6">
                 {!! Form::select('vat_exempt', array(0 => 'No', 1 => 'Yes'), old('vat_exempt'), array('id' => 'vat_exempt', 'class' => 'form-control')) !!}
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-sm-4  col-form-label">
+                Full Duty/ Vat Reporting: <abbr title="This information is required.">*</abbr>
+            </label>
+
+            <div class="col-sm-6">
+                {!! Form::select('full_dutyandvat', array(0 => 'No', 1 => 'Yes'), old('full_dutyandvat'), array('id' => 'full_dutyandvat', 'class' => 'form-control')) !!}
             </div>
         </div>
 
