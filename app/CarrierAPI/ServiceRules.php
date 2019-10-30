@@ -20,7 +20,6 @@ use App\CompanyPackagingType;
  */
 class ServiceRules
 {
-
     public $debug = false;
     public $eol = "\n";
 
@@ -59,7 +58,6 @@ class ServiceRules
 
     private function preprocess($shipment)
     {
-
         if (!isset($shipment['carrier_code'])) {
             $shipment['carrier_code'] = 'cost';
         }
@@ -140,30 +138,21 @@ class ServiceRules
      */
     private function country_filter($shipment, $serviceDetails)
     {
-
         if (isset($serviceDetails['pivot']['country_filter']) && $serviceDetails['pivot']['country_filter'] > "") {
-
             if (substr($serviceDetails['pivot']['country_filter'], 0, 1) == "!") {
-
                 if (strpos($serviceDetails['pivot']['country_filter'], $shipment['recipient_country_code']) !== false) {
-
                     return false;
                 } else {
-
                     return true;
                 }
             } else {
-
                 if (strpos($serviceDetails['pivot']['country_filter'], $shipment['recipient_country_code']) !== false) {
-
                     return true;
                 } else {
-
                     return false;
                 }
             }
         } else {
-
             return true;
         }
     }
@@ -246,11 +235,8 @@ class ServiceRules
 
         // Fail if service is uk24 and both origin & destination postcodes are in NI
         if (strtolower($serviceDetails['code']) == 'uk24') {
-
             if (substr($shipment['sender_postcode'], 0, 2) == substr($shipment['recipient_postcode'], 0, 2)) {
-
                 if (substr($shipment['sender_postcode'], 0, 2) == 'BT') {
-
                     if ($this->debug) {
                         echo "UK24 service not suitable for local NI movements" . $this->eol;
                     }
@@ -280,10 +266,8 @@ class ServiceRules
          * **************************************************
          */
         if ($serviceDetails['id'] == 3 && ($shipment['company_id'] != 550)) {
-
             $packages = $shipment['packages'];
             foreach ($packages as $package) {
-
                 $vol = $package['length'] * $package['width'] * $package['height'];
                 if ($vol > 179641 || $package['weight'] > 30) {
                     return false;
@@ -296,7 +280,6 @@ class ServiceRules
 
     private function carrier_code($shipment, $serviceDetails)
     {
-
         $result = true;
 
         if ($shipment['carrier_code'] > '' && $shipment['carrier_code'] != 'cost' && $shipment['carrier_code'] != 'price') {
@@ -317,11 +300,9 @@ class ServiceRules
 
     private function code($shipment, $serviceDetails)
     {
-
         $result = true;
 
         if (isset($shipment['service_code']) && $shipment['service_code'] > '') {
-
             if ($this->debug) {
                 echo "Checking Code : |", $shipment['service_code'], "| ServiceDetails Code : |", $serviceDetails['code'] . "|" . $this->eol;
             }
@@ -357,7 +338,6 @@ class ServiceRules
 
             return false;
         } else {
-
             return true;
         }
     }
@@ -387,14 +367,11 @@ class ServiceRules
 
     private function isEuCountry($shipment, $addressType)
     {
-
         $country = Country::where('country_code', $shipment[$addressType . '_country_code'])->first();
 
         if ($country && isset($country->eu)) {
-
             return $country->eu;
         } else {
-
             $msg = "Fn isEuCountry : CountryCode - " . $shipment[$addressType . '_country_code'] . "\n\n";
             $msg .= "Unable to determine if $addressType Country is part of the EU\n\n";
             $msg .= "Shipment Details below\n\n";
@@ -406,16 +383,13 @@ class ServiceRules
 
     private function non_eu($shipment, $serviceDetails)
     {
-        if ($serviceDetails['non_eu'] == '0' && $this->isEuShipment($shipment)) {
-
-            // Not defined or does not matter
+        if ($serviceDetails['non_eu'] == '1' && $this->isEuShipment($shipment)) {
             if ($this->debug) {
-                echo "Non EU - Not Required" . $this->eol;
+                echo "Non EU - Invalid Country" . $this->eol;
             }
 
             return false;
         } else {
-
             return true;
         }
     }
@@ -533,7 +507,6 @@ class ServiceRules
         }
 
         return (preg_match($serviceDetails['account_number_regex'], $shipment['bill_shipping_account']) && preg_match($serviceDetails['account_number_regex'], $shipment['bill_tax_duty_account']));
-
     }
 
 
@@ -542,9 +515,9 @@ class ServiceRules
 
         /*
          * Note packaging_code may be the customers own
-         * package type, so we need to identify what the 
+         * package type, so we need to identify what the
          * IFS equivilant is.
-         * 
+         *
          */
         if (substr($serviceDetails['packaging_types'], 0, 1) == '!') {
             $negativeCondition = true;
@@ -571,7 +544,6 @@ class ServiceRules
             }
 
             if ($negativeCondition) {
-
                 if ($this->debug) {
                     echo "Negative Condition" . $this->eol;
                 }
@@ -592,7 +564,6 @@ class ServiceRules
                     }
                 }
             } else {
-
                 if ($this->debug) {
                     echo "Positive Condition" . $this->eol;
                 }
@@ -634,12 +605,10 @@ class ServiceRules
 
         // If Service is IPF and Girth > 330, ignore min weight calc
         if ($serviceDetails['code'] == 'ipf') {
-
             if (count($shipment['packages']) == $shipment['pieces']) {
                 for ($i = 0; $i < $shipment['pieces']; ++$i) {
                     $girth = girth($shipment['packages'][$i]['length'], $shipment['packages'][$i]['width'], $shipment['packages'][$i]['height']);
                     if ($girth > 330) {
-
                         return true;
                     }
                 }
@@ -648,9 +617,7 @@ class ServiceRules
 
         // If Even one piece is greater than or equal to min, then return true
         foreach ($shipment['packages'] as $package) {
-
             if ($package['weight'] >= $serviceDetails['min_weight']) {
-
                 return true;
             }
         }
@@ -668,9 +635,7 @@ class ServiceRules
     private function max_weight($shipment, $serviceDetails)
     {
         foreach ($shipment['packages'] as $package) {
-
             if ($package['weight'] > $serviceDetails['max_weight']) {
-
                 return false;
             }
         }
@@ -689,14 +654,10 @@ class ServiceRules
 
         // Check no single piece is greater than allowed girth
         if ($serviceDetails['max_girth'] > 0) {
-
             if (count($shipment['packages']) == $shipment['pieces']) {
-
                 for ($i = 0; $i < $shipment['pieces']; ++$i) {
-
                     $girth = girth($shipment['packages'][$i]['length'], $shipment['packages'][$i]['width'], $shipment['packages'][$i]['height']);
                     if ($girth > $serviceDetails['max_girth']) {
-
                         return false;
                     }
                 }
@@ -727,12 +688,9 @@ class ServiceRules
      */
     private function max_dimension($shipment, $serviceDetails)
     {
-
         foreach ($shipment['packages'] as $package) {
-
             $maxDim = max($package['length'], $package['width'], $package['height']);
             if (($maxDim > $serviceDetails['max_dimension'])) {
-
                 return false;
             }
         }
@@ -799,10 +757,9 @@ class ServiceRules
 
     private function category($shipment, $serviceDetails)
     {
-
         if (isset($shipment['ship_reason']) && (strcasecmp($shipment['ship_reason'], 'documents') == 0)) {
             $category = 'doc';
-        } else if ($this->isEuShipment($shipment)) {
+        } elseif ($this->isEuShipment($shipment)) {
             $category = 'eu';
         } else {
             $category = 'nondoc';
@@ -825,9 +782,7 @@ class ServiceRules
 
             // Is it an array
             if (is_array($shipment['options'])) {
-
                 foreach ($shipment['options'] as $option) {
-
                     switch ($option) {
                         case '0900':
                             if ($serviceDetails['9am']) {
@@ -866,18 +821,14 @@ class ServiceRules
                     }
                 }
             } else {
-
                 if ($shipment['options'] == '') {
-
                     $supported = true;
                 }
             }
         } else {
-
             $supported = true;
         }
 
         return $supported;
     }
-
 }
