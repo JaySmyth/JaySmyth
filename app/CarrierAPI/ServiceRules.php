@@ -383,9 +383,11 @@ class ServiceRules
 
     private function non_eu($shipment, $serviceDetails)
     {
-        if ($serviceDetails['non_eu'] == '1' && $this->isEuShipment($shipment)) {
+        if ($serviceDetails['non_eu'] == '0' && $this->isEuShipment($shipment)) {
+
+            // Not defined or does not matter
             if ($this->debug) {
-                echo "Non EU - Invalid Country" . $this->eol;
+                echo "Non EU - Not Required" . $this->eol;
             }
 
             return false;
