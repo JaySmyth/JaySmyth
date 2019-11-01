@@ -72,7 +72,7 @@ class PricingModel
 
     public function log($msg)
     {
-        $this->log[] = $msg;
+        $this->log[] = $msg . " - " . date('H:i:s');
     }
 
     public function __construct($debug = false)
@@ -452,18 +452,30 @@ class PricingModel
             $i = $this->countLPSPackages();
             $this->log("$i LPS Packages found");
             $this->calcSurcharge('LPS', $i);
+            if ($this->isPeakSeason()) {
+                $this->log("Add Peak Season PSS");
+                $this->calcSurcharge('PLP');
+            }
         } else {
 
             // Oversize Piece
             if ($this->isOSP()) {
                 $this->log("OSP Packages found");
                 $this->calcSurcharge('OSP');
+                if ($this->isPeakSeason()) {
+                    $this->log("Add Peak Season PSS");
+                    $this->calcSurcharge('PAH');
+                }
             } else {
 
                 // OverWeight Piece
                 if ($this->isOWP()) {
                     $this->log("OWP Packages found");
                     $this->calcSurcharge('OWP');
+                }
+                if ($this->isPeakSeason()) {
+                    $this->log("Add Peak Season PSS");
+                    $this->calcSurcharge('PAH');
                 }
             }
         }
@@ -572,6 +584,12 @@ class PricingModel
 
     // Over Max Limits
     public function isMAX()
+    {
+        return false;
+    }
+
+    // Is Peak Season
+    public function isPeakSeason()
     {
         return false;
     }
