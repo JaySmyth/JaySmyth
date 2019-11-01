@@ -409,15 +409,18 @@ class PricingModel
 
     public function calcSurcharge($code, $packages = 0)
     {
+        $this->surchargeDetails = $this->getSurcharge($code);
         if ($packages == 0) {
             $packages = $this->shipment['pieces'];
+            $description = $this->surchargeDetails->name;
+        } else {
+            $description = $this->surchargeDetails->name . " ($packages Packages)";
         }
-
-        $this->surchargeDetails = $this->getSurcharge($code);
 
         if ($this->surchargeId > 0 && isset($this->surchargeDetails->name)) {
             $charge['code'] = $code;
-            $charge['description'] = $this->surchargeDetails->name;
+            $charge['description'] = $description;
+            ;
             $charge['value'] = 0;
             $charge['value'] = $this->surchargeDetails->consignment_rate;
             $charge['value'] += $this->chargeableWeight * $this->surchargeDetails->weight_rate;
@@ -454,7 +457,7 @@ class PricingModel
             $this->calcSurcharge('LPS', $i);
             if ($this->isPeakSeason()) {
                 $this->log("Add Peak Season PSS");
-                $this->calcSurcharge('PLP');
+                $this->calcSurcharge('PLP', $i);
             }
         } else {
 
@@ -464,7 +467,8 @@ class PricingModel
                 $this->calcSurcharge('OSP');
                 if ($this->isPeakSeason()) {
                     $this->log("Add Peak Season PSS");
-                    $this->calcSurcharge('PAH');
+                    $i = $this->countOSPPackages();
+                    $this->calcSurcharge('PAH', $i);
                 }
             } else {
 
@@ -475,7 +479,8 @@ class PricingModel
                 }
                 if ($this->isPeakSeason()) {
                     $this->log("Add Peak Season PSS");
-                    $this->calcSurcharge('PAH');
+                    $i = $this->countOWPPackages();
+                    $this->calcSurcharge('PAH', $i);
                 }
             }
         }
@@ -645,16 +650,13 @@ class PricingModel
             return false;
         }
 
-        foreach ($this->shipment['packages'] as $package) {
-            if (isset($package['length']) && isset($package['width']) && isset($package['height'])) {
-                $maxDim = max($package['length'], $package['width'], $package['height']);
-                if ($maxDim > $this->maxStdDimension) {
-                    return true;
-                }
-            }
+        // Check if shipment contains any LPS packages
+        $i = $this->countOSPPackages();
+        if ($i > 0) {
+            return true;
+        } else {
+            return false;
         }
-
-        return false;
     }
 
     /**
@@ -662,15 +664,13 @@ class PricingModel
      */
     public function isOWP()
     {
-        foreach ($this->shipment['packages'] as $package) {
-            if (isset($package['weight']) && isset($package['volumetric_weight'])) {
-                if ($package['weight'] > $this->maxStdWeight || $package['volumetric_weight'] > $this->maxStdWeight) {
-                    return true;
-                }
-            }
+        // Check if shipment contains any LPS packages
+        $i = $this->countOWPPackages();
+        if ($i > 0) {
+            return true;
+        } else {
+            return false;
         }
-
-        return false;
     }
 
     /**
@@ -713,6 +713,44 @@ class PricingModel
         foreach ($this->shipment['packages'] as $package) {
             if ($this->isLPSPackage($package)) {
                 $i++;
+            }
+        }
+
+        return $i;
+    }
+
+    /**
+     * Returns true if this is a large package shipment
+     */
+    public function countOSPPackages()
+    {
+        $i = 0;
+        foreach ($this->shipment['packages'] as $package) {
+            if (isset($package['length']) && isset($package['width']) && isset($package['height'])) {
+                $maxDim = max($package['length'], $package['width'], $package['height']);
+                if ($maxDim > $this->maxStdDimension) {
+                    $i++;
+                }
+            }
+        }
+
+        return $i;
+    }
+
+    /**
+     * Returns true if this is a large package shipment
+     */
+    public function countOWPPackages()
+    {
+        $i = 0;
+        foreach ($this->shipment['packages'] as $package) {
+            if (isset($package['weight']) && $package['weight'] > $this->maxStdWeight) {
+                $i++;
+                continue;
+            }
+            if (isset($package['volumetric_weight']) && $package['volumetric_weight'] > $this->maxStdWeight) {
+                $i++;
+                continue;
             }
         }
 
@@ -800,12 +838,6 @@ class PricingModel
                     $result = $this->getPrevSegmentCharge($currentRateLine);
                     $charge['value'] = $result['charge'];
                     $this->log($charge['description'] . ' - ' .$charge['value']);
-
-                    /*
-                      if ($this->debug) {
-                      echo "Add charge : " . $charge['value'] . "\n";
-                      }
-                     */
                 }
             }
             /*
@@ -815,13 +847,6 @@ class PricingModel
              */
             $incrementalWeight = $this->chargeableWeight - $result['break_point'];
             $charge = $this->calcSegmentCharge($currentRateLine, $incrementalWeight, $charge);
-
-            /*
-              if ($this->debug) {
-              echo "Add charge : " . $charge['value'] . "\n";
-              }
-             */
-
             $this->addSurcharge($charge);
         } else {
             $this->log("No Rate found");
