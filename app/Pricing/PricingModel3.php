@@ -143,12 +143,12 @@ class PricingModel3 extends PricingModel
         /**
         *   4th Nov to 10 Jan
         */
-        // $startDate = date('Y-m-d', strtotime(date('Y') . "/10/04"));
-        // $endDate = date('Y-m-d', strtotime(date('Y') + 1 . "/01/10"));
-        //$currentDate = date('Y-m-d');
-        //if ($currentDate >= $startDate && $currentDate <= $endDate) {
-        //     return true;
-        //}
+        $startDate = date('Y-m-d', strtotime(date('Y') . "/11/01"));
+        $endDate = date('Y-m-d', strtotime(date('Y') + 1 . "/01/10"));
+        $currentDate = date('Y-m-d');
+        if ($currentDate >= $startDate && $currentDate <= $endDate) {
+            return true;
+        }
 
         return false;
     }

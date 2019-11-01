@@ -476,11 +476,11 @@ class PricingModel
                 if ($this->isOWP()) {
                     $this->log("OWP Packages found");
                     $this->calcSurcharge('OWP');
-                }
-                if ($this->isPeakSeason()) {
-                    $this->log("Add Peak Season PSS");
-                    $i = $this->countOWPPackages();
-                    $this->calcSurcharge('PAH', $i);
+                    if ($this->isPeakSeason()) {
+                        $this->log("Add Peak Season PSS");
+                        $i = $this->countOWPPackages();
+                        $this->calcSurcharge('PAH', $i);
+                    }
                 }
             }
         }
