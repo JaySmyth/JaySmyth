@@ -420,7 +420,6 @@ class PricingModel
         if ($this->surchargeId > 0 && isset($this->surchargeDetails->name)) {
             $charge['code'] = $code;
             $charge['description'] = $description;
-            ;
             $charge['value'] = 0;
             $charge['value'] = $this->surchargeDetails->consignment_rate;
             $charge['value'] += $this->chargeableWeight * $this->surchargeDetails->weight_rate;
