@@ -49,7 +49,7 @@ class UpdateShopify extends Command
      */
     public function handle()
     {
-        $shipments = Shipment::whereReceived(1)->whereReceivedSent(0)->whereCompanyId(908)->orderBy('id', 'DESC')->get();
+        $shipments = Shipment::whereReceived(1)->whereReceivedSent(0)->whereCompanyId(995)->orderBy('id', 'DESC')->get();
 
         $this->info($shipments->count() . " shipments found");
 
@@ -76,7 +76,7 @@ class UpdateShopify extends Command
                 'received_sent' => 1
             ]);
 
-            Mail::to('linenbundle1541718156@in.fulfillment.stock-sync.com')->cc(['paul@eascamattress.ie'])->bcc(['dshannon@antrim.ifsgroup.com'])->send(new \App\Mail\GenericError('Tracking Numbers - ' . $shipments->count() . ' shipments', null, $this->tempFile));
+            Mail::to('supernova-hair-tools1572962736@in.uptracker.app')->bcc(['it@antrim.ifsgroup.com'])->send(new \App\Mail\GenericError('We Are Paradoxx Tracking Numbers - ' . $shipments->count() . ' shipments', null, $this->tempFile));
         }
     }
 
