@@ -55,11 +55,16 @@ class UpdateShopify extends Command
 
         $handle = fopen($this->tempFile, "w");
 
+        $ids = [];
+
         foreach ($shipments as $shipment) {
 
             $order = VvOrders::whereOrderNumber($shipment->shipment_reference)->first();
 
             if ($order) {
+
+                // Add to the array of shipment ids
+                $ids[] = $shipment->id;
 
                 foreach ($order->stockItems as $item) {
                     fputcsv($handle, [$order->order_reference, $item->stock->part_number, $item->actual_quantity, $shipment->carrier_consignment_number, strtoupper($shipment->carrier->name)]);
@@ -69,14 +74,14 @@ class UpdateShopify extends Command
 
         fclose($handle);
 
-        if ($shipments->count() > 0) {
+        if (count($ids) > 0) {
 
             // Set the source field on all shipments to that of the filename
-            \App\Shipment::whereIn('id', $shipments->pluck('id'))->update([
+            \App\Shipment::whereIn('id', $ids)->update([
                 'received_sent' => 1
             ]);
 
-            Mail::to('supernova-hair-tools1572962736@in.uptracker.app')->bcc(['it@antrim.ifsgroup.com'])->send(new \App\Mail\GenericError('We Are Paradoxx Tracking Numbers - ' . $shipments->count() . ' shipments', null, $this->tempFile));
+            Mail::to('supernova-hair-tools1572962736@in.uptracker.app')->bcc(['it@antrim.ifsgroup.com'])->send(new \App\Mail\GenericError('We Are Paradoxx Tracking Numbers - ' . count($ids) . ' shipments', null, $this->tempFile));
         }
     }
 
