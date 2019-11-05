@@ -410,11 +410,11 @@ class PricingModel
     public function calcSurcharge($code, $packages = 0)
     {
         $this->surchargeDetails = $this->getSurcharge($code);
+        $description = (isset($this->surchargeDetails->name)) ? $this->surchargeDetails->name : "Surcharge";
         if ($packages == 0) {
             $packages = $this->shipment['pieces'];
-            $description = $this->surchargeDetails->name;
         } else {
-            $description = $this->surchargeDetails->name . " ($packages Packages)";
+            $description .= " ($packages Packages)";
         }
 
         if ($this->surchargeId > 0 && isset($this->surchargeDetails->name)) {
