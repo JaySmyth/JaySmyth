@@ -119,11 +119,11 @@ class ServiceRules
                 break;
 
             case 'uk24':
-                    return !$this->checkUk24($shipment, $serviceDetails);
+                    return $this->checkUk24($shipment, $serviceDetails);
                 break;
 
             case 'ie48':
-                    return !$this->checkIe48($shipment, $serviceDetails);
+                    return $this->checkIe48($shipment, $serviceDetails);
                 break;
 
         }
