@@ -12,6 +12,7 @@ use App\Country;
 use App\Carrier;
 use App\PackagingType;
 use App\CompanyPackagingType;
+use App\IfsNdPostcode;
 
 /**
  * Description of ServiceRules
@@ -109,14 +110,22 @@ class ServiceRules
             return false;
         }
 
-        // uk24 Service specific checks
-        if ($serviceDetails['code'] == 'uk24' && !$this->checkUk24($shipment, $serviceDetails)) {
-            return false;
-        }
+        // Service specific tests
+        switch (strtolower($serviceDetails['code'])) {
 
-        // Fastway ie48 Service specific checks
-        if ($serviceDetails['code'] == 'ie48' && !$this->checkIe48($shipment, $serviceDetails)) {
-            return false;
+            case 'ni24':
+            case 'ni48':
+                    return $this->checkNi($shipment, $serviceDetails);
+                break;
+
+            case 'uk24':
+                    return $this->checkUk24($shipment, $serviceDetails);
+                break;
+
+            case 'ie48':
+                    return $this->checkIe48($shipment, $serviceDetails);
+                break;
+
         }
 
         return true;
@@ -230,18 +239,36 @@ class ServiceRules
         return true;
     }
 
+    private function checkNi($shipment, $serviceDetails)
+    {
+
+        // Exp Freight deliver to postcodes in ifs_nd_postcodes table, IFS deliver to the rest
+        if (in_array(strtolower($serviceDetails['code']), ['ni24', 'ni48'])) {
+            $ifsPostCodes = new IfsNdPostcode();
+            $ifsArea = $ifsPostCodes->isServed($shipment['recipient_postcode']);
+            if ($ifsArea && $serviceDetails['carrier_id'] == 1) {
+                // Area served by IFS and Carrier is IFS
+                return true;
+            }
+            if (!$ifsArea && $serviceDetails['carrier_id'] == 15) {
+                // Area not served by IFS and Carrier is ExpressFreight
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function checkUk24($shipment, $serviceDetails)
     {
 
         // Fail if service is uk24 and both origin & destination postcodes are in NI
-        if (strtolower($serviceDetails['code']) == 'uk24') {
-            if (substr($shipment['sender_postcode'], 0, 2) == substr($shipment['recipient_postcode'], 0, 2)) {
-                if (substr($shipment['sender_postcode'], 0, 2) == 'BT') {
-                    if ($this->debug) {
-                        echo "UK24 service not suitable for local NI movements" . $this->eol;
-                    }
-                    return false;
+        if (substr($shipment['sender_postcode'], 0, 2) == substr($shipment['recipient_postcode'], 0, 2)) {
+            if (substr($shipment['sender_postcode'], 0, 2) == 'BT') {
+                if ($this->debug) {
+                    echo "UK24 service not suitable for local NI movements" . $this->eol;
                 }
+                return false;
             }
         }
 
@@ -365,6 +392,11 @@ class ServiceRules
         }
     }
 
+    private function isNonEuShipment($shipment)
+    {
+        return !$this->isEuShipment($shipment);
+    }
+
     private function isEuCountry($shipment, $addressType)
     {
         $country = Country::where('country_code', $shipment[$addressType . '_country_code'])->first();
@@ -383,11 +415,11 @@ class ServiceRules
 
     private function non_eu($shipment, $serviceDetails)
     {
-        if ($serviceDetails['non_eu'] == '0' && $this->isEuShipment($shipment)) {
+        if ($serviceDetails['non_eu'] == '0' && $this->isNonEuShipment($shipment)) {
 
-            // Not defined or does not matter
+            // Non EU shipments not allowed and shipment is for non EU
             if ($this->debug) {
-                echo "Non EU - Not Required" . $this->eol;
+                echo "fn non_eu - failed" . $this->eol;
             }
 
             return false;
