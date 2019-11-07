@@ -183,30 +183,13 @@ class ImportExpressFreightPurchaseInvoices extends Command
     }
 
     /**
-     * Read one line at a time and create an array of field names and values.
-     *
-     * @param type $data
-     *
-     * @return void
-     */
-    private function assignFieldNames($data)
-    {
-        $i = 0;
-        foreach ($this->fields as $field) {
-            $row[$field] = (isset($data[$i])) ? trim($data[$i]) : null;
-            $i++;
-        }
-        return $row;
-    }
-
-    /**
      * Save and set the purchase invoice.
      *
      * @param type $line
      */
     private function createPurchaseInvoice($file)
     {
-        $invoiceNumber = 'EXP' . str_replace(['.csv', ''], '', $file);
+        $invoiceNumber = str_replace(['.csv', ''], '', $file);
 
         $this->purchaseInvoice = PurchaseInvoice::whereInvoiceNumber($invoiceNumber)->whereCarrierId(14)->first();
 
@@ -231,6 +214,23 @@ class ImportExpressFreightPurchaseInvoices extends Command
         $this->invoices[] = $invoiceNumber;
 
         return true;
+    }
+
+    /**
+     * Read one line at a time and create an array of field names and values.
+     *
+     * @param type $data
+     *
+     * @return void
+     */
+    private function assignFieldNames($data)
+    {
+        $i = 0;
+        foreach ($this->fields as $field) {
+            $row[$field] = (isset($data[$i])) ? trim($data[$i]) : null;
+            $i++;
+        }
+        return $row;
     }
 
     /**
