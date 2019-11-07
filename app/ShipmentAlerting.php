@@ -32,9 +32,7 @@ trait ShipmentAlerting
         $fieldSentAt = $fieldSent . '_at';
 
         foreach ($this->alerts as $alert) {
-
             if ($alert->$statusCode && !$alert->$fieldSent) {
-
                 Mail::to($alert->email)->queue(new \App\Mail\ShippingAlertGeneric($this, $statusCode));
 
                 $alert->$fieldSent = true;
@@ -53,9 +51,7 @@ trait ShipmentAlerting
     public function alertProblem($problemEvent, $relevance)
     {
         foreach ($this->alerts as $alert) {
-
             if ($alert->problems && in_array($alert->type, $relevance) && !stristr($alert->problems_sent, $problemEvent)) {
-
                 Mail::to($alert->email)->queue(new \App\Mail\ShippingAlertProblem($this, $problemEvent));
 
                 $alert->problems_sent .= '|' . $problemEvent;
@@ -132,7 +128,7 @@ trait ShipmentAlerting
      */
     private function sendArrangePickup()
     {
-        // If sender postcode not "BT", alert the department. This is required so that any mainland pickups can be arranged etc.        
+        // If sender postcode not "BT", alert the department. This is required so that any mainland pickups can be arranged etc.
         if (!$this->originatesFromBtPostcode() && strtoupper($this->sender_country_code != 'US')) {
             Mail::to('courier@antrim.ifsgroup.com')->cc('courieruk@antrim.ifsgroup.com')->queue(new \App\Mail\ArrangePickup($this));
         }
@@ -143,12 +139,10 @@ trait ShipmentAlerting
      */
     private function sendWarning()
     {
-
         $message = '';
         if ($this->getGbpCustomsValue() > 25000 && in_array($this->recipient_country_code, ['IR'])) {
             $message = 'both';
         } else {
-
             if ($this->getGbpCustomsValue() > 25000) {
                 $message = 'value';
             }
@@ -179,7 +173,6 @@ trait ShipmentAlerting
     private function sendInsuranceRequested()
     {
         if ($this->insurance_value > 0) {
-
             if ($this->isUkDomestic()) {
                 $recipient = 'courieruk@antrim.ifsgroup.com';
             } else {
@@ -196,14 +189,15 @@ trait ShipmentAlerting
     private function sendLossMaking()
     {
         if ($this->shipping_cost > $this->shipping_charge && !in_array($this->company_id, [113])) {
-
             if ($this->isUkDomestic()) {
                 $recipient = 'gmcnicholl@antrim.ifsgroup.com';
+                $ccEmails = ['aplatt@antrim.ifsgroup.com', 'it@antrim.ifsgroup.com', 'sanderton@antrim.ifsgroup.com', 'dclarke@antrim.ifsgroup.com'];
             } else {
                 $recipient = 'aplatt@antrim.ifsgroup.com';
+                $ccEmails = ['it@antrim.ifsgroup.com', 'sanderton@antrim.ifsgroup.com', 'dclarke@antrim.ifsgroup.com'];
             }
 
-            Mail::to($recipient)->cc(['it@antrim.ifsgroup.com', 'sanderton@antrim.ifsgroup.com', 'dclarke@antrim.ifsgroup.com'])->queue(new \App\Mail\ShipmentWarning($this, 'loss'));
+            Mail::to($recipient)->cc($ccEmails)->queue(new \App\Mail\ShipmentWarning($this, 'loss'));
         }
     }
 
@@ -220,5 +214,4 @@ trait ShipmentAlerting
 
         Mail::to($email)->queue(new \App\Mail\ShippingAlertProblem($this, 'Some random problem event'));
     }
-
 }
