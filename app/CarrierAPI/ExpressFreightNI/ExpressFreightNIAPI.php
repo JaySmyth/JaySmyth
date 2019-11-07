@@ -89,14 +89,14 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
         $currentConsignmentNumber = nextAvailable('EXPNICONSIGNMENT');
         $currentConsignmentNumber = str_pad($currentConsignmentNumber, 3, 0, STR_PAD_LEFT);
 
-        $trackingNumber = 'I012' . date('dmy', strtotime($shipment['ship_date'])) . $currentConsignmentNumber;
+        $consignmentNumber = 'I012' . date('dmy', strtotime($shipment['ship_date'])) . $currentConsignmentNumber;
 
         // Set the carrier consignment and tracking numbers
-        $data['carrier_consignment_number'] = $trackingNumber;
-        $data['carrier_tracking_number'] = $trackingNumber;
+        $data['carrier_consignment_number'] = $consignmentNumber;
+        $data['carrier_tracking_number'] = $consignmentNumber;
 
         for ($i = 0; $i < $data['pieces']; $i++) {
-            $trackingNumber .= str_pad($i + 1, 3, 0, STR_PAD_LEFT);                      // Append the package number
+            $trackingNumber = $consignmentNumber . str_pad($i + 1, 3, 0, STR_PAD_LEFT); // Append the package number
             $data['packages'][$i]['carrier_tracking_number'] = $trackingNumber;         // Store tracking no for package
             $data['packages'][$i]['barcode'] = $trackingNumber;                         // Store tracking no for package
         }
