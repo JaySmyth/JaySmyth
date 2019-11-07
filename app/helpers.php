@@ -916,7 +916,8 @@ function gmtToCarbonUtc($datetime)
 {
     $datetime = toCarbon($datetime);
 
-    return $datetime->subHour(1);
+    //return $datetime->subHour(1);
+    return $datetime;
 }
 
 /**
