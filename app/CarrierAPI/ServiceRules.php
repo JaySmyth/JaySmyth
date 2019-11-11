@@ -126,20 +126,20 @@ class ServiceRules
 
             case 'ni24':
             case 'ni48':
-                    $result =  $this->checkNi($shipment, $serviceDetails);
+                    return $this->checkNi($shipment, $serviceDetails);
                 break;
 
             case 'uk24':
-                    $result =   $this->checkUk24($shipment, $serviceDetails);
+                    return $this->checkUk24($shipment, $serviceDetails);
                 break;
 
             case 'ie48':
-                    $result =   $this->checkIe48($shipment, $serviceDetails);
+                    return $this->checkIe48($shipment, $serviceDetails);
                 break;
 
         }
 
-        return $result;
+        return true;
     }
 
     /*
