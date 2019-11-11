@@ -110,25 +110,36 @@ class ServiceRules
             return false;
         }
 
+        // Check Service Specific tests
+        if (!$this->serviceSpecificChecks($shipment, $serviceDetails)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function serviceSpecificChecks($shipment, $serviceDetails)
+    {
+
         // Service specific tests
         switch (strtolower($serviceDetails['code'])) {
 
             case 'ni24':
             case 'ni48':
-                    return $this->checkNi($shipment, $serviceDetails);
+                    $result =  $this->checkNi($shipment, $serviceDetails);
                 break;
 
             case 'uk24':
-                    return $this->checkUk24($shipment, $serviceDetails);
+                    $result =   $this->checkUk24($shipment, $serviceDetails);
                 break;
 
             case 'ie48':
-                    return $this->checkIe48($shipment, $serviceDetails);
+                    $result =   $this->checkIe48($shipment, $serviceDetails);
                 break;
 
         }
 
-        return true;
+        return $result;
     }
 
     /*
