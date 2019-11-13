@@ -60,6 +60,10 @@ class ShipmentWarning extends Mailable
                 $subject = "Loss Making Shipment";
                 break;
 
+            case "ship_reason":
+                $subject = "Non standard ship reason detected (" . $this->shipment->ship_reason . ")";
+                break;
+
 
             default:
                 $subject = "High customs value (over £25,000) and problem country detected";

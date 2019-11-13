@@ -191,7 +191,7 @@ trait ShipmentAlerting
     private function sendShipReason()
     {
         if (in_array($this->ship_reason, ['repair', 'return', 'temp'])) {
-            Mail::to('courier@antrim.ifsgroup.com')->queue(new \App\Mail\ShipmentWarning($this, 'Ship reason:' . $this->ship_reason));
+            Mail::to('courier@antrim.ifsgroup.com')->queue(new \App\Mail\ShipmentWarning($this, 'ship_reason'));
         }
     }
 
