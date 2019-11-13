@@ -110,6 +110,17 @@ class ServiceRules
             return false;
         }
 
+        // Check Service Specific tests
+        if (!$this->serviceSpecificChecks($shipment, $serviceDetails)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function serviceSpecificChecks($shipment, $serviceDetails)
+    {
+
         // Service specific tests
         switch (strtolower($serviceDetails['code'])) {
 
