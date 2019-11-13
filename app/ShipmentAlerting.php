@@ -190,7 +190,7 @@ trait ShipmentAlerting
      */
     private function sendShipReason()
     {
-        if (in_array($this->ship_reason, ['repair', 'return', 'temp'])) {
+        if (in_array($this->ship_reason, ['repair', 'return', 'temp']) && !$this->isUkDomestic()) {
             Mail::to('courier@antrim.ifsgroup.com')->queue(new \App\Mail\ShipmentWarning($this, 'ship_reason'));
         }
     }
