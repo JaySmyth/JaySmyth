@@ -253,18 +253,25 @@ class ServiceRules
     private function checkNi($shipment, $serviceDetails)
     {
 
+        // For Glen Dimplex rules are different - use IFS regardless
+        if ($shipment['company_id'] == 5505) {
+            if ($serviceDetails['carrier_id'] == 1) {
+                return true;
+            }
+
+            return false;
+        }
+
         // Exp Freight deliver to postcodes in ifs_nd_postcodes table, IFS deliver to the rest
-        if (in_array(strtolower($serviceDetails['code']), ['ni24', 'ni48'])) {
-            $ifsPostCodes = new IfsNdPostcode();
-            $ifsArea = $ifsPostCodes->isServed($shipment['recipient_postcode']);
-            if ($ifsArea && $serviceDetails['carrier_id'] == 1) {
-                // Area served by IFS and Carrier is IFS
-                return true;
-            }
-            if (!$ifsArea && $serviceDetails['carrier_id'] == 15) {
-                // Area not served by IFS and Carrier is ExpressFreight
-                return true;
-            }
+        $ifsPostCodes = new IfsNdPostcode();
+        $ifsArea = $ifsPostCodes->isServed($shipment['recipient_postcode']);
+        if ($ifsArea && $serviceDetails['carrier_id'] == 1) {
+            // Area served by IFS and Carrier is IFS
+            return true;
+        }
+        if (!$ifsArea && $serviceDetails['carrier_id'] == 15) {
+            // Area not served by IFS and Carrier is ExpressFreight
+            return true;
         }
 
         return false;
