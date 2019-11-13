@@ -44,7 +44,7 @@ class PricingModel3 extends PricingModel
         $this->upperMaxGirth = 400;
 
         // Calculate Fuel Surcharge on the following charge codes
-        $this->fuelChargeCodes = ['BRO', 'COR', 'DISC', 'DTP', 'EAS', 'FRT', 'FUEL', 'ICE', 'LIA', 'LPS', 'MIS', 'OOA', 'OSP', 'OWP', 'RAS', 'RES'];
+        $this->fuelChargeCodes = ['BRO', 'COR', 'DISC', 'DTP', 'EAS', 'FRT', 'FUEL', 'ICE', 'LIA', 'LPS', 'MIS', 'OOA', 'OSP', 'OWP', 'RAS', 'RES', 'PLP', 'PAH'];
     }
 
     public function isRAS()
