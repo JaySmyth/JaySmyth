@@ -16,7 +16,7 @@ trait ShipmentAlerting
     /**
      * Send a generic shipment alert and update the alerts table.
      *
-     * @param string    $statusCode      a valid email e.g. collected, delivered, cancelled
+     * @param string $statusCode a valid email e.g. collected, delivered, cancelled
      */
     public function alertGeneric($statusCode)
     {
@@ -45,8 +45,8 @@ trait ShipmentAlerting
     /**
      * Send problem email and update alerts table.
      *
-     * @param string    $problemEvent   problem event message
-     * @param array     $relevance     (s)ender (r)ecipient (b)roker (o)ther (d)epartment
+     * @param string $problemEvent problem event message
+     * @param array $relevance (s)ender (r)ecipient (b)roker (o)ther (d)epartment
      */
     public function alertProblem($problemEvent, $relevance)
     {
@@ -77,9 +77,9 @@ trait ShipmentAlerting
 
         // Problems only
         return $this->alerts()->create([
-                    'email' => $email,
-                    'type' => 'd',
-                    'problems' => 1
+            'email' => $email,
+            'type' => 'd',
+            'problems' => 1
         ]);
     }
 
@@ -94,33 +94,7 @@ trait ShipmentAlerting
         $this->sendHazardousBooked();
         $this->sendInsuranceRequested();
         $this->sendLossMaking();
-    }
-
-    /**
-     * Air freight shipment booked - notify air exports.
-     */
-    private function sendAirFreightBooked()
-    {
-        if (strtoupper($this->service->scs_job_route) == 'XFF') {
-            Mail::to('airexports@antrim.ifsgroup.com')->queue(new \App\Mail\AirFreightBooked($this));
-        }
-    }
-
-    /**
-     * Air freight shipment booked with airline.
-     */
-    private function sendBookedWithAirline()
-    {
-        // Only do this for CDE at present
-        if ($this->company_id == 314) {
-            if (filter_var($this->sender_email, FILTER_VALIDATE_EMAIL)) {
-                $recipientEmail = $this->sender_email;
-            } else {
-                $recipientEmail = 'airexports@antrim.ifsgroup.com';
-            }
-
-            Mail::to($recipientEmail)->cc('airexports@antrim.ifsgroup.com')->queue(new \App\Mail\BookedWithAirline($this));
-        }
+        $this->sendShipReason();
     }
 
     /**
@@ -131,6 +105,16 @@ trait ShipmentAlerting
         // If sender postcode not "BT", alert the department. This is required so that any mainland pickups can be arranged etc.
         if (!$this->originatesFromBtPostcode() && strtoupper($this->sender_country_code != 'US')) {
             Mail::to('courier@antrim.ifsgroup.com')->cc('courieruk@antrim.ifsgroup.com')->queue(new \App\Mail\ArrangePickup($this));
+        }
+    }
+
+    /**
+     * Air freight shipment booked - notify air exports.
+     */
+    private function sendAirFreightBooked()
+    {
+        if (strtoupper($this->service->scs_job_route) == 'XFF') {
+            Mail::to('airexports@antrim.ifsgroup.com')->queue(new \App\Mail\AirFreightBooked($this));
         }
     }
 
@@ -202,6 +186,16 @@ trait ShipmentAlerting
     }
 
     /**
+     * Non standard ship reason.
+     */
+    private function sendShipReason()
+    {
+        if (in_array($this->ship_reason, ['repair', 'return', 'temp']) && !$this->isWithinEu()) {
+            Mail::to('courier@antrim.ifsgroup.com')->queue(new \App\Mail\ShipmentWarning($this, 'ship_reason'));
+        }
+    }
+
+    /**
      * Test the email that may be generated against a shipment.
      *
      * @param type $email
@@ -213,5 +207,22 @@ trait ShipmentAlerting
         }
 
         Mail::to($email)->queue(new \App\Mail\ShippingAlertProblem($this, 'Some random problem event'));
+    }
+
+    /**
+     * Air freight shipment booked with airline.
+     */
+    private function sendBookedWithAirline()
+    {
+        // Only do this for CDE at present
+        if ($this->company_id == 314) {
+            if (filter_var($this->sender_email, FILTER_VALIDATE_EMAIL)) {
+                $recipientEmail = $this->sender_email;
+            } else {
+                $recipientEmail = 'airexports@antrim.ifsgroup.com';
+            }
+
+            Mail::to($recipientEmail)->cc('airexports@antrim.ifsgroup.com')->queue(new \App\Mail\BookedWithAirline($this));
+        }
     }
 }
