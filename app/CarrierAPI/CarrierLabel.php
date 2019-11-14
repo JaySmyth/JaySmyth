@@ -4,7 +4,8 @@ namespace App\CarrierAPI;
 
 use TCPDI;
 
-abstract class CarrierLabel {
+abstract class CarrierLabel
+{
     /*
       |--------------------------------------------------------------------------
       | CarrierLabel Class (abstract)
@@ -56,14 +57,6 @@ abstract class CarrierLabel {
     abstract public function create();
 
     /**
-     * Add a 6x4 page to the PDF.
-     */
-    protected function addPage()
-    {
-        $this->pdf->AddPage('P', ['102', '153']);
-    }
-
-    /**
      * Import a page.
      *
      * @param type $pageNumber
@@ -76,15 +69,22 @@ abstract class CarrierLabel {
         // Add a blank page
         $this->addPage();
 
-        // insert the original PDF - Slightly scale input so it fits
-        $this->pdf->useTemplate($tpl, -10, -25, 282, 200, false);
+        $this->pdf->useTemplate($tpl, 1, 1, $originalPdfSize['w'], $originalPdfSize['h'], false);
+    }
+
+    /**
+     * Add a 6x4 page to the PDF.
+     */
+    protected function addPage()
+    {
+        $this->pdf->AddPage('P', ['102', '153']);
     }
 
     /**
      * Insert a base64 image to the PDF.
      *
-     * @param string    $base64Image
-     * @param array     $options
+     * @param string $base64Image
+     * @param array $options
      */
     protected function addImage($base64Image, $options)
     {
