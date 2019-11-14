@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use \Spatie\PdfToImage\Pdf;
+use App\Country;
 
 class Shipment extends Model
 {
@@ -693,8 +694,8 @@ class Shipment extends Model
      */
     public function isWithinEu()
     {
-        $sender = App\Country::where('country_code', $this->sender_country_code)->first()->eu;
-        $recipient = App\Country::where('country_code', $this->recipient_country_code)->first()->eu;
+        $sender = Country::where('country_code', $this->sender_country_code)->first()->eu;
+        $recipient = Country::where('country_code', $this->recipient_country_code)->first()->eu;
 
         if ($sender && $recipient) {
             return true;
