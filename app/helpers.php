@@ -1294,6 +1294,40 @@ function getExcelColumNames($numberOfColumns = 52)
     return $columns;
 }
 
+
+/**
+ * Convert currency.
+ *
+ * @param $amount
+ * @param string $fromCurrency
+ * @param string $toCurrency
+ * @return float|null
+ */
+function convertCurrency($amount, $fromCurrency = 'GBP', $toCurrency = 'USD')
+{
+    if (strtoupper($fromCurrency) != 'GBP') {
+
+        $fromCurrency = \App\Currency::where('code', $fromCurrency)->first();
+
+        if ($fromCurrency) {
+            $amount = round($amount / $fromCurrency->rate, 2);
+        } else {
+            // No rate found - return null
+            return null;
+        }
+    }
+
+    $toCurrency = \App\Currency::where('code', $toCurrency)->first();
+
+    if ($toCurrency) {
+        return round($amount * $toCurrency->rate, 2);
+    }
+
+    // No rate found - return null
+    return null;
+}
+
+
 // *********************************************************************************************************************************************************** //
 // **************************************************************** LEGACY CONVERSION FUNCTIONS ************************************************************ //
 // ********************************************************* THESE CAN BE REMOVED ONCE DATA MIGRATED *********************************************************
