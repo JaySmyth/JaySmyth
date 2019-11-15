@@ -254,7 +254,7 @@ class ServiceRules
     {
 
         // For Glen Dimplex rules are different - use IFS regardless
-        if ($shipment['company_id'] == 5505) {
+        if ($shipment['company_id'] == 550) {
             if ($serviceDetails['carrier_id'] == 1) {
                 return true;
             }
