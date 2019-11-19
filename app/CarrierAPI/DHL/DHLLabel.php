@@ -2,7 +2,8 @@
 
 namespace App\CarrierAPI\DHL;
 
-class DHLLabel extends \App\CarrierAPI\CarrierLabel {
+class DHLLabel extends \App\CarrierAPI\CarrierLabel
+{
 
     /**
      * Accepts Shipment and Carrier Response data
@@ -23,13 +24,10 @@ class DHLLabel extends \App\CarrierAPI\CarrierLabel {
     public function create()
     {
         // Set the source data and get the number of pages in the PDF
-        $pageCount = $this->pdf->setSourceData(base64_decode($this->data['LabelImage']['OutputImage']));
-
-        // Add Master Label (DHL puts at end)
-        $this->importPageFromTemplate($pageCount);
+        $pageCount = $this->pdf->setSourceData(base64_decode($this->data));
 
         // Add Package Labels
-        for ($pageNumber = 1; $pageNumber < $pageCount; $pageNumber++) {
+        for ($pageNumber = 1; $pageNumber <= $pageCount; $pageNumber++) {
             $this->importPageFromTemplate($pageNumber);
             $this->customizeLabel();
         }
@@ -39,14 +37,6 @@ class DHLLabel extends \App\CarrierAPI\CarrierLabel {
 
     public function customizeLabel()
     {
-
-
-        /*
-         * **********************************
-         * Customize Label for Fedex UK48
-         * **********************************
-         */
-
         $this->addLongServiceBox(67, 1, 35, 9, $this->serviceCode);
     }
 
