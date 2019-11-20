@@ -22,11 +22,15 @@ class DHL
     protected $isWithinEu;
     protected $rateRequest;
     protected $pltAvailable = false;
+    protected $mode;
 
     function __construct($shipment, $mode)
     {
         // Data array passed through
         $this->shipment = $shipment;
+
+        // Set the mode
+        $this->mode = $mode;
 
         // Payment types
         $this->paymentTypes = ['sender' => 'S', 'recipient' => 'R', 'other' => 'T'];
@@ -43,7 +47,7 @@ class DHL
         $this->serviceType = (isset($productCodes[0])) ? $productCodes[0] : null;
 
         // Define the environment
-        switch ($mode) {
+        switch ($this->mode) {
             case 'test':
                 $this->username = 'ifsgloballoGB';
                 $this->password = 'F#1tL$0dK#5w';
@@ -228,7 +232,8 @@ class DHL
             'type' => $type,
             'carrier' => 'DHL',
             'direction' => $direction,
-            'msg' => $msg
+            'msg' => $msg,
+            'mode' => $this->mode
         ]);
     }
 
