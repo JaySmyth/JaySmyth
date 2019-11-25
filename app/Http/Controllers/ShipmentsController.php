@@ -929,12 +929,9 @@ class ShipmentsController extends Controller
     public function test(Request $request)
     {
 
-        $trackingNumber = '47312482';
+        $shipments = Shipment::where('invoice_run_id', 783)->pluck('id');
 
-        $trackingNumber = str_pad($trackingNumber, 8, 0, STR_PAD_LEFT);
-        $trackingNumber .= mod11CheckDigit((string)$trackingNumber);                        // Then add check digit
-
-        dd($trackingNumber);
+        dispatch(new \App\Jobs\GenerateMultifreightSalesXml($shipments, 0, 2880));
 
     }
 
