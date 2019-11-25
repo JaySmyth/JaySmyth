@@ -929,9 +929,7 @@ class ShipmentsController extends Controller
     public function test(Request $request)
     {
 
-        $shipments = Shipment::where('invoice_run_id', 783)->pluck('id');
 
-        dispatch(new \App\Jobs\GenerateMultifreightSalesXml($shipments, 0, 2880));
 
     }
 
