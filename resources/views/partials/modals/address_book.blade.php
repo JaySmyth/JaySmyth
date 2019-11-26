@@ -20,7 +20,8 @@
                             <tr>
                                 <th>Name</th>
                                 <th>Company</th>
-                                <th>Address</th>             
+                                <th>Address</th>
+                                <th>Postcode</th>
                                 <th>Country</th>
                                 <th>&nbsp;</th>
                             </tr>

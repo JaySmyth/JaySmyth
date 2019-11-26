@@ -78,12 +78,14 @@ $("#address_book_filter").keyup(function () {
     var tr = table.getElementsByTagName("tr");
     var name;
     var companyName;
+    var postcode;
 
     for (i = 0; i < tr.length; i++) {
         name = tr[i].getElementsByTagName("td")[0];
         companyName = tr[i].getElementsByTagName("td")[1];
+        postcode = tr[i].getElementsByTagName("td")[3];
 
-        if (name.innerHTML.toUpperCase().indexOf(filter) > -1 || companyName.innerHTML.toUpperCase().indexOf(filter) > -1) {
+        if (name.innerHTML.toUpperCase().indexOf(filter) > -1 || companyName.innerHTML.toUpperCase().indexOf(filter) > -1 || postcode.innerHTML.toUpperCase().indexOf(filter) > -1) {
             tr[i].style.display = "";
         } else {
             tr[i].style.display = "none";
@@ -91,8 +93,6 @@ $("#address_book_filter").keyup(function () {
     }
 
 });
-
-
 
 
 /**
@@ -184,20 +184,19 @@ $(document).on('click', '.select-transport-address', function () {
 });
 
 
-
 // Populate the fields with an address (collection request screen)
 function getTransportAddress(id) {
     $.get('/transport-addresses/' + id,
-            function (response) {
-                // Set the values of the fields
-                $.each(response, function (key, value) {
-                    $('#from_' + key).val(value);
-                    $('#from_' + key).parent("div").removeClass("has-error");
-                });
-
-                $("#address_id").val(response['id']);
-
+        function (response) {
+            // Set the values of the fields
+            $.each(response, function (key, value) {
+                $('#from_' + key).val(value);
+                $('#from_' + key).parent("div").removeClass("has-error");
             });
+
+            $("#address_id").val(response['id']);
+
+        });
 }
 
 // Load the address boof and display the results
@@ -213,11 +212,12 @@ function loadTransportAddressBook() {
         $.each(response, function (i, item) {
 
             var tr = $('<tr id="address-' + item.id + '" class="select-transport-address">').append(
-                    $('<td>').html('<span class="address-name">' + item.name + '</span>'),
-                    $('<td>').html('<span class="address-company">' + item.company_name + '</span>'),
-                    $('<td>').html('<span class="address-address">' + item.address1 + ', ' + item.city + ' ' + item.postcode + '</span>'),
-                    $('<td>').text(item.country_code),
-                    $('<td>').html('<a href="/transport-addresses/' + item.id + '" title="Delete ' + item.name + '" class="delete" data-record-name="address"><i class="fas fa-times" aria-hidden="true"></i></a>'));
+                $('<td>').html('<span class="address-name">' + item.name + '</span>'),
+                $('<td>').html('<span class="address-company">' + item.company_name + '</span>'),
+                $('<td>').html('<span class="address-address">' + item.address1 + ', ' + item.city + '</span>'),
+                $('<td>').html('<span class="address-address">' + item.postcode + '</span>'),
+                $('<td>').text(item.country_code),
+                $('<td>').html('<a href="/transport-addresses/' + item.id + '" title="Delete ' + item.name + '" class="delete" data-record-name="address"><i class="fas fa-times" aria-hidden="true"></i></a>'));
 
             tr.appendTo('#address_book_body');
         });
@@ -284,8 +284,6 @@ $("#save-transport-address").click(function () {
 });
 
 
-
-
 // ********************************************************************** //
 // ******************************* Scroll to Top ************************ //
 
@@ -343,15 +341,11 @@ $(document).on('focus', 'input[type=text][readonly]', function () {
 });
 
 
-
-
 // back button
 $('a.back').click(function () {
     parent.history.back();
     return false;
 });
-
-
 
 
 // ---------------------------------------------------------------------------------------------------------------------------------------- //
@@ -566,7 +560,6 @@ $(".cancel-sea-freight-shipment").click(function () {
 });
 
 
-
 // ---------------------------------------------------------------------------------------------------------------------------------------- //
 // ---------------------------------------------------- ***  CREATE COMPANY FORM *** ------------------------------------------------------ //
 // ---------------------------------------------------------------------------------------------------------------------------------------- //
@@ -582,8 +575,6 @@ $("#city").keyup(function () {
     var companyName = $('#company_name').val();
     $('#site_name').val(companyName + ' - ' + city);
 });
-
-
 
 
 // ---------------------------------------------------------------------------------------------------------------------------------------- //
@@ -632,7 +623,6 @@ if (path.indexOf("manifest-profiles/") != -1) {
         $('#manifest_profile').submit();
     });
 }
-
 
 
 // ---------------------------------------------------------------------------------------------------------------------------------------- //
@@ -685,7 +675,6 @@ if (path.indexOf("/driver-manifests/") != -1) {
     });
 
 }
-
 
 
 // ---------------------------------------------------------------------------------------------------------------------------------------- //
@@ -744,7 +733,6 @@ if (path.indexOf("/transport-jobs") != -1) {
 // ---------------------------------------------------------------------------------------------------------------------------------------- //
 // ----------------------------------------------------------- ***  QUOTATIONS *** -------------------------------------------------------- //
 // ---------------------------------------------------------------------------------------------------------------------------------------- //
-
 
 
 /*
@@ -808,7 +796,7 @@ $(".toggle-quotation-status").click(function () {
 // --------------------------------------------------------- *** customs_entries  *** ----------------------------------------------------------- //
 // ---------------------------------------------------------------------------------------------------------------------------------------- //
 
-$('.customs-company-id').change(function() {
+$('.customs-company-id').change(function () {
     var companyId = $(this);
     checkDutyVatFlag(companyId.val());
 })
@@ -816,14 +804,14 @@ $('.customs-company-id').change(function() {
 // Populate the fields with an address (collection request screen)
 function checkDutyVatFlag(id) {
     $.get('/customs-entries/type/' + id,
-            function (data, status) {
-                if(data != 1) {
-                    $("#fullDutyAndVatOnly").hide();
-                } else {
-                    $("#fullDutyAndVatOnly").show();
-                }
+        function (data, status) {
+            if (data != 1) {
+                $("#fullDutyAndVatOnly").hide();
+            } else {
+                $("#fullDutyAndVatOnly").show();
             }
-        );
+        }
+    );
 }
 
 // ---------------------------------------------------------------------------------------------------------------------------------------- //
@@ -974,7 +962,6 @@ if (path.indexOf("/jobs") != -1) {
 
 
 }
-
 
 
 if (path.indexOf("/processes") != -1) {
