@@ -20,6 +20,54 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
 
     public $mode;
 
+    public function preProcess($shipment)
+    {
+
+    }
+
+    public function createShipment($shipment)
+    {
+        $response = [];
+
+        $errors = $this->validateShipment($shipment);
+
+        if (empty($errors)) {
+
+            // Set IFS specific settings
+            $this->initCarrier($shipment);
+
+            // Create Carrier Shipment object
+            $ifsShipment = $this->buildCarrierShipment($shipment);
+
+            // Send message to Carrier
+            $reply = $this->sendMessageToCarrier($ifsShipment, 'create_shipment');
+
+            // Check for errors
+            if (isset($reply['errors']) && $reply['errors'] > '') {
+
+                // Request unsuccessful - return errors
+                $errorMsg = 'Carrier Error : ' . ((string)$reply['errors']);
+                return $this->generateErrorResponse($response, $errorMsg);
+            } else {
+
+                // Request successful -  Calc Routing
+                $route_id = $this->calc_routing($shipment);
+
+                // Prepare Response
+                return $this->createShipmentResponse($reply, $shipment['service_code'], $route_id, $shipment);
+            }
+        } else {
+            return $this->generateErrorResponse($response, $errors);
+        }
+    }
+
+    public function validateShipment($shipment)
+    {
+        $rules['dry_ice'] = 'not_supported';
+        $rules['insurance_value'] = 'not_supported';
+
+        return $this->applyRules($rules, $shipment);
+    }
 
     function initCarrier()
     {
@@ -29,19 +77,6 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
     public function buildCarrierShipment($shipment)
     {
         return $shipment;
-    }
-
-    public function preProcess($shipment)
-    {
-
-    }
-
-    public function validateShipment($shipment)
-    {
-        $rules['dry_ice'] = 'not_supported';
-        $rules['insurance_value'] = 'not_supported';
-
-        return $this->applyRules($rules, $shipment);
     }
 
     private function sendMessageToCarrier($shipment)
@@ -89,7 +124,7 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
         $currentConsignmentNumber = nextAvailable('EXPNICONSIGNMENT');
         $currentConsignmentNumber = str_pad($currentConsignmentNumber, 3, 0, STR_PAD_LEFT);
 
-        $consignmentNumber = 'I012' . date('dmy', strtotime($shipment['ship_date'])) . $currentConsignmentNumber;
+        $consignmentNumber = 'I012' . date('dmy', time()) . $currentConsignmentNumber;
 
         // Set the carrier consignment and tracking numbers
         $data['carrier_consignment_number'] = $consignmentNumber;
@@ -104,55 +139,9 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
         return $data;
     }
 
-    public function createShipment($shipment)
-    {
-        $response = [];
-
-        $errors = $this->validateShipment($shipment);
-
-        if (empty($errors)) {
-
-            // Set IFS specific settings
-            $this->initCarrier($shipment);
-
-            // Create Carrier Shipment object
-            $ifsShipment = $this->buildCarrierShipment($shipment);
-
-            // Send message to Carrier
-            $reply = $this->sendMessageToCarrier($ifsShipment, 'create_shipment');
-
-            // Check for errors
-            if (isset($reply['errors']) && $reply['errors'] > '') {
-
-                // Request unsuccessful - return errors
-                $errorMsg = 'Carrier Error : ' . ((string)$reply['errors']);
-                return $this->generateErrorResponse($response, $errorMsg);
-            } else {
-
-                // Request successful -  Calc Routing
-                $route_id = $this->calc_routing($shipment);
-
-                // Prepare Response
-                return $this->createShipmentResponse($reply, $shipment['service_code'], $route_id, $shipment);
-            }
-        } else {
-            return $this->generateErrorResponse($response, $errors);
-        }
-    }
-
     private function calc_routing($shipment)
     {
         return 1;
-    }
-
-    /**
-     *
-     * @param type $reply
-     */
-    private function generatePdf($shipment, $serviceCode, $labelData)
-    {
-        $label = new ExpressFreightNILabel($shipment, $serviceCode, $labelData);
-        return $label->create();
     }
 
     private function createShipmentResponse($reply, $serviceCode, $route_id, $shipment)
@@ -184,6 +173,16 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
         $response['label_base64'][0]['base64'] = $this->generatePDF($shipment, $serviceCode, $response);
 
         return $response;
+    }
+
+    /**
+     *
+     * @param type $reply
+     */
+    private function generatePdf($shipment, $serviceCode, $labelData)
+    {
+        $label = new ExpressFreightNILabel($shipment, $serviceCode, $labelData);
+        return $label->create();
     }
 
 }
