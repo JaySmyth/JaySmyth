@@ -56,35 +56,10 @@ class ISLEDI
         $this->job;
     }
 
-    private function getXMLHeadings()
+    public function createXMLSalesInvoice($shipments)
     {
 
-        return '<?xml version="1.0" encoding="utf-8"?><ISLEDI xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">';
-    }
-
-    public function toXML()
-    {
-
-        $xml = $this->getXMLHeadings();
-        $xml .= $this->context->toXML();
-        $xml .= $this->groupage->toXML();
-
-        if ($this->job) {
-
-            foreach ($this->job as $job) {
-                $xml .= $job->toXML();
-            }
-        }
-
-        $xml .= '</ISLEDI>';
-
-        return $xml;
-    }
-
-    public function createXMLSalesInvoice($shipments, $invoiceRun)
-    {
-
-        foreach ($shipments as $shipment) {
+        foreach (Shipment::whereIn('id', $shipments)->cursor() as $shipment) {
 
             /*
              * *********************************
@@ -95,7 +70,7 @@ class ISLEDI
 
                 // Shipment not priced so try to price
                 $prices = $shipment->price();
-                
+
                 // If able to price, then update shipment record
                 if ($prices['errors'] == []) {
                     $shipment->quoted = json_encode($prices);
@@ -167,15 +142,6 @@ class ISLEDI
                 // store job
                 $this->job[] = $job;
 
-                /*
-                 * *********************************
-                 * Update Shipment record and sync
-                 * Invoicing status to legacy system
-                 * *********************************
-                 */
-                $shipment->invoicing_status = 1;
-                $shipment->invoice_run_id = $invoiceRun->id;
-                $shipment->save();
             }
         }
 
@@ -222,11 +188,6 @@ class ISLEDI
         }
 
         return true;
-    }
-
-    public function getfield($fieldName)
-    {
-        return $this->shipment->$fieldName;
     }
 
     private function setJobHdr($jobHdr)
@@ -327,20 +288,6 @@ class ISLEDI
         return $jobLine;
     }
 
-    private function setRecJny($recJny)
-    {
-
-        // $recJny->setAttribute('airline-prefix', '');
-        $recJny->setAttribute('char-prefix', substr($this->shipment->consignment_number, 0, 3));
-        $recJny->setAttribute('flight-by-1', $this->carrier->scs_carrier_code);
-        $recJny->setAttribute('flight-prefix-1', $this->carrier->scs_carrier_code);
-        $recJny->setAttribute('mawb', substr($this->shipment->consignment_number, 3));
-        $recJny->setAttribute('mawb-date', $this->shipment->ship_date);
-        // $recJny->setAttribute('port-of-loading', substr($this->shipment->ship_date,3));
-
-        return $recJny;
-    }
-
     private function setJobCol($jobCol)
     {
 
@@ -386,6 +333,97 @@ class ISLEDI
         $jobDel->setAttribute('country-code', $this->shipment->recipient_country_code);
 
         return $jobDel;
+    }
+
+    private function setDocAdds($docAdds, $type)
+    {
+
+        $addressTypes = ['CONSEE' => 'recipient', 'CONSOR' => 'sender'];
+        $addressType = $addressTypes[$type];
+
+        $docAdds->setAttribute('address-type', $type);
+        $docAdds->setAttribute('contact-name', $this->getField($addressType . "_name"));
+        $docAdds->setAttribute('name', $this->getField($addressType . "_company_name"));
+        $docAdds->setAttribute('address-1', $this->getField($addressType . "_address1"));
+        $docAdds->setAttribute('address-2', $this->getField($addressType . "_address2"));
+        $docAdds->setAttribute('address-3', $this->getField($addressType . "_address3"));
+        $docAdds->setAttribute('town', $this->getField($addressType . "_city"));
+        $docAdds->setAttribute('county', $this->getField($addressType . "_state"));
+        $docAdds->setAttribute('country-code', $this->getField($addressType . "_country_code"));
+        $docAdds->setAttribute('email', $this->getField($addressType . "_email"));
+        $docAdds->setAttribute('postcode', $this->getField($addressType . "_postcode"));
+        $docAdds->setAttribute('telephone', $this->getField($addressType . "_telephone"));
+
+        return $docAdds;
+    }
+
+    public function getfield($fieldName)
+    {
+        return $this->shipment->$fieldName;
+    }
+
+    public function summarizePackages()
+    {
+
+        $weightUom = ['kg' => 'kgs', 'lb' => 'lbs'];
+        $dimsUom = ['cm' => 'C', 'in' => 'I', 'inch' => 'I'];
+        $this->packageSummary = [];
+
+        // Get Shipment Packages
+        $packages = Package::where('shipment_id', $this->shipment->id)->get();
+
+        // Summarize them
+        foreach ($packages as $package) {
+
+            $size = $package->length . $package->width . $package->height;
+
+            if (isset($this->packageSummary[$size])) {
+
+                $this->packageSummary[$size]['pieces']++;
+            } else {
+
+                $this->packageSummary[$size]['length'] = $package->length;
+                $this->packageSummary[$size]['width'] = $package->width;
+                $this->packageSummary[$size]['height'] = $package->height;
+                $this->packageSummary[$size]['unit-type'] = $dimsUom[$this->shipment->dims_uom];
+                $this->packageSummary[$size]['weight'] = $package->weight;
+                $this->packageSummary[$size]['pieces'] = '1';
+                $this->packageSummary[$size]['weight-type'] = $weightUom[$this->shipment->weight_uom];
+                $this->packageSummary[$size]['package-type'] = $package->packaging_code;
+                $this->packageSummary[$size]['cube'] = round($package->length * $package->width * $package->height / 1000000, 4);
+            }
+        }
+    }
+
+    private function setjobDims($jobDims, $package)
+    {
+
+        $jobDims->setAttribute("entered-length", $package['length']);
+        $jobDims->setAttribute("entered-width", $package['width']);
+        $jobDims->setAttribute("entered-height", $package['height']);
+        $jobDims->setAttribute("entered-weight", $package['weight']);
+        $jobDims->setAttribute("entered-unit-type", $package['unit-type']);
+        $jobDims->setAttribute("weight-type", $package['weight-type']);
+        // $jobDims->setAttribute("package-type", $package['package-type']);
+        $jobDims->setAttribute("package-type", 'PIECES');
+        $jobDims->setAttribute("pieces", $package['pieces']);
+        $jobDims->setAttribute("entered-cube", $package['cube'] * $package['pieces']);
+
+        return $jobDims;
+    }
+
+    private function setRecJny($recJny)
+    {
+
+        // $recJny->setAttribute('airline-prefix', '');
+        $recJny->setAttribute('char-prefix', substr($this->shipment->consignment_number, 0, 3));
+        $recJny->setAttribute('flight-by-1', $this->carrier->scs_carrier_code);
+        $recJny->setAttribute('flight-prefix-1', $this->carrier->scs_carrier_code);
+        $recJny->setAttribute('mawb', substr($this->shipment->consignment_number, 3));
+        $recJny->setAttribute('mawb-date', $this->shipment->ship_date);
+        // $recJny->setAttribute('port-of-loading', substr($this->shipment->ship_date,3));
+
+        return $recJny;
     }
 
     private function setRecCost($charge)
@@ -457,76 +495,29 @@ class ISLEDI
         return $recChg;
     }
 
-    private function setDocAdds($docAdds, $type)
+    public function toXML()
     {
 
-        $addressTypes = ['CONSEE' => 'recipient', 'CONSOR' => 'sender'];
-        $addressType = $addressTypes[$type];
+        $xml = $this->getXMLHeadings();
+        $xml .= $this->context->toXML();
+        $xml .= $this->groupage->toXML();
 
-        $docAdds->setAttribute('address-type', $type);
-        $docAdds->setAttribute('contact-name', $this->getField($addressType . "_name"));
-        $docAdds->setAttribute('name', $this->getField($addressType . "_company_name"));
-        $docAdds->setAttribute('address-1', $this->getField($addressType . "_address1"));
-        $docAdds->setAttribute('address-2', $this->getField($addressType . "_address2"));
-        $docAdds->setAttribute('address-3', $this->getField($addressType . "_address3"));
-        $docAdds->setAttribute('town', $this->getField($addressType . "_city"));
-        $docAdds->setAttribute('county', $this->getField($addressType . "_state"));
-        $docAdds->setAttribute('country-code', $this->getField($addressType . "_country_code"));
-        $docAdds->setAttribute('email', $this->getField($addressType . "_email"));
-        $docAdds->setAttribute('postcode', $this->getField($addressType . "_postcode"));
-        $docAdds->setAttribute('telephone', $this->getField($addressType . "_telephone"));
+        if ($this->job) {
 
-        return $docAdds;
-    }
-
-    private function setjobDims($jobDims, $package)
-    {
-
-        $jobDims->setAttribute("entered-length", $package['length']);
-        $jobDims->setAttribute("entered-width", $package['width']);
-        $jobDims->setAttribute("entered-height", $package['height']);
-        $jobDims->setAttribute("entered-weight", $package['weight']);
-        $jobDims->setAttribute("entered-unit-type", $package['unit-type']);
-        $jobDims->setAttribute("weight-type", $package['weight-type']);
-        // $jobDims->setAttribute("package-type", $package['package-type']);
-        $jobDims->setAttribute("package-type", 'PIECES');
-        $jobDims->setAttribute("pieces", $package['pieces']);
-        $jobDims->setAttribute("entered-cube", $package['cube'] * $package['pieces']);
-
-        return $jobDims;
-    }
-
-    public function summarizePackages()
-    {
-
-        $weightUom = ['kg' => 'kgs', 'lb' => 'lbs'];
-        $dimsUom = ['cm' => 'C', 'in' => 'I', 'inch' => 'I'];
-        $this->packageSummary = [];
-
-        // Get Shipment Packages
-        $packages = Package::where('shipment_id', $this->shipment->id)->get();
-
-        // Summarize them
-        foreach ($packages as $package) {
-
-            $size = $package->length . $package->width . $package->height;
-
-            if (isset($this->packageSummary[$size])) {
-
-                $this->packageSummary[$size]['pieces'] ++;
-            } else {
-
-                $this->packageSummary[$size]['length'] = $package->length;
-                $this->packageSummary[$size]['width'] = $package->width;
-                $this->packageSummary[$size]['height'] = $package->height;
-                $this->packageSummary[$size]['unit-type'] = $dimsUom[$this->shipment->dims_uom];
-                $this->packageSummary[$size]['weight'] = $package->weight;
-                $this->packageSummary[$size]['pieces'] = '1';
-                $this->packageSummary[$size]['weight-type'] = $weightUom[$this->shipment->weight_uom];
-                $this->packageSummary[$size]['package-type'] = $package->packaging_code;
-                $this->packageSummary[$size]['cube'] = round($package->length * $package->width * $package->height / 1000000, 4);
+            foreach ($this->job as $job) {
+                $xml .= $job->toXML();
             }
         }
+
+        $xml .= '</ISLEDI>';
+
+        return $xml;
+    }
+
+    private function getXMLHeadings()
+    {
+
+        return '<?xml version="1.0" encoding="utf-8"?><ISLEDI xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">';
     }
 
 }

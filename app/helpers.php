@@ -1049,6 +1049,24 @@ function customsEntryRequired($senderCountryCode, $recipientCountryCode)
 }
 
 /**
+ * Shipment within EU.
+ *
+ * @param $senderCountryCode
+ * @param $recipientCountryCode
+ * @return bool
+ */
+function isWithinEu($senderCountryCode, $recipientCountryCode)
+{
+    $sender = Country::where('country_code', $senderCountryCode)->first()->eu;
+    $recipient = Country::where('country_code', $recipientCountryCode)->first()->eu;
+
+    if ($sender && $recipient) {
+        return true;
+    }
+    return false;
+}
+
+/**
  * Identify direction of travel
  *
  * @param type $shipment
@@ -1293,6 +1311,7 @@ function getExcelColumNames($numberOfColumns = 52)
 
     return $columns;
 }
+
 
 // *********************************************************************************************************************************************************** //
 // **************************************************************** LEGACY CONVERSION FUNCTIONS ************************************************************ //

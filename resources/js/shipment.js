@@ -430,7 +430,7 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
             var htmlArray = [];
 
             $.each(response, function (i, item) {
-                htmlArray.push('<tr id="address-' + item.id + '" class="select-address"><td><span class="address-name">' + item.name + '</span></td><td><span class="address-company">' + item.company_name + '</span></td><td><span class="address-address">' + item.address1 + ', ' + item.city + ' ' + item.postcode + '</span></td><td>' + item.country_code + '</td><td><a href="/addresses/' + item.id + '" title="Delete ' + item.name + '" class="delete" data-record-name="address"><i class="fas fa-times" aria-hidden="true"></i></a></td></tr>');
+                htmlArray.push('<tr id="address-' + item.id + '" class="select-address"><td><span class="address-name">' + item.name + '</span></td><td><span class="address-company">' + item.company_name + '</span></td><td><span class="address-address">' + item.address1 + ', ' + item.city + '</span></td><td><span class="address-address">' + item.postcode + '</span></td><td>' + item.country_code + '</td><td><a href="/addresses/' + item.id + '" title="Delete ' + item.name + '" class="delete" data-record-name="address"><i class="fas fa-times" aria-hidden="true"></i></a></td></tr>');
             });
 
             $('#address_book_body').append(htmlArray.join(""));

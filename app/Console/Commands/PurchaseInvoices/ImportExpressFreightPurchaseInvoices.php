@@ -252,9 +252,9 @@ class ImportExpressFreightPurchaseInvoices extends Command
                 'exchange_rate' => 1,
                 'billed_amount' => $value,
                 'billed_amount_currency_code' => 'GBP',
-                'vat_applied' => 0,
+                'vat_applied' => 1,
                 'vat' => 0,
-                'vat_rate' => 0,
+                'vat_rate' => 20,
                 'purchase_invoice_id' => $this->purchaseInvoice->id,
                 'purchase_invoice_line_id' => $purchaseInvoiceLineId
             ]);

@@ -58,7 +58,7 @@ class Address extends Model
     /**
      * Set the postcode.
      *
-     * @param  string  $value
+     * @param string $value
      * @return string
      */
     public function setPostcodeAttribute($value)
@@ -69,7 +69,7 @@ class Address extends Model
     /**
      * Set the type.
      *
-     * @param  string  $value
+     * @param string $value
      * @return string
      */
     public function setTypeAttribute($value)
@@ -102,10 +102,11 @@ class Address extends Model
     public function scopeFilter($query, $filter)
     {
         if ($filter) {
-            return $query->where(function($query) use ($filter) {
-                        $query->where('name', 'LIKE', '%' . $filter . '%')
-                                ->orWhere('company_name', 'LIKE', '%' . $filter . '%');
-                    });
+            return $query->where(function ($query) use ($filter) {
+                $query->where('name', 'LIKE', '%' . $filter . '%')
+                    ->orWhere('company_name', 'LIKE', '%' . $filter . '%')
+                    ->orWhere('postcode', 'LIKE', '%' . $filter . '%');
+            });
         }
     }
 
