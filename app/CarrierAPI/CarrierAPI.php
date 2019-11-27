@@ -50,7 +50,7 @@ class CarrierAPI
     private $company;
     private $carrier;
     private $mode;
-    private $nonPricedServices = ["ipf", "air", "usg"];
+    private $nonPricedServices = ["ief", "ipf", "air", "usg"];
 
     /*
      * ************************************
