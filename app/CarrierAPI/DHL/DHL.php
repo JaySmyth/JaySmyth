@@ -288,7 +288,7 @@ class DHL
                         "Recipient" => [
                             "Contact" => [
                                 "PersonName" => $this->shipment['recipient_name'],
-                                "CompanyName" => $this->shipment['recipient_company_name'],
+                                "CompanyName" => ($this->shipment['recipient_company_name']) ? $this->shipment['recipient_company_name'] : $this->shipment['recipient_name'],
                                 "PhoneNumber" => $this->shipment['recipient_telephone']
                             ],
                             "Address" => $this->addAddress('recipient')
