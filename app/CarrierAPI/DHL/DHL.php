@@ -7,6 +7,7 @@ use App\Service;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Arr;
+use function GuzzleHttp\Psr7\str;
 
 class DHL
 {
@@ -244,6 +245,12 @@ class DHL
      */
     protected function shipmentRequest()
     {
+        $eori = (!empty($this->shipment['eori'])) ? $this->shipment['eori'] : $this->company->eori;
+
+        if (strlen($eori) == 0) {
+            $eori = '000000000000';
+        }
+
         $this->request = [
             "ShipmentRequest" => [
                 "RequestedShipment" => [
@@ -279,7 +286,7 @@ class DHL
                             "Address" => $this->addAddress('sender'),
                             "RegistrationNumbers" => [
                                 "RegistrationNumber" => [
-                                    "Number" => (!empty($this->shipment['eori'])) ? $this->shipment['eori'] : $this->company->eori,
+                                    "Number" => $eori,
                                     "NumberTypeCode" => "EIN",
                                     "NumberIssuerCountryCode" => $this->shipment['sender_country_code']
                                 ]
