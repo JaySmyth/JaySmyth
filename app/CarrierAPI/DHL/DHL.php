@@ -410,9 +410,16 @@ class DHL
             $i = 1;
 
             foreach ($this->shipment['contents'] as $content) {
+
+                $commodityCode = (!empty($content['harmonized_code'])) ? $content['harmonized_code'] : $content['commodity_code'];
+
+                if (!$this->pltAvailable && strlen($commodityCode) == 0) {
+                    $commodityCode = '0000000000';
+                }
+
                 $lineItems[] = [
                     'ExportLineItem' => [
-                        "CommodityCode" => (!empty($content['harmonized_code'])) ? $content['harmonized_code'] : $content['commodity_code'],
+                        "CommodityCode" => $commodityCode,
                         "ItemNumber" => $i,
                         "Quantity" => $content['quantity'],
                         "QuantityUnitOfMeasurement" => $content['uom'],
