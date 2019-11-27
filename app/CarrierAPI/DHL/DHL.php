@@ -144,7 +144,7 @@ class DHL
                     "ShipTimestamp" => date('Y-m-d', time()) . 'T' . date('H:i:s', time() + 120) . 'GMT+00:00',
                     "UnitOfMeasurement" => "SI",
                     "DeclaredValue" => $this->shipment['customs_value'],
-                    "DeclaredValueCurrecyCode" => $this->shipment['currency_code'],
+                    "DeclaredValueCurrecyCode" => (!empty($this->shipment['currency_code'])) ? $this->shipment['currency_code'] : 'GBP',
                     "Content" => $this->getContent(),
                     "PaymentInfo" => strtoupper($this->shipment['terms_of_sale']),
                     "NextBusinessDay" => "Y",
@@ -250,7 +250,7 @@ class DHL
                     "ShipmentInfo" => [
                         "DropOffType" => 'REGULAR_PICKUP',
                         "ServiceType" => $this->serviceType,
-                        "Currency" => $this->shipment['currency_code'],
+                        "Currency" => (!empty($this->shipment['currency_code'])) ? $this->shipment['currency_code'] : 'GBP',
                         "UnitOfMeasurement" => 'SI',
                         "Billing" => [
                             'ShipperAccountNumber' => $this->shipment['bill_shipping_account'],
