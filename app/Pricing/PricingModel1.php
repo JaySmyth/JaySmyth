@@ -49,6 +49,8 @@ class PricingModel1 extends PricingModel
         $domesticZones = new DomesticZone();
         switch (strtolower($this->shipment['service_code'])) {
 
+            case 'uk24':
+            case 'uk24r':
             case 'uk48':
             case 'uk48r':
             case 'uk48p':

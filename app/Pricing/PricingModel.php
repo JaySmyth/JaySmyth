@@ -166,6 +166,7 @@ class PricingModel
         $this->shipment = $shipment;
         $this->priceType = $priceType;
         $this->service = Service::find($shipment['service_id']);
+
         $this->log("PriceType: $priceType");
         $this->log("ServiceId: ".$shipment['service_id']);
 
@@ -364,7 +365,7 @@ class PricingModel
         if (empty($fuelPercentage)) {
             $this->fuelPercentage = 0;
             $error = 'Unable to determine Fuel surcharge. Carrier :' . $this->shipment['carrier_id']
-                    . " Service :" . $this->shipment['service_id']
+                    . " Service :" . $this->shipment['service_code']
                     . " Date :" . $this->shipment['ship_date'];
             $this->response['errors'][] = $error;
             $this->log($error);
