@@ -432,8 +432,8 @@ class DHL
                         "QuantityUnitOfMeasurement" => $content['uom'],
                         "ItemDescription" => substr(trim($content['description']), 0, 35),
                         "UnitPrice" => $content['unit_value'],
-                        "NetWeight" => $content['unit_weight'] * $content['quantity'],
-                        "GrossWeight" => $content['unit_weight'] * $content['quantity'],
+                        "NetWeight" => round($content['unit_weight'] * $content['quantity'], 2),
+                        "GrossWeight" => round($content['unit_weight'] * $content['quantity'], 2),
                         "ManufacturingCountryCode" => $content['country_of_manufacture']
                     ]
                 ];
