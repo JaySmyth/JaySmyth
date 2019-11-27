@@ -279,7 +279,7 @@ class DHL
                             "Address" => $this->addAddress('sender'),
                             "RegistrationNumbers" => [
                                 "RegistrationNumber" => [
-                                    "Number" => $this->company->eori,
+                                    "Number" => (!empty($this->shipment['eori'])) ? $this->shipment['eori'] : $this->company->eori,
                                     "NumberTypeCode" => "EIN",
                                     "NumberIssuerCountryCode" => $this->shipment['sender_country_code']
                                 ]
