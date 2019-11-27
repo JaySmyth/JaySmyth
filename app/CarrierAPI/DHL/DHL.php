@@ -272,7 +272,7 @@ class DHL
                         "Shipper" => [
                             "Contact" => [
                                 "PersonName" => $this->shipment['sender_name'],
-                                "CompanyName" => $this->shipment['sender_company_name'],
+                                "CompanyName" => ($this->shipment['sender_company_name']) ? $this->shipment['sender_company_name'] : $this->shipment['sender_name'],
                                 "PhoneNumber" => $this->shipment['sender_telephone'],
                                 "EmailAddress" => $this->shipment['sender_email']
                             ],
