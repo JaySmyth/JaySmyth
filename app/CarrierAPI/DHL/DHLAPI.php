@@ -136,7 +136,7 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
         foreach ($reply['ShipmentResponse']['PackagesResult']['PackageResult'] as $package) {
             $response['packages'][$i]['index'] = $package['@number'];
             $response['packages'][$i]['carrier_tracking_number'] = $package['TrackingNumber'];
-            $response['packages'][$i]['barcode'] = $package['TrackingNumber'];
+            $response['packages'][$i]['barcode'] = 'J' . $package['TrackingNumber'];
             $response['packages'][$i]['carrier_tracking_code'] = $package['TrackingNumber'];
             $i++;
         }
