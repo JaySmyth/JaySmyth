@@ -216,7 +216,12 @@ class PurchaseInvoice extends Model
                 continue;
             }
 
-            $shipment = Shipment::whereCarrierId($this->carrier_id)->whereCarrierTrackingNumber($line->carrier_tracking_number)->first();
+            if ($this->carrier_id == 14) {
+                $shipment = Shipment::whereIn('carrier_id', [14, 15])->whereCarrierTrackingNumber($line->carrier_tracking_number)->first();
+            } else {
+                $shipment = Shipment::whereCarrierId($this->carrier_id)->whereCarrierTrackingNumber($line->carrier_tracking_number)->first();
+            }
+
 
             if ($shipment) {
 
