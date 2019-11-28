@@ -118,7 +118,7 @@ class ImportExpressFreightPurchaseInvoices extends Command
                     $row = $this->assignFieldNames($data);
 
                     // Lookup shipment
-                    $shipment = \App\Shipment::whereConsignmentNumber($row['Consignment Number'])->whereIn('carrier_id', [14])->first();
+                    $shipment = \App\Shipment::whereConsignmentNumber($row['Consignment Number'])->whereIn('carrier_id', [14, 15])->first();
 
                     $purchaseInvoiceLine = new PurchaseInvoiceLine();
                     $purchaseInvoiceLine->purchase_invoice_id = $this->purchaseInvoice->id;
