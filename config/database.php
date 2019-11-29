@@ -64,8 +64,11 @@ return [
             'prefix' => '',
             'strict' => false,
             'engine' => null,
+            'options' => array(
+                PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_BUNDLE_PEM', null)
+            )
         ],
-        
+
         'apitest' => [
             'driver' => 'mysql',
             'host' => env('APITEST_HOST', 'localhost'),
@@ -93,7 +96,7 @@ return [
             'strict' => false,
             'engine' => null,
         ],
-        
+
         'vmi' => [
             'driver' => 'mysql',
             'host' => env('VMI_DB_HOST', 'localhost'),
@@ -107,7 +110,7 @@ return [
             'strict' => false,
             'engine' => null,
         ],
-        
+
         'multifreight' => [
             'driver' => 'mysql',
             'host' => env('MULTIFREIGHT_DB_HOST', 'localhost'),
@@ -120,6 +123,9 @@ return [
             'prefix' => '',
             'strict' => false,
             'engine' => null,
+            'options' => array(
+                PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_BUNDLE_PEM', null)
+            )
         ],
 
         'pgsql' => [
