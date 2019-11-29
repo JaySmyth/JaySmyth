@@ -21,6 +21,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use App\CarrierAPI\Pdf;
+use Illuminate\Support\Facades\DB;
 
 class ShipmentsController extends Controller
 {
@@ -928,7 +929,9 @@ class ShipmentsController extends Controller
      */
     public function test(Request $request)
     {
+        $ssl = DB::select("SHOW STATUS LIKE 'Ssl_version'", [1]);
 
+        dd($ssl);
 
 
     }
