@@ -64,9 +64,9 @@ return [
             'prefix' => '',
             'strict' => false,
             'engine' => null,
-            'options' => array(
-                PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_BUNDLE_PEM', null)
-            )
+            //'options' => array(
+//                PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_BUNDLE_PEM', null)
+  //          )
         ],
 
         'apitest' => [
@@ -123,9 +123,9 @@ return [
             'prefix' => '',
             'strict' => false,
             'engine' => null,
-            'options' => array(
-                PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_BUNDLE_PEM', null)
-            )
+           // 'options' => array(
+            //    PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_BUNDLE_PEM', null)
+           // )
         ],
 
         'pgsql' => [
