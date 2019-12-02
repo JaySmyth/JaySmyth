@@ -20,6 +20,8 @@ class Flash
             $message = str_replace(["\r\n", "\r", "\n"], "<br/>", $message);
         }
 
+        $message = str_replace("'", '', $message);
+
         session()->flash($this->key, [
             'type' => $type,
             'title' => $title,

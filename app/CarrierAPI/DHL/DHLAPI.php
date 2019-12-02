@@ -40,6 +40,8 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
 
             $errors = Arr::pluck($reply['ShipmentResponse']['Notification'], 'Message');
 
+            $errors = $this->cleanErrors($errors);
+
             return $this->generateErrorResponse($response, $errors);
         }
 
@@ -111,6 +113,28 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
         return $errors;
     }
 
+    /**
+     * Clean up DHL errors before returning to the user.
+     *
+     * @param $errors
+     * @return mixed
+     */
+    protected function cleanErrors($errors)
+    {
+
+        foreach ($errors as $key => $value) {
+
+            if (stristr($value, 'Process failure occurred')) {
+                unset($errors[$key]);
+            }
+
+            if (stristr($value, 'minimum length  ------------ /shipreq:ShipmentRequest/RequestedShipment/InternationalDetail/ExportDeclaration/ExportLineItems/ExportLineItem[0]/CommodityCode')) {
+                $errors[$key] = 'Commodity codes required. Please edit commodiy lines and update with harmonized or commodity code.';
+            }
+        }
+
+        return $errors;
+    }
 
     /**
      *
