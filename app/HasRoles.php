@@ -137,7 +137,7 @@ trait HasRoles
 
     /**
      * Returns the number of reports that the user has acceess to.
-     * 
+     *
      * @return type
      */
     public function hasReports()
@@ -183,7 +183,7 @@ trait HasRoles
     }
 
     /**
-     * 
+     *
      * @return string
      */
     public function getOnlyShipRoute()
@@ -193,32 +193,17 @@ trait HasRoles
             case 'sea':
                 return 'sea-freight/create';
             default:
-                return "/shipments/create?mode=$mode";
+                return '/shipments/create';
         }
     }
 
     /**
-     * 
-     * @return string
-     */
-    public function getOnlyHistoryRoute()
-    {
-        $mode = $this->getOnlyMode();
-        switch ($mode) {
-            case 'sea':
-                return 'sea-freight';
-            default:
-                return "/shipments/?mode=$mode";
-        }
-    }
-
-    /**
-     * 
+     *
      * @return string
      */
     public function getDefaultRoute()
     {
-        if ($this->hasRole('cudv') || $this->hasRole('ifsc')) {
+        if ($this->hasRole('ifsc')) {
             return '/customs-entries';
         }
 
@@ -267,10 +252,10 @@ trait HasRoles
      * manager role, all companies for their associated depots will be returned.
      * For all customers, only companies that have been defined for them will
      * be returned.
-     * 
+     *
      * @param mixed $enabled Enabled status of the company - default returns all enabled and disabled companies. Boolean accepted - 0 disabled / 1 enabled
-     * 
-     * @return 
+     *
+     * @return
      */
     public function getAllowedCompanies($enabled = 'all')
     {
@@ -308,7 +293,7 @@ trait HasRoles
 
     /**
      * Get an array of company IDs enabled for the user.
-     * 
+     *
      * @return array    company IDs
      */
     public function getAllowedCompanyIds($enabled = 'all')
@@ -318,8 +303,8 @@ trait HasRoles
 
     /**
      * Get an array of depot IDs associated with the user.
-     * 
-     * @return 
+     *
+     * @return
      */
     public function getDepotIds()
     {
@@ -343,7 +328,7 @@ trait HasRoles
 
     /**
      * Determine if a user is associated with a given depot.
-     * 
+     *
      * @param type $depotId
      * @return boolean
      */
@@ -355,9 +340,9 @@ trait HasRoles
     }
 
     /**
-     * Determines if a user is associated with a given model by comparing 
+     * Determines if a user is associated with a given model by comparing
      * the user's list of allowed company ids with the model's company id.
-     * 
+     *
      * @return boolean
      */
     public function relatedTo($related)
@@ -388,7 +373,7 @@ trait HasRoles
 
     /**
      * Check if a user has more than one company.
-     * 
+     *
      * @return boolean
      */
     public function hasMultipleCompanies()
@@ -402,7 +387,7 @@ trait HasRoles
 
     /**
      * Check if a user has more than one company.
-     * 
+     *
      * @return boolean
      */
     public function hasMultipleImportConfigs()
@@ -416,7 +401,7 @@ trait HasRoles
 
     /**
      * Check if a user has more than one depot
-     * 
+     *
      * @return boolean
      */
     public function hasMultipleDepots()
@@ -430,7 +415,7 @@ trait HasRoles
 
     /**
      * Check if a user has at least one shipping mode enabled.
-     * 
+     *
      * @return boolean
      */
     public function hasAtLeastOneMode()
@@ -469,7 +454,7 @@ trait HasRoles
 
     /**
      * Check if the user is able to upload shipments.
-     * 
+     *
      * @return boolean
      */
     public function canUploadShipments()
@@ -487,7 +472,7 @@ trait HasRoles
 
     /**
      * Get the defined import configurations available to the user.
-     * 
+     *
      * @return type
      */
     public function getImportConfigs()
