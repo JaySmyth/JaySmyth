@@ -218,6 +218,7 @@ class CustomsEntriesController extends Controller
     {
         $query = CustomsEntry::orderBy('date', 'DESC')
                 ->filter($request->filter)
+                ->additionalRef($request->additional_reference)
                 ->dateBetween($request->date_from, $request->date_to)
                 ->hasCompany($request->company)
                 ->hasCpc($request->cpc)
