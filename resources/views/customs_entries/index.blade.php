@@ -83,6 +83,7 @@
             <th>Number</th>
             <th>Customer</th>
             <th>Reference</th>
+            <th>Addit Ref.</th>
             @can('create_customs_entry')<th>SCS Job</th>@endcan
             <th>Date</th>
             @if($fullDutyAndVat)
@@ -109,6 +110,7 @@
             </td>
             <td>{{$entry->company->company_name}}</td>
             <td>{{$entry->reference}}</td>
+            <td>{{$entry->additional_reference}}</td>
                 @can('create_customs_entry')<td>{{$entry->scs_job_number}}</td>@endcan
                 <td>{{$entry->date->timezone(Auth::user()->time_zone)->format(Auth::user()->date_format)}}</td>
                 @if($fullDutyAndVat)
