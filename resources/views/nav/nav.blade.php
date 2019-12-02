@@ -61,13 +61,13 @@
 
                         @can('courier')
                             <li class="nav-item ml-sm-2">
-                                <a class="nav-link" href="{{url('/shipments')}}">Ship</a>
+                                <a class="nav-link" href="{{url('/shipments')}}">History</a>
                             </li>
                         @endcan
 
                         @can('sea')
                             <li class="nav-item ml-sm-2">
-                                <a class="nav-link" href="{{url('/sea-freight')}}">Ship</a>
+                                <a class="nav-link" href="{{url('/sea-freight')}}">History</a>
                             </li>
                         @endcan
 
