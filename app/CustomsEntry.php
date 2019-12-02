@@ -136,6 +136,18 @@ class CustomsEntry extends Model
     }
 
     /**
+     * Scope filter.
+     *
+     * @return
+     */
+    public function scopeAdditionalRef($query, $filter)
+    {
+        if ($filter) {
+            return $query->where('additional_reference', 'LIKE', '%' . $filter . '%');
+        }
+    }
+
+    /**
      * Scope date.
      *
      * @return
