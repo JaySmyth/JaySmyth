@@ -15,6 +15,15 @@
 
 <div class="form-group row">
     <label class="col-sm-3 col-form-label">
+        Additional reference:
+    </label>
+    <div class="col-sm-8">
+        <input type="text" name="additional_reference" id="additional_reference" value="{{Input::get('additional_reference')}}" class="form-control">
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-3 col-form-label">
         Date From:
     </label>
     <div class="col-sm-8">
