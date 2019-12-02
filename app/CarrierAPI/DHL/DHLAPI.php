@@ -40,7 +40,7 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
 
             $errors = Arr::pluck($reply['ShipmentResponse']['Notification'], 'Message');
 
-            //$errors = $this->cleanErrors($errors);
+            $errors = $this->cleanErrors($errors);
 
             return $this->generateErrorResponse($response, $errors);
         }
