@@ -281,7 +281,7 @@ class DHL
                                 "PersonName" => $this->shipment['sender_name'],
                                 "CompanyName" => ($this->shipment['sender_company_name']) ? $this->shipment['sender_company_name'] : $this->shipment['sender_name'],
                                 "PhoneNumber" => $this->shipment['sender_telephone'],
-                                "EmailAddress" => $this->shipment['sender_email']
+                                "EmailAddress" => ($this->shipment['sender_email']) ? $this->shipment['sender_email'] : 'courier@antrim.ifsgroup.com',
                             ],
                             "Address" => $this->addAddress('sender'),
                             "RegistrationNumbers" => [
