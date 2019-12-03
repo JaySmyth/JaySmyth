@@ -132,8 +132,8 @@ class Kernel extends ConsoleKernel
         /*
          * RF server
          */
-        $schedule->command('ifs:start-rfserver')->between('8:00', '22:00')->withoutOverlapping(1);
-        $schedule->command('ifs:check-rfserver')->between('8:00', '22:00')->withoutOverlapping(1);
+        $schedule->command('ifs:start-rfserver')->between('7:00', '22:00')->withoutOverlapping(1);
+        $schedule->command('ifs:check-rfserver')->between('7:00', '22:00')->withoutOverlapping(1);
 
         /*
          * Misc
