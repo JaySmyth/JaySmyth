@@ -207,6 +207,10 @@ trait HasRoles
             return '/customs-entries';
         }
 
+        if ($this->hasRole('cudv') && !$this->hasRole('courier')) {
+            return '/customs-entries';
+        }
+
         switch ($this->getOnlyMode()) {
             case 'sea':
                 return 'sea-freight/create';
