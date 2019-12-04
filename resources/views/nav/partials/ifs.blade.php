@@ -72,7 +72,6 @@
     <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Transport</a>
     <div class="dropdown-menu">
         @can('view_transport_job')<a class="dropdown-item" href="{{url('/transport-jobs')}}">Transport Jobs</a>@endcan
-        @can('view_unmanifested_jobs')<a class="dropdown-item" href="{{url('/transport-jobs/unmanifested')}}">Unmanifested Jobs</a>@endcan
         @can('close_transport_job')<a class="dropdown-item" href="{{url('/transport-jobs/close')}}">POD/Close Jobs</a>@endcan
         <div class="dropdown-divider"></div>
         @can('create_postcode')<a class="dropdown-item" href="{{url('/postcodes')}}">Postcodes</a>@endcan

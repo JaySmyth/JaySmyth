@@ -41,10 +41,10 @@ class CorrectStatusOnTransportJobs extends Command
     public function handle()
     {
         $transportJobs = TransportJob::whereCompleted(1)
-                ->where('driver_manifest_id', '>', 0)
-                ->whereNotIn('status_id', [15, 7])
-                ->orderBy('id', 'DESC')
-                ->get();
+            ->where('sent', 1)
+            ->whereNotIn('status_id', [15, 7])
+            ->orderBy('id', 'DESC')
+            ->get();
 
         $this->info($transportJobs->count() . ' transport jobs found');
 

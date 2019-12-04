@@ -116,7 +116,7 @@
     </div>
 
     <div class="col-sm-5">
-        <div class="card">
+        <div class="card h-100">
             <div class="card-header">Details</div>
 
             <div class="card-body text-large">
@@ -142,30 +142,6 @@
                         <a href="{{url('/shipments', $transportJob->shipment_id)}}" title="View Shipment">{{$transportJob->shipment->carrier_consignment_number}}</a>
                         @else
                         {{$transportJob->reference}}
-                        @endif
-                    </div>
-                </div>
-
-                <div class="row mb-2">
-                    <div class="col-sm-5"><strong>Driver Manifest</strong></div>
-                    <div class="col-sm-7">
-
-                        @if($transportJob->driver_manifest_id)
-                        <a href="{{url('/driver-manifests', $transportJob->driver_manifest_id)}}" title="View Driver Manifest">{{$transportJob->driverManifest->driver->name}} - {{$transportJob->driverManifest->number}}</a>
-                        @else
-                        <i>Not manifested</i>
-                        @endif
-
-                    </div>
-                </div>
-
-                <div class="row mb-2">
-                    <div class="col-sm-5"><strong>Date / Time Manifested</strong></div>
-                    <div class="col-sm-7">
-                        @if($transportJob->date_manifested)
-                        {{$transportJob->date_manifested->timezone(Auth::user()->time_zone)->format(Auth::user()->date_format . ' H:i')}}
-                        @else
-                        <i>Not manifested</i>
                         @endif
                     </div>
                 </div>
@@ -227,9 +203,19 @@
                     <div class="col-sm-7">
                         @if($transportJob->sent)
                         <span class="badge badge-success">{{$transportJob->transend_route}}</span>
-                        <span class="ml-2 text-muted text-italic">(sent to transend - {{$transportJob->attempts}} additional attempts)</span>
                         @else
                         <span class="badge badge-primary">{{$transportJob->transend_route}}</span>                                                
+                        @endif
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-sm-5"><strong>TranSend Status</strong></div>
+                    <div class="col-sm-7">
+                        @if($transportJob->sent)
+                            Sent ({{$transportJob->attempts}} additional attempts)
+                        @else
+                            Not sent
                         @endif
                     </div>
                 </div>

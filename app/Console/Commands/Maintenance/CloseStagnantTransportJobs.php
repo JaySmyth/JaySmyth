@@ -43,7 +43,7 @@ class CloseStagnantTransportJobs extends Command
         $cutOff = new Carbon('-4 weeks');
 
         $transportJobs = TransportJob::whereCompleted(0)
-                ->where('driver_manifest_id', '>', 0)
+                ->where('sent', 1)
                 ->where('status_id', '!=', 7)
                 ->where('date_requested', '<', $cutOff->endOfDay())
                 ->orderBy('date_requested', 'ASC')
