@@ -349,6 +349,12 @@ class ReportsController extends Controller
 
         $this->authorize(new Report);
 
+        if ($request->status) {
+            $status = [$request->status];
+        } else {
+            $status = [8, 9, 10, 11, 12, 17];
+        }
+
         $shipments = Shipment::orderBy('ship_date', 'DESC')
             ->filter($request->filter)
             ->hasCompany($request->company)
@@ -356,7 +362,7 @@ class ReportsController extends Controller
             ->hasMode($report->mode_id)
             ->where('service_id', '<>', 4)
             ->whereReceived(1)
-            ->whereIn('status_id', [8, 9, 10, 11, 12, 17])
+            ->whereIn('status_id', $status)
             ->restrictCompany($request->user()->getAllowedCompanyIds())
             ->with('service')
             ->paginate(250);

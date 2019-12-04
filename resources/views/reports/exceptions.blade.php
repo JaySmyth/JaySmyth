@@ -21,6 +21,10 @@
             <input type="text" name="date_to" value="@if(Auth::user()->hasIfsRole() && !Input::get('date_from') && !Input::get('date_to')){{date(Auth::user()->date_format)}}@else{{Input::get('date_to')}}@endif" class="form-control datepicker" placeholder="Date To">
         </div>
         <div class="form-group">
+            <label for="status">Status</label>
+            {!! Form::select('status', [8 => 'On Hold', 9 => 'Return To Sender', 10 => 'Failure', 11 => 'Unknown', 12 => 'Error', 17 => 'Available For Pickup'], Input::get('status'), array('class' => 'form-control')) !!}
+        </div>
+        <div class="form-group">
             <label for="month">Shipper</label>
             {!! Form::select('company', dropDown('enabledSites', 'All Shippers'), Input::get('company'), array('class' => 'form-control')) !!}
         </div>
