@@ -22,7 +22,7 @@
         </div>
         <div class="form-group">
             <label for="status">Status</label>
-            {!! Form::select('status', [8 => 'On Hold', 9 => 'Return To Sender', 10 => 'Failure', 11 => 'Unknown', 12 => 'Error', 17 => 'Available For Pickup'], Input::get('status'), array('class' => 'form-control')) !!}
+            {!! Form::select('status', ['' => 'All Statuses', 8 => 'On Hold', 9 => 'Return To Sender', 10 => 'Failure', 11 => 'Unknown', 12 => 'Error', 17 => 'Available For Pickup'], Input::get('status'), array('class' => 'form-control')) !!}
         </div>
         <div class="form-group">
             <label for="month">Shipper</label>
