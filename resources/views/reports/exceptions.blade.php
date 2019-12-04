@@ -28,6 +28,10 @@
             <label for="month">Shipper</label>
             {!! Form::select('company', dropDown('enabledSites', 'All Shippers'), Input::get('company'), array('class' => 'form-control')) !!}
         </div>
+        <div class="form-group">
+            <label for="month">Traffic</label>
+            {!! Form::select('traffic', dropDown('traffic', 'All Traffic'), Input::get('traffic'), array('class' => 'form-control')) !!}
+        </div>
 
         <button type="submit" class="btn btn-primary mt-3">Update Report</button>
 
