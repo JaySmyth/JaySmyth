@@ -428,7 +428,7 @@ class DHL
                     "CommodityCode" => $commodityCode,
                     "ItemNumber" => $i,
                     "Quantity" => $content['quantity'],
-                    "QuantityUnitOfMeasurement" => $content['uom'],
+                    "QuantityUnitOfMeasurement" => $this->convertToDhlUom($content['uom']),
                     "ItemDescription" => substr(trim($content['description']), 0, 35),
                     "UnitPrice" => round($content['unit_value'], 2),
                     "NetWeight" => round($content['unit_weight'] * $content['quantity'], 2),
@@ -450,6 +450,66 @@ class DHL
             ];
 
         }
+    }
+
+    /**
+     * Convert UOM to DHL spec.
+     *
+     * @param $uom
+     * @return string
+     */
+    protected function convertToDhlUom($uom)
+    {
+        switch (strtoupper($uom)) {
+            case 'CG':
+                // Centigram
+                return '2GM';
+            case 'CM':
+                // Centimeters
+                return '2M';
+            case 'CM3':
+                // Cubic Centimeters
+                return '2M3';
+            case 'EA':
+            case 'HUN':
+            case 'QT':
+            case'YN':
+                // Each
+                return '2NO';
+            case 'FT':
+                // Square Feet
+                return '2M2';
+            case 'GAL':
+                // Gallons
+                return '2L';
+            case 'GRM':
+            case 'G':
+                // Gram
+                return 'GM';
+            case 'MG':
+                //  Milligrams
+                return '3GM';
+            case 'ML':
+                // Milliliters
+                return '3L';
+            case 'PR':
+                // Pairs
+                return 'PRS';
+            case 'LB':
+                // Pounds
+                return '3KG';
+            case 'TOZ':
+                // Ounces
+                return '2KG';
+            case 'YD':
+                // Yards
+                return '3M';
+            default :
+                return $uom;
+
+        }
+
+
     }
 
     /**
