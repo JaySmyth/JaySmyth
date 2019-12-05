@@ -250,16 +250,16 @@ class DomesticRate extends Model
      * @param type $effectiveDate
      * @return string
      */
-    public function doRateUpload($companyId, $serviceId, $rateId, $currentRate, $uploadedRate, $effectiveDate = '')
+    public function doRateUpload($companyId, $serviceId, $rateId, $stdRate, $uploadedRate, $effectiveDate = '')
     {
         // check old and new rates have same structure
-        $currentKeys = $this->buildCurrentKeys($currentRate, $companyId);
+        $currentKeys = $this->buildCurrentKeys($stdRate, $companyId);
         $uploadedKeys = $this->buildUploadedKeys($uploadedRate);
         $diff = array_diff(array_keys($currentKeys), array_keys($uploadedKeys));
         if ($diff == []) {
-
             // Tables Match so build discounts
             $discounts = $this->buildDiscounts($currentKeys, $uploadedKeys, $companyId, $effectiveDate);
+
             if ($discounts != []) {
                 DomesticRateDiscount::insert($discounts);
             }
