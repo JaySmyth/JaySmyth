@@ -473,7 +473,7 @@ class DHL
             case 'EA':
             case 'HUN':
             case 'QT':
-            case'YN':
+            case 'YN':
                 // Each
                 return '2NO';
             case 'FT':
@@ -506,10 +506,7 @@ class DHL
                 return '3M';
             default :
                 return $uom;
-
         }
-
-
     }
 
     /**
