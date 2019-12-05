@@ -101,7 +101,7 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
          */
         $rules['bill_shipping_account'] = 'required|digits:9';
         $rules['bill_tax_duty_account'] = 'required|digits:9';
-        $rules['alcohol'] = 'not_supported';
+        //$rules['alcohol'] = 'not_supported';
         $rules['dry_ice'] = 'not_supported';
         $rules['hazardous'] = 'not_supported';
         $rules['insurance_value'] = 'not_supported';
