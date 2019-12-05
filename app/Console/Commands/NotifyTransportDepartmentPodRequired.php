@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Shipment;
 use Carbon\Carbon;
-use App\TransportJob;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
@@ -23,7 +22,7 @@ class NotifyTransportDepartmentPodRequired extends Command
      *
      * @var string
      */
-    protected $description = 'Advise transport department that there are jobs that need POD';
+    protected $description = 'Notify operations that there are jobs that required POD';
 
     /**
      * Create a new command instance.
@@ -42,23 +41,13 @@ class NotifyTransportDepartmentPodRequired extends Command
      */
     public function handle()
     {
-        $transportJobs = TransportJob::whereCompleted(0)
-                ->where('driver_manifest_id', '>', 0)
-                ->where('status_id', '!=', 7)
-                ->where('date_requested', '<', Carbon::yesterday()->endOfDay())
-                ->orderBy('date_requested', 'ASC')
-                ->get();
-
-        if ($transportJobs->count() > 20) {
-            Mail::to('scharlton@antrim.ifsgroup.com')->cc(['transport@antrim.ifsgroup.com'])->send(new \App\Mail\PodTransportJobs($transportJobs));
-        }
 
         $localPod = Shipment::where('carrier_id', 1)
-                ->where('recipient_country_code', 'IE')
-                ->where('ship_date', '<', Carbon::yesterday()->endOfDay())
-                ->orderBy('ship_date', 'ASC')
-                ->isActive()
-                ->get();
+            ->where('recipient_country_code', 'IE')
+            ->where('ship_date', '<', Carbon::yesterday()->endOfDay())
+            ->orderBy('ship_date', 'ASC')
+            ->isActive()
+            ->get();
 
         if ($localPod->count() > 0) {
             Mail::to(['lclose@antrim.ifsgroup.com', 'cgordon@antrim.ifsgroup.com'])->cc(['gmcnicholl@antrim.ifsgroup.com'])->send(new \App\Mail\PodShipments($localPod));

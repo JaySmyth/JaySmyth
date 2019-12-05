@@ -39,8 +39,6 @@ class Kernel extends ConsoleKernel
         Commands\StartRfserver::class,
         Commands\CheckRfserver::class,
         Commands\UploadFiles::class,
-        Commands\CloseDriverManifests::class,
-        Commands\OpenDriverManifests::class,
         Commands\NotifyTransportDepartmentPodRequired::class,
         Commands\UpdateScsJobNumbersOnPurchaseInvoiceLines::class,
         Commands\ProcessShipmentUploads::class,
@@ -145,8 +143,6 @@ class Kernel extends ConsoleKernel
          * Transport
          *
          */
-        $schedule->command('ifs:close-driver-manifests')->dailyAt('21:00');
-        $schedule->command('ifs:open-driver-manifests')->dailyAt('07:00');
         $schedule->command('ifs:close-stagnant-transport-jobs')->dailyAt('05:35');
         $schedule->command('ifs:correct-status-on-transport-jobs')->dailyAt('05:38');
         $schedule->command('ifs:notify-transport-department-pod-required')->weekdays()->dailyAt('09:20');

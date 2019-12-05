@@ -133,7 +133,7 @@ body .container-fluid a .fas:hover, body .container-fluid a .far:hover{
     background-color: $red;
 }
 
-.badge-on_hold, .badge-new, .badge-booking, .badge-booked, .badge-return_to_sender, .badge-unmanifested {
+.badge-on_hold, .badge-new, .badge-booking, .badge-booked, .badge-return_to_sender, .badge-unmanifested, .badge-open {
     color: $white;
     background-color: $orange;
 }
@@ -152,7 +152,7 @@ body .container-fluid a .fas:hover, body .container-fluid a .far:hover{
     color: $red;
 }
 
-.text-caution, .on_hold, .saved, .new, .booking, .booked, .passed, .return_to_sender, .unmanifested {
+.text-caution, .on_hold, .saved, .new, .booking, .booked, .passed, .return_to_sender, .unmanifested, .open {
     color: $orange;
 }
 
