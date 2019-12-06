@@ -260,6 +260,8 @@ class CustomsEntriesController extends Controller
 
         $customsEntries = $this->search($request, false);
 
+        $fullDutyAndVat = $this->getDutyVatType($request);
+
         return Excel::download(new \App\Exports\CustomsEntriesByCommodityExport($customsEntries, $fullDutyAndVat), 'customs_entries.xlsx');
     }
 
