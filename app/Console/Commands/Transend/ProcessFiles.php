@@ -112,7 +112,13 @@ class ProcessFiles extends Command
         if ($handle = opendir($this->directory)) {
             while (false !== ($file = readdir($handle))) {
                 if (!is_dir($file) && stristr($file, '.csv')) {
-                    $this->processFile($file);
+
+                    // File already exists in the archive - delete it
+                    if (file_exists($this->directory . $this->archiveDirectory . '/' . $file)) {
+                        unlink($this->directory . $file);
+                    } else {
+                        $this->processFile($file);
+                    }
 
                     if (!$this->testMode) {
                         $this->archiveFile($file);
