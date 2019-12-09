@@ -53,8 +53,8 @@ class DimCheckController extends Controller
 
                 if ($rowNumber >= 2) {
 
-                    $dhlActualWeight = (is_numeric($data[30])) ? $data[30] : 0;
-                    $dhlVolWeight = (is_numeric($data[31])) ? $data[31] : 0;
+                    $dhlActualWeight = (!empty($data[30]) && is_numeric($data[30])) ? $data[30] : 0;
+                    $dhlVolWeight = (!empty($data[31]) && is_numeric($data[31])) ? $data[31] : 0;
 
                     $shipment = Shipment::where('carrier_consignment_number', $data[2])->where('carrier_id', 5)->first();
 
