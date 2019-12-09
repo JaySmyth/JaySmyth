@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use App\PurchaseInvoice;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
+use App\Exports\PurchaseInvoicesExport;
 
 class PurchaseInvoicesController extends Controller
 {
@@ -36,6 +36,42 @@ class PurchaseInvoicesController extends Controller
         $purchaseInvoices = $this->search($request);
 
         return view('purchase_invoices.index', compact('purchaseInvoices'));
+    }
+
+    /**
+     * Search.
+     *
+     * @param $request
+     * @param bool $paginate
+     * @param bool $limit
+     * @return mixed
+     */
+    private function search($request, $paginate = true, $limit = false)
+    {
+        $query = PurchaseInvoice::orderBy('date', 'DESC')
+            ->orderBy('invoice_number', 'DESC')
+            ->filter($request->filter)
+            ->dateBetween($request->date_from, $request->date_to)
+            ->hasConsignmentOrScsJob($request->consignment)
+            ->hasCarrier($request->carrier)
+            ->hasStatus($request->status)
+            ->hasType($request->type)
+            ->hasImportExport($request->import_export)
+            ->hasReceived($request->received)
+            ->hasQueried($request->queried)
+            ->hasCosts($request->costs)
+            ->hasCopyDocs($request->copy_docs)
+            ->with('carrier');
+
+        if ($limit) {
+            $query->limit($limit);
+        }
+
+        if (!$paginate) {
+            return $query->get();
+        }
+
+        return $query->paginate(50);
     }
 
     /**
@@ -236,7 +272,7 @@ class PurchaseInvoicesController extends Controller
     /**
      * Download the result set to an Excel Document.
      *
-     * @param  Request
+     * @param Request
      * @return Excel document
      */
     public function negativeVariancesDownload($id)
@@ -253,7 +289,7 @@ class PurchaseInvoicesController extends Controller
     /**
      * Download the result set to an Excel Document.
      *
-     * @param  Request
+     * @param Request
      * @return Excel document
      */
     public function costComparisonDownload($id)
@@ -339,7 +375,7 @@ class PurchaseInvoicesController extends Controller
 
     /**
      * Download invoice as multifreight XML.
-     * 
+     *
      * @param type $id
      * @return file download
      */
@@ -376,28 +412,19 @@ class PurchaseInvoicesController extends Controller
      * @return
      */
 
-    private function search($request, $paginate = true)
+    /**
+     * Download the result set to an Excel Document.
+     *
+     * @param Request
+     * @return Excel document
+     */
+    public function download(Request $request)
     {
-        $query = PurchaseInvoice::orderBy('date', 'DESC')
-                ->orderBy('invoice_number', 'DESC')
-                ->filter($request->filter)
-                ->dateBetween($request->date_from, $request->date_to)
-                ->hasConsignmentOrScsJob($request->consignment)
-                ->hasCarrier($request->carrier)
-                ->hasStatus($request->status)
-                ->hasType($request->type)
-                ->hasImportExport($request->import_export)
-                ->hasReceived($request->received)
-                ->hasQueried($request->queried)
-                ->hasCosts($request->costs)
-                ->hasCopyDocs($request->copy_docs)
-                ->with('carrier');
+        $this->authorize('admin', new PurchaseInvoice);
 
-        if (!$paginate) {
-            return $query->get();
-        }
+        $invoices = $this->search($request, false, 2000);
 
-        return $query->paginate(50);
+        return Excel::download(new PurchaseInvoicesExport($invoices), 'invoices.xlsx');
     }
 
 }

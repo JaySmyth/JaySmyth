@@ -223,6 +223,7 @@ Route::get('purchase-invoices/{id}/negative-variances-download', 'PurchaseInvoic
 Route::get('purchase-invoices/{id}/preview-xml', 'PurchaseInvoicesController@previewXml');
 Route::get('purchase-invoices/{id}/download-xml', 'PurchaseInvoicesController@downloadXml');
 
+Route::get('purchase-invoices/download', 'PurchaseInvoicesController@download');
 Route::get('purchase-invoices/copy-docs-email', 'PurchaseInvoicesController@copyDocsEmail');
 Route::get('purchase-invoices/export-invoices', 'PurchaseInvoicesController@exportInvoices');
 
