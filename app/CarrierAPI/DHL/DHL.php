@@ -279,9 +279,9 @@ class DHL
                         "Shipper" => [
                             "Contact" => [
                                 "PersonName" => $this->shipment['sender_name'],
-                                "CompanyName" => ($this->shipment['sender_company_name']) ? $this->shipment['sender_company_name'] : $this->shipment['sender_name'],
+                                "CompanyName" => (!empty($this->shipment['sender_company_name'])) ? $this->shipment['sender_company_name'] : $this->shipment['sender_name'],
                                 "PhoneNumber" => $this->shipment['sender_telephone'],
-                                "EmailAddress" => ($this->shipment['sender_email']) ? $this->shipment['sender_email'] : 'courier@antrim.ifsgroup.com',
+                                "EmailAddress" => (!empty($this->shipment['sender_email'])) ? $this->shipment['sender_email'] : 'courier@antrim.ifsgroup.com',
                             ],
                             "Address" => $this->addAddress('sender'),
                             "RegistrationNumbers" => [
@@ -295,7 +295,7 @@ class DHL
                         "Recipient" => [
                             "Contact" => [
                                 "PersonName" => $this->shipment['recipient_name'],
-                                "CompanyName" => ($this->shipment['recipient_company_name']) ? $this->shipment['recipient_company_name'] : $this->shipment['recipient_name'],
+                                "CompanyName" => (!empty($this->shipment['recipient_company_name'])) ? $this->shipment['recipient_company_name'] : $this->shipment['recipient_name'],
                                 "PhoneNumber" => $this->shipment['recipient_telephone']
                             ],
                             "Address" => $this->addAddress('recipient')
