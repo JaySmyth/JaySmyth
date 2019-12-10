@@ -15,6 +15,7 @@ class PurchaseInvoicesExport implements FromCollection, WithHeadings, ShouldAuto
     }
 
     /**
+     * Define column headings for the excel document.
      *
      * @return array
      */
@@ -37,6 +38,11 @@ class PurchaseInvoicesExport implements FromCollection, WithHeadings, ShouldAuto
         ];
     }
 
+    /**
+     * Build the collection.
+     *
+     * @return \Illuminate\Support\Collection
+     */
     public function collection()
     {
         $collection = collect();

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\IfsNdPostcode;
 use Illuminate\Http\Request;
 use App\Http\Requests\PostcodeRequest;
 use App\Postcode;
@@ -21,10 +22,10 @@ class PostcodesController extends Controller
     }
 
     /**
-     * 
      *
-     * @param  
-     * @return 
+     *
+     * @param
+     * @return
      */
     public function index(Request $request)
     {
@@ -37,10 +38,10 @@ class PostcodesController extends Controller
     }
 
     /**
-     * 
      *
-     * @param  
-     * @return 
+     *
+     * @param
+     * @return
      */
     public function create()
     {
@@ -50,10 +51,10 @@ class PostcodesController extends Controller
     }
 
     /**
-     * 
      *
-     * @param  
-     * @return 
+     *
+     * @param
+     * @return
      */
     public function store(PostcodeRequest $request)
     {
@@ -67,10 +68,10 @@ class PostcodesController extends Controller
     }
 
     /**
-     * 
      *
-     * @param  
-     * @return 
+     *
+     * @param
+     * @return
      */
     public function edit($id)
     {
@@ -82,10 +83,10 @@ class PostcodesController extends Controller
     }
 
     /**
-     * 
      *
-     * @param  
-     * @return 
+     *
+     * @param
+     * @return
      */
     public function update(PostcodeRequest $request, $id)
     {
@@ -98,6 +99,22 @@ class PostcodesController extends Controller
         flash()->success('Updated!', 'Postcode updated successfully.');
 
         return redirect('postcodes');
+    }
+
+    /**
+     *
+     *
+     * @param
+     * @return
+     */
+    public function ifsNonDeliveryPostcodes()
+    {
+        $this->authorize(new Postcode);
+
+        $postcodes = IfsNdPostcode::all();
+        $postcodes = $postcodes->sortBy('postcode', SORT_NATURAL);
+
+        return view('postcodes.ifs_nd_postcodes', compact('postcodes'));
     }
 
 }

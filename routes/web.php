@@ -531,6 +531,7 @@ Route::get('packaging/dims', 'CompanyPackagingTypesController@dims');
  */
 
 Route::resource('postcodes', 'PostcodesController');
+Route::get('ifs-nd-postcodes', 'PostcodesController@ifsNonDeliveryPostcodes');
 
 /*
   |--------------------------------------------------------------------------
