@@ -364,6 +364,7 @@ class ReportsController extends Controller
             ->whereReceived(1)
             ->whereIn('status_id', $status)
             ->traffic($request->traffic)
+            ->hasService($request->service)
             ->restrictCompany($request->user()->getAllowedCompanyIds())
             ->with('service')
             ->paginate(250);
