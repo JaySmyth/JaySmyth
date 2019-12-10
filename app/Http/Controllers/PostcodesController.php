@@ -109,7 +109,7 @@ class PostcodesController extends Controller
      */
     public function ifsNonDeliveryPostcodes()
     {
-        $this->authorize(new Postcode);
+        $this->authorize('index', new Postcode);
 
         $postcodes = IfsNdPostcode::all();
         $postcodes = $postcodes->sortBy('postcode', SORT_NATURAL);
