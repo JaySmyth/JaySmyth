@@ -106,7 +106,7 @@ class UPS extends Tracking
         if (isset($response['Fault'])) {
             //$response = Arr::dot($response);
             //Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Get UPS tracking ' . $this->trackingNumber . ' - fault', $response['Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description']));
-            return [];
+            //return [];
         }
 
         if ($this->shipment->pieces > 1) {
