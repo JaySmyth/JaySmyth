@@ -708,7 +708,7 @@ class ReportsController extends Controller
             ->shipDateBetween($dateFrom, $dateTo)
             ->hasStatus('S')
             ->join('carriers', 'carriers.id', '=', 'shipments.carrier_id')
-            ->groupBy('carrier_id')
+            ->groupBy('shipments.carrier_id')
             ->select(DB::raw('count(*) as total, sum(pieces) as total_pieces, sum(weight) as total_weight, sum(volumetric_weight) as total_volumetric_weight, shipments.*'));
 
         $shipments = $shipments->paginate(2500);
