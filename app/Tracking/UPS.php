@@ -113,7 +113,7 @@ class UPS extends Tracking
 
             $events = [];
 
-            for ($i = 1; $i < $this->shipment->pieces; $i++) {
+            for ($i = 0; $i <= $this->shipment->pieces; $i++) {
                 if (!empty($response['TrackResponse']['Shipment']['Package'][$i]['Activity'])) {
                     $activities = array_reverse($response['TrackResponse']['Shipment']['Package'][$i]['Activity']);
                     $events = $events + $this->processActivities($activities);

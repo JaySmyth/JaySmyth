@@ -50,16 +50,15 @@ class GetTracking extends Command
     {
 
         /*
-                $shipments = Shipment::whereIn('carrier_tracking_number', ['1Z922E2A0496733575'])->get();
+                        $shipments = Shipment::whereIn('carrier_tracking_number', ['1Z922E2A0496733575'])->get();
 
-                foreach ($shipments as $shipment) {
+                        foreach ($shipments as $shipment) {
 
-                    $this->info('Getting tracking updates for ' . $shipment->carrier->name . ' shipment: ' . $shipment->carrier_consignment_number);
+                            $this->info('Getting tracking updates for ' . $shipment->carrier->name . ' shipment: ' . $shipment->carrier_consignment_number);
 
-                    $shipment->updateTracking();
+                            $shipment->updateTracking();
 
-
-                }
+                        }
         */
 
         $active = $this->option('active');
