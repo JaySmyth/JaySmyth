@@ -102,24 +102,16 @@ class UPS extends Tracking
         //$response = Arr::dot($response);
         //dd($response);
 
-        // Error encountered
-        if (isset($response['Fault'])) {
-            //$response = Arr::dot($response);
-            //Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Get UPS tracking ' . $this->trackingNumber . ' - fault', $response['Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description']));
-            //return [];
-        }
+        // Return array
+        $events = [];
 
         if ($this->shipment->pieces > 1) {
-
-            $events = [];
-
             for ($i = 0; $i <= $this->shipment->pieces; $i++) {
                 if (!empty($response['TrackResponse']['Shipment']['Package'][$i]['Activity'])) {
                     $activities = array_reverse($response['TrackResponse']['Shipment']['Package'][$i]['Activity']);
                     $events = $events + $this->processActivities($activities);
                 }
             }
-
         }
 
         if (empty($events) && !empty($response['TrackResponse']['Shipment']['Package']['Activity'])) {
