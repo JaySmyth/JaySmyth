@@ -16,7 +16,7 @@ class PerformRateIncrease extends Command
      *
      * @var string
      */
-    protected $signature = 'ifs:perform-rate-increase {percentage}';
+    protected $signature = 'ifs:perform-rate-increase {percentage?}';
 
     /**
      * The console command description.
@@ -30,7 +30,7 @@ class PerformRateIncrease extends Command
      *
      * @var decimal
      */
-    protected $increasePercentage = 3;
+    protected $increasePercentage = 0;
 
     /**
      * Date rate effective from.
@@ -97,27 +97,23 @@ class PerformRateIncrease extends Command
      */
     protected function checkAbleToIncrease()
     {
-
         $rates = DomesticRate::where('rate_id', '>=', '500')
                 ->where('to_date', '>', $this->fromDate)
                 ->first();
-        If ($rates) {
-
+        if ($rates) {
             $this->unableToApplyIncrease('domestic_rates');
         }
 
         $rates = RateDetail::where('rate_id', '>=', '500')
                 ->where('to_date', '>', $this->fromDate)
                 ->first();
-        If ($rates) {
-
+        if ($rates) {
             $this->unableToApplyIncrease(' rate_details ');
         }
     }
 
     protected function unableToApplyIncrease($table)
     {
-
         $blank = "                                                                 ";
         $this->error($blank);
         $this->error("  Unable to perform Increase.                                    ");
@@ -133,9 +129,7 @@ class PerformRateIncrease extends Command
 
     protected function checkPercentage()
     {
-
         if (is_numeric($this->increasePercentage)) {
-
             if ($this->increasePercentage > 0 && $this->increasePercentage < 5) {
                 return;
             }
@@ -151,21 +145,19 @@ class PerformRateIncrease extends Command
         $this->error($blank);
         $this->error("  e.g.                                                    ");
         $this->error($blank);
-        $this->error("      php artisan ifs:perform-rate-increase 3.0           ");
+        $this->error("      php artisan ifs:perform-rate-increase 3.5           ");
         $this->error($blank);
         exit();
     }
 
     public function increaseDomesticRates($multiplier)
     {
-
         $rates = DomesticRate::where('rate_id', '>=', '500')
                 ->where('to_date', '>', date('Y-m-d'))
                 ->get();
 
         // Cycle through rates selected and increase values
         foreach ($rates as $rate) {
-
             DomesticRate::create([
                 'rate_id' => $rate->rate_id,
                 'service' => $rate->service,
@@ -183,14 +175,12 @@ class PerformRateIncrease extends Command
 
     public function increaseIntlRates($multiplier)
     {
-
         $rates = RateDetail::where('rate_id', '>=', '500')
                 ->where('to_date', '>', date('Y-m-d'))
                 ->get();
 
         // Cycle through rates selected and increase values
         foreach ($rates as $rate) {
-
             RateDetail::create([
                 'rate_id' => $rate->rate_id,
                 'residential' => $rate->residential,
@@ -209,7 +199,7 @@ class PerformRateIncrease extends Command
         }
     }
 
-    function createEmail()
+    public function createEmail()
     {
 
         // Set email subject
@@ -221,5 +211,4 @@ class PerformRateIncrease extends Command
 
         mail($this->contactEmail, $subject, $message);
     }
-
 }
