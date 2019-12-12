@@ -116,6 +116,7 @@ class ProcessFiles extends Command
                     // File already exists in the archive - delete it
                     if (file_exists($this->directory . $this->archiveDirectory . '/' . $file)) {
                         unlink($this->directory . $file);
+                        Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('File already exists in archive directory', "$file already processed"));
                     } else {
                         $this->processFile($file);
                     }
@@ -570,9 +571,14 @@ class ProcessFiles extends Command
             $this->error("Problem archiving $file  - file not found");
         }
 
-        if (copy($originalFile, $archiveFile)) {
-            unlink($originalFile);
-            $this->info("File archived successfully");
+        if (!file_exists($archiveFile)) {
+            if (copy($originalFile, $archiveFile)) {
+                unlink($originalFile);
+                $this->info("File archived successfully");
+            }
+        } else {
+            $this->error("Problem archiving $archiveFile  - already exists");
+            Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Error archiving transend export file', "Problem archiving $archiveFile  - already exists"));
         }
     }
 
