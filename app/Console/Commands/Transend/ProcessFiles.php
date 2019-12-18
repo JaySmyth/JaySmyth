@@ -545,6 +545,7 @@ class ProcessFiles extends Command
             }
 
             return null;
+
         } else {
             Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Unknown transend exception code - ' . $code, $code . ' not defined in transend_codes table'));
         }
