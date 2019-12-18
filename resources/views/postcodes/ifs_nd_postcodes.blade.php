@@ -2,7 +2,7 @@
 
 @section('content')
 
-    @include('partials.title', ['title' => 'IFS Non Delivery Postcodes', 'results'=> $postcodes, 'create' => 'ifs_nd_postcode'])
+    @include('partials.title', ['title' => 'IFS Non Delivery Postcodes', 'results'=> $postcodes, 'create' => 'postcode'])
 
     <table class="table table-striped table-sm">
         <thead>
