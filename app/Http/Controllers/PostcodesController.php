@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Postcode;
 use App\IfsNdPostcode;
 use Illuminate\Http\Request;
 use App\Http\Requests\PostcodeRequest;
-use App\Postcode;
+use Illuminate\Support\Facades\Validator;
 
 class PostcodesController extends Controller
 {
@@ -102,7 +102,7 @@ class PostcodesController extends Controller
     }
 
     /**
-     *
+     * List ND postcodes.
      *
      * @param
      * @return
@@ -111,10 +111,51 @@ class PostcodesController extends Controller
     {
         $this->authorize('index', new Postcode);
 
-        $postcodes = IfsNdPostcode::all();
-        $postcodes = $postcodes->sortBy('postcode', SORT_NATURAL);
+        $postcodes = IfsNdPostcode::orderBy('postcode')->paginate(1000);
 
         return view('postcodes.ifs_nd_postcodes', compact('postcodes'));
+    }
+
+
+    /**
+     * Store ND postcode.
+     *
+     * @param
+     * @return
+     */
+    public function storeIfsNonDeliveryPostcode(Request $request)
+    {
+        $this->authorize('index', new Postcode);
+
+        $validator = Validator::make($request->all(), [
+            'postcode' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        IfsNdPostcode::create($request->all());
+
+        flash()->success('Created!', 'Postcode added successfully.');
+
+        return redirect('ifs-nd-postcodes');
+    }
+
+
+    /**
+     * Delete.
+     *
+     * @param Delete $postcode
+     * @return string
+     */
+    public function deleteIfsNonDeliveryPostcode(IfsNdPostcode $postcode)
+    {
+        $postcode->delete();
+
+        return response()->json(null, 204);
     }
 
 }

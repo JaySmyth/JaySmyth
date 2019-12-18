@@ -6,6 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class IfsNdPostcode extends Model
 {
+    /*
+     * Black list of NON mass assignable - all others are mass assignable.
+     *
+     * @var array
+     */
+    protected $guarded = ['id'];
+
+    /**
+     * Postcode served by IFS.
+     *
+     * @param $postcode
+     * @return bool
+     */
     public function isServed($postcode)
     {
 

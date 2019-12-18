@@ -531,7 +531,16 @@ Route::get('packaging/dims', 'CompanyPackagingTypesController@dims');
  */
 
 Route::resource('postcodes', 'PostcodesController');
+
+/*
+  |--------------------------------------------------------------------------
+  | IFS ND Postcodes
+  |--------------------------------------------------------------------------
+ */
 Route::get('ifs-nd-postcodes', 'PostcodesController@ifsNonDeliveryPostcodes');
+Route::post('ifs-nd-postcodes', 'PostcodesController@storeIfsNonDeliveryPostcode');
+Route::view('ifs-nd-postcodes/create', 'postcodes/create_ifs_nd_postcode');
+Route::delete('ifs-nd-postcodes/{postcode}', 'PostcodesController@deleteIfsNonDeliveryPostcode');
 
 /*
   |--------------------------------------------------------------------------
