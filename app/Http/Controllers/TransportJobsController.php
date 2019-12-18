@@ -170,7 +170,6 @@ class TransportJobsController extends Controller
         $cutOff = new Carbon('yesterday');
 
         $transportJobs = TransportJob::whereCompleted(0)
-                ->where('driver_manifest_id', '>', 0)
                 ->where('status_id', '!=', 7)
                 ->where('date_requested', '<', $cutOff->endOfDay())
                 ->orderBy('date_requested', 'ASC')
