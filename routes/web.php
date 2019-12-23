@@ -1,13 +1,5 @@
 <?php
 
-Route::get('env', function () {
-    dd(env('APP_ENV'));
-});
-
-Route::get('exception', function () {
-    $error = new FalseObject();
-});
-
 // Temporary route for testing
 Route::get('test/{id}', 'APIController@test');
 Route::get('reprice/{shipment}', 'APIController@reprice');

@@ -86,7 +86,7 @@ class Handler extends ExceptionHandler
 
             $html = $handler->getHtml($e);
 
-            Mail::to(['gmcbroom@antrim.ifsgroup.com', 'oldandgrey@hotmail.com'])->send(new ErrorException($html));
+            Mail::to(['gmcbroom@antrim.ifsgroup.com', 'dshannon@antrim.ifsgroup.com'])->send(new ErrorException($html));
         } catch (Exception $ex) {
             dd($ex);
         }
