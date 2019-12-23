@@ -56,6 +56,7 @@ class Kernel extends ConsoleKernel
         Commands\ProcessScsCollectionRequests::class,
         Commands\SendTrackingNumbers::class,
         Commands\ProcessVendorvillageOrders::class,
+        Commands\IncreaseCostRate::class,
         Commands\PerformRateIncrease::class,
         Commands\UpdateShopify::class,
         Commands\BulkCreateTrackers::class,

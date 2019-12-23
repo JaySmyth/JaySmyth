@@ -1,9 +1,5 @@
 <?php
 
-Route::get('env', function () {
-    dd(env('APP_ENV'));
-});
-
 // Temporary route for testing
 Route::get('test/{id}', 'APIController@test');
 Route::get('reprice/{shipment}', 'APIController@reprice');
@@ -496,15 +492,15 @@ Route::get('company-rate/{company}/{service}/{discount?}/{date?}', 'RateControll
   |--------------------------------------------------------------------------
  */
 
-Route::get('surcharges', 'SurchargesController@index');
+ Route::get('surcharges', 'SurchargesController@index');
 
-Route::get('surchargedetails', 'SurchargeDetailsController@index');
-Route::get('surchargedetails/{surcharge}/{company}/index', 'SurchargeDetailsController@index');
-Route::get('surchargedetails/{surcharge}/{company}/create', 'SurchargeDetailsController@create');
-Route::post('surchargedetails', 'SurchargeDetailsController@store');
-Route::get('surchargedetails/{surcharge}/{company}/edit', 'SurchargeDetailsController@edit');
-Route::patch('surchargedetails/{surcharge}', 'SurchargeDetailsController@update');
-Route::delete('surchargedetails/{surcharge}/{company}/delete', 'SurchargeDetailsController@destroy');
+ Route::get('surchargedetails', 'SurchargeDetailsController@index');
+ Route::get('surchargedetails/{surcharge}/{company}/index', 'SurchargeDetailsController@index');
+ Route::get('surchargedetails/{surcharge}/{company}/create', 'SurchargeDetailsController@create');
+ Route::post('surchargedetails/{surcharge}/{company}/create', 'SurchargeDetailsController@store');
+ Route::get('surchargedetails/{surcharge}/{company}/edit', 'SurchargeDetailsController@edit');
+ Route::patch('surchargedetails/{surcharge}', 'SurchargeDetailsController@update');
+ Route::delete('surchargedetails/{surcharge}/{company}/delete', 'SurchargeDetailsController@destroy');
 
 
 /*

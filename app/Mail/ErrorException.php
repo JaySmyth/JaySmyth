@@ -9,20 +9,18 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 
 class ErrorException extends Mailable
 {
+    use Queueable, SerializesModels;
 
-    use Queueable,
-        SerializesModels;
-
-    protected $exception;
+    public $content;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($exception)
+    public function __construct($content)
     {
-        $this->exception = $exception;
+        $this->content = $content;
     }
 
     /**
@@ -32,9 +30,6 @@ class ErrorException extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.errors.exception')
-                        ->subject('Application Error - exception caught')
-                        ->with(['exception' => $this->exception]);
+        return $this->view('emails.errors.exception')->subject('Exception Error - ship.ifsgroup.com')->with(['content' => $this->content]);
     }
-
 }
