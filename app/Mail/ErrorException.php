@@ -30,6 +30,6 @@ class ErrorException extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.errors.exception')->with(['content' => $this->content]);
+        return $this->view('emails.errors.exception')->subject('Exception Error - ship.ifsgroup.com')->with(['content' => $this->content]);
     }
 }
