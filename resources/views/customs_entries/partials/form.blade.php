@@ -25,7 +25,7 @@
         </label>
 
         <div class="col-sm-6">
-            {!! Form::Text('reference', old('reference'), ['id' => 'reference', 'class' => 'form-control', 'maxlength' => '20']) !!}
+            {!! Form::Text('reference', old('reference'), ['id' => 'reference', 'class' => 'form-control', 'maxlength' => '25']) !!}
 
             @if ($errors->has('reference'))
             <span class="form-text">
@@ -43,7 +43,7 @@
         </label>
 
         <div class="col-sm-6">
-            {!! Form::Text('consignment_number', old('consignment_number'), ['id' => 'consignment_number', 'class' => 'form-control', 'maxlength' => '20']) !!}
+            {!! Form::Text('consignment_number', old('consignment_number'), ['id' => 'consignment_number', 'class' => 'form-control', 'maxlength' => '25']) !!}
 
             @if ($errors->has('consignment_number'))
             <span class="form-text">
