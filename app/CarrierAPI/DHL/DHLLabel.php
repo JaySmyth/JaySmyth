@@ -26,6 +26,9 @@ class DHLLabel extends \App\CarrierAPI\CarrierLabel
         // Set the source data and get the number of pages in the PDF
         $pageCount = $this->pdf->setSourceData(base64_decode($this->data));
 
+        // Add Master Label (DHL puts at end)
+        $this->importPageFromTemplate($pageCount);
+
         // Add Package Labels
         for ($pageNumber = 1; $pageNumber <= $pageCount; $pageNumber++) {
             $this->importPageFromTemplate($pageNumber);
