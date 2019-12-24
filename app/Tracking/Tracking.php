@@ -28,19 +28,22 @@ abstract class Tracking
      */
     public function update()
     {
-
         $events = $this->getEvents();
 
-        foreach ($events as $event) {
+        if (is_array($events)) {
 
-            if (!$this->ignoreEvent($event)) {
+            foreach ($events as $event) {
 
-                $tracking = \App\Tracking::firstOrCreate(['message' => $event['message'], 'status' => $event['status'], 'shipment_id' => $this->shipment->id])->update($event);
+                if (!$this->ignoreEvent($event)) {
 
-                if ($tracking) {
-                    $this->processEvent($event);
+                    $tracking = \App\Tracking::firstOrCreate(['message' => $event['message'], 'status' => $event['status'], 'shipment_id' => $this->shipment->id])->update($event);
+
+                    if ($tracking) {
+                        $this->processEvent($event);
+                    }
                 }
             }
+
         }
 
         return true;
