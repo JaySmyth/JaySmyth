@@ -274,7 +274,7 @@ class DHL
                         ],
                     ],
                     "ShipTimestamp" => date('Y-m-d', time()) . 'T' . date('H:i:s', time() + 120) . 'GMT+00:00',
-                    "PaymentInfo" => strtoupper($this->shipment['terms_of_sale']),
+                    "PaymentInfo" => $this->getPaymentInfo(),
                     "Ship" => [
                         "Shipper" => [
                             "Contact" => [
@@ -315,6 +315,22 @@ class DHL
         // Enable once approved and obtain valid "ContentID" values from DHL
         //$this->addDangerousGoods();
     }
+
+
+    /**
+     * Get the payment type.
+     *
+     * @return string
+     */
+    protected function getPaymentInfo()
+    {
+        if ($this->shipment['bill_tax_duty'] == 'recipient') {
+            return 'DDU';
+        }
+
+        return strtoupper($this->shipment['terms_of_sale']);
+    }
+
 
     /**
      * Add address element.
