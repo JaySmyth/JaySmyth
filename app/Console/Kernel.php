@@ -101,7 +101,7 @@ class Kernel extends ConsoleKernel
          */
         $schedule->command('transend:send')->weekdays()->everyFiveMinutes()->between('7:10', '21:25')->withoutOverlapping(5);
         $schedule->command('transend:cancel')->weekdays()->everyFiveMinutes()->between('7:10', '21:25')->withoutOverlapping(5);
-        $schedule->command('transend:process-files')->weekdays()->everyFiveMinutes()->between('7:10', '21:25')->withoutOverlapping(5);
+        $schedule->command('transend:process-files')->weekdays()->everyTenMinutes()->between('7:10', '21:25')->withoutOverlapping(5);
 
         /*
          * Shipment related

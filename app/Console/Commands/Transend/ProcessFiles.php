@@ -115,7 +115,11 @@ class ProcessFiles extends Command
 
                     // File already exists in the archive - delete it
                     if (file_exists($this->directory . $this->archiveDirectory . '/' . $file)) {
-                        unlink($this->directory . $file);
+
+                        if (file_exists($this->directory . $file)) {
+                            unlink($this->directory . $file);
+                        }
+
                         Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('File already exists in archive directory', "$file already processed"));
                     } else {
                         $this->processFile($file);
