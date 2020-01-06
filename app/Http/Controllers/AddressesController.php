@@ -75,7 +75,7 @@ class AddressesController extends Controller
     public function create(Request $request)
     {
         if ($request->definition == 'sender' || $request->definition == 'recipient') {
-            return view('addresses.create', compact('addresses'));
+            return view('addresses.create');
         }
 
         \App::abort(404);
