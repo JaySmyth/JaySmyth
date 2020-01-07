@@ -57,7 +57,7 @@ class GenerateMultifreightSalesXml implements ShouldQueue
      */
     public function handle()
     {
-        if (count($this->shipments) == 0) {
+        if (empty($this->shipments)) {
             return true;
         }
 
