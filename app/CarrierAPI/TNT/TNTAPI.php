@@ -20,12 +20,14 @@ class TNTAPI extends \App\CarrierAPI\CarrierBase
      */
     public function preProcess($shipment)
     {
-        if ($shipment['bill_shipping_account'] == '') {
+        if (empty($shipment['bill_shipping_account']) && strtolower($shipment['bill_shipping']) == 'sender') {
             $shipment['bill_shipping_account'] = Service::find($shipment['service_id'])->account;
         }
-        if ($shipment['bill_tax_duty_account'] == '') {
+
+        if (empty($shipment['bill_tax_duty_account']) && strtolower($shipment['bill_tax_duty']) == 'sender') {
             $shipment['bill_tax_duty_account'] = Service::find($shipment['service_id'])->account;
         }
+
         return $shipment;
     }
 

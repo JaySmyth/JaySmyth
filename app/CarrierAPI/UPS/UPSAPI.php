@@ -42,7 +42,7 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
                 'pass' => 'tLniwtbP7',
                 // Access Key to use to connect to UPS
                 'key' => '4D132F25A427F478'
-            // Shipper, Billing and Duty Account numbers
+                // Shipper, Billing and Duty Account numbers
             ]
         ];
 
@@ -221,7 +221,7 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
 
         // Set payment information
         $upsShipment->setPaymentInformation(new \Ups\Entity\PaymentInformation(
-                $this->billTo[$shipment['bill_shipping']], (object) array('AccountNumber' => $shipment['bill_shipping_account'])
+            $this->billTo[$shipment['bill_shipping']], (object)array('AccountNumber' => $shipment['bill_shipping_account'])
         ));
 
         /*
@@ -248,12 +248,15 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
             $shipment['recipient_company_name'] = $shipment['recipient_name'];
             $shipment['recipient_name'] = '.';
         }
-        if (!isset($shipment['bill_shipping_account']) || $shipment['bill_shipping_account'] == '') {
+
+        if (empty($shipment['bill_shipping_account']) && strtolower($shipment['bill_shipping']) == 'sender') {
             $shipment['bill_shipping_account'] = Service::find($shipment['service_id'])->account;
         }
-        if (!isset($shipment['bill_tax_duty_account']) || $shipment['bill_tax_duty_account'] == '') {
+
+        if (empty($shipment['bill_tax_duty_account']) && strtolower($shipment['bill_tax_duty']) == 'sender') {
             $shipment['bill_tax_duty_account'] = Service::find($shipment['service_id'])->account;
         }
+
         if (isset($shipment['alcohol']['quantity']) && $shipment['alcohol']['quantity'] > 0) {
             $shipment['errors'][] = 'Carrier does not accept Alcohol';
         }
@@ -295,7 +298,7 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
 
         try {
             $api = new \Ups\Shipping(
-                    $this->account[strtoupper($this->mode)]['key'], $this->account[strtoupper($this->mode)]['id'], $this->account[strtoupper($this->mode)]['pass']
+                $this->account[strtoupper($this->mode)]['key'], $this->account[strtoupper($this->mode)]['id'], $this->account[strtoupper($this->mode)]['pass']
             );
 
             $confirm = $api->confirm(\Ups\Shipping::REQ_VALIDATE, $upsShipment, $labelSpecification);
