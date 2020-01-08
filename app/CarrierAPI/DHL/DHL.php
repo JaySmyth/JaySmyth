@@ -324,7 +324,7 @@ class DHL
      */
     protected function getPaymentInfo()
     {
-        if ($this->shipment['bill_tax_duty'] == 'recipient') {
+        if ($this->shipment['bill_tax_duty'] == 'recipient' || strtoupper($this->shipment['terms_of_sale']) == 'DAP') {
             return 'DDU';
         }
 
