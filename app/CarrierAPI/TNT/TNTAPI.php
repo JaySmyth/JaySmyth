@@ -41,7 +41,6 @@ class TNTAPI extends \App\CarrierAPI\CarrierBase
         $rules['bill_shipping'] = 'required|in:sender,recipient';
         $rules['bill_tax_duty'] = 'required|in:sender,recipient';
         $rules['bill_shipping_account'] = 'required';
-        $rules['bill_tax_duty_account'] = 'required';
         $rules['alcohol'] = 'not_supported';
         $rules['dry_ice'] = 'not_supported';
         $rules['hazardous'] = 'not_supported';
