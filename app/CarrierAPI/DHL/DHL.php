@@ -259,12 +259,7 @@ class DHL
                         "ServiceType" => $this->serviceType,
                         "Currency" => (!empty($this->shipment['currency_code'])) ? $this->shipment['currency_code'] : 'GBP',
                         "UnitOfMeasurement" => 'SI',
-                        "Billing" => [
-                            'ShipperAccountNumber' => $this->shipment['bill_shipping_account'],
-                            'ShippingPaymentType' => $this->paymentTypes[$this->shipment['bill_shipping']],
-                            'BillingAccountNumber' => $this->shipment['bill_shipping_account'],
-                            'DutyAndTaxPayerAccountNumber' => $this->shipment['bill_tax_duty_account']
-                        ],
+                        "Billing" => $this->addBilling(),
                         'LabelType' => 'PDF',
                         'LabelTemplate' => 'ECOM26_64_002',
                         'LabelOptions' => [
@@ -274,7 +269,7 @@ class DHL
                         ],
                     ],
                     "ShipTimestamp" => date('Y-m-d', time()) . 'T' . date('H:i:s', time() + 120) . 'GMT+00:00',
-                    "PaymentInfo" => $this->getPaymentInfo(),
+                    "PaymentInfo" => strtoupper($this->shipment['terms_of_sale']),
                     "Ship" => [
                         "Shipper" => [
                             "Contact" => [
@@ -318,17 +313,23 @@ class DHL
 
 
     /**
-     * Get the payment type.
+     * Get the billing element.
      *
-     * @return string
+     * @return array
      */
-    protected function getPaymentInfo()
+    protected function addBilling()
     {
-        if ($this->shipment['bill_tax_duty'] == 'recipient' || strtoupper($this->shipment['terms_of_sale']) == 'DAP') {
-            return 'DDU';
+        $billing = [
+            'ShipperAccountNumber' => $this->shipment['bill_shipping_account'],
+            'ShippingPaymentType' => $this->paymentTypes[$this->shipment['bill_shipping']],
+            'BillingAccountNumber' => $this->shipment['bill_shipping_account']
+        ];
+
+        if (!empty($this->shipment['bill_tax_duty_account'])) {
+            $billing['DutyAndTaxPayerAccountNumber'] = $this->shipment['bill_tax_duty_account'];
         }
 
-        return strtoupper($this->shipment['terms_of_sale']);
+        return $billing;
     }
 
 
