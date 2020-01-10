@@ -30,3 +30,4 @@ class AddPltEnabledToCompaniesTable extends Migration
         });
     }
 }
+
