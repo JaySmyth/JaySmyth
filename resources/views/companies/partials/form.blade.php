@@ -266,8 +266,6 @@
             </div>
         </div>
 
-        <div class="form-group row">&nbsp;</div>
-
         <div class="form-group row">
             <label class="col-sm-4  col-form-label">
                 Label Size: <abbr title="This information is required.">*</abbr>
@@ -302,6 +300,16 @@
 
         <div class="form-group row">
             <label class="col-sm-4  col-form-label">
+                Enable Paperless Trade: <abbr title="This information is required.">*</abbr>
+            </label>
+
+            <div class="col-sm-6">
+                {!! Form::select('plt_enabled', dropDown('boolean'), old('plt_enabled'), array('id' => 'plt_enabled', 'class' => 'form-control')) !!}
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-sm-4  col-form-label">
                 Localisation: <abbr title="This information is required.">*</abbr>
             </label>
 
@@ -309,8 +317,6 @@
                 {!! Form::select('localisation_id', dropDown('localisations'), old('localisation_id'), array('id' => 'localisation_id', 'class' => 'form-control')) !!}
             </div>
         </div>
-
-        <div class="form-group row">&nbsp;</div>
 
         <div class="form-group row{{ $errors->has('scs_code') ? ' has-danger' : '' }}">
             <label class="col-sm-4  col-form-label">SCS Code:

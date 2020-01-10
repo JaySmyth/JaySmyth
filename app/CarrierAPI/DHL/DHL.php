@@ -73,7 +73,9 @@ class DHL
     public function sendRequest()
     {
         // Send rate request first
-        $this->sendRateRequest();
+        if ($this->company->plt_enabled) {
+            $this->sendRateRequest();
+        }
 
         // Build an array to send as json to DHL
         $this->shipmentRequest();
