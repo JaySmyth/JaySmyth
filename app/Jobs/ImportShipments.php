@@ -316,7 +316,7 @@ class ImportShipments implements ShouldQueue
         $this->row['terms_of_sale'] = (empty($this->row['terms_of_sale'])) ? $this->importConfig->default_terms : $this->row['terms_of_sale'];
         $this->row['bill_shipping'] = (empty($this->row['bill_shipping'])) ? 'sender' : $this->row['bill_shipping'];
         $this->row['bill_tax_duty'] = (empty($this->row['bill_tax_duty'])) ? whoPaysDuty($this->row['terms_of_sale']) : $this->row['bill_tax_duty'];
-        $this->row['customs_value'] = (empty($this->row['customs_value']) || $this->row['customs_value'] < 1 || $this->row['customs_value'] == '') ? $this->importConfig->default_customs_value : $this->row['customs_value'];
+        $this->row['customs_value'] = $this->getCustomsValue();
         $this->row['goods_description'] = (empty($this->row['goods_description'])) ? $this->importConfig->default_goods_description : $this->row['goods_description'];
         $this->row['packaging_code'] = (empty($this->row['packaging_code'])) ? $this->company->getPackagingTypes(1)->first()->code : $this->row['packaging_code'];
         $this->row['documents_flag'] = (empty($this->row['documents_flag'])) ? false : $this->row['documents_flag'];
@@ -613,7 +613,7 @@ class ImportShipments implements ShouldQueue
             $this->row['contents'][0]['country_of_manufacture'] = $commodity->country_of_manufacture;
             $this->row['contents'][0]['quantity'] = $this->row['product_quantity'];
             $this->row['contents'][0]['uom'] = $commodity->uom;
-            $this->row['contents'][0]['unit_value'] = round($this->formatCustomsValue($this->row['customs_value']) / $this->row['product_quantity'], 2);
+            $this->row['contents'][0]['unit_value'] = round($this->row['customs_value'] / $this->row['product_quantity'], 2);
             $this->row['contents'][0]['currency_code'] = $commodity->currency_code;
             $this->row['contents'][0]['unit_weight'] = round($this->row['weight'] / $this->row['product_quantity'], 2);
             $this->row['contents'][0]['weight_uom'] = $commodity->weight_uom;
@@ -820,13 +820,14 @@ class ImportShipments implements ShouldQueue
      * @param $customsValue
      * @return float
      */
-    protected function formatCustomsValue($customsValue)
+    protected function getCustomsValue()
     {
-        if (!is_numeric($customsValue)) {
-            $customsValue = trim($customsValue);
+        $customsValue = (empty($this->row['customs_value']) || $this->row['customs_value'] < 1 || $this->row['customs_value'] == '') ? $this->importConfig->default_customs_value : trim($this->row['customs_value']);
 
-            return (float)str_replace(' ', '.', $customsValue);
+        if (!is_numeric($customsValue)) {
+             return (float)str_replace(' ', '.', $customsValue);
         }
+
         return $customsValue;
     }
 
