@@ -613,7 +613,7 @@ class ImportShipments implements ShouldQueue
             $this->row['contents'][0]['country_of_manufacture'] = $commodity->country_of_manufacture;
             $this->row['contents'][0]['quantity'] = $this->row['product_quantity'];
             $this->row['contents'][0]['uom'] = $commodity->uom;
-            $this->row['contents'][0]['unit_value'] = round($this->row['customs_value'] / $this->row['product_quantity'], 2);
+            $this->row['contents'][0]['unit_value'] = round($this->formatCustomsValue($this->row['customs_value']) / $this->row['product_quantity'], 2);
             $this->row['contents'][0]['currency_code'] = $commodity->currency_code;
             $this->row['contents'][0]['unit_weight'] = round($this->row['weight'] / $this->row['product_quantity'], 2);
             $this->row['contents'][0]['weight_uom'] = $commodity->weight_uom;
@@ -812,6 +812,22 @@ class ImportShipments implements ShouldQueue
 
         // Mail end user to notify thenm of an issue
         Mail::to($this->user->email)->cc($this->importConfig->cc_import_results_email ?: [])->bcc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Shipment Upload Failed', 'There was a problem with the file uploaded. Please check the values in the CSV file and try again.', $this->path));
+    }
+
+    /**
+     * Ensure numeric customs value.
+     *
+     * @param $customsValue
+     * @return float
+     */
+    protected function formatCustomsValue($customsValue)
+    {
+        if (!is_numeric($customsValue)) {
+            $customsValue = trim($customsValue);
+
+            return (float)str_replace(' ', '.', $customsValue);
+        }
+        return $customsValue;
     }
 
 }
