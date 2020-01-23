@@ -49,7 +49,7 @@ class ShipmentWarning extends Mailable
                 break;
 
             case "hazardous":
-                $subject = "Hazardous/Dry Ice Shipment detected";
+                $subject = "Hazardous/Dry Ice Shipment/Lithium Batteries detected";
                 break;
 
             case "insurance":

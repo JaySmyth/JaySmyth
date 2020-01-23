@@ -146,7 +146,9 @@ trait ShipmentAlerting
      */
     private function sendHazardousBooked()
     {
-        if (is_numeric($this->hazardous) || strtoupper($this->hazardous) == 'E' || $this->dry_ice_flag) {
+        $batteries = (!empty($this->lithium_batteries) && $this->lithium_batteries > 0) ? true : false;
+
+        if (is_numeric($this->hazardous) || strtoupper($this->hazardous) == 'E' || $this->dry_ice_flag || $batteries) {
             Mail::to('courier@antrim.ifsgroup.com')->queue(new \App\Mail\ShipmentWarning($this, 'hazardous'));
         }
     }
