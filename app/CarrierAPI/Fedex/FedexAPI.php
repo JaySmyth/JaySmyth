@@ -136,7 +136,6 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
 
     private function sendMessageToCarrier($message, $msgType)
     {
-
         $this->transactionHeader = $this->getData($message, 'transaction_id');
 
         $replyMsg = $this->transmitMessage($message);
@@ -148,7 +147,6 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
 
     public function transmitMessage($msg)
     {
-
         $seconds = 5;
         $milliseconds = 0;
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -350,14 +348,11 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
 
     public function createShipment($shipment)
     {
-
-
         $response = [];
         $shipment = $this->preProcess($shipment);
 
         $errors = $this->validateShipment($shipment);
         if ($errors != []) {
-
             return $this->generateErrorResponse($response, $errors);
         } else {
 
@@ -372,7 +367,6 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
                 // Request unsuccessful - return errors
                 return $this->generateErrorResponse($response, $reply[3]);
             } else {
-
                 $fedexRoute = new \App\FedexRoute();
                 $route_id = $fedexRoute->getRouteId($shipment);
 
@@ -397,7 +391,6 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
         $service = Company::find($shipment['company_id'])->services()->where("code", $shipment['service_code'])->where("carrier_id", "2")->first();
 
         if (!empty($service)) {
-
             if ($service->pivot->account > "") {
                 $shipment['sender_account'] = $service->pivot->account;
             } else {
@@ -419,17 +412,14 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
             $shipment['recipient_account'] = $shipment['bill_shipping_account'];
         }
 
-        // Fudge to set correct routing for Fedex
-        if (strtoupper($shipment['service_code']) == 'UK48') {
-            $shipment['sender_postcode'] = 'XY35';
-
-            // Don't send email address to FedEx as notificiations are 24HRS out
-            // $shipment['recipient_email'] = '';
-        }
-
         // Fudge for Guernsey & Jersey
         if (in_array(strtolower($shipment['recipient_country_code']), ['gg', 'je', 'im'])) {
             $shipment['recipient_country_code'] = 'gb';
+        }
+
+        // Fudge to set correct routing for Fedex
+        if (in_array(strtolower($shipment['service_code']), ['uk48', 'uk24'])) {
+            $shipment['sender_postcode'] = 'XY35';
         }
 
         // Setup Package Types
@@ -593,7 +583,6 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
 
     public function buildGROUP($data, $msgGroups)
     {
-
         $msgData = [];
 
         // Replace field names with correct "020 field numbers"
@@ -664,14 +653,12 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
                         case 'lithium_batteries':
 
                             if (is_numeric($value)) {
-
                                 $packages = $this->getData($data, 'packages');
                                 $numberOfPackages = count($packages);
 
                                 for ($i = 1; $i <= $numberOfPackages; $i++) {
                                     $msgData[$this->fedex->fldno['lithium_batteries'] . '-' . $i] = $value;
                                 }
-
                             }
 
                             break;
@@ -772,14 +759,14 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
                             }
                             break;
 
-                        case 'collection_date' :
+                        case 'collection_date':
                             // Change format
                             if ($value > '') {
                                 $msgData[$this->fedex->fldno[$key]] = Carbon::createFromFormat('Y-m-d', $this->getData($data, 'collection_date'))->format('Ymd');
                             }
                             break;
 
-                        case 'packages.*.weight' :
+                        case 'packages.*.weight':
                             $cnt = 1;
                             $packages = $this->getData($data, 'packages');
                             if ($packages > '') {
@@ -807,7 +794,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
                             }
                             break;
 
-                        case 'commercial_invoice_comments' :
+                        case 'commercial_invoice_comments':
 
                             $comments = $this->getData($data, 'commercial_invoice_comments');
                             if ($comments > '') {
@@ -856,7 +843,6 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
 
     private function getPayorCountry($data, $value)
     {
-
         $reply = '';
         switch (strtolower($value)) {
             case 'shipper':
@@ -916,7 +902,6 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
         $finished = false;
         $msg = '';
         foreach ($arrData as $arrKey => $arrValue) {
-
             if ($arrValue != '' && $arrValue != '!') {
                 $fldNoAbs = $this->getFldNo($arrKey);
                 $value = $this->multiplier($fldNoAbs, $arrValue, 'encode');
@@ -973,7 +958,6 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
 
     private function generatePdf($data, $serviceCode = '', $route_id, $splitServiceBox = false)
     {
-
         $label = new FedexLabel($data, $serviceCode, $this->connection['url'], $route_id, $splitServiceBox);
         return $label->create();
     }
@@ -1043,11 +1027,10 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
         curl_setopt($ch, CURLOPT_NOBODY, 1);
         curl_setopt($ch, CURLOPT_FAILONERROR, 1);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        if (curl_exec($ch) !== FALSE) {
+        if (curl_exec($ch) !== false) {
             return true;
         } else {
             return false;
         }
     }
-
 }
