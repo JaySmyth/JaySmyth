@@ -417,8 +417,8 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
             $shipment['recipient_country_code'] = 'gb';
         }
 
-        // Fudge to set correct routing for Fedex
-        if (in_array(strtolower($shipment['service_code']), ['uk48', 'uk24'])) {
+        // Fudge to set correct routing for Fedex UK shipments
+        if (strtoupper($shipment['sender_country_code']) == "GB" && strtoupper($shipment['recipient_country_code']) == "GB") {
             $shipment['sender_postcode'] = 'XY35';
         }
 
