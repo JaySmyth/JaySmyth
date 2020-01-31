@@ -34,10 +34,8 @@ class PricingZones extends Model
         }
 
         if (isset($data['ship_date'])) {
-
-            $criteria['ship_date'] = $data['ship_date'];
+            $criteria['ship_date'] = date('Y-m-d', strtotime($data['ship_date']));
         } else {
-
             $criteria['ship_date'] = date('Y-m-d');
         }
 
@@ -59,14 +57,12 @@ class PricingZones extends Model
         }
 
         if (isset($zone[0])) {
-            
             return $zone[0];
         } else {
-            
             return $zone;
         }
 
-        return NULL;
+        return null;
     }
 
     /**
@@ -109,9 +105,7 @@ class PricingZones extends Model
 
     public function scopeFindZones($query, $parameters)
     {
-
         foreach ($parameters as $parameter => $value) {
-
             if ($value > '') {
                 switch ($parameter) {
                     case 'sender_postcode':
@@ -134,5 +128,4 @@ class PricingZones extends Model
 
         return $query->orderBy('company_id', 'DESC')->orderBy('from_sender_postcode')->orderBy('from_recipient_postcode')->get();
     }
-
 }
