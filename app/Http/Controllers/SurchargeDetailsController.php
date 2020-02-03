@@ -12,6 +12,8 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class SurchargeDetailsController extends Controller
 {
+    private $companyId;
+    private $companyIds;
 
     /**
      * Create a new controller instance.
@@ -21,6 +23,17 @@ class SurchargeDetailsController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+    }
+
+    private function setCompanyIds($request)
+    {
+        if (isset($request->company) && $request->company > 0) {
+            $this->companyId = $request->company;
+            $this->companyIds = [0, $request->company];
+        } else {
+            $this->companyId = 0;
+            $this->companyIds = [0];
+        }
     }
 
     /**
@@ -33,29 +46,35 @@ class SurchargeDetailsController extends Controller
     {
         $this->authorize(new Surcharge);
         $title = "Surcharge Details";
-        $surcharges = $this->search($request);
+
+        $this->setCompanyIds($request);
+        $companyId = $this->companyId;
+
+        // Get Surcharge Details
+        $surcharges = SurchargeDetail::where('surcharge_id', $request->surcharge)
+        ->whereIn('company_id', $this->companyIds)
+        ->where('from_date', '<=', date('Y-m-d'))
+        ->where('to_date', '>=', date('Y-m-d'))
+        ->orderBy('name')
+        ->orderBy('to_date')
+        ->orderBy('company_id', 'desc')
+        ->get();
 
         /*
          * ****************************************
          * If Company specified then cycle through
-         * the charges and remove the default 
+         * the charges and remove the default
          * charge if company specific charge exists
          * Company charge will always appear first
          * ****************************************
          */
-        if (isset($request->company)) {
-            $companyId = $request->company;
-        } else {
-            $companyId = 0;
-        }
-        if ($surcharges) {
 
+        if ($surcharges) {
             $chargeCodes = [];
             foreach ($surcharges as $key => $surcharge) {
 
                 // If Charge already added then ignore
                 if (in_array($surcharge->code, $chargeCodes)) {
-
                     $surcharges->forget($key);
                 } else {
 
@@ -70,7 +89,6 @@ class SurchargeDetailsController extends Controller
 
     private function search($request, $paginate = true)
     {
-
         if (isset($request->effective_date)) {
             $effectiveDate = $request_date;
         } else {
@@ -85,7 +103,7 @@ class SurchargeDetailsController extends Controller
             ->filter($request->filter)
             ->hasSurcharge($request->surcharge);
 
-        if (isset($request->company)) {
+        if ($request->company > 0) {
             $query->whereIn('company_id', ['0', $request->company]);
         } else {
             $query->whereIn('company_id', ['0']);
@@ -109,10 +127,17 @@ class SurchargeDetailsController extends Controller
      */
     public function create(Surcharge $surcharge)
     {
-
         $this->authorize('index', new Surcharge);
 
-        return view('surcharge_details.create', compact('surcharge'));
+        // Can only get Surcharge Codes already configured
+        $surchargeCodes = SurchargeDetail::where('surcharge_id', $surcharge->id)
+        ->where('company_id', '0')
+        ->where('to_date', '>=', date('Y-m-d'))
+        ->orderBy('name')
+        ->orderBy('to_date')
+        ->pluck('name', 'id');
+
+        return view('surcharge_details.create', compact('surcharge', 'surchargeCodes'));
     }
 
     /**
@@ -123,30 +148,46 @@ class SurchargeDetailsController extends Controller
      */
     public function store(Request $request, $surcharge, $company)
     {
-
         $this->authorize('index', new Surcharge);
 
-        // Check to see if record already exists
+        // If no Company specified assume all - 0
+        $companyId = ($request->company_id == '') ? 0 : $request->company_id;
+
+        // Get charge name from default charge (company 0)
+        $surcharge = SurchargeDetail::where('code', $request->code)
+                ->where('surcharge_id', $request->surcharge_id)
+                ->where('company_id', '0')
+                ->first();
+
+        if ($surcharge) {
+            $request->name = $surcharge->name;
+        } else {
+            flash()->error('Failed!', "Sorry, default surcharge does not exist.", true);
+            return back();
+        }
+
+        // Check to see if record already exists covering this period
         $surchargeDetails = SurchargeDetail::where('code', $request->code)
             ->where('surcharge_id', $request->surcharge_id)
-            ->where('company_id', $request->company_id)
+            ->where('company_id', $companyId)
             ->where('to_date', '>=', $request->from_date)
             ->first();
 
+        // If it exists then close it off
         if ($surchargeDetails) {
-            flash()->error('Failed!', "Sorry, Surcharge already exists.", true);
-            return back();
-        } else {
-
-            // Get charge name from default charge (company 0)
-            $request->name = SurchargeDetail::where('code', $request->code)
-                ->where('surcharge_id', $request->surcharge_id)
-                ->where('company_id', '0')
-                ->first()->name;
-            SurchargeDetail::create($request->all());
-            flash()->success('Created!', 'Surcharge created successfully.');
-            return redirect("surchargedetails/$surcharge/$company/index");
+            $newToDate = date('Y-m-d', strtotime($request->from_date . ' -1 day'));
+            if ($surchargeDetails->from_date >= $newToDate) {
+                $surchargeDetails->delete();
+            } else {
+                $surchargeDetails->to_date =  $newToDate;
+                $surchargeDetails->save();
+            }
         }
+
+        // Finally create new surcharge detail record
+        SurchargeDetail::create($request->all());
+        flash()->success('Created!', 'Surcharge created successfully.');
+        return redirect("surchargedetails/$surcharge/$company/index");
     }
 
     /**
@@ -157,7 +198,6 @@ class SurchargeDetailsController extends Controller
      */
     public function edit(SurchargeDetail $surcharge)
     {
-
         $this->authorize('index', new Surcharge);
 
         return view('surcharge_details.edit', compact('surcharge'));
@@ -173,26 +213,39 @@ class SurchargeDetailsController extends Controller
     {
         $this->authorize('index', new Surcharge);
 
-        $surchargeDetails = SurchargeDetail::where('code', $request->code)
-            ->where('surcharge_id', $request->surcharge_id)
-            ->where('company_id', $request->company_id)
-            ->where('to_date', '>=', $request->from_date)
-            ->first();
+        $surchargeDetails = SurchargeDetail::find($request->charge_id);
 
-        // Close old Record
         if ($surchargeDetails) {
-            $surchargeDetails->to_date = Carbon::createFromformat('d-m-Y', $request->to_date)->addDay(-1)->format('Y-m-d');
+            $name = $surchargeDetails->name;
+
+            $closeDate = Carbon::createFromformat('d-m-Y', $request->from_date)->addDay(-1);
+            $fromDate = Carbon::createFromformat('d-m-Y', $request->from_date);
+
+            // Check for and remove any future records
+            SurchargeDetail::where('company_id', $request->company_id)
+                ->where('surcharge_id', $request->surcharge_id)
+                ->where('code', $request->code)
+                ->where('from_date', '>=', $fromDate->format('Y-m-d'))
+                ->where('to_date', '>=', $fromDate->format('Y-m-d'))
+                ->delete();
+
+            // Close old Record
+            $surchargeDetails->to_date = $closeDate->format('d-m-Y');
             $surchargeDetails->save();
+
+            // Add new record
+            $surcharge->create(array_merge($request->all(), ['name' => $name]));
+            flash()->success('Updated!', 'Surcharge updated successfully.');
+
+            $surchargeId = (isset($request->surcharge_id)) ? $request->surcharge_id : 0;
+            $companyId = (isset($request->company_id)) ? $request->company_id : 0;
+            $url = 'surchargedetails' . '/' . $surcharge->surcharge_id . '/' . $companyId . '/index';
+
+            return redirect($url);
         }
+        flash()->error('Failed!', "Sorry, surcharge not found.", true);
 
-        $surcharge->update($request->all());
-        flash()->success('Updated!', 'Surcharge updated successfully.');
-
-        $surchargeId = (isset($request->surcharge_id)) ? $request->surcharge_id : 0;
-        $companyId = (isset($request->company_id)) ? $request->company_id : 0;
-        $url = 'surchargedetails' . '/' . $surchargeId . '/' . $companyId . '/index';
-
-        return redirect($url);
+        return back();
     }
 
     /**
@@ -233,5 +286,4 @@ class SurchargeDetailsController extends Controller
 
         return Excel::download(new SurchargesExport($surcharges), 'surcharges.xlsx');
     }
-
 }

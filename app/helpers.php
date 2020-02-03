@@ -292,8 +292,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             $result = Auth::user()->depots()->pluck('name', 'id');
             break;
         case 'countries':
-            $result = App\Country::select('country', 'country_code')->orderBy('country')->pluck('country',
-                'country_code');
+            $result = App\Country::select('country', 'country_code')->orderBy('country')->pluck('country', 'country_code');
             break;
         case 'senderCountries':
             $result = ['GB' => 'UNITED KINGDOM', 'IE' => 'IRELAND', 'US' => 'UNITED STATES', 'CA' => 'CANADA'];
@@ -329,9 +328,8 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             $result = App\ManifestProfile::select('name', 'id')->pluck('name', 'id');
             break;
         case 'departments':
-            $result = App\Department::select('id',
-                DB::raw('CONCAT(name, " (", code, ")") AS department'))->orderBy('department')->pluck('department',
-                'id');
+            $result = App\Department::select('id', DB::raw('CONCAT(name, " (", code, ")") AS department'))
+                    ->orderBy('department')->pluck('department', 'id');
             break;
         case 'surchargeCategories':
             $result = App\Surcharge::select('name', 'id')->pluck('name', 'id');
@@ -346,8 +344,8 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             $result = App\Localisation::select('time_zone', 'id')->pluck('time_zone', 'id');
             break;
         case 'statuses':
-            $result = App\Status::select('name', 'id')->where('id', '>', 1)->where('id', '<', 13)->pluck('name',
-                'id')->toArray();
+            $result = App\Status::select('name', 'id')->where('id', '>', 1)
+                ->where('id', '<', 13)->pluck('name', 'id')->toArray();
             $result = array_add($result, 'S', 'Shipped (All except cancelled)');
             break;
         case 'uoms':
@@ -385,9 +383,8 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             break;
         case 'serviceIds':
             // $result = App\Service::select('carrier_name', 'id')->orderBy('carrier_name')->pluck('carrier_name', 'id');
-            $result = App\Service::select('id',
-                DB::raw('CONCAT(name, "/ ", carrier_name) AS carrier_name'))->orderBy('carrier_name')->pluck('carrier_name',
-                'id');
+            $result = App\Service::select('id', DB::raw('CONCAT(name, "/ ", carrier_name) AS carrier_name'))
+                    ->orderBy('carrier_name')->pluck('carrier_name', 'id');
             break;
         case 'shipReasons':
             $result = App\ShipReason::orderBy('id')->pluck('description', 'code');
@@ -396,9 +393,8 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             $result = App\CustomsProcedureCode::select('code', 'id')->orderBy('code')->pluck('code', 'id');
             break;
         case 'vehicles':
-            $result = App\Vehicle::select('id',
-                DB::raw('CONCAT(registration, " (", type, ")") AS vehicle'))->orderBy('vehicle')->pluck('vehicle',
-                'id');
+            $result = App\Vehicle::select('id', DB::raw('CONCAT(registration, " (", type, ")") AS vehicle'))
+                    ->orderBy('vehicle')->pluck('vehicle', 'id');
             break;
         case 'drivers':
             $result = App\Driver::select('name', 'id')->whereEnabled(1)->orderBy('name')->pluck('name', 'id');
@@ -504,11 +500,10 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             $result = [13 => 'Unmanifested', 14 => 'Manifested', 15 => 'Completed', 7 => 'Cancelled'];
             break;
         case 'standardSalesRates':
-            $result = App\Rate::where('rate_type', 's')->where('id', '<',
-                '1000')->orderBy('description')->pluck('description', 'id');
+            $result = App\Rate::where('rate_type', 's')->where('id', '<', '1000')
+                    ->orderBy('description')->pluck('description', 'id');
             break;
         case 'scsChargeCodes':
-
 
             $result = [
                 'AAR' => 'AAR - Alternative Address Request',
@@ -576,7 +571,7 @@ function getDates($start = '-6 months', $finish = '+3 months', $format = 'd-m-Y'
     $start = strtotime($start);
     $finish = strtotime($finish);
 
-    $i = 1;
+    $i = 0;
 
     do {
         $currentDate = $start + (86400 * $i);
@@ -718,7 +713,6 @@ function isDomestic($senderCountryCode, $recipientCountryCode)
 
     // Shipping within the UK
     if (isUkDomestic($senderCountryCode) && isUkDomestic($recipientCountryCode)) {
-
         return true;
     }
 
@@ -949,7 +943,6 @@ function getTimezone($countryCode, $state = false, $city = false)
 
     // Get timezone using country code
     if (!$timezone) {
-
         $countryTimezones = DateTimeZone::listIdentifiers(DateTimeZone::PER_COUNTRY, $countryCode);
 
         if (count($countryTimezones) > 0) {
@@ -989,12 +982,10 @@ function calcVat($countryCode, $valueOfGoods, $vatExempt)
             $vatDetails['vat_amount'] = 0;
             $vatDetails['vat_code'] = 'Z';
         } else {
-
             $percent = (float)VatCodes::where('code', '1')->first()->percent;
 
             // Goods are not Exempt
             if ($valueOfGoods > 0) {
-
                 $vatDetails['vat_amount'] = round(($valueOfGoods * $percent) / 100, 2);
                 $vatDetails['vat_code'] = '1';
             } else {
@@ -1075,24 +1066,31 @@ function isWithinEu($senderCountryCode, $recipientCountryCode)
  */
 function identifyDirection($shipment)
 {
-
     $customer_country_code = Company::find($shipment['company_id'])->country_code;
 
     // Shipper and Recipient in UK
     if ($shipment['sender_country_code'] == $shipment['recipient_country_code'] && $shipment['sender_country_code'] == "GB") {
-
-        if ((substr($shipment['sender_postcode'], 0, 2) == 'BT') && (substr($shipment['recipient_postcode'], 0,
-                    2) == 'BT')) {
+        if ((substr($shipment['sender_postcode'], 0, 2) == 'BT') && (substr(
+            $shipment['recipient_postcode'],
+            0,
+            2
+        ) == 'BT')) {
             $direction = "internal";
-        } elseif ((substr($shipment['sender_postcode'], 0, 2) == 'BT') && (substr($shipment['recipient_postcode'], 0,
-                    2) != 'BT')) {
+        } elseif ((substr($shipment['sender_postcode'], 0, 2) == 'BT') && (substr(
+            $shipment['recipient_postcode'],
+            0,
+            2
+        ) != 'BT')) {
             $direction = "export";
         } else {
             $direction = "import";
         }
     } else {
-        $direction = getDirection($customer_country_code, $shipment['sender_country_code'],
-            $shipment['recipient_country_code']);
+        $direction = getDirection(
+            $customer_country_code,
+            $shipment['sender_country_code'],
+            $shipment['recipient_country_code']
+        );
     }
 
     return $direction;
@@ -1125,7 +1123,6 @@ function getDirection($homeCountry, $fromCountry, $toCountry)
  */
 function identifyDepartment($shipment)
 {
-
     $direction = identifyDirection($shipment);
 
     if ($direction == "unknown") {
@@ -1246,13 +1243,12 @@ function getProgressBarColour($statusCode)
  */
 function nextAvailable($sequenceType)
 {
-
     $seq = 0;
 
     /*
      * *********************************************************
      * Bracket as transaction and lock record within a callback
-     * 
+     *
      * Note: lock only works within a transaction
      * *********************************************************
      */
@@ -1363,7 +1359,6 @@ function getLegacyTestingStatus($testing)
 
 function convertBillToCountryToLegacy($billTo, $senderCountryCode, $recipientCountryCode)
 {
-
     switch ($billTo) {
         case 'sender':
             return $senderCountryCode;
@@ -1691,8 +1686,10 @@ function convertLegacyManifestNumber($manifestNumber, $domestic)
     }
 
     if ($domestic) {
-        $manifest = App\Manifest::whereNumber($manifestNumber)->whereIn('manifest_profile_id',
-            [3, 7, 9, 8, 11, 5, 6])->first();
+        $manifest = App\Manifest::whereNumber($manifestNumber)->whereIn(
+            'manifest_profile_id',
+            [3, 7, 9, 8, 11, 5, 6]
+        )->first();
     } else {
         $manifest = App\Manifest::whereNumber($manifestNumber)->whereIn('manifest_profile_id', [1, 2, 12, 4])->first();
     }
@@ -1712,9 +1709,7 @@ function convertLegacyManifestNumber($manifestNumber, $domestic)
  */
 function consolidateCharges($charges)
 {
-
     foreach ($charges as $charge) {
-
         $code = $charge['code'];
 
         if ($code == 'DISC') {
@@ -1734,7 +1729,6 @@ function consolidateCharges($charges)
 
     if (!empty($sumCharges)) {
         foreach ($sumCharges as $code => $charge) {
-
             $charges[] = ['code' => $code, 'description' => $charge['description'], 'value' => $charge['value']];
         }
     }
@@ -1786,7 +1780,6 @@ function calcVolume($length, $width, $height, $divisor = 5000)
 
 function whoPaysDuty($terms)
 {
-
     $terms = strtoupper($terms);
     $whoPaysDuty = [
         "EXW" => "recipient",
@@ -1799,7 +1792,6 @@ function whoPaysDuty($terms)
     ];
 
     if (array_key_exists($terms, $whoPaysDuty)) {
-
         return $whoPaysDuty[$terms];
     }
 
@@ -1808,7 +1800,6 @@ function whoPaysDuty($terms)
 
 function calcDiscPercentage($currentVal, $uploadedVal)
 {
-
     $discount = 0;
     if ($currentVal <> 0) {
         $discount = (($currentVal - $uploadedVal) / $currentVal) * 100;
@@ -1816,7 +1807,6 @@ function calcDiscPercentage($currentVal, $uploadedVal)
 
     // Ignore small differences
     if (abs($discount) < .3) {
-
         $discount = 0;
     }
 
@@ -1857,10 +1847,8 @@ function logRateChange($userId, $companyId, $serviceId, $rateId, $directory = ''
  */
 function rawToSql($sql, $params = [])
 {
-
     $quote = '"';
     foreach ($params as $key => $value) {
-
         $sql = str_ireplace(":$key", $quote . $value . $quote, $sql);
     }
 

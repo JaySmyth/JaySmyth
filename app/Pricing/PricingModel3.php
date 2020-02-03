@@ -38,8 +38,8 @@ class PricingModel3 extends PricingModel
     {
         parent::__construct();
 
-        $this->maxStdDimension = 122;
-        $this->maxStdWeight = 32;
+        $this->maxStdDimension = 99;
+        $this->maxStdWeight = 68;
         $this->lowerMaxGirth = 300;
         $this->upperMaxGirth = 400;
 
