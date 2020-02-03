@@ -5,7 +5,6 @@
 <h2>Edit Surcharge: {{$surcharge->name}} - {{$surcharge->code}} </h2>
 
 <hr>
-
 {!! Form::model($surcharge, ['method' => 'POST', 'url' => ['surchargedetails', $surcharge->id], 'class' => '', 'autocomplete' => 'off']) !!}
 
 {{ method_field('PATCH') }}

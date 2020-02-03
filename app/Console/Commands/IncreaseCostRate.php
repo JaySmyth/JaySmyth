@@ -12,7 +12,7 @@ class IncreaseCostRate extends Command
      *
      * @var string
      */
-    protected $signature = 'ifs:increase-cost-rate {rateId} {percentage} {fromDate?}';
+    protected $signature = 'ifs:increase-cost-rate {rateId?} {percentage?} {fromDate?}';
 
     /**
      * The console command description.
@@ -22,11 +22,14 @@ class IncreaseCostRate extends Command
     protected $description = 'Increase Cost Rate';
 
     protected $rate;
+    protected $rateId;
     protected $increasePercentage;
     protected $multiplier;
     protected $fromDate;
     protected $toDate;
     protected $endDate;
+    protected $error = false;
+
 
     /**
      * Create a new command instance.
@@ -48,30 +51,58 @@ class IncreaseCostRate extends Command
      */
     public function handle()
     {
-        $rateId = $this->argument('rateId');
+        $this->rateId = $this->argument('rateId');
         $this->increasePercentage = $this->argument('percentage');
         $this->setDates($this->argument('fromDate'));
-        $this->multiplier = 1 + $this->increasePercentage / 100;
-        $this->rate = \App\Rate::find($rateId);
-        $this->checkPercentage();
-        $this->checkAbleToIncrease();
-        $this->info("");
-        $this->info("Increasing rate $rateId by " . $this->increasePercentage . "%");
-        $this->info("Please wait, this may take a while...");
+        if ($this->checkInput()) {
+            $this->multiplier = 1 + $this->increasePercentage / 100;
+            $this->rate = \App\Rate::find($this->rateId);
+            if ($this->rate) {
+                $this->checkAbleToIncrease();
+                $this->info("");
+                $this->info("Increasing rate " . $this->rateId . " by " . $this->increasePercentage . "%");
+                $this->info("Please wait, this may take a while...");
 
-        $this->info("    FromDate: ".$this->fromDate);
-        $this->info("    ToDate:   ".$this->toDate);
-        $this->info("    EndDate:  ".$this->endDate);
+                $this->info("    FromDate: ".$this->fromDate);
+                $this->info("    ToDate:   ".$this->toDate);
+                $this->info("    EndDate:  ".$this->endDate);
 
-        if ($this->rate->model == 'domestic') {
-            $this->info("Increasing Domestic Rate");
-            $this->increaseDomesticRates();
+                if ($this->rate->model == 'domestic') {
+                    $this->info("Increasing Domestic Rate");
+                    $this->increaseDomesticRates();
+                } else {
+                    $this->info("Increasing International Rate");
+                    $this->increaseIntlRates();
+                }
+                $this->info("Rates Increased Successfully");
+                $this->info("");
+            }
         } else {
-            $this->info("Increasing International Rate");
-            $this->increaseIntlRates();
+            $this->displayHelp();
         }
-        $this->info("Rates Increased Successfully");
-        $this->info("");
+
+        if ($this->error) {
+            $this->closeError();
+        }
+    }
+
+    protected function checkInput()
+    {
+        $this->checkRateId();
+        $this->checkPercentage();
+
+        // Format date
+        if ($this->argument('fromDate') && $this->check_date($this->argument('fromDate'), 'Y-m-d', 'UTC')) {
+            $this->checkDate = date('Y-m-d', strtotime($this->argument('fromDate')));
+        }
+
+        return true;
+    }
+
+    public function check_date($str_dt, $str_dateformat, $str_timezone)
+    {
+        $date = DateTime::createFromFormat($str_dateformat, $str_dt, new DateTimeZone($str_timezone));
+        return $date && DateTime::getLastErrors()['warning_count'] == 0 && DateTime::getLastErrors()['error_count'] == 0;
     }
 
     public function setDates($fromDate = '')
@@ -111,28 +142,28 @@ class IncreaseCostRate extends Command
 
     protected function invalidDate()
     {
-        $blank = "                                                                 ";
+        $blank =     "                                                                                       ";
         $this->error($blank);
-        $this->error("  Unable to perform Increase.                                    ");
+        $this->error("  Unable to perform Increase.                                                          ");
         $this->error($blank);
-        $this->error("  Date is invalid. Required in format YYYY-mm-dd                 ");
+        $this->error("  Date is invalid. Required in format YYYY-mm-dd                                       ");
         $this->error($blank);
-        $this->error("  Please correct and try again.                                  ");
+        $this->error("  Please correct and try again.                                                        ");
         $this->error($blank);
         exit();
     }
 
     protected function unableToApplyIncrease($table)
     {
-        $blank = "                                                                 ";
+        $blank =     "                                                                                      ";
         $this->error($blank);
-        $this->error("  Unable to perform Increase.                                    ");
+        $this->error("  Unable to perform Increase.                                                         ");
         $this->error($blank);
-        $this->error("  Rate: " . $this->rate->id . " already contains rates for all or part of the period   ");
+        $this->error("  Rate: " . $this->rate->id . " already contains rates for all or part of the period                       ");
         $this->error($blank);
-        $this->error("                    " . $this->fromDate . ' to ' . $this->toDate . '                     ');
+        $this->error("                    " . $this->fromDate . ' to ' . $this->toDate . '                                          ');
         $this->error($blank);
-        $this->error("  Please remove these rates and try again.                       ");
+        $this->error("  Please remove these rates and try again.                                            ");
         $this->error($blank);
         exit();
     }
@@ -145,18 +176,23 @@ class IncreaseCostRate extends Command
             }
         }
 
-        $blank = "                                                                               ";
-        $this->error($blank);
-        $this->error("  Invalid Percentage.                                                          ");
-        $this->error($blank);
-        $this->error("  Please enter command in the following format                                 ");
-        $this->error($blank);
-        $this->error("      php artisan ifs:perform-rate-increase {rateId} {percentage} {fromDate?}  ");
-        $this->error($blank);
-        $this->error("  e.g.                                                                         ");
-        $this->error($blank);
-        $this->error("      php artisan ifs:perform-rate-increase 3.5                                ");
-        $this->error($blank);
+        $this->error("  Invalid Percentage.                                                                 ");
+        $this->error = true;
+    }
+
+    protected function checkRateId()
+    {
+        if ($this->rate) {
+            return;
+        }
+
+        $this->error("  Invalid RateId.                                                                     ");
+        $this->error = true;
+    }
+
+    protected function closeError()
+    {
+        $this->displayhelp();
         exit();
     }
 
@@ -231,5 +267,24 @@ class IncreaseCostRate extends Command
         $message .= " effective " . $this->fromDate . ". These rates will remain active until " . $this->toDate . " unless further changes are applied.\n\n";
 
         mail($this->contactEmail, $subject, $message);
+    }
+
+    protected function displayhelp()
+    {
+        $blank =     "                                                                                      ";
+        $this->error($blank);
+        $this->error("  Please enter command in the following format                                        ");
+        $this->error($blank);
+        $this->error("      php artisan ifs:increase-cost-rate {rate_id} {percentage} {Date Effective From?}");
+        $this->error($blank);
+        $this->error("  e.g.                                                                                ");
+        $this->error($blank);
+        $this->error("      php artisan ifs:increase-cost-rate 10 3.5 2020-01-06                            ");
+        $this->error("      php artisan ifs:increase-cost-rate 10 3.5     (defaults to 01 Jan next year)    ");
+        $this->error($blank);
+        $this->error("      rate_id must be an integer and valid rate_id.                                   ");
+        $this->error("      percentage must be a positive number greater than zero and less than 5          ");
+        $this->error("      Date Effective from must be a valid date in format 2020-01-06                   ");
+        $this->error($blank);
     }
 }

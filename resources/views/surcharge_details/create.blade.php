@@ -6,7 +6,7 @@
 
 <hr>
 
-{!! Form::Open(['url' => ['surchargedetails', $surcharge->id], 'class' => '', 'autocomplete' => 'off']) !!}
+{!! Form::Model(['url' => ['surchargedetails', $surcharge->id], 'class' => '', 'autocomplete' => 'off']) !!}
 
 @include('surcharge_details.partials.form', ['submitButtonText' => 'Create Charge'])
 
