@@ -24,23 +24,19 @@ use Illuminate\Http\Request;
 
 class RateController extends Controller
 {
-
     public function index()
     {
-
         $rates = Rate::orderBy("rate_type")->orderBy("model")->orderBy("description")->get();
         return view('rates.index', compact("rates"));
     }
 
     public function showRate(Rate $rate, $rateDate = '')
     {
-
         $charges = [];
         if ($rateDate == '') {
             $rateDate = date('Y-m-d');
         }
         if ($rate) {
-
             if (strtolower($rate->model) == 'domestic') {
                 $rateTable = DomesticRate::where('rate_id', $rate->id)->where('from_date', '<=', $rateDate)->where('to_date', '>=', $rateDate)->get();
             } else {
@@ -51,29 +47,24 @@ class RateController extends Controller
             $table = $companyRates->formatRateTable($rate, 0, $rateTable);
             $tableFormat = $rate->model;
             if ($tableFormat == "domestic") {
-
                 $domesticRate = new DomesticRate();
                 $zones = $domesticRate->getZones($rate, $rateDate);
 
                 return view('rates.show_' . $tableFormat, compact("tableFormat", "rate", "table", "zones", "charges"));
             } else {
-
                 $intlRate = new RateDetail();
                 $zones = $intlRate->getZones($rate, $rateDate);
 
                 return view('rates.show_intl', compact("tableFormat", "rate", "table", "zones", "charges"));
             }
         } else {
-
             return view('errors.404');
         }
     }
 
     public function showCompanyRate(Company $company, Service $service, $discount = 0, $shipDate = null)
     {
-
         if ($service) {
-
             if (is_null($shipDate)) {
                 $shipDate = Carbon::today()->toDateString('Y-m-d');
             } else {
@@ -82,17 +73,16 @@ class RateController extends Controller
 
             $rateInfo = $company->salesRateForService($service->id);
             $rate = Rate::find($rateInfo['id']);
-            if ($rate->model == 'domestic') {
-
-                return $rate->getRateView($company, '', $discount, $shipDate);
-            } else {
-
-                return $rate->getRateView($company, $service, $discount, $shipDate);
+            if ($rate) {
+                if ($rate->model == 'domestic') {
+                    return $rate->getRateView($company, '', $discount, $shipDate);
+                } else {
+                    return $rate->getRateView($company, $service, $discount, $shipDate);
+                }
             }
-        } else {
-
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -111,7 +101,6 @@ class RateController extends Controller
 
         //$companyList = $companies::where('legacy', '1')->orderBy('id')->get();
         foreach ($companyList as $company) {
-
             echo "********************************<br>";
             echo "* Migrating Company : " . $company->id . "<br>";
             echo "********************************<br>";
@@ -125,12 +114,11 @@ class RateController extends Controller
      * a company and Migrates them to the new system
      * as a table of discounts on a standard rate.
      * **********************************************
-     * 
+     *
      * @param type $Company
      */
     public function migrateAllRates(Company $company)
     {
-
         ini_set('memory_limit', '384M');
         set_time_limit(300);
         if ($company) {
@@ -152,7 +140,6 @@ class RateController extends Controller
                     // $rate = RateDiscount::where('company_id', $company->id)->delete();
                     // Cycle through each service and migrate it.
                     foreach ($customerServices as $service) {
-
                         $this->doMigration($oldCompany, $service);
                     }
                 }
@@ -164,13 +151,12 @@ class RateController extends Controller
      * Given the service, create the appropriate objects
      * to allow migration of the legacy rate to the
      * new system and then initiate the migration
-     * 
+     *
      * @param type $company
      * @param type $service
      */
     public function doMigration($company, $service)
     {
-
         if ($service->app == 'courierUK') {
 
             // Domestic Services
@@ -197,10 +183,10 @@ class RateController extends Controller
     }
 
     /**
-     * Get all information necessary to start the 
+     * Get all information necessary to start the
      * migration. Migrate the rate, and enable the
      * service for the Company
-     * 
+     *
      * @param type $company
      * @param type $legacyService
      * @param type $rate
@@ -208,8 +194,6 @@ class RateController extends Controller
      */
     public function migrateRate($company, $legacyService, $rate)
     {
-
-
         $carrierId = $legacyService->getCarrierId();
         $currentRate = $rate->readLegacyRate($company, $legacyService);
 
@@ -228,7 +212,6 @@ class RateController extends Controller
 
                 // Migrate the rate and enable the service for the company
                 if ($rate->migrate($company, $currentRate, $newRateId, $newService)) {
-
                     $this->displayStatus('Migrated', $company, $legacyService);
 
                     if (strtoupper($legacyService->service) == 'UK48') {
@@ -239,11 +222,9 @@ class RateController extends Controller
                         $service->find(3)->enableForCompany($company->company, $newRateId);
                         $service->find(19)->enableForCompany($company->company, $newRateId);
                     } else {
-
                         return $newService->enableForCompany($company->company, $newRateId);
                     }
                 } else {
-
                     $this->displayStatus('Failed', $company, $legacyService);
                     return false;
                 }
@@ -255,14 +236,13 @@ class RateController extends Controller
 
     /**
      * Display Status, Carrier & Service for the given company
-     * 
+     *
      * @param type $status
      * @param type $company
      * @param type $legacyService
      */
     public function displayStatus($status, $company, $legacyService)
     {
-
         echo "Company : " . $company->company
         . ' Service : ' . $legacyService->service
         . ' Carrier : ' . $legacyService->gateway
@@ -273,14 +253,13 @@ class RateController extends Controller
     /**
      * Given Legacy tableName and Service identify
      * the correct base table to use on the new system
-     * 
+     *
      * @param type $tableName
      * @param type $rateType
      * @return int
      */
     public function getRateId($company, $legacyService, $newService)
     {
-
         $stdRates = [
             'CUKA' => 500, 'CUKB' => 501, 'CUKC' => 502, 'CUKD' => 503,
             'CUK24_1' => 710, 'CUK24_2' => 711, 'CUK24_3' => 712, 'CUK24_4' => 713, 'CUK24_5' => 714,
@@ -303,7 +282,6 @@ class RateController extends Controller
 
     public function getRateTableName($company, $legacyService)
     {
-
         if ($legacyService->app == 'courierUK') {
 
             // Domestic Service
@@ -377,7 +355,6 @@ class RateController extends Controller
 
         // Import csv file
         if ($request->hasFile('file')) {
-
             $array = array_map('str_getcsv', file(storage_path('app/' . $path)));
             $keys = $array[0];
             unset($array[0]);
@@ -403,7 +380,6 @@ class RateController extends Controller
             flash()->error('File Failed!', $errors);
             return back();
         } else {
-
             if ($rate->model == "domestic") {
 
                 // Identify all domestic rates
@@ -423,14 +399,16 @@ class RateController extends Controller
 
                 // Set base rate for International service
                 CompanyRates::updateOrCreate(
-                        [
+                    [
                     'company_id' => $companyId,
                     'service_id' => $serviceId
-                        ], [
+                        ],
+                    [
                     'rate_id' => $request->rate_id,
                     'discount' => 0,
                     'special_discount' => 1
-                ]);
+                ]
+                );
             }
 
             // Update log
@@ -444,22 +422,19 @@ class RateController extends Controller
 
     /**
      * Download rate - excel.
-     * 
+     *
      * @param Company $company
      * @param Service $service
      * @param type $effectiveDate
-     * 
+     *
      * @return Excel document
      */
     public function downloadCompanyRate(Company $company, Service $service, $effectiveDate = '', $download = true)
     {
-
         if ($service) {
-
             $effectiveDate = ($effectiveDate) ? $effectiveDate : Carbon::today()->toDateString();
             $rateInfo = $company->salesRateForService($service->id);
             if (isset($rateInfo['id']) && isset($rateInfo['discount'])) {
-
                 $rate = Rate::find($rateInfo['id']);
                 if ($rate) {
                     return $rate->downloadCompanyRate($company, $service, $rateInfo['discount'], $effectiveDate, $download);
@@ -481,20 +456,16 @@ class RateController extends Controller
 
     public function revertCompanyRates(Request $request)
     {
-
         $errors = [];
         if (Carbon::parse($request->effectiveDate)->gt(Carbon::parse($request->revertToDate))) {
-
             $company = Company::find($request->company_id);
             if ($company) {
-
                 $effectiveDate = Carbon::parse($request->effectiveDate)->format("Y-m-d");
                 $revertToDate = Carbon::parse($request->revertToDate)->format("Y-m-d");
                 $discount = $request->discount;
 
                 // Cycle through each of the companies services reverting rates
                 foreach ($company->services as $service) {
-
                     $errors = $this->revertRate($company, $service, $effectiveDate, $revertToDate, $discount);
                     if ($errors != []) {
                         echo "Errors in processing upload<br>";
@@ -511,7 +482,7 @@ class RateController extends Controller
      * ***************************************
      * Revert rate to a previous date
      * ***************************************
-     * 
+     *
      */
 
     public function revertRate(Company $company, Service $service, $effectiveDate = '', $revertToDate = '', $discount = 0)
@@ -549,5 +520,4 @@ class RateController extends Controller
                 break;
         }
     }
-
 }
