@@ -315,13 +315,13 @@ class CompanyRates extends Model
         $rate = Rate::find($rateId);
         if ($rate) {
             if (strtolower($rate->model) == 'domestic') {
-                $companyrates = CompanyRates::where('company_id', $companyId)->where('rate_id', $rateId)->get();
+                return CompanyRates::where('company_id', $companyId)->where('rate_id', $rateId)->get();
             } else {
-                $companyrates = CompanyRates::where('company_id', $companyId)->where('service_id', $serviceId)->get();
+                return CompanyRates::where('company_id', $companyId)->where('service_id', $serviceId)->get();
             }
         }
 
-        return $companyrates;
+        return null;
     }
 
     public function closeRateDiscounts($companyId, $rateId = '', $serviceId = '', $effectiveDate = '')
