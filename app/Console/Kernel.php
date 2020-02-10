@@ -146,7 +146,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:close-stagnant-transport-jobs')->dailyAt('05:35');
         $schedule->command('ifs:correct-status-on-transport-jobs')->dailyAt('05:38');
         $schedule->command('ifs:notify-transport-department-pod-required')->weekdays()->dailyAt('09:20');
-        $schedule->command('ifs:log-scanning-kpis')->weekdays()->dailyAt('09:30');
+        $schedule->command('ifs:log-scanning-kpis')->weekdays()->dailyAt('09:00');
 
         /**
          * Express Freight
