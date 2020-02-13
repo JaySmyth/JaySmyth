@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use Illuminate\Support\Str;
 use App\PurchaseInvoice;
 use App\User;
 use Illuminate\Bus\Queueable;
@@ -11,6 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ExportPurchaseInvoices implements ShouldQueue
 {

@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Str;
 use App\Address;
 use App\Http\Requests;
 use App\Http\Requests\AddressRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Response;
 
 class AddressesController extends Controller

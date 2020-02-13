@@ -2,8 +2,8 @@
 
 namespace App\CarrierAPI\TNT;
 
-use Illuminate\Support\Str;
 use App\Service;
+use Illuminate\Support\Str;
 use SimpleXMLElement;
 
 class TNT

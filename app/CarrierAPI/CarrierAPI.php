@@ -9,8 +9,6 @@
 
 namespace App\CarrierAPI;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use App;
 use App\CarrierAPI\APIShipment;
 use App\CarrierAPI\CWide\CWideAPI;
@@ -37,6 +35,8 @@ use App\State;
 use Carbon\Carbon;
 use DB;
 use Exception;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use TCPDI;
 
 /**

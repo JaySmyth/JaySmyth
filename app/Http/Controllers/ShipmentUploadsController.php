@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Arr;
 use App\ShipmentUpload;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class ShipmentUploadsController extends Controller
 {

@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use App\Company;
 use App\CompanyRates;
 use App\Http\Controllers\Controller;
@@ -11,9 +9,11 @@ use App\Http\Requests\CompanyRequest;
 use App\Rate;
 use App\Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use Validator;
 

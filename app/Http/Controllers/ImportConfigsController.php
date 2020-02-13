@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Str;
 use App\Http\Requests\ImportConfigRequest;
 use App\ImportConfig;
 use Faker\Generator as Faker;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ImportConfigsController extends Controller

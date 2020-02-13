@@ -2,12 +2,12 @@
 
 namespace App\Console\Commands\PurchaseInvoices;
 
-use Illuminate\Support\Str;
 use App\PurchaseInvoice;
 use App\PurchaseInvoiceCharge;
 use App\PurchaseInvoiceLine;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Sftp\SftpAdapter;
 

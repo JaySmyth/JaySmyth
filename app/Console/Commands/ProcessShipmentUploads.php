@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Support\Str;
 use App\ShipmentUpload;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 
 class ProcessShipmentUploads extends Command
 {

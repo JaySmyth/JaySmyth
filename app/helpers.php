@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Arr;
 use App\Company;
 use App\Country;
 use App\Postcode;
@@ -8,6 +7,7 @@ use App\State;
 use App\User;
 use App\VatCodes;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 
 /**
  * Return flash messaging class.

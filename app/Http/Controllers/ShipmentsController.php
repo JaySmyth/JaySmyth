@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use App\CarrierAPI\Facades\CarrierAPI;
 use App\CarrierAPI\Pdf;
 use App\Company;
@@ -21,8 +19,10 @@ use App\User;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ShipmentsController extends Controller

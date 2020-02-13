@@ -2,7 +2,6 @@
 
 namespace App;
 
-use Illuminate\Support\Str;
 use App\Country;
 use App\Legacy\FukShipment;
 use App\Mail\GenericError;
@@ -11,6 +10,7 @@ use App\Pricing\Pricing;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Spatie\PdfToImage\Pdf;
 
 class Shipment extends Model

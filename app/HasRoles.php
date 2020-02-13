@@ -58,7 +58,7 @@ trait HasRoles
      * Determine if the user has the given role.
      *
      * @param  mixed $role
-     * @return boolean
+     * @return bool
      */
     public function hasRole($role)
     {
@@ -73,7 +73,7 @@ trait HasRoles
      * Determine if the user may perform the given permission.
      *
      * @param  Permission $permission
-     * @return boolean
+     * @return bool
      */
     public function hasPermission($permission)
     {
@@ -92,7 +92,7 @@ trait HasRoles
      * Determine if the user is an IFS user. The user must have
      * an IFS group email address and at least one IFS role.
      *
-     * @return boolean
+     * @return bool
      */
     public function hasIfsRole()
     {
@@ -113,7 +113,7 @@ trait HasRoles
     /**
      * Determine if the user has more than one shipping role available (courier, air etc.).
      *
-     * @return boolean
+     * @return bool
      */
     public function hasMultipleModes()
     {
@@ -335,7 +335,7 @@ trait HasRoles
      * Determine if a user is associated with a given depot.
      *
      * @param type $depotId
-     * @return boolean
+     * @return bool
      */
     public function hasDepot($depotId)
     {
@@ -348,7 +348,7 @@ trait HasRoles
      * Determines if a user is associated with a given model by comparing
      * the user's list of allowed company ids with the model's company id.
      *
-     * @return boolean
+     * @return bool
      */
     public function relatedTo($related)
     {
@@ -380,7 +380,7 @@ trait HasRoles
     /**
      * Check if a user has more than one company.
      *
-     * @return boolean
+     * @return bool
      */
     public function hasMultipleCompanies()
     {
@@ -394,7 +394,7 @@ trait HasRoles
     /**
      * Check if a user has more than one company.
      *
-     * @return boolean
+     * @return bool
      */
     public function hasMultipleImportConfigs()
     {
@@ -408,7 +408,7 @@ trait HasRoles
     /**
      * Check if a user has more than one depot.
      *
-     * @return boolean
+     * @return bool
      */
     public function hasMultipleDepots()
     {
@@ -422,7 +422,7 @@ trait HasRoles
     /**
      * Check if a user has at least one shipping mode enabled.
      *
-     * @return boolean
+     * @return bool
      */
     public function hasAtLeastOneMode()
     {
@@ -462,7 +462,7 @@ trait HasRoles
     /**
      * Check if the user is able to upload shipments.
      *
-     * @return boolean
+     * @return bool
      */
     public function canUploadShipments()
     {

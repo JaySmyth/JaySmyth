@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Str;
 use App\Carrier;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TrackingRequest;
@@ -10,6 +9,7 @@ use App\Shipment;
 use App\Tracking;
 use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class TrackingController extends Controller
 {

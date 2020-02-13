@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Arr;
 use App\CarrierAPI\Pdf;
 use App\Http\Requests\QuotationRequest;
 use App\Quotation;
 use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class QuotationsController extends Controller
 {
