@@ -9,7 +9,7 @@
         Description, part number or commodity code:
     </label>
     <div class="col-sm-8">
-        <input type="text" name="filter" id="filter" value="{{Input::get('filter')}}" class="form-control">
+        <input type="text" name="filter" id="filter" value="{{Request::get('filter')}}" class="form-control">
     </div>   
 </div>
 
@@ -18,7 +18,7 @@
         Shipper:
     </label>
     <div class="col-sm-8">
-        {!! Form::select('company_id', dropDown('sites', 'All Shippers'), Input::get('company_id'), array('class' => 'form-control')) !!}
+        {!! Form::select('company_id', dropDown('sites', 'All Shippers'), Request::get('company_id'), array('class' => 'form-control')) !!}
     </div>   
 </div>
 
@@ -27,7 +27,7 @@
         Currency:
     </label>
     <div class="col-sm-8">
-        {!! Form::select('currency_code', dropDown('currencies', 'All Currencies'), Input::get('currency_code'), array('class' => 'form-control')) !!}
+        {!! Form::select('currency_code', dropDown('currencies', 'All Currencies'), Request::get('currency_code'), array('class' => 'form-control')) !!}
     </div>   
 </div>
 

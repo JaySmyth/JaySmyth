@@ -6,7 +6,7 @@
         <small>{{$manifest->number ?? ''}}</small>
         <div class="float-right">
             {!! Form::Open(['id' => 'manifest', 'url' => Request::path(), 'method' => 'get', 'class' => '', 'autocomplete' => 'off']) !!}
-            {!! Form::select('manifest_id', $dropdown, Input::get('manifest_id'), array('id' => 'manifest_id', 'placeholder' => 'Not manifested', 'class' => 'form-control')) !!}
+            {!! Form::select('manifest_id', $dropdown, Request::get('manifest_id'), array('id' => 'manifest_id', 'placeholder' => 'Not manifested', 'class' => 'form-control')) !!}
             {!! Form::Close() !!}
         </div>
     </h2>

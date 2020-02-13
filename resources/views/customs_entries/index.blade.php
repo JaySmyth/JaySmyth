@@ -9,7 +9,7 @@
         Entry number, reference or consignment number:
     </label>
     <div class="col-sm-8">
-        <input type="text" name="filter" id="filter" value="{{Input::get('filter')}}" class="form-control">
+        <input type="text" name="filter" id="filter" value="{{Request::get('filter')}}" class="form-control">
     </div>
 </div>
 
@@ -18,7 +18,7 @@
         Additional reference:
     </label>
     <div class="col-sm-8">
-        <input type="text" name="additional_reference" id="additional_reference" value="{{Input::get('additional_reference')}}" class="form-control">
+        <input type="text" name="additional_reference" id="additional_reference" value="{{Request::get('additional_reference')}}" class="form-control">
     </div>
 </div>
 
@@ -27,7 +27,7 @@
         Date From:
     </label>
     <div class="col-sm-8">
-        <input type="text" name="date_from" value="{{Input::get('date_from')}}" class="form-control datepicker" placeholder="Date from">
+        <input type="text" name="date_from" value="{{Request::get('date_from')}}" class="form-control datepicker" placeholder="Date from">
     </div>
 </div>
 
@@ -36,7 +36,7 @@
         Date To:
     </label>
     <div class="col-sm-8">
-        <input type="text" name="date_to" value="{{Input::get('date_to')}}" class="form-control datepicker" placeholder="Date To">
+        <input type="text" name="date_to" value="{{Request::get('date_to')}}" class="form-control datepicker" placeholder="Date To">
     </div>
 </div>
 
@@ -45,7 +45,7 @@
         CPC:
     </label>
     <div class="col-sm-8">
-        {!! Form::select('cpc', dropDown('cpc', 'All CPCs'), Input::get('cpc'), array('class' => 'form-control')) !!}
+        {!! Form::select('cpc', dropDown('cpc', 'All CPCs'), Request::get('cpc'), array('class' => 'form-control')) !!}
     </div>
 </div>
 
@@ -54,7 +54,7 @@
         Customer:
     </label>
     <div class="col-sm-8">
-        {!! Form::select('company', dropDown('sites', 'All Customers'), Input::get('company'), array('class' => 'form-control')) !!}
+        {!! Form::select('company', dropDown('sites', 'All Customers'), Request::get('company'), array('class' => 'form-control')) !!}
     </div>
 </div>
 

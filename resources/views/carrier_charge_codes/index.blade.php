@@ -4,14 +4,14 @@
 
 @section('advanced_search_form')
 
-<input type="hidden" name="mode" value="{{Input::get('mode')}}">
+<input type="hidden" name="mode" value="{{Request::get('mode')}}">
 
 <div class="form-group row">
     <label class="col-sm-3 col-form-label">
         Carrier Charge Code or Description:
     </label>
     <div class="col-sm-8">
-        {!! Form::Text('filter', Input::get('filter'), ['class' => 'form-control', 'maxlength' => '50']) !!}
+        {!! Form::Text('filter', Request::get('filter'), ['class' => 'form-control', 'maxlength' => '50']) !!}
     </div>   
 </div>
 
@@ -20,7 +20,7 @@
         SCS Charge Code:
     </label>
     <div class="col-sm-8">
-        {!! Form::select('scs_code',  dropDown('scsChargeCodes', 'All SCS Codes'), Input::get('scs_code'), array('class' => 'form-control')) !!}
+        {!! Form::select('scs_code',  dropDown('scsChargeCodes', 'All SCS Codes'), Request::get('scs_code'), array('class' => 'form-control')) !!}
     </div>                        
 </div>
 
@@ -29,7 +29,7 @@
         Carrier:
     </label>
     <div class="col-sm-8">
-        {!! Form::select('carrier',  dropDown('carriers', 'All Carriers'), Input::get('carrier'), array('class' => 'form-control')) !!}
+        {!! Form::select('carrier',  dropDown('carriers', 'All Carriers'), Request::get('carrier'), array('class' => 'form-control')) !!}
     </div>                        
 </div>
 

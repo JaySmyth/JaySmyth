@@ -4,14 +4,14 @@
 
 @section('advanced_search_form')
 
-<input type="hidden" name="definition" value="{{Input::get('definition')}}">
+<input type="hidden" name="definition" value="{{Request::get('definition')}}">
 
 <div class="form-group row">
     <label class="col-sm-3 col-form-label">
         Name, Company or City:
     </label>
     <div class="col-sm-8">
-        <input type="text" name="filter" id="filter" value="{{Input::get('filter')}}" class="form-control">
+        <input type="text" name="filter" id="filter" value="{{Request::get('filter')}}" class="form-control">
     </div>   
 </div>
 
@@ -20,7 +20,7 @@
         Country:
     </label>
     <div class="col-sm-8">
-        {!! Form::select('country_code', dropDown('countries', 'All Countries'), Input::get('country_code'), array('class' => 'form-control')) !!}
+        {!! Form::select('country_code', dropDown('countries', 'All Countries'), Request::get('country_code'), array('class' => 'form-control')) !!}
     </div>   
 </div>
 
@@ -29,7 +29,7 @@
         Shipper:
     </label>
     <div class="col-sm-8">
-        {!! Form::select('company_id', dropDown('sites', 'All Shippers'), Input::get('company_id'), array('class' => 'form-control')) !!}
+        {!! Form::select('company_id', dropDown('sites', 'All Shippers'), Request::get('company_id'), array('class' => 'form-control')) !!}
     </div>   
 </div>
 
@@ -39,7 +39,7 @@
 
 @section('content')
 
-@if(Input::get('definition') == 'sender')
+@if(Request::get('definition') == 'sender')
 @section('toolbar')                
 <a href="{{ url('/addresses/create?definition=sender') }}" class="btn btn-success btn-sm btn-xs ml-sm-3 pr-sm-2 text-white" title="New Sender" role="button"><span class="fas fa-plus-circle text-white mr-sm-1" aria-hidden="true"></span>New</a>
 @endsection
@@ -50,7 +50,7 @@
 @endsection
 @endif
 
-@include('partials.title', ['title' => Input::get('definition') . 's', 'results'=> $addresses])
+@include('partials.title', ['title' => Request::get('definition') . 's', 'results'=> $addresses])
 
 {!! Form::Open(['url' => 'addresses', 'autocomplete' => 'off']) !!}
 

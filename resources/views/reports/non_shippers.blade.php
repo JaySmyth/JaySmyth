@@ -8,23 +8,23 @@
 
         {!! Form::Open(['url' => Request::path(), 'method' => 'get', 'autocomplete' => 'off']) !!}
 
-        <input type="hidden" name="mode" value="{{Input::get('mode')}}">
+        <input type="hidden" name="mode" value="{{Request::get('mode')}}">
 
         <div class="form-group">
             <label for="date_from">Date From</label>
-            <input type="text" name="date_from" value="@if(Auth::user()->hasIfsRole() && !Input::get('date_from') && !Input::get('date_to')){{date(Auth::user()->date_format)}}@else{{Input::get('date_from')}}@endif" class="form-control datepicker" placeholder="Date from">
+            <input type="text" name="date_from" value="@if(Auth::user()->hasIfsRole() && !Request::get('date_from') && !Request::get('date_to')){{date(Auth::user()->date_format)}}@else{{Request::get('date_from')}}@endif" class="form-control datepicker" placeholder="Date from">
         </div>
         <div class="form-group">
             <label for="date_to">Date To</label>
-            <input type="text" name="date_to" value="@if(Auth::user()->hasIfsRole() && !Input::get('date_from') && !Input::get('date_to')){{date(Auth::user()->date_format)}}@else{{Input::get('date_to')}}@endif" class="form-control datepicker" placeholder="Date To">
+            <input type="text" name="date_to" value="@if(Auth::user()->hasIfsRole() && !Request::get('date_from') && !Request::get('date_to')){{date(Auth::user()->date_format)}}@else{{Request::get('date_to')}}@endif" class="form-control datepicker" placeholder="Date To">
         </div>
         <div class="form-group">
             <label for="month">Depot</label>
-            {!! Form::select('depot', dropDown('associatedDepots', 'All Depots'), Input::get('depot'), array('class' => 'form-control')) !!}
+            {!! Form::select('depot', dropDown('associatedDepots', 'All Depots'), Request::get('depot'), array('class' => 'form-control')) !!}
         </div>
         <div class="form-group">
             <label for="month">Salesperson</label>
-            {!! Form::select('salesperson', dropDown('sales', 'All Salespersons'), Input::get('salesperson'), array('class' => 'form-control')) !!}
+            {!! Form::select('salesperson', dropDown('sales', 'All Salespersons'), Request::get('salesperson'), array('class' => 'form-control')) !!}
         </div>
 
         <button type="submit" class="btn btn-primary mt-3">Update Report</button>

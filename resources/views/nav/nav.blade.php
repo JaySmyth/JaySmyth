@@ -130,7 +130,7 @@
 
             {!! Form::Open(['id' => 'nav-search', 'url' => Request::path(), 'method' => 'get', 'class' => 'form-inline mt-3 ml-sm-4', 'autocomplete' => 'off']) !!}
             <div class="input-group">
-                <input type="text" name="filter" id="filter" value="{{Input::get('filter')}}" class="form-control" placeholder="@yield('navSearchPlaceholder')" aria-label="Search">
+                <input type="text" name="filter" id="filter" value="{{Request::get('filter')}}" class="form-control" placeholder="@yield('navSearchPlaceholder')" aria-label="Search">
                 <span class="input-group-btn">
                     <button type="submit" class="btn"><span class="fas fa-fw fa-search fa-lg" aria-hidden="true"></span></button>
                 </span>

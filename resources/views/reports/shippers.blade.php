@@ -10,31 +10,31 @@
 
         <div class="form-group">
             <label for="date_from">Date From</label>
-            <input type="text" name="date_from" value="@if(Auth::user()->hasIfsRole() && !Input::get('date_from') && !Input::get('date_to')){{date(Auth::user()->date_format)}}@else{{Input::get('date_from')}}@endif" class="form-control datepicker" placeholder="Date from">
+            <input type="text" name="date_from" value="@if(Auth::user()->hasIfsRole() && !Request::get('date_from') && !Request::get('date_to')){{date(Auth::user()->date_format)}}@else{{Request::get('date_from')}}@endif" class="form-control datepicker" placeholder="Date from">
         </div>
         <div class="form-group">
             <label for="date_to">Date To</label>
-            <input type="text" name="date_to" value="@if(Auth::user()->hasIfsRole() && !Input::get('date_from') && !Input::get('date_to')){{date(Auth::user()->date_format)}}@else{{Input::get('date_to')}}@endif" class="form-control datepicker" placeholder="Date To">
+            <input type="text" name="date_to" value="@if(Auth::user()->hasIfsRole() && !Request::get('date_from') && !Request::get('date_to')){{date(Auth::user()->date_format)}}@else{{Request::get('date_to')}}@endif" class="form-control datepicker" placeholder="Date To">
         </div>
 
         <div class="form-group">
             <label for="month">Traffic</label>
-            {!! Form::select('traffic', dropDown('traffic', 'All Traffic'), Input::get('traffic'), array('class' => 'form-control')) !!}
+            {!! Form::select('traffic', dropDown('traffic', 'All Traffic'), Request::get('traffic'), array('class' => 'form-control')) !!}
         </div>
 
         <div class="form-group">
             <label for="month">Carrier</label>
-            {!! Form::select('carrier', dropDown('carriers', 'All Carriers'), Input::get('carrier'), array('class' => 'form-control')) !!}
+            {!! Form::select('carrier', dropDown('carriers', 'All Carriers'), Request::get('carrier'), array('class' => 'form-control')) !!}
         </div>
 
         <div class="form-group">
             <label for="month">Depot</label>
-            {!! Form::select('depot', dropDown('associatedDepots', 'All Depots'), Input::get('depot'), array('class' => 'form-control')) !!}
+            {!! Form::select('depot', dropDown('associatedDepots', 'All Depots'), Request::get('depot'), array('class' => 'form-control')) !!}
         </div>
 
         <div class="form-group">
             <label for="month">Service</label>
-            {!! Form::select('service', dropDown('services', 'All Services'), Input::get('service'), array('class' => 'form-control')) !!}
+            {!! Form::select('service', dropDown('services', 'All Services'), Request::get('service'), array('class' => 'form-control')) !!}
         </div>
 
         <button type="submit" class="btn btn-primary mt-3">Update Report</button>
@@ -86,7 +86,7 @@
                     <td class="text-center">
                         <a href="{{url('/shipments?filter=&company=' . $shipment->company->id . '&' . Request::getQueryString())}}" title="Shipment History"><span class="fas fa-history" aria-hidden="true"></span></a>
 
-                        @if(!Input::get('date_from'))
+                        @if(!Request::get('date_from'))
                         <a href="{{url('/shipments/batched-shipping-docs/master?filter=&company=' . $shipment->company->id . '&date_from=' . date(Auth::user()->date_format) . '&date_to=' . date(Auth::user()->date_format))}}" title="Download Master Labels"><span class="fas fa-print ml-sm-2" aria-hidden="true"></span></a>                        
                         <a href="{{url('/shipments/batched-shipping-docs/invoice?filter=&company=' . $shipment->company->id . '&date_from=' . date(Auth::user()->date_format) . '&date_to=' . date(Auth::user()->date_format))}}" title="Download Commercial Invoices"><span class="fas fa-list-alt ml-sm-2" aria-hidden="true"></span></a>                        
                         <a href="{{url('/shipments/batched-shipping-docs/despatch?filter=&company=' . $shipment->company->id . '&date_from=' . date(Auth::user()->date_format) . '&date_to=' . date(Auth::user()->date_format))}}" title="Download Despatch Notes"><span class="fas fa-file ml-sm-2" aria-hidden="true"></span></a> 

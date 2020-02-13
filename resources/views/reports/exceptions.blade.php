@@ -10,31 +10,31 @@
 
         <div class="form-group">
             <label for="filter">Consignment or Reference</label>
-            <input type="text" name="filter" id="filter" value="{{Input::get('filter')}}" class="form-control" placeholder="">
+            <input type="text" name="filter" id="filter" value="{{Request::get('filter')}}" class="form-control" placeholder="">
         </div>
         <div class="form-group">
             <label for="date_from">Date From</label>
-            <input type="text" name="date_from" value="@if(Auth::user()->hasIfsRole() && !Input::get('date_from') && !Input::get('date_to')){{date(Auth::user()->date_format)}}@else{{Input::get('date_from')}}@endif" class="form-control datepicker" placeholder="Date from">
+            <input type="text" name="date_from" value="@if(Auth::user()->hasIfsRole() && !Request::get('date_from') && !Request::get('date_to')){{date(Auth::user()->date_format)}}@else{{Request::get('date_from')}}@endif" class="form-control datepicker" placeholder="Date from">
         </div>
         <div class="form-group">
             <label for="date_to">Date To</label>
-            <input type="text" name="date_to" value="@if(Auth::user()->hasIfsRole() && !Input::get('date_from') && !Input::get('date_to')){{date(Auth::user()->date_format)}}@else{{Input::get('date_to')}}@endif" class="form-control datepicker" placeholder="Date To">
+            <input type="text" name="date_to" value="@if(Auth::user()->hasIfsRole() && !Request::get('date_from') && !Request::get('date_to')){{date(Auth::user()->date_format)}}@else{{Request::get('date_to')}}@endif" class="form-control datepicker" placeholder="Date To">
         </div>
         <div class="form-group">
             <label for="status">Status</label>
-            {!! Form::select('status', ['' => 'All Statuses', 8 => 'On Hold', 9 => 'Return To Sender', 10 => 'Failure', 11 => 'Unknown', 12 => 'Error', 17 => 'Available For Pickup'], Input::get('status'), array('class' => 'form-control')) !!}
+            {!! Form::select('status', ['' => 'All Statuses', 8 => 'On Hold', 9 => 'Return To Sender', 10 => 'Failure', 11 => 'Unknown', 12 => 'Error', 17 => 'Available For Pickup'], Request::get('status'), array('class' => 'form-control')) !!}
         </div>
         <div class="form-group">
             <label for="month">Shipper</label>
-            {!! Form::select('company', dropDown('enabledSites', 'All Shippers'), Input::get('company'), array('class' => 'form-control')) !!}
+            {!! Form::select('company', dropDown('enabledSites', 'All Shippers'), Request::get('company'), array('class' => 'form-control')) !!}
         </div>
         <div class="form-group">
             <label for="month">Traffic</label>
-            {!! Form::select('traffic', dropDown('traffic', 'All Traffic'), Input::get('traffic'), array('class' => 'form-control')) !!}
+            {!! Form::select('traffic', dropDown('traffic', 'All Traffic'), Request::get('traffic'), array('class' => 'form-control')) !!}
         </div>
         <div class="form-group">
             <label for="month">Service</label>
-            {!! Form::select('service', dropDown('services', 'All Services'), Input::get('service'), array('class' => 'form-control')) !!}
+            {!! Form::select('service', dropDown('services', 'All Services'), Request::get('service'), array('class' => 'form-control')) !!}
         </div>
 
         <button type="submit" class="btn btn-primary mt-3">Update Report</button>
@@ -52,7 +52,7 @@
                 <tr>
                     <th>Consignment</th>
                     <th>Carrier Ref</th>
-                    @if(!Input::get('mode'))<th>Mode</th>@endif
+                    @if(!Request::get('mode'))<th>Mode</th>@endif
                     @if(Auth::user()->hasIfsRole() && Auth::user()->hasMultipleDepots())<th class="text-center">Depot</th>@endif
 
                     @if(Auth::user()->hasIfsRole())
@@ -90,7 +90,7 @@
                         {{$shipment->carrier_consignment_number}}
                         @endif
                     </td>
-                    @if(!Input::get('mode'))<td>{{ucfirst($shipment->mode->name)}}</td>@endif
+                    @if(!Request::get('mode'))<td>{{ucfirst($shipment->mode->name)}}</td>@endif
                     @if(Auth::user()->hasIfsRole() && Auth::user()->hasMultipleDepots())<td class="text-center"><span class="badge badge-secondary" data-placement="bottom" data-toggle="tooltip" data-original-title="{{$shipment->depot->name ?? 'Unknown'}}">{{$shipment->depot->code ?? ''}}</span></td>@endif
 
                     @if(Auth::user()->hasIfsRole())

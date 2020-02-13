@@ -8,7 +8,7 @@
 
         <div class="float-right">
             {!! Form::Open(['id' => 'manifest_profile', 'url' => Request::path(), 'method' => 'get', 'class' => '', 'autocomplete' => 'off']) !!}
-            {!! Form::select('id', dropDown('manifestProfiles'), Input::get('id'), array('id' => 'id', 'class' => 'form-control')) !!}
+            {!! Form::select('id', dropDown('manifestProfiles'), Request::get('id'), array('id' => 'id', 'class' => 'form-control')) !!}
             {!! Form::Close() !!}
         </div>
     </h2>

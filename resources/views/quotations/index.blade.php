@@ -9,7 +9,7 @@
         Reference or Company Name:
     </label>
     <div class="col-sm-8">
-        <input type="text" name="filter" id="filter" value="{{Input::get('filter')}}" class="form-control">
+        <input type="text" name="filter" id="filter" value="{{Request::get('filter')}}" class="form-control">
     </div>
 </div>
 
@@ -18,7 +18,7 @@
         Date From:
     </label>
     <div class="col-sm-8">
-        <input type="text" name="date_from" value="{{Input::get('date_from')}}" class="form-control datepicker" placeholder="Date from">
+        <input type="text" name="date_from" value="{{Request::get('date_from')}}" class="form-control datepicker" placeholder="Date from">
     </div>
 </div>
 
@@ -27,7 +27,7 @@
         Date To:
     </label>
     <div class="col-sm-8">
-        <input type="text" name="date_to" value="{{Input::get('date_to')}}" class="form-control datepicker" placeholder="Date To">
+        <input type="text" name="date_to" value="{{Request::get('date_to')}}" class="form-control datepicker" placeholder="Date To">
     </div>
 </div>
 
@@ -36,7 +36,7 @@
         Department:
     </label>
     <div class="col-sm-8">
-        {!! Form::select('department', dropDown('departments', 'All Departments'), Input::get('department'), array('class' => 'form-control')) !!}
+        {!! Form::select('department', dropDown('departments', 'All Departments'), Request::get('department'), array('class' => 'form-control')) !!}
     </div>
 </div>
 
@@ -45,7 +45,7 @@
         Successful:
     </label>
     <div class="col-sm-8">
-        {!! Form::select('successful', dropDown('boolean', 'All Statuses'), Input::get('successful'), array('class' => 'form-control')) !!}
+        {!! Form::select('successful', dropDown('boolean', 'All Statuses'), Request::get('successful'), array('class' => 'form-control')) !!}
     </div>
 </div>
 

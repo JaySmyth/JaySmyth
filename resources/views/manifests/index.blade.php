@@ -4,14 +4,14 @@
 
 @section('advanced_search_form')
 
-<input type="hidden" name="mode" value="{{Input::get('mode')}}">
+<input type="hidden" name="mode" value="{{Request::get('mode')}}">
 
 <div class="form-group row">
     <label class="col-sm-4  col-form-label">
         Manifest Number:
     </label>
     <div class="col-sm-7">
-        <input type="text" name="filter" id="filter" value="{{Input::get('filter')}}" class="form-control">
+        <input type="text" name="filter" id="filter" value="{{Request::get('filter')}}" class="form-control">
     </div>                        
 </div>
 
@@ -20,7 +20,7 @@
         Date From:
     </label>
     <div class="col-sm-7">
-        <input type="text" name="date_from" value="{{Input::get('date_from')}}" class="form-control datepicker">
+        <input type="text" name="date_from" value="{{Request::get('date_from')}}" class="form-control datepicker">
     </div>                        
 </div>
 
@@ -29,7 +29,7 @@
         Date To:
     </label>
     <div class="col-sm-7">
-        <input type="text" name="date_to" value="{{Input::get('date_to')}}" class="form-control datepicker">
+        <input type="text" name="date_to" value="{{Request::get('date_to')}}" class="form-control datepicker">
     </div>                        
 </div>
 
@@ -38,7 +38,7 @@
         Type:
     </label>
     <div class="col-sm-7">
-        {!! Form::select('manifest_profile_id', dropDown('manifestProfiles', 'All Types'), Input::get('manifest_profile_id'), array('class' => 'form-control')) !!}
+        {!! Form::select('manifest_profile_id', dropDown('manifestProfiles', 'All Types'), Request::get('manifest_profile_id'), array('class' => 'form-control')) !!}
     </div>                        
 </div>
 
@@ -47,7 +47,7 @@
         Carriers:
     </label>
     <div class="col-sm-7">
-        {!! Form::select('carrier_id', dropDown('carriers', 'All Carriers'), Input::get('carrier_id'), array('class' => 'form-control')) !!}
+        {!! Form::select('carrier_id', dropDown('carriers', 'All Carriers'), Request::get('carrier_id'), array('class' => 'form-control')) !!}
     </div>                        
 </div>
 
@@ -56,7 +56,7 @@
         Depot:
     </label>
     <div class="col-sm-7">
-        {!! Form::select('depot_id', dropDown('depots', 'All Depots'), Input::get('depot_id'), array('class' => 'form-control')) !!}
+        {!! Form::select('depot_id', dropDown('depots', 'All Depots'), Request::get('depot_id'), array('class' => 'form-control')) !!}
     </div>                        
 </div>
 

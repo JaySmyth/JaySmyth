@@ -10,7 +10,7 @@
 
         <div class="form-group">
             <label for="month">Month</label>
-            {!! Form::select('month', dropDown('monthsPrevious'), Input::get('month'), array('class' => 'form-control')) !!}
+            {!! Form::select('month', dropDown('monthsPrevious'), Request::get('month'), array('class' => 'form-control')) !!}
         </div>
 
         <button type="submit" class="btn btn-primary mt-3">Update Report</button>
@@ -22,8 +22,8 @@
     <main class="col-sm-10 ml-sm-auto" role="main">
 
         <h2>{{$report->name}} -
-            @if(Input::get('month'))
-            {{Input::get('month')}}
+            @if(Request::get('month'))
+            {{Request::get('month')}}
             @else
             {{ date("F Y", time())}}
             @endif

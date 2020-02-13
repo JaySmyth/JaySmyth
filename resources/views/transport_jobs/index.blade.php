@@ -9,7 +9,7 @@
         Job Number, Reference or SCS Job Number:
     </label>
     <div class="col-sm-6">
-        <input type="text" name="filter" id="filter" value="{{Input::get('filter')}}" class="form-control"> 
+        <input type="text" name="filter" id="filter" value="{{Request::get('filter')}}" class="form-control"> 
     </div>   
 </div>
 <div class="form-group row">
@@ -17,7 +17,7 @@
         Job Type:
     </label>
     <div class="col-sm-6">
-        {!! Form::select('type', dropDown('jobType', 'Collections and Deliveries'), Input::get('type'), array('class' => 'form-control')) !!}
+        {!! Form::select('type', dropDown('jobType', 'Collections and Deliveries'), Request::get('type'), array('class' => 'form-control')) !!}
     </div>   
 </div>
 <div class="form-group row">
@@ -25,7 +25,7 @@
         Department:
     </label>
     <div class="col-sm-6">
-        {!! Form::select('department', dropDown('departments', 'All Departments'), Input::get('department'), array('class' => 'form-control')) !!}
+        {!! Form::select('department', dropDown('departments', 'All Departments'), Request::get('department'), array('class' => 'form-control')) !!}
     </div>   
 </div>
 <div class="form-group row">
@@ -33,7 +33,7 @@
         Status:
     </label>
     <div class="col-sm-6">
-        {!! Form::select('status', dropDown('jobStatuses', 'All Statuses'), Input::get('status'), array('class' => 'form-control')) !!}
+        {!! Form::select('status', dropDown('jobStatuses', 'All Statuses'), Request::get('status'), array('class' => 'form-control')) !!}
     </div>   
 </div>
 

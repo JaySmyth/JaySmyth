@@ -33,7 +33,7 @@ use App\TransactionLog;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Request as Input;
 
 class APIController extends Controller
 {

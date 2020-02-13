@@ -9,7 +9,7 @@
         Service Code:
     </label>
     <div class="col-sm-6">
-        <input type="text" name="filter" id="filter" value="{{Input::get('filter')}}" class="form-control"> 
+        <input type="text" name="filter" id="filter" value="{{Request::get('filter')}}" class="form-control"> 
     </div>   
 </div>
 
@@ -18,7 +18,7 @@
         Carrier:
     </label>
     <div class="col-sm-6">
-        {!! Form::select('carrier',  dropDown('carriers', 'All Carriers'), Input::get('carrier'), array('class' => 'form-control')) !!}
+        {!! Form::select('carrier',  dropDown('carriers', 'All Carriers'), Request::get('carrier'), array('class' => 'form-control')) !!}
     </div>   
 </div>
 
@@ -27,7 +27,7 @@
         From Date:
     </label>
     <div class="col-sm-6">
-        <input type="text" name="from_date" value="{{Input::get('from_date')}}" class="form-control datepicker" placeholder="From Date">
+        <input type="text" name="from_date" value="{{Request::get('from_date')}}" class="form-control datepicker" placeholder="From Date">
     </div>   
 </div>
 
@@ -36,7 +36,7 @@
         To Date:
     </label>
     <div class="col-sm-6">
-        <input type="text" name="to_date" value="{{Input::get('to_date')}}" class="form-control datepicker" placeholder="To Date">
+        <input type="text" name="to_date" value="{{Request::get('to_date')}}" class="form-control datepicker" placeholder="To Date">
     </div>   
 </div>
 
