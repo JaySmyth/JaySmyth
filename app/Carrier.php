@@ -40,6 +40,11 @@ class Carrier extends Model
         return $this->hasMany(Service::class)->orderBy('carrier_name');
     }
 
+    /**
+     * Packaging types.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function packagingTypes()
     {
         return $this->hasMany('App\CarrierPackagingType');
