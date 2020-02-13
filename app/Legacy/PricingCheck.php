@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class PricingCheck extends Model
 {
-
     /**
      * The connection name for the model.
      *
@@ -30,5 +29,4 @@ class PricingCheck extends Model
      * No timestamps.
      */
     public $timestamps = false;
-
 }

@@ -3,13 +3,12 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class CarrierScanUsed extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -33,8 +32,7 @@ class CarrierScanUsed extends Mailable
     public function build()
     {
         return $this->view('emails.shipments.carrier_scan_used')
-                        ->subject('Scan missed, used carrier scan - ' . $this->shipment->consignment_number)
+                        ->subject('Scan missed, used carrier scan - '.$this->shipment->consignment_number)
                         ->with(['shipment' => $this->shipment]);
     }
-
 }

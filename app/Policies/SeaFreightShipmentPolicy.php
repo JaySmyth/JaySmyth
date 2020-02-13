@@ -2,23 +2,22 @@
 
 namespace App\Policies;
 
-use Illuminate\Auth\Access\HandlesAuthorization;
-use App\User;
 use App\SeaFreightShipment;
+use App\User;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class SeaFreightShipmentPolicy
 {
-
     use HandlesAuthorization;
 
     /**
-     * Intercept all checks - ensure all users have sea role
+     * Intercept all checks - ensure all users have sea role.
      *
-     * @return boolean
+     * @return bool
      */
     public function before(User $user)
     {
-        if (!$user->hasPermission('sea')) {
+        if (! $user->hasPermission('sea')) {
             return false;
         }
     }
@@ -26,7 +25,7 @@ class SeaFreightShipmentPolicy
     /**
      * Index policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function index(User $user)
     {
@@ -38,7 +37,7 @@ class SeaFreightShipmentPolicy
     /**
      * Show policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function view(User $user, SeaFreightShipment $shipment)
     {
@@ -50,7 +49,7 @@ class SeaFreightShipmentPolicy
     /**
      * Create policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function create(User $user)
     {
@@ -62,7 +61,7 @@ class SeaFreightShipmentPolicy
     /**
      * Update policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function update(User $user, SeaFreightShipment $shipment)
     {
@@ -74,7 +73,7 @@ class SeaFreightShipmentPolicy
     /**
      * Cancel policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function cancel(User $user, SeaFreightShipment $shipment)
     {
@@ -86,7 +85,7 @@ class SeaFreightShipmentPolicy
     /**
      * Receive policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function process(User $user, SeaFreightShipment $shipment)
     {
@@ -98,7 +97,7 @@ class SeaFreightShipmentPolicy
     /**
      * POD policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function status(User $user, SeaFreightShipment $shipment)
     {
@@ -110,7 +109,7 @@ class SeaFreightShipmentPolicy
     /**
      * Download policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function download(User $user)
     {
@@ -122,7 +121,7 @@ class SeaFreightShipmentPolicy
     /**
      * Add commodity policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function addContainer(User $user, SeaFreightShipment $shipment)
     {
@@ -130,5 +129,4 @@ class SeaFreightShipmentPolicy
             return true;
         }
     }
-
 }

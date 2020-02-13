@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Requests;
+use Illuminate\Http\Request;
 
 class PreferencesController extends Controller
 {
@@ -30,7 +30,7 @@ class PreferencesController extends Controller
 
     /**
      * Sets an authenticated user's shipping preferences for a given company and mode.
-     * Expects all requests via ajax call
+     * Expects all requests via ajax call.
      *
      * @param  Illuminate\Http\Request
      * @return void
@@ -69,5 +69,4 @@ class PreferencesController extends Controller
             $request->user()->resetPreferences($request->company_id, $request->mode_id);
         }
     }
-
 }

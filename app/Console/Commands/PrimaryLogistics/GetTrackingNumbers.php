@@ -2,16 +2,15 @@
 
 namespace App\Console\Commands\PrimaryLogistics;
 
-use GuzzleHttp\Psr7;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use GuzzleHttp\Exception\GuzzleException;
 
 class GetTrackingNumbers extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -41,7 +40,7 @@ class GetTrackingNumbers extends Command
         parent::__construct();
         $this->user = config('services.cartrover.api_user');
         $this->key = config('services.cartrover.api_key');
-        $this->tempFile = storage_path('app/temp/tracking_' . time() . '.csv');
+        $this->tempFile = storage_path('app/temp/tracking_'.time().'.csv');
     }
 
     /**
@@ -55,21 +54,19 @@ class GetTrackingNumbers extends Command
 
         // Retreive the shipments that require updated
         $shipments = \App\Shipment::where('carrier_consignment_number', '=', DB::raw('consignment_number'))->whereSource('cartrover')->whereCarrierId(12)->whereCompanyId(874)->whereReceivedSent(1)->whereNotIn('status_id', [1, 7])->whereIn('recipient_country_code', ['US', 'CA'])->get();
-        
-        $this->info($shipments->count() . ' shipments found');
+
+        $this->info($shipments->count().' shipments found');
 
         foreach ($shipments as $shipment) {
-
             try {
 
                 // Send the request to CartRover
-                $response = $client->get($this->uri . $shipment->consignment_number);
+                $response = $client->get($this->uri.$shipment->consignment_number);
 
                 // Get cart rover response
                 $reply = json_decode($response->getBody()->getContents(), true);
-                
-                if (isset($reply['response']['order_status']) && $reply['response']['order_status'] == 'shipped') {
 
+                if (isset($reply['response']['order_status']) && $reply['response']['order_status'] == 'shipped') {
                     $shipment->carrier_consignment_number = $reply['response']['shipments'][0]['tracking_no'];
                     $shipment->carrier_tracking_number = $reply['response']['shipments'][0]['tracking_no'];
                     $shipment->ship_date = strtotime($reply['response']['shipments'][0]['date']);
@@ -84,37 +81,35 @@ class GetTrackingNumbers extends Command
                     $this->updated++;
                 }
             } catch (GuzzleException $exc) {
-
                 if ($exc->hasResponse()) {
-                    Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Get Primary Logistics Tracking Numbers (' . $shipment->company->company_name . '/' . $shipment->consignment_number . ')', Psr7\str($exc->getResponse())));
+                    Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Get Primary Logistics Tracking Numbers ('.$shipment->company->company_name.'/'.$shipment->consignment_number.')', Psr7\str($exc->getResponse())));
                 }
             }
         }
 
         if ($this->updated > 0) {
-            Mail::to('kerrikids1526376033@in.fulfillment.stock-sync.com')->cc(['it@antrim.ifsgroup.com', 'info@babocush.com'])->send(new \App\Mail\GenericError('Tracking Numbers - ' . $this->updated . ' shipments', null, $this->tempFile));
+            Mail::to('kerrikids1526376033@in.fulfillment.stock-sync.com')->cc(['it@antrim.ifsgroup.com', 'info@babocush.com'])->send(new \App\Mail\GenericError('Tracking Numbers - '.$this->updated.' shipments', null, $this->tempFile));
         }
     }
 
     /**
-     * Build a CSV file to send to babocush
+     * Build a CSV file to send to babocush.
      *
      * @param type $shipment
      */
     protected function addToTrackingFile($shipment, $carrier)
     {
-        $handle = fopen($this->tempFile, "a");
+        $handle = fopen($this->tempFile, 'a');
 
         $line = [
             $shipment->shipment_reference,
             1,
             $shipment->pieces,
             $shipment->carrier_consignment_number,
-            $carrier
+            $carrier,
         ];
 
         fputcsv($handle, $line);
         fclose($handle);
     }
-
 }

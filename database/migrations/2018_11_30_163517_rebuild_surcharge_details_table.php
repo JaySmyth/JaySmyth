@@ -1,13 +1,12 @@
 <?php
 
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Migrations\Migration;
 
 class RebuildSurchargeDetailsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -15,7 +14,6 @@ class RebuildSurchargeDetailsTable extends Migration
      */
     public function up()
     {
-
         DB::table('surcharge_details')->truncate();
 
         Schema::table('surcharge_details', function (Blueprint $table) {
@@ -35,7 +33,7 @@ class RebuildSurchargeDetailsTable extends Migration
     public function down()
     {
         DB::table('surcharge_details')->truncate();
-        
+
         if (Schema::hasColumn('surcharge_details', 'created_at')) {
             Schema::table('surcharge_details', function (Blueprint $table) {
                 $table->dropColumn('created_at');
@@ -47,5 +45,4 @@ class RebuildSurchargeDetailsTable extends Migration
             });
         }
     }
-
 }

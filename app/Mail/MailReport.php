@@ -3,13 +3,12 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class MailReport extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -23,7 +22,7 @@ class MailReport extends Mailable
      *
      * @return void
      */
-    public function __construct($reportName, $recipientName, $filePath, $data = array())
+    public function __construct($reportName, $recipientName, $filePath, $data = [])
     {
         $this->reportName = $reportName;
         $this->recipientName = $recipientName;
@@ -42,9 +41,8 @@ class MailReport extends Mailable
             $this->attach($this->filePath);
         }
 
-        return $this->view('emails.mail_reports.' . $this->reportName)
-                        ->subject(snakeCaseToWords($this->reportName) . ' - ' . $this->recipientName)
+        return $this->view('emails.mail_reports.'.$this->reportName)
+                        ->subject(snakeCaseToWords($this->reportName).' - '.$this->recipientName)
                         ->with(['name' => $this->recipientName, 'data' => $this->data]);
     }
-
 }

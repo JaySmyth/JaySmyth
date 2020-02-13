@@ -4,7 +4,6 @@ use Illuminate\Database\Seeder;
 
 class ServicesTableSeeder extends Seeder
 {
-
     /**
      * Run the database seeds.
      *
@@ -19,5 +18,4 @@ class ServicesTableSeeder extends Seeder
         // Modify a few records
         DB::table('services')->insert($service);
     }
-
 }

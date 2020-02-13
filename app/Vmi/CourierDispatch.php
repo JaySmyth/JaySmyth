@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class CourierDispatch extends Model
 {
-
     /**
      * The connection name for the model.
      *
@@ -30,5 +29,4 @@ class CourierDispatch extends Model
      * No timestamps.
      */
     public $timestamps = false;
-
 }

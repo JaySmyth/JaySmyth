@@ -2,8 +2,8 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 class Package extends Model
 {
@@ -47,7 +47,7 @@ class Package extends Model
     }
 
     /**
-     * A package has one packaging type
+     * A package has one packaging type.
      *
      * @return
      */
@@ -57,13 +57,13 @@ class Package extends Model
     }
 
     /**
-     * Get the route code for the package
+     * Get the route code for the package.
      *
      * @return string
      */
     public function getRouteAttribute()
     {
-        // Override Fedex International BFS            
+        // Override Fedex International BFS
         if ($this->shipment->route->code == 'BFS') {
             return 'FEDF';
         }
@@ -73,11 +73,11 @@ class Package extends Model
 
     /**
      * Sets a package to collected.
-     * 
+     *
      * @param type $userId
      * @param type $dateReceived
      * @param type $carrierScan
-     * @return boolean
+     * @return bool
      */
     public function setCollected($dateCollected = null)
     {
@@ -96,11 +96,11 @@ class Package extends Model
 
     /**
      * Sets a package to received and inserts a tracking event.
-     * 
+     *
      * @param type $userId
      * @param type $dateReceived
      * @param type $carrierScan
-     * @return boolean
+     * @return bool
      */
     public function setReceived($dateReceived = null, $userId = 0, $carrierScan = false, $location = 'depot')
     {
@@ -118,8 +118,8 @@ class Package extends Model
          * Add a tracking event to the shipment
          */
 
-        $message = 'Package ' . $this->index . ' received';
-        $message = ($carrierScan) ? $message . ' (carrier scan)' : $message;
+        $message = 'Package '.$this->index.' received';
+        $message = ($carrierScan) ? $message.' (carrier scan)' : $message;
 
         $this->shipment->addTracking('received', $dateReceived, $userId, $message, $location);
 
@@ -130,7 +130,7 @@ class Package extends Model
         $complete = true;
 
         foreach ($this->shipment->packages as $package) {
-            if (!$package->received) {
+            if (! $package->received) {
                 $complete = false;
                 break;
             }
@@ -148,11 +148,11 @@ class Package extends Model
 
     /**
      * Sets a package to received and inserts a tracking event.
-     * 
+     *
      * @param type $userId
      * @param type $dateReceived
      * @param type $carrierScan
-     * @return boolean
+     * @return bool
      */
     public function setLoaded($dateLoaded = null)
     {
@@ -166,40 +166,39 @@ class Package extends Model
         $this->date_loaded = $dateLoaded;
         $this->save();
 
-        $this->shipment->addTracking('received', $dateLoaded, 0, 'Package ' . $this->index . ' loaded to route', 'depot');
+        $this->shipment->addTracking('received', $dateLoaded, 0, 'Package '.$this->index.' loaded to route', 'depot');
 
         return true;
     }
 
     /**
      * Get the contents of a package.
-     * 
+     *
      * @param type $packageIndex
      */
     public function getContents()
     {
         if ($this->shipment->contents) {
-
             $contents = $this->shipment->contents->where('package_index', $this->index)->first();
 
             if ($contents) {
                 return [
                     'description' => $contents->description,
-                    'quantity' => $contents->quantity
+                    'quantity' => $contents->quantity,
                 ];
             }
         }
 
         return [
             'description' => ($this->shipment->goods_description) ? $this->shipment->goods_description : 'unknown',
-            'quantity' => 1
+            'quantity' => 1,
         ];
     }
 
     /**
      * Determine if package received a valid receipt scan or was marked as received by route scan.
      *
-     * @return boolean
+     * @return bool
      */
     public function getTrueReceiptScanAttribute()
     {
@@ -207,9 +206,10 @@ class Package extends Model
             if ($this->loaded && $this->date_received == $this->date_loaded) {
                 return false;
             }
+
             return true;
         }
+
         return false;
     }
-
 }

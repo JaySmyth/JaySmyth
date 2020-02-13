@@ -76,7 +76,7 @@ return [
     'unique' => ':attribute has already been taken.',
     'url' => ':attribute format is invalid.',
     'old_password' => ':attribute is invalid.',
-    'not_supported' => ':attribute option is not supported by this carrier.',   
+    'not_supported' => ':attribute option is not supported by this carrier.',
     'time_before' => ':attribute must be before :value.',
     'time_after' => ':attribute must be before :value.',
     'greater_than_value' => ':attribute must be greater than :value.',
@@ -112,6 +112,6 @@ return [
         'contents.*.unit_value' => 'Commodity Unit Value',
         'contents.*.weight_uom' => 'Commodity Weight Uom',
         'contents.*.country_of_manufacture' => 'Commodity Country of Manufacture',
-        'contents.*.unit_weight' => 'Commodity Unit Weight'
+        'contents.*.unit_weight' => 'Commodity Unit Weight',
     ],
 ];

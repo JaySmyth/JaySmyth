@@ -2,8 +2,8 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 class CustomsEntry extends Model
 {
@@ -104,7 +104,6 @@ class CustomsEntry extends Model
     }
 
     /**
-     *
      * @return int
      */
     public function getDutyAttribute()
@@ -113,7 +112,6 @@ class CustomsEntry extends Model
     }
 
     /**
-     *
      * @return int
      */
     public function getVatAttribute()
@@ -129,9 +127,9 @@ class CustomsEntry extends Model
     public function scopeFilter($query, $filter)
     {
         if ($filter) {
-            return $query->where('number', 'LIKE', '%' . $filter . '%')
-                            ->orWhere('consignment_number', 'LIKE', '%' . $filter . '%')
-                            ->orWhere('reference', 'LIKE', '%' . $filter . '%');
+            return $query->where('number', 'LIKE', '%'.$filter.'%')
+                            ->orWhere('consignment_number', 'LIKE', '%'.$filter.'%')
+                            ->orWhere('reference', 'LIKE', '%'.$filter.'%');
         }
     }
 
@@ -143,7 +141,7 @@ class CustomsEntry extends Model
     public function scopeAdditionalRef($query, $filter)
     {
         if ($filter) {
-            return $query->where('additional_reference', 'LIKE', '%' . $filter . '%');
+            return $query->where('additional_reference', 'LIKE', '%'.$filter.'%');
         }
     }
 
@@ -154,11 +152,11 @@ class CustomsEntry extends Model
      */
     public function scopeDateBetween($query, $dateFrom, $dateTo)
     {
-        if (!$dateFrom && $dateTo) {
+        if (! $dateFrom && $dateTo) {
             return $query->where('date', '<', Carbon::parse($dateTo)->endOfDay());
         }
 
-        if ($dateFrom && !$dateTo) {
+        if ($dateFrom && ! $dateTo) {
             return $query->where('date', '>', Carbon::parse($dateFrom)->startOfDay());
         }
 
@@ -209,13 +207,13 @@ class CustomsEntry extends Model
     /**
      * Check that the entry has been completed.
      *
-     * @return boolean
+     * @return bool
      */
     public function isComplete()
     {
 
         // Fields to check values of
-        if (!empty($this->company_id)) {
+        if (! empty($this->company_id)) {
             $fullDutyAndVat = Company::find($this->company_id)->full_dutyandvat;
             if ($fullDutyAndVat) {
                 $fields = ['company_id', 'number', 'reference', 'scs_job_number', 'commercial_invoice_value', 'commercial_invoice_value_currency_code', 'customs_value', 'pieces', 'commodity_count', 'weight'];

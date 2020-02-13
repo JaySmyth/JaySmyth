@@ -19,12 +19,12 @@ class Commodity extends Model
         'uom',
         'commodity_code',
         'harmonized_code',
-        'shipping_cost'
+        'shipping_cost',
     ];
 
     /**
      * A commodity is owned by a company.
-     * 
+     *
      * @return type
      */
     public function company()
@@ -34,7 +34,7 @@ class Commodity extends Model
 
     /**
      * Scope filter.
-     * 
+     *
      * @param type $query
      * @param type $filter
      * @return type
@@ -42,17 +42,17 @@ class Commodity extends Model
     public function scopeFilter($query, $filter)
     {
         if ($filter) {
-            return $query->where(function($query) use ($filter) {
-                        $query->where('description', 'LIKE', '%' . $filter . '%')
-                                ->orWhere('product_code', 'LIKE', '%' . $filter . '%')
-                                ->orWhere('commodity_code', 'LIKE', '%' . $filter . '%');
-                    });
+            return $query->where(function ($query) use ($filter) {
+                $query->where('description', 'LIKE', '%'.$filter.'%')
+                                ->orWhere('product_code', 'LIKE', '%'.$filter.'%')
+                                ->orWhere('commodity_code', 'LIKE', '%'.$filter.'%');
+            });
         }
     }
 
     /**
      * Scope company.
-     * 
+     *
      * @param type $query
      * @param type $companyId
      * @return type
@@ -66,7 +66,7 @@ class Commodity extends Model
 
     /**
      * Scope city.
-     * 
+     *
      * @param type $query
      * @param type $city
      * @return type
@@ -74,13 +74,13 @@ class Commodity extends Model
     public function scopeHasCurrency($query, $currencyCode)
     {
         if ($currencyCode) {
-            return $query->where('currency_code', 'LIKE', '%' . $currencyCode . '%');
+            return $query->where('currency_code', 'LIKE', '%'.$currencyCode.'%');
         }
     }
 
     /**
      * Scope restrict results by company.
-     * 
+     *
      * @param type $query
      * @param type $companyIds
      * @return type
@@ -89,5 +89,4 @@ class Commodity extends Model
     {
         return $query->whereIn('company_id', $companyIds);
     }
-
 }

@@ -3,13 +3,12 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class ExportPurchaseInvoices extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -45,5 +44,4 @@ class ExportPurchaseInvoices extends Mailable
                         ->subject('Purchase Invoice Export (XML attached)')
                         ->with(['invoices' => $this->invoices, 'files' => $this->files]);
     }
-
 }

@@ -4,8 +4,8 @@ namespace App\Legacy;
 
 use Illuminate\Database\Eloquent\Model;
 
-class FukRate extends Model {
-
+class FukRate extends Model
+{
     /**
      * The connection name for the model.
      *
@@ -32,7 +32,7 @@ class FukRate extends Model {
     public $debug = false;
     public $packagingCodes;
 
-    public function __construct(array $attributes = array())
+    public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
 
@@ -41,15 +41,15 @@ class FukRate extends Model {
 
     public function readLegacyRate($company, $service)
     {
-
         if ($company->UKRate == '') {
             $rateTable = 'undefined';
         } else {
             $rateTable = $company->UKRate;
         }
 
-        if ($this->debug)
-            display("select * from FUKRates where rate = \"$rateTable\" and compID = \"" . $company->company . "\" and service = \"" . strtoupper($service->service) . "\" and effective_from <= \"" . date('Y-m-d') . "\" and effective_to >= \"" . date('Y-m-d') . "\";");
+        if ($this->debug) {
+            display("select * from FUKRates where rate = \"$rateTable\" and compID = \"".$company->company.'" and service = "'.strtoupper($service->service).'" and effective_from <= "'.date('Y-m-d').'" and effective_to >= "'.date('Y-m-d').'";');
+        }
 
         // Look for company specific rate that is currently valid
         $rates = $this->where('rate', $rateTable)
@@ -61,9 +61,9 @@ class FukRate extends Model {
                 ->get();
 
         if ($rates->isEmpty()) {
-
-            if ($this->debug)
-                display("select * from FUKRates where rate = \"$rateTable\" and service = \"" . strtoupper($service->service) . "\" and effective_from <= \"" . date('Y-m-d') . "\" and effective_to >= \"" . date('Y-m-d') . "\";");
+            if ($this->debug) {
+                display("select * from FUKRates where rate = \"$rateTable\" and service = \"".strtoupper($service->service).'" and effective_from <= "'.date('Y-m-d').'" and effective_to >= "'.date('Y-m-d').'";');
+            }
 
             // Look for company specific rate that is currently valid
             $rates = $this->where('rate', $rateTable)
@@ -78,7 +78,7 @@ class FukRate extends Model {
     }
 
     /**
-     * Migrate Rate from old system to the New System
+     * Migrate Rate from old system to the New System.
      *
      * @param type $companyId
      * @param type $service
@@ -86,7 +86,6 @@ class FukRate extends Model {
      */
     public function migrate($company, $legacyRate, $newRateId, $newService)
     {
-
         $newRate = \App\DomesticRate::where('rate_id', $newRateId)
                 ->where('from_date', '<=', date('Y-m-d'))
                 ->where('to_date', '>=', date('Y-m-d'))
@@ -94,13 +93,13 @@ class FukRate extends Model {
                 ->get();
 
         if ($this->ratesMatch($legacyRate, $newRate)) {
-
             $this->clearExistingDiscounts($company->company, $newRateId);
             foreach ($legacyRate as $row) {
 
                 // Create Discount or return false
-                if (!$this->addDiscount($row, $company->company, $newRateId, strtolower($row['service']))) {
+                if (! $this->addDiscount($row, $company->company, $newRateId, strtolower($row['service']))) {
                     $this->clearExistingDiscounts($company->company, $newRateId);
+
                     return false;
                 }
             }
@@ -123,7 +122,6 @@ class FukRate extends Model {
 
     public function addDiscount($row, $companyId, $newRateId, $newService)
     {
-
         if (isset($this->packagingCodes[$row->packaging])) {
             $packagingCode = $this->packagingCodes[$row->packaging];
         } else {
@@ -138,7 +136,6 @@ class FukRate extends Model {
                 ->first();
 
         if ($newRate) {
-
             $firstDiscount = 0;
             $othersDiscount = 0;
             $notionalDiscount = 0;
@@ -175,10 +172,10 @@ class FukRate extends Model {
         } else {
 
             // No Rate Found
-            echo "select * from rate_details where 'rate_id' = '" . $newRateId . "'"
-            . " and 'service' = '0'"
-            . " and 'packaging_code' = '" . $row->p_type . "'"
-            . " and 'area' = '" . $row->zone . "'";
+            echo "select * from rate_details where 'rate_id' = '".$newRateId."'"
+            ." and 'service' = '0'"
+            ." and 'packaging_code' = '".$row->p_type."'"
+            ." and 'area' = '".$row->zone."'";
             dd($newRate);
 
             return false;
@@ -187,15 +184,13 @@ class FukRate extends Model {
 
     public function display($message, $data)
     {
-
         echo "*** $message***<pre>";
         print_r($data);
-        echo "</pre>";
+        echo '</pre>';
     }
 
     public function ratesMatch($oldRate, $newRate)
     {
-
         $oldKeys = [];
         $newKeys = [];
 
@@ -204,26 +199,23 @@ class FukRate extends Model {
 
         $diff = array_diff($oldKeys, $newKeys);
 
-        if (empty($diff))
+        if (empty($diff)) {
             return true;
+        }
 
-        display("Rates for following service do not match - Legacy : " . count($oldKeys) . " New " . count($newKeys));
+        display('Rates for following service do not match - Legacy : '.count($oldKeys).' New '.count($newKeys));
 
         return false;
     }
 
     public function buildLegacyKeys($rate)
     {
-
         $keys = [];
         foreach ($rate as $row) {
-
             if (isset($this->packagingCodes[$row['packaging']])) {
-
-                $keys[] = strtoupper($row['service'] . $this->packagingCodes[$row['packaging']] . $row['area']);
+                $keys[] = strtoupper($row['service'].$this->packagingCodes[$row['packaging']].$row['area']);
             } else {
-
-                $keys[] = strtoupper($row['service'] . $row['packaging'] . $row['area']);
+                $keys[] = strtoupper($row['service'].$row['packaging'].$row['area']);
             }
         }
 
@@ -232,13 +224,11 @@ class FukRate extends Model {
 
     public function buildNewKeys($rate)
     {
-
         $keys = [];
         foreach ($rate as $row) {
-            $keys[] = strtoupper($row->service . $row->packaging_code . $row->area);
+            $keys[] = strtoupper($row->service.$row->packaging_code.$row->area);
         }
 
         return $keys;
     }
-
 }

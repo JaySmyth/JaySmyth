@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Auth;
-use App\Quotation;
 use App\CarrierAPI\Pdf;
-use Illuminate\Http\Request;
 use App\Http\Requests\QuotationRequest;
+use App\Quotation;
+use Auth;
+use Illuminate\Http\Request;
 
 class QuotationsController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -23,7 +22,7 @@ class QuotationsController extends Controller
 
     /**
      * List customs entries.
-     * 
+     *
      * @param Request $request
      * @return type
      */
@@ -38,7 +37,7 @@ class QuotationsController extends Controller
 
     /**
      * Display a customs entry.
-     * 
+     *
      * @param type $id
      * @return type
      */
@@ -52,8 +51,8 @@ class QuotationsController extends Controller
     /**
      * Displays new entry form.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function create()
     {
@@ -65,8 +64,8 @@ class QuotationsController extends Controller
     /**
      * Save the customs entry.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function store(QuotationRequest $request)
     {
@@ -84,8 +83,8 @@ class QuotationsController extends Controller
     /**
      * Displays edit form.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function edit(Quotation $quotation)
     {
@@ -97,8 +96,8 @@ class QuotationsController extends Controller
     /**
      * Updates an existing entry.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function update(Quotation $quotation, QuotationRequest $request)
     {
@@ -120,7 +119,6 @@ class QuotationsController extends Controller
     public function status(Quotation $quotation, Request $request)
     {
         if ($request->ajax()) {
-
             $this->authorize($quotation);
 
             $quotation->log(($request->successful) ? 'Set to unsuccessful' : 'Set to successful');
@@ -148,7 +146,7 @@ class QuotationsController extends Controller
 
     /**
      * Delete.
-     * 
+     *
      * @param Quotation $quotation
      * @return string
      */
@@ -163,10 +161,10 @@ class QuotationsController extends Controller
 
     /*
      * Quotation search.
-     * 
+     *
      * @param   $request
      * @param   $paginate
-     * 
+     *
      * @return
      */
 
@@ -178,11 +176,10 @@ class QuotationsController extends Controller
                 ->hasDepartment($request->department)
                 ->hasSuccessful($request->successful);
 
-        if (!$paginate) {
+        if (! $paginate) {
             return $query->get();
         }
 
         return $query->paginate(50);
     }
-
 }

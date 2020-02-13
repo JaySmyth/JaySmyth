@@ -7,17 +7,16 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 
 class LogPolicy
 {
-
     use HandlesAuthorization;
 
     /**
      * Intercept all checks - ensure IFS user.
      *
-     * @return boolean
+     * @return bool
      */
     public function before(User $user)
     {
-        if (!$user->hasIfsRole()) {
+        if (! $user->hasIfsRole()) {
             return false;
         }
     }
@@ -25,7 +24,7 @@ class LogPolicy
     /**
      * Index policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function index(User $user)
     {
@@ -37,7 +36,7 @@ class LogPolicy
     /**
      * Get roles policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function getData(User $user)
     {
@@ -45,5 +44,4 @@ class LogPolicy
             return true;
         }
     }
-
 }

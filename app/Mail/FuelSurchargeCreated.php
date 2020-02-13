@@ -3,13 +3,12 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class FuelSurchargeCreated extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -36,5 +35,4 @@ class FuelSurchargeCreated extends Mailable
                         ->subject('New Fuel Surcharge')
                         ->with(['user' => $this->fuelSurcharge]);
     }
-
 }

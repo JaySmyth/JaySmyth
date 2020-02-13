@@ -4,7 +4,6 @@ use Illuminate\Database\Seeder;
 
 class DepotsTableSeeder extends Seeder
 {
-
     /**
      * Run the database seeds.
      *
@@ -19,5 +18,4 @@ class DepotsTableSeeder extends Seeder
             ['code' => 'OLD', 'name' => 'Redundant', 'city' => 'n/a', 'state' => 'n/a', 'postcode' => '', 'country_code' => 'GB', 'localisation_id' => 1],
         ]);
     }
-
 }

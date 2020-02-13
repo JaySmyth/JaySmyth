@@ -3,12 +3,11 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class ManifestExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
-
     public function __construct($manifest, $user)
     {
         $this->manifest = $manifest;
@@ -16,7 +15,6 @@ class ManifestExport implements FromCollection, WithHeadings, ShouldAutoSize
     }
 
     /**
-     * 
      * @return array
      */
     public function headings(): array
@@ -39,7 +37,6 @@ class ManifestExport implements FromCollection, WithHeadings, ShouldAutoSize
     }
 
     /**
-     * 
      * @return type
      */
     public function collection()
@@ -56,19 +53,18 @@ class ManifestExport implements FromCollection, WithHeadings, ShouldAutoSize
                 'Sender Name' => $shipment->sender_name,
                 'Sender Telephone' => $shipment->sender_telephone,
                 'Sender Email' => $shipment->sender_email,
-                'Destination' => $shipment->recipient_city . ', ' . $shipment->recipient_country_code,
+                'Destination' => $shipment->recipient_city.', '.$shipment->recipient_country_code,
                 'Service' => $shipment->service->name,
                 'Carrier Service' => $shipment->service->carrier_code,
                 'Ship Date' => $shipment->ship_date->format($this->user->date_format),
                 'Pieces' => $shipment->pieces,
-                'Weight' => $shipment->weight . strtoupper($shipment->weight_uom),
+                'Weight' => $shipment->weight.strtoupper($shipment->weight_uom),
             ]);
 
-            $collection->push($row);
+        $collection->push($row);
 
         endforeach;
 
         return $collection;
     }
-
 }

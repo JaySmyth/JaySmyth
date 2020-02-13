@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\DB;
 
 class FukPackage extends Model
 {
-
     /**
      * The connection name for the model.
      *
@@ -44,11 +43,11 @@ class FukPackage extends Model
 
     /**
      * Sets a package to received and inserts a tracking event.
-     * 
+     *
      * @param type $userId
      * @param type $dateReceived
      * @param type $carrierScan
-     * @return boolean
+     * @return bool
      */
     public function setReceived($dateReceived = null, $userId = 0, $carrierScan = false)
     {
@@ -67,8 +66,8 @@ class FukPackage extends Model
          * Add a tracking event to the shipment
          */
 
-        $message = 'Package ' .  $this->shipment->getPackageScanCount() . ' received';
-        $message = ($carrierScan) ? $message . ' (carrier scan)' : $message;
+        $message = 'Package '.$this->shipment->getPackageScanCount().' received';
+        $message = ($carrierScan) ? $message.' (carrier scan)' : $message;
 
         DB::connection('legacy')->table('ShipTrack')->insert(
                 [
@@ -81,7 +80,7 @@ class FukPackage extends Model
                     'eventtype' => 'FirstScan',
                     'location' => 'IFS Global Logistics',
                     'city' => 'Antrim',
-                    'countrycode' => 'GB'
+                    'countrycode' => 'GB',
                 ]
         );
 
@@ -95,12 +94,11 @@ class FukPackage extends Model
             }
         }
 
-        // All packages scanned - update the shipment receipt status         
+        // All packages scanned - update the shipment receipt status
         if ($complete) {
             $this->shipment->setReceived($dateReceived, $userId, $carrierScan, false);
         }
 
         return true;
     }
-
 }

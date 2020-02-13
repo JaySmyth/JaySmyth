@@ -2,12 +2,11 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\ShipmentUpload;
+use Illuminate\Console\Command;
 
 class ProcessShipmentUploads extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -45,51 +44,47 @@ class ProcessShipmentUploads extends Command
         // Loop through each of the uploads
         foreach ($shipmentUploads as $shipmentUpload):
 
-            if (!$shipmentUpload->importConfig->user) {
+            if (! $shipmentUpload->importConfig->user) {
                 $this->error('User not defined on import config');
                 continue;
             }
 
-            $this->info($shipmentUpload->importConfig->company_name . ': checking "' . $shipmentUpload->directory . '" for files to process');
+        $this->info($shipmentUpload->importConfig->company_name.': checking "'.$shipmentUpload->directory.'" for files to process');
 
-            if ($handle = opendir($shipmentUpload->directory)) {
+        if ($handle = opendir($shipmentUpload->directory)) {
+            while (false !== ($file = readdir($handle))) {
+                if (stristr($file, '.csv')) {
+                    $originalFile = $shipmentUpload->directory.$file;
 
-                while (false !== ($file = readdir($handle))) {
+                    $this->info("Found $originalFile");
 
-                    if (stristr($file, '.csv')) {
+                    $tempFile = storage_path('app/temp/original_'.str_random(12).'.csv');
 
-                        $originalFile = $shipmentUpload->directory . $file;
-
-                        $this->info("Found $originalFile");
-
-                        $tempFile = storage_path('app/temp/original_' . str_random(12) . '.csv');
-
-                        // Move the uploaded file to "storage/app/temp" for processing
-                        if (copy($originalFile, $tempFile)) {
+                    // Move the uploaded file to "storage/app/temp" for processing
+                    if (copy($originalFile, $tempFile)) {
 
                             // Delete the original
-                            unlink($originalFile);
+                        unlink($originalFile);
 
-                            // Dispatch the job
-                            dispatch(new \App\Jobs\ImportShipments($tempFile, $shipmentUpload->importConfig->id, $shipmentUpload->importConfig->user))->onQueue('import');
+                        // Dispatch the job
+                        dispatch(new \App\Jobs\ImportShipments($tempFile, $shipmentUpload->importConfig->id, $shipmentUpload->importConfig->user))->onQueue('import');
 
-                            // Update the last upload time on the shipment upload record
-                            $shipmentUpload->last_upload = time();
-                            $shipmentUpload->save();
+                        // Update the last upload time on the shipment upload record
+                        $shipmentUpload->last_upload = time();
+                        $shipmentUpload->save();
 
-                            $shipmentUpload->log('File Processed', $originalFile);
-                            
-                            $shipmentUpload->incrementTotalProcessed();
-                        }
+                        $shipmentUpload->log('File Processed', $originalFile);
+
+                        $shipmentUpload->incrementTotalProcessed();
                     }
                 }
-
-                closedir($handle);
             }
+
+            closedir($handle);
+        }
 
         endforeach;
 
         $this->info('Finished processing shipment uploads');
     }
-
 }

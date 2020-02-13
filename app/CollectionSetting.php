@@ -50,5 +50,4 @@ class CollectionSetting extends Model
     {
         $this->attributes['delivery_route'] = strtoupper($value);
     }
-
 }

@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Package;
+use Illuminate\Http\Request;
 
 class RfController extends Controller
 {
-
     protected $cc;
     protected $routes = ['ADHOC', 'ROAD', 'AIR', 'SEA', 'DHL', 'EUROR', 'FEDC', 'FEDL', 'FEDF', 'NI', 'RM', 'ROI', 'TNT', 'UK1', 'UK2', 'UK24', 'UPS', 'US', 'EXP', 'ALL'];
     protected $route;
@@ -19,7 +18,7 @@ class RfController extends Controller
     public function __construct()
     {
         $esc = chr(27);
-        $this->cc = ['esc' => $esc, 'err' => chr(7) . chr(7), 'nl' => $esc . 'E', 'dl' => $esc . 'E' . $esc . 'E', 'cls' => $esc . '[H' . $esc . '[0J'];
+        $this->cc = ['esc' => $esc, 'err' => chr(7).chr(7), 'nl' => $esc.'E', 'dl' => $esc.'E'.$esc.'E', 'cls' => $esc.'[H'.$esc.'[0J'];
     }
 
     /**
@@ -44,10 +43,11 @@ class RfController extends Controller
         if (in_array(strtoupper($this->data), $this->routes)) {
             $this->session->route = strtoupper($this->data);
             $this->session->save();
+
             return strtoupper($this->data);
         }
 
-        if (!$this->session->route) {
+        if (! $this->session->route) {
             return $this->getDisplay(null, 'Scan ROUTE', true, true);
         }
 
@@ -70,7 +70,7 @@ class RfController extends Controller
         $route = ($this->route) ? $this->route : 'NO ROUTE!';
 
         // Output centered title
-        $display .= $this->center("* RECEIPTS *");
+        $display .= $this->center('* RECEIPTS *');
         $display .= $this->cc['dl'];
         $display .= $this->center("== $route ==");
         $display .= $this->cc['dl'];
@@ -83,7 +83,7 @@ class RfController extends Controller
 
         if ($prompt) {
             $display .= $this->cc['dl'];
-            $display .= $prompt . ': ';
+            $display .= $prompt.': ';
         }
         echo $display;
         exit;
@@ -119,7 +119,7 @@ class RfController extends Controller
         $package = Package::whereBarcode($this->data)->first();
 
         // Package not recognised
-        if (!$package) {
+        if (! $package) {
             return $this->getDisplay('Package not recognised', 'Scan Package', true);
         }
 
@@ -153,5 +153,4 @@ class RfController extends Controller
         // Successful scan
         return $this->getDisplay("Pkg $scanCount scanned!", 'Scan Package');
     }
-
 }

@@ -2,17 +2,16 @@
 
 namespace App\Exceptions;
 
-use Mail;
+use App\Mail\ErrorException;
 use Exception;
-use \App\Mail\ErrorException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
+use Mail;
 use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
 
 class Handler extends ExceptionHandler
 {
-
     /**
      * A list of the exception types that should not be reported.
      *
@@ -68,15 +67,16 @@ class Handler extends ExceptionHandler
         if ($request->expectsJson()) {
             return response()->json(['error' => 'Unauthenticated.'], 401);
         }
+
         return redirect()->guest('login');
     }
 
     /**
- * Sends an email to the developer about the exception.
- *
- * @param  \Exception  $exception
- * @return void
- */
+     * Sends an email to the developer about the exception.
+     *
+     * @param  \Exception  $exception
+     * @return void
+     */
     public function sendEmail(Exception $exception)
     {
         try {

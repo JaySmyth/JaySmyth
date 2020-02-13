@@ -6,8 +6,8 @@ use App\Company;
 use App\Service;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Support\Arr;
 use function GuzzleHttp\Psr7\str;
+use Illuminate\Support\Arr;
 
 class DHL
 {
@@ -25,7 +25,7 @@ class DHL
     protected $pltAvailable = false;
     protected $mode;
 
-    function __construct($shipment, $mode)
+    public function __construct($shipment, $mode)
     {
         // Data array passed through
         $this->shipment = $shipment;
@@ -55,7 +55,7 @@ class DHL
                 $this->url = 'https://wsbexpress.dhl.com/rest/sndpt/';
                 break;
 
-            default :
+            default:
                 $this->username = 'ifsgloballoGB';
                 $this->password = 'F#1tL$0dK#5w';
                 $this->url = 'https://wsbexpress.dhl.com/rest/gbl/';
@@ -64,7 +64,6 @@ class DHL
 
         // New Guzzle client
         $this->client = new Client(['auth' => [$this->username, $this->password]]);
-
     }
 
     /**
@@ -85,7 +84,7 @@ class DHL
 
         try {
             // Send the request and get the response
-            $response = $this->client->post($this->url . 'ShipmentRequest', ['json' => $this->request]);
+            $response = $this->client->post($this->url.'ShipmentRequest', ['json' => $this->request]);
 
             // Get the response body
             $response = $response->getBody()->getContents();
@@ -94,9 +93,9 @@ class DHL
             $this->log('REPLY-2', 'I', $response);
 
             return json_decode($response, true);
-
         } catch (GuzzleException $exception) {
             $error['ShipmentResponse']['Notification'][0]['Message'] = 'Problem processing shipment details. Please contact IT';
+
             return $error;
         }
     }
@@ -113,7 +112,7 @@ class DHL
 
         try {
             // Send the request and get the response
-            $response = $this->client->post($this->url . 'RateRequest', ['json' => $this->request]);
+            $response = $this->client->post($this->url.'RateRequest', ['json' => $this->request]);
 
             // Get the response body
             $response = $response->getBody()->getContents();
@@ -127,9 +126,9 @@ class DHL
             if (in_array('WY', Arr::flatten($this->rateRequest))) {
                 $this->pltAvailable = true;
             }
-
         } catch (GuzzleException $exception) {
             $error['ShipmentResponse']['Notification'][0]['Message'] = 'Problem processing shipment details. Please contact IT';
+
             return $error;
         }
     }
@@ -140,42 +139,42 @@ class DHL
     protected function rateRequest()
     {
         $this->request = [
-            "RateRequest" => [
-                "ClientDetails" => null,
-                "RequestedShipment" => [
-                    "DropOffType" => "REQUEST_COURIER",
-                    "ShipTimestamp" => date('Y-m-d', time()) . 'T' . date('H:i:s', time() + 120) . 'GMT+00:00',
-                    "UnitOfMeasurement" => "SI",
-                    "DeclaredValue" => $this->shipment['customs_value'],
-                    "DeclaredValueCurrecyCode" => (!empty($this->shipment['currency_code'])) ? $this->shipment['currency_code'] : 'GBP',
-                    "Content" => $this->getContent(),
-                    "PaymentInfo" => strtoupper($this->shipment['terms_of_sale']),
-                    "NextBusinessDay" => "Y",
-                    "Account" => $this->shipment['bill_shipping_account'],
-                    "RequestValueAddedServices" => "Y",
-                    "ServiceType" => $this->serviceType,
-                    "Billing" => [
+            'RateRequest' => [
+                'ClientDetails' => null,
+                'RequestedShipment' => [
+                    'DropOffType' => 'REQUEST_COURIER',
+                    'ShipTimestamp' => date('Y-m-d', time()).'T'.date('H:i:s', time() + 120).'GMT+00:00',
+                    'UnitOfMeasurement' => 'SI',
+                    'DeclaredValue' => $this->shipment['customs_value'],
+                    'DeclaredValueCurrecyCode' => (! empty($this->shipment['currency_code'])) ? $this->shipment['currency_code'] : 'GBP',
+                    'Content' => $this->getContent(),
+                    'PaymentInfo' => strtoupper($this->shipment['terms_of_sale']),
+                    'NextBusinessDay' => 'Y',
+                    'Account' => $this->shipment['bill_shipping_account'],
+                    'RequestValueAddedServices' => 'Y',
+                    'ServiceType' => $this->serviceType,
+                    'Billing' => [
                         'ShipperAccountNumber' => $this->shipment['bill_shipping_account'],
                         'ShippingPaymentType' => $this->paymentTypes[$this->shipment['bill_shipping']],
-                        'BillingAccountNumber' => $this->shipment['bill_shipping_account']
+                        'BillingAccountNumber' => $this->shipment['bill_shipping_account'],
                     ],
-                    "Ship" => [
-                        "Shipper" => [
-                            "City" => $this->shipment['sender_city'],
-                            "PostalCode" => $this->shipment['sender_postcode'],
-                            "CountryCode" => $this->shipment['sender_country_code']
+                    'Ship' => [
+                        'Shipper' => [
+                            'City' => $this->shipment['sender_city'],
+                            'PostalCode' => $this->shipment['sender_postcode'],
+                            'CountryCode' => $this->shipment['sender_country_code'],
                         ],
-                        "Recipient" => [
-                            "City" => $this->shipment['recipient_city'],
-                            "PostalCode" => $this->shipment['recipient_postcode'],
-                            "CountryCode" => $this->shipment['recipient_country_code']
-                        ]
+                        'Recipient' => [
+                            'City' => $this->shipment['recipient_city'],
+                            'PostalCode' => $this->shipment['recipient_postcode'],
+                            'CountryCode' => $this->shipment['recipient_country_code'],
+                        ],
                     ],
-                    "Packages" => [
-                        "RequestedPackages" => $this->addRatePackages()
-                    ]
-                ]
-            ]
+                    'Packages' => [
+                        'RequestedPackages' => $this->addRatePackages(),
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -186,7 +185,7 @@ class DHL
      */
     protected function getContent()
     {
-        if ((strtolower($this->shipment['ship_reason']) == "documents") || $this->isWithinEu) {
+        if ((strtolower($this->shipment['ship_reason']) == 'documents') || $this->isWithinEu) {
             return 'DOCUMENTS';
         }
 
@@ -203,23 +202,21 @@ class DHL
         $packages = [];
 
         foreach ($this->shipment['packages'] as $package) {
-
             $packages[] = [
-                "@number" => $package['index'],
-                "Weight" => [
-                    "Value" => $package['weight']
+                '@number' => $package['index'],
+                'Weight' => [
+                    'Value' => $package['weight'],
                 ],
-                "Dimensions" => [
-                    "Length" => $package['length'],
-                    "Width" => $package['width'],
-                    "Height" => $package['height']
+                'Dimensions' => [
+                    'Length' => $package['length'],
+                    'Width' => $package['width'],
+                    'Height' => $package['height'],
                 ],
-                "CustomerReferences" => 'Piece ' . $package['index']
+                'CustomerReferences' => 'Piece '.$package['index'],
             ];
         }
 
         return $packages;
-
     }
 
     /**
@@ -236,7 +233,7 @@ class DHL
             'carrier' => 'DHL',
             'direction' => $direction,
             'msg' => $msg,
-            'mode' => $this->mode
+            'mode' => $this->mode,
         ]);
     }
 
@@ -247,62 +244,62 @@ class DHL
      */
     protected function shipmentRequest()
     {
-        $eori = (!empty($this->shipment['eori'])) ? $this->shipment['eori'] : $this->company->eori;
+        $eori = (! empty($this->shipment['eori'])) ? $this->shipment['eori'] : $this->company->eori;
 
         if (strlen($eori) == 0) {
             $eori = '000000000000';
         }
 
         $this->request = [
-            "ShipmentRequest" => [
-                "RequestedShipment" => [
-                    "ShipmentInfo" => [
-                        "DropOffType" => 'REGULAR_PICKUP',
-                        "ServiceType" => $this->serviceType,
-                        "Currency" => (!empty($this->shipment['currency_code'])) ? $this->shipment['currency_code'] : 'GBP',
-                        "UnitOfMeasurement" => 'SI',
-                        "Billing" => $this->addBilling(),
+            'ShipmentRequest' => [
+                'RequestedShipment' => [
+                    'ShipmentInfo' => [
+                        'DropOffType' => 'REGULAR_PICKUP',
+                        'ServiceType' => $this->serviceType,
+                        'Currency' => (! empty($this->shipment['currency_code'])) ? $this->shipment['currency_code'] : 'GBP',
+                        'UnitOfMeasurement' => 'SI',
+                        'Billing' => $this->addBilling(),
                         'LabelType' => 'PDF',
                         'LabelTemplate' => 'ECOM26_64_002',
                         'LabelOptions' => [
                             'DetachOptions' => [
-                                'SplitLabelsByPieces' => 'N'
-                            ]
+                                'SplitLabelsByPieces' => 'N',
+                            ],
                         ],
                     ],
-                    "ShipTimestamp" => date('Y-m-d', time()) . 'T' . date('H:i:s', time() + 120) . 'GMT+00:00',
-                    "PaymentInfo" => strtoupper($this->shipment['terms_of_sale']),
-                    "Ship" => [
-                        "Shipper" => [
-                            "Contact" => [
-                                "PersonName" => $this->shipment['sender_name'],
-                                "CompanyName" => (!empty($this->shipment['sender_company_name'])) ? $this->shipment['sender_company_name'] : $this->shipment['sender_name'],
-                                "PhoneNumber" => $this->shipment['sender_telephone'],
-                                "EmailAddress" => (!empty($this->shipment['sender_email'])) ? $this->shipment['sender_email'] : 'courier@antrim.ifsgroup.com',
+                    'ShipTimestamp' => date('Y-m-d', time()).'T'.date('H:i:s', time() + 120).'GMT+00:00',
+                    'PaymentInfo' => strtoupper($this->shipment['terms_of_sale']),
+                    'Ship' => [
+                        'Shipper' => [
+                            'Contact' => [
+                                'PersonName' => $this->shipment['sender_name'],
+                                'CompanyName' => (! empty($this->shipment['sender_company_name'])) ? $this->shipment['sender_company_name'] : $this->shipment['sender_name'],
+                                'PhoneNumber' => $this->shipment['sender_telephone'],
+                                'EmailAddress' => (! empty($this->shipment['sender_email'])) ? $this->shipment['sender_email'] : 'courier@antrim.ifsgroup.com',
                             ],
-                            "Address" => $this->addAddress('sender'),
-                            "RegistrationNumbers" => [
-                                "RegistrationNumber" => [
-                                    "Number" => $eori,
-                                    "NumberTypeCode" => "EIN",
-                                    "NumberIssuerCountryCode" => $this->shipment['sender_country_code']
-                                ]
-                            ]
+                            'Address' => $this->addAddress('sender'),
+                            'RegistrationNumbers' => [
+                                'RegistrationNumber' => [
+                                    'Number' => $eori,
+                                    'NumberTypeCode' => 'EIN',
+                                    'NumberIssuerCountryCode' => $this->shipment['sender_country_code'],
+                                ],
+                            ],
                         ],
-                        "Recipient" => [
-                            "Contact" => [
-                                "PersonName" => $this->shipment['recipient_name'],
-                                "CompanyName" => (!empty($this->shipment['recipient_company_name'])) ? $this->shipment['recipient_company_name'] : $this->shipment['recipient_name'],
-                                "PhoneNumber" => $this->shipment['recipient_telephone']
+                        'Recipient' => [
+                            'Contact' => [
+                                'PersonName' => $this->shipment['recipient_name'],
+                                'CompanyName' => (! empty($this->shipment['recipient_company_name'])) ? $this->shipment['recipient_company_name'] : $this->shipment['recipient_name'],
+                                'PhoneNumber' => $this->shipment['recipient_telephone'],
                             ],
-                            "Address" => $this->addAddress('recipient')
-                        ]
+                            'Address' => $this->addAddress('recipient'),
+                        ],
                     ],
-                    "Packages" => [
-                        "RequestedPackages" => $this->addPackages()
-                    ]
-                ]
-            ]
+                    'Packages' => [
+                        'RequestedPackages' => $this->addPackages(),
+                    ],
+                ],
+            ],
         ];
 
         $this->addPltShipment();
@@ -312,7 +309,6 @@ class DHL
         // Enable once approved and obtain valid "ContentID" values from DHL
         //$this->addDangerousGoods();
     }
-
 
     /**
      * Get the billing element.
@@ -324,16 +320,15 @@ class DHL
         $billing = [
             'ShipperAccountNumber' => $this->shipment['bill_shipping_account'],
             'ShippingPaymentType' => $this->paymentTypes[$this->shipment['bill_shipping']],
-            'BillingAccountNumber' => $this->shipment['bill_shipping_account']
+            'BillingAccountNumber' => $this->shipment['bill_shipping_account'],
         ];
 
-        if (!empty($this->shipment['bill_tax_duty_account'])) {
+        if (! empty($this->shipment['bill_tax_duty_account'])) {
             $billing['DutyAndTaxPayerAccountNumber'] = $this->shipment['bill_tax_duty_account'];
         }
 
         return $billing;
     }
-
 
     /**
      * Add address element.
@@ -344,18 +339,18 @@ class DHL
     protected function addAddress($type)
     {
         $address = [
-            "StreetLines" => $this->shipment[$type . '_address1'],
-            "City" => $this->shipment[$type . '_city'],
-            "PostalCode" => $this->shipment[$type . '_postcode'],
-            "CountryCode" => $this->shipment[$type . '_country_code']
+            'StreetLines' => $this->shipment[$type.'_address1'],
+            'City' => $this->shipment[$type.'_city'],
+            'PostalCode' => $this->shipment[$type.'_postcode'],
+            'CountryCode' => $this->shipment[$type.'_country_code'],
         ];
 
-        if (!empty($this->shipment[$type . '_address2'])) {
-            $address["StreetLines2"] = $this->shipment[$type . '_address2'];
+        if (! empty($this->shipment[$type.'_address2'])) {
+            $address['StreetLines2'] = $this->shipment[$type.'_address2'];
         }
 
-        if (!empty($this->shipment[$type . '_address3'])) {
-            $address["StreetLines3"] = $this->shipment[$type . '_address3'];
+        if (! empty($this->shipment[$type.'_address3'])) {
+            $address['StreetLines3'] = $this->shipment[$type.'_address3'];
         }
 
         return $address;
@@ -371,21 +366,19 @@ class DHL
         $packages = [];
 
         foreach ($this->shipment['packages'] as $package) {
-
             $packages[] = [
-                "@number" => $package['index'],
-                "Weight" => $package['weight'],
-                "Dimensions" => [
-                    "Length" => $package['length'],
-                    "Width" => $package['width'],
-                    "Height" => $package['height']
+                '@number' => $package['index'],
+                'Weight' => $package['weight'],
+                'Dimensions' => [
+                    'Length' => $package['length'],
+                    'Width' => $package['width'],
+                    'Height' => $package['height'],
                 ],
-                "CustomerReferences" => 'Piece ' . $package['index']
+                'CustomerReferences' => 'Piece '.$package['index'],
             ];
         }
 
         return $packages;
-
     }
 
     /**
@@ -394,7 +387,6 @@ class DHL
      * ShipmentRequest/RequestedShipment/ShipmentInfo/SpecialServices/Service
      * ShipmentRequest/RequestedShipment/InternationalDetail/ExportDeclaration
      * ShipmentRequest/RequestedShipment/InternationalDetail/ExportDeclaration
-     *
      */
     protected function addPltShipment()
     {
@@ -403,12 +395,12 @@ class DHL
             $this->request['ShipmentRequest']['RequestedShipment']['ShipmentInfo']['LabelOptions']['RequestDHLCustomsInvoice'] = 'Y';
             $this->request['ShipmentRequest']['RequestedShipment']['ShipmentInfo']['SpecialServices'] = [
                 'Service' => [
-                    'ServiceType' => 'WY'
-                ]
+                    'ServiceType' => 'WY',
+                ],
             ];
             $this->request['ShipmentRequest']['RequestedShipment']['InternationalDetail']['ExportDeclaration'] = [
                 'InvoiceDate' => date('Y-m-d'),
-                'InvoiceNumber' => $this->company->id . time()
+                'InvoiceNumber' => $this->company->id.time(),
             ];
         }
     }
@@ -417,7 +409,7 @@ class DHL
      * Add commodities and line items elements.
      * ShipmentRequest/RequestedShipment/InternationalDetail/Commodities
      * ShipmentRequest/RequestedShipment/InternationalDetail/Content
-     * ShipmentRequest/RequestedShipment/InternationalDetail/ExportDeclaration/ExportLineItems/ExportLineItem
+     * ShipmentRequest/RequestedShipment/InternationalDetail/ExportDeclaration/ExportLineItems/ExportLineItem.
      *
      * @return null
      */
@@ -425,49 +417,44 @@ class DHL
     {
         $this->request['ShipmentRequest']['RequestedShipment']['InternationalDetail']['Content'] = $this->getContent();
 
-        if (!empty($this->shipment['contents'])) {
-
+        if (! empty($this->shipment['contents'])) {
             $this->request['ShipmentRequest']['RequestedShipment']['InternationalDetail']['Commodities'] = [
                 'Description' => substr(trim($this->shipment['contents'][0]['description']), 0, 35),
-                "CustomsValue" => $this->shipment['customs_value']
+                'CustomsValue' => $this->shipment['customs_value'],
             ];
 
             $lineItems = [];
             $i = 1;
 
             foreach ($this->shipment['contents'] as $content) {
+                $commodityCode = (! empty($content['harmonized_code'])) ? $content['harmonized_code'] : $content['commodity_code'];
 
-                $commodityCode = (!empty($content['harmonized_code'])) ? $content['harmonized_code'] : $content['commodity_code'];
-
-                if (!$this->pltAvailable && strlen($commodityCode) == 0) {
+                if (! $this->pltAvailable && strlen($commodityCode) == 0) {
                     $commodityCode = '0000000000';
                 }
 
                 $lineItems[] = [
-                    "CommodityCode" => $commodityCode,
-                    "ItemNumber" => $i,
-                    "Quantity" => $content['quantity'],
-                    "QuantityUnitOfMeasurement" => $this->convertToDhlUom($content['uom']),
-                    "ItemDescription" => substr(trim($content['description']), 0, 35),
-                    "UnitPrice" => round($content['unit_value'], 2),
-                    "NetWeight" => round($content['unit_weight'] * $content['quantity'], 2),
-                    "GrossWeight" => round($content['unit_weight'] * $content['quantity'], 2),
-                    "ManufacturingCountryCode" => $content['country_of_manufacture']
+                    'CommodityCode' => $commodityCode,
+                    'ItemNumber' => $i,
+                    'Quantity' => $content['quantity'],
+                    'QuantityUnitOfMeasurement' => $this->convertToDhlUom($content['uom']),
+                    'ItemDescription' => substr(trim($content['description']), 0, 35),
+                    'UnitPrice' => round($content['unit_value'], 2),
+                    'NetWeight' => round($content['unit_weight'] * $content['quantity'], 2),
+                    'GrossWeight' => round($content['unit_weight'] * $content['quantity'], 2),
+                    'ManufacturingCountryCode' => $content['country_of_manufacture'],
                 ];
 
                 $i++;
             }
 
             $this->request['ShipmentRequest']['RequestedShipment']['InternationalDetail']['ExportDeclaration']['ExportLineItems']['ExportLineItem'] = $lineItems;
-
         } else {
-
-            $description = (strtolower($this->shipment['ship_reason']) == "documents") ? $this->shipment['documents_description'] : $this->shipment['goods_description'];
+            $description = (strtolower($this->shipment['ship_reason']) == 'documents') ? $this->shipment['documents_description'] : $this->shipment['goods_description'];
 
             $this->request['ShipmentRequest']['RequestedShipment']['InternationalDetail']['Commodities'] = [
-                'Description' => substr(trim($description), 0, 35)
+                'Description' => substr(trim($description), 0, 35),
             ];
-
         }
     }
 
@@ -523,14 +510,14 @@ class DHL
             case 'YD':
                 // Yards
                 return '3M';
-            default :
+            default:
                 return $uom;
         }
     }
 
     /**
      * Add dangerous goods.
-     * ShipmentRequest/RequestedShipment/DangerousGoods/Content
+     * ShipmentRequest/RequestedShipment/DangerousGoods/Content.
      *
      * @return array
      */
@@ -538,10 +525,9 @@ class DHL
     {
         if ((isset($this->shipment['hazardous']) && $this->shipment['hazardous'] != 'N') || (isset($this->shipment['dry_ice_flag']) && $this->shipment['dry_ice_flag'])) {
             $this->request['ShipmentRequest']['RequestedShipment']['DangerousGoods']['Content'] = [
-                "ContentID" => $this->shipment['hazardous'] . '00',
-                "DryIceTotalNetWeight" => $this->shipment['dry_ice_total_weight']
+                'ContentID' => $this->shipment['hazardous'].'00',
+                'DryIceTotalNetWeight' => $this->shipment['dry_ice_total_weight'],
             ];
         }
     }
-
 }

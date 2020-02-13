@@ -9,12 +9,12 @@ namespace App\ScsXml;
  */
 
 /**
- * Description of PreProcess
+ * Description of PreProcess.
  *
  * @author gmcbroom
  */
-class PreProcess {
-
+class PreProcess
+{
     private $keyField;
     private $interface;
     private $string;
@@ -22,56 +22,65 @@ class PreProcess {
     /**
      * @return PreProcess
      */
-    public function setKeyfield($value) {
+    public function setKeyfield($value)
+    {
         $this->keyField = $value;
+
         return $this;
     }
 
     /**
      * @return PreProcess
      */
-    public function setInterface($value) {
+    public function setInterface($value)
+    {
         $this->interface = $value;
+
         return $this;
     }
 
     /**
      * @return PreProcess
      */
-    public function setString($value) {
+    public function setString($value)
+    {
         $this->string = $value;
+
         return $this;
     }
 
     /**
      * @return PreProcess
      */
-    public function getKeyfield() {
+    public function getKeyfield()
+    {
         return $this->keyField;
     }
 
     /**
      * @return PreProcess
      */
-    public function getInterface($value) {
+    public function getInterface($value)
+    {
         return $this->interface;
     }
 
     /**
      * @return PreProcess
      */
-    public function getString($value) {
+    public function getString($value)
+    {
         return $this->string;
     }
 
     /**
      * @return XML
      */
-    public function toXML() {
-        return '<PreProcess KeyField="' . $this->keyField . '" '
-                . 'Interface="' . $this->interface . '">'
-                . $this->string
-                . '</PreProcess>';
+    public function toXML()
+    {
+        return '<PreProcess KeyField="'.$this->keyField.'" '
+                .'Interface="'.$this->interface.'">'
+                .$this->string
+                .'</PreProcess>';
     }
-
 }

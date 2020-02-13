@@ -4,7 +4,6 @@ use Illuminate\Database\Seeder;
 
 class ReportsTableSeeder extends Seeder
 {
-
     /**
      * Run the database seeds.
      *
@@ -23,5 +22,4 @@ class ReportsTableSeeder extends Seeder
             ['name' => 'FedEx Customs (individual entry)', 'description' => 'Breakdown of FedEx customs clearance', 'route' => 'fedex-customs', 'permission' => 'view_fedex_customs_report', 'criteria' => '{"carrier_id":2,"services":[7,9,10,11],"customs_value_low":2000.00,"customs_value_high":999999}', 'depot_id' => 1, 'mode_id' => 1],
         ]);
     }
-
 }

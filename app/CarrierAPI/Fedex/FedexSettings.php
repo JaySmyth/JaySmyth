@@ -12,33 +12,32 @@ use App\Carrier;
 use App\CarrierPackagingType;
 
 /**
- * Description of FedexFields
+ * Description of FedexFields.
  *
  * @author gmcbroom
  */
 class FedexSettings
 {
-
-    public $fieldDefs = array();
-    public $options = array();
-    public $hazardFlags = array();
-    public $mvfields = array();
-    public $addressType = array();
-    public $carrier = array();
-    public $svc = array();
-    public $packageTypes = array();
-    public $weightUnits = array();
-    public $shortWeightUnits = array();
-    public $dimensionUnits = array();
-    public $shortDimensionUnits = array();
-    public $payor = array();
-    public $paymentType = array();
-    public $terms = array();
-    public $labelDefn = array();
-    public $fldno = array();
-    public $group = array();
-    public $mult = array();
-    public $lbMult = array();
+    public $fieldDefs = [];
+    public $options = [];
+    public $hazardFlags = [];
+    public $mvfields = [];
+    public $addressType = [];
+    public $carrier = [];
+    public $svc = [];
+    public $packageTypes = [];
+    public $weightUnits = [];
+    public $shortWeightUnits = [];
+    public $dimensionUnits = [];
+    public $shortDimensionUnits = [];
+    public $payor = [];
+    public $paymentType = [];
+    public $terms = [];
+    public $labelDefn = [];
+    public $fldno = [];
+    public $group = [];
+    public $mult = [];
+    public $lbMult = [];
     public $labelStockType;
     public $logo;
 
@@ -98,7 +97,7 @@ class FedexSettings
         // Define supported Label Sizes
         $this->labelDefn = [
             'A4' => ['p', 'in', 'A4', true, 'UTF-8', false],
-            '6X4' => ['p', 'in', array(6, 4), true, 'UTF-8', false],
+            '6X4' => ['p', 'in', [6, 4], true, 'UTF-8', false],
         ];
 
         // Define Logo
@@ -218,12 +217,12 @@ class FedexSettings
         $this->fieldDefs[] = 'alcohol.volume/42/ALCOHOL/0/0';                     // Option triggered by alcohol.quantity
         //
         // $this->fieldDefs[] = 'CustomsClearanceDetail.FreeCirculation/1097/OPTION/0/0";
-        // 
+        //
         // Options - Details in Options function
         $this->fieldDefs[] = 'special_services/0/OPTION/0/0';
         //
         // Broker Fields
-        $this->fieldDefs[] = 'broker_select/1174/SHIPMENT/0/0';                   // Set this at shipment level       
+        $this->fieldDefs[] = 'broker_select/1174/SHIPMENT/0/0';                   // Set this at shipment level
         $this->fieldDefs[] = 'broker.contact/66/BROKER/0/0';
         $this->fieldDefs[] = 'broker.company/1180/BROKER/0/0';
         $this->fieldDefs[] = 'broker.telephone/67/BROKER/0/0';
@@ -279,7 +278,6 @@ class FedexSettings
          * *******************************************
          */
         foreach ($this->fieldDefs as $value) {
-
             $tmp = explode('/', $value);
             if (isset($tmp[0])) {
                 $this->fldno[$tmp[0]] = $tmp[1];
@@ -309,20 +307,20 @@ class FedexSettings
         }
     }
 
-    public function multiplier($uom, $key, $value, $mode = "enable")
+    public function multiplier($uom, $key, $value, $mode = 'enable')
     {
         $mult = 0;
         if (isset($this->mult[$uom][$this->fldno[$key]])) {
             $mult = $this->mult[$uom][$this->fldno[$key]];
         }
 
-        if ($mult > 0 && !is_numeric($value)) {
+        if ($mult > 0 && ! is_numeric($value)) {
             $msg = "uom: $uom, key: $key, value: $value, mode: $mode";
             mail('it@antrim.ifsgroup.com', "Error in CarrierAPI\FedexSettings - multiplier", $msg);
         }
 
         if ($mult > 0) {
-            if ($mode == "enable") {
+            if ($mode == 'enable') {
                 $value = $value * $mult;
             } else {
                 $value = $value / $mult;
@@ -331,5 +329,4 @@ class FedexSettings
 
         return $value;
     }
-
 }

@@ -2,19 +2,18 @@
 
 namespace App\Jobs;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7;
-use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Mail;
 
 class TransendOrderImport implements ShouldQueue
 {
-
     use InteractsWithQueue,
         Queueable,
         SerializesModels;
@@ -56,22 +55,22 @@ class TransendOrderImport implements ShouldQueue
             'headers' => [
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-            ]
+            ],
         ]);
 
         $jsonData = json_encode($this->buildRequest(), JSON_HEX_AMP | JSON_HEX_APOS);
 
-        if (!$jsonData) {
-            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Transend Order Import (' . $this->transportJob->number . ')', 'Failed to json encode data'));
+        if (! $jsonData) {
+            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Transend Order Import ('.$this->transportJob->number.')', 'Failed to json encode data'));
             exit();
         }
 
         if ($this->getDepot() == 'TEST') {
-            echo "\n\n" . $jsonData . "\n\n";
+            echo "\n\n".$jsonData."\n\n";
         }
 
         if ($this->transportJob->goods_description == 'TEST') {
-            Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError($this->transportJob->number . ' JSON', $jsonData));
+            Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError($this->transportJob->number.' JSON', $jsonData));
         }
 
         try {
@@ -83,16 +82,15 @@ class TransendOrderImport implements ShouldQueue
             $reply = json_decode($this->clean($response->getBody()->getContents()), true);
 
             // Order imported to transend successfully - update the tranport job to sent
-            if (isset($reply['RequestStatus']) && $reply['RequestStatus'] == "OK") {
+            if (isset($reply['RequestStatus']) && $reply['RequestStatus'] == 'OK') {
                 $this->transportJob->setToSent();
                 $this->transportJob->log('Transend Import Successful', ($this->actionIndicator == 'D') ? 'Cancel Job' : null, $reply);
             } else {
-                Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Transend Order Import Failed (' . $this->transportJob->number . ')', $reply['RequestError'] . ' - JSON: ' . $jsonData));
+                Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Transend Order Import Failed ('.$this->transportJob->number.')', $reply['RequestError'].' - JSON: '.$jsonData));
             }
         } catch (GuzzleException $exc) {
-
             if ($exc->hasResponse()) {
-                Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Transend Order Import GuzzleException (' . $this->transportJob->number . ')', Psr7\str($exc->getResponse()) . ' - JSON: ' . $jsonData));
+                Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Transend Order Import GuzzleException ('.$this->transportJob->number.')', Psr7\str($exc->getResponse()).' - JSON: '.$jsonData));
             }
         }
     }
@@ -122,12 +120,12 @@ class TransendOrderImport implements ShouldQueue
                         'ContactDetails' => $this->getContactDetail(),
                     ],
                     'StartDepotCode' => $this->getDepot(),
-                    'TransportOrderRef' => $this->transportJob->number . strtoupper($this->transportJob->type) . $this->transportJob->attempts,
+                    'TransportOrderRef' => $this->transportJob->number.strtoupper($this->transportJob->type).$this->transportJob->attempts,
                     'OrderDate' => $this->transportJob->date_requested->format('Y-m-d\TH:i:s'),
                     'DeliveryDate' => $this->transportJob->date_requested->format('Y-m-d\TH:i:s'),
                     'PlannedArriveTime' => $this->getPlannedTime(),
                     'PlannedDepartTime' => $this->getPlannedTime(15),
-                    'SpecialInstructions' => $this->transportJob->instructions . ' - FINAL DESTINATION: ' . $this->transportJob->final_destination . ' - PREMISES CLOSES: ' . $this->transportJob->closing_time,
+                    'SpecialInstructions' => $this->transportJob->instructions.' - FINAL DESTINATION: '.$this->transportJob->final_destination.' - PREMISES CLOSES: '.$this->transportJob->closing_time,
                     'TextField1' => $this->transportJob->transend_route,
                     'TextField2' => ($this->shipment) ? strtoupper($this->shipment->service->code) : $this->transportJob->transend_route,
                     'OrderJobs' => [
@@ -139,21 +137,21 @@ class TransendOrderImport implements ShouldQueue
                             'JobRef4' => $this->getAccountCode(),
                             'Sequence' => 1,
                             'ExpectedPaymentAmount' => $this->transportJob->cash_on_delivery,
-                            'OrderJobDetails' => $this->getJobDetails()
-                        ]
+                            'OrderJobDetails' => $this->getJobDetails(),
+                        ],
                     ],
-                    "Attributes" => [
+                    'Attributes' => [
                         [
                             'Code' => 'ROUTENO',
-                            'Value' => $this->transportJob->transend_route
+                            'Value' => $this->transportJob->transend_route,
                         ],
                         [
                             'Code' => 'SERVICE',
-                            'Value' => ($this->shipment) ? strtoupper($this->shipment->service->code) : $this->transportJob->transend_route
-                        ]
-                    ]
-                ]
-            ]
+                            'Value' => ($this->shipment) ? strtoupper($this->shipment->service->code) : $this->transportJob->transend_route,
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -185,16 +183,16 @@ class TransendOrderImport implements ShouldQueue
 
         // Deliveries, use company name and postcode
         if ($this->transportJob->type == 'd') {
-            return strtoupper(substr($this->transportJob->to_company_name, 0, 3) . '00' . preg_replace('/\s+/', '', $this->transportJob->to_postcode) . '-001');
+            return strtoupper(substr($this->transportJob->to_company_name, 0, 3).'00'.preg_replace('/\s+/', '', $this->transportJob->to_postcode).'-001');
         }
 
         // Collections with known SCS code
         if ($this->transportJob->scs_company_code) {
-            return $this->transportJob->scs_company_code . '-002';
+            return $this->transportJob->scs_company_code.'-002';
         }
 
         // Collections where SCS code isn't known, use company name and postcode
-        return strtoupper(substr($this->transportJob->from_company_name, 0, 3) . '00' . preg_replace('/\s+/', '', $this->transportJob->from_postcode) . '-002');
+        return strtoupper(substr($this->transportJob->from_company_name, 0, 3).'00'.preg_replace('/\s+/', '', $this->transportJob->from_postcode).'-002');
     }
 
     /**
@@ -205,10 +203,10 @@ class TransendOrderImport implements ShouldQueue
     private function getAccountName()
     {
         if ($this->transportJob->type == 'd') {
-            return strtoupper(substr($this->transportJob->to_company_name, 0, 3) . 00 . $this->transportJob->to_postcode);
+            return strtoupper(substr($this->transportJob->to_company_name, 0, 3). 00 .$this->transportJob->to_postcode);
         }
 
-        return ($this->shipment) ? $this->shipment->company->company_name : strtoupper(substr($this->transportJob->from_company_name, 0, 3) . 00 . $this->transportJob->from_postcode);
+        return ($this->shipment) ? $this->shipment->company->company_name : strtoupper(substr($this->transportJob->from_company_name, 0, 3). 00 .$this->transportJob->from_postcode);
     }
 
     /**
@@ -226,7 +224,7 @@ class TransendOrderImport implements ShouldQueue
                 'Address4' => $this->transportJob->to_address3,
                 'Address5' => $this->transportJob->to_city,
                 'Address6' => $this->transportJob->to_state,
-                'PostCode' => ($this->transportJob->to_postcode) ? $this->transportJob->to_postcode : 'XX'
+                'PostCode' => ($this->transportJob->to_postcode) ? $this->transportJob->to_postcode : 'XX',
             ];
         }
 
@@ -237,7 +235,7 @@ class TransendOrderImport implements ShouldQueue
             'Address4' => $this->transportJob->from_address3,
             'Address5' => $this->transportJob->from_city,
             'Address6' => $this->transportJob->from_state,
-            'PostCode' => ($this->transportJob->from_postcode) ? $this->transportJob->from_postcode : 'XX'
+            'PostCode' => ($this->transportJob->from_postcode) ? $this->transportJob->from_postcode : 'XX',
         ];
     }
 
@@ -274,22 +272,22 @@ class TransendOrderImport implements ShouldQueue
         $time = '12:00';
 
         if ($this->transportJob->type == 'c') {
-            if (!empty($this->transportJob->routing['collection_time'])) {
+            if (! empty($this->transportJob->routing['collection_time'])) {
                 $time = $this->transportJob->routing['collection_time'];
             }
         } else {
-            if (!empty($this->transportJob->routing['delivery_time'])) {
+            if (! empty($this->transportJob->routing['delivery_time'])) {
                 $time = $this->transportJob->routing['delivery_time'];
             }
         }
 
-        $time = Carbon::parse(date('Y-m-d') . " " . $time);
+        $time = Carbon::parse(date('Y-m-d').' '.$time);
 
         if ($minutes) {
-            return $time->addMinutes($minutes)->format("Y-m-d H:i:s");
+            return $time->addMinutes($minutes)->format('Y-m-d H:i:s');
         }
 
-        return $time->format("Y-m-d H:i:s");
+        return $time->format('Y-m-d H:i:s');
     }
 
     /**
@@ -300,13 +298,13 @@ class TransendOrderImport implements ShouldQueue
     protected function getJobTypeCode()
     {
         // Courier job, use the service code with appendage
-        if (!empty($this->shipment->service->code)) {
-            return strtoupper($this->shipment->service->code . $this->transportJob->type);
+        if (! empty($this->shipment->service->code)) {
+            return strtoupper($this->shipment->service->code.$this->transportJob->type);
         }
 
         // For non courier jobs, use the transend code defined in the departments table with appendage
-        if (!empty($this->transportJob->department->transend_code)) {
-            return strtoupper($this->transportJob->department->transend_code . $this->transportJob->type);
+        if (! empty($this->transportJob->department->transend_code)) {
+            return strtoupper($this->transportJob->department->transend_code.$this->transportJob->type);
         }
 
         return 'unknown';
@@ -322,9 +320,7 @@ class TransendOrderImport implements ShouldQueue
         $details = [];
 
         if ($this->shipment) {
-
             foreach ($this->shipment->packages as $package) {
-
                 $contents = $package->getContents();
 
                 $details[] = [
@@ -348,7 +344,7 @@ class TransendOrderImport implements ShouldQueue
             'OrderedQty' => $this->transportJob->pieces,
             'OriginalDespatchQty' => $this->transportJob->pieces,
             'SkuWeight' => $this->getTransportJobWeight('weight'),
-            'SkuCube' => $this->getTransportJobWeight('volumetric_weight')
+            'SkuCube' => $this->getTransportJobWeight('volumetric_weight'),
         ];
 
         return $details;
@@ -361,13 +357,11 @@ class TransendOrderImport implements ShouldQueue
      */
     private function getTransportJobWeight($field)
     {
-
         if ($this->transportJob->$field > 0 && $this->transportJob->pieces > 1) {
             return $this->transportJob->$field / $this->transportJob->pieces;
         }
 
         return $this->transportJob->$field;
-
     }
 
     /**
@@ -378,9 +372,9 @@ class TransendOrderImport implements ShouldQueue
      */
     private function clean($string)
     {
-        $pos = strpos($string, "{");
+        $pos = strpos($string, '{');
         $string = substr($string, $pos);
-        $string = str_replace("\r\n", "", $string);
+        $string = str_replace("\r\n", '', $string);
         $pos = strrpos($string, '}');
         $string = substr($string, 0, $pos + 1);
 
@@ -395,7 +389,6 @@ class TransendOrderImport implements ShouldQueue
      */
     public function failed($exception)
     {
-        Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Transend Order Import (' . $this->transportJob->number . ')', $exception));
+        Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Transend Order Import ('.$this->transportJob->number.')', $exception));
     }
-
 }

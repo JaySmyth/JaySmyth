@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class MfJobLine extends Model
 {
-
     /**
      * The connection name for the model.
      *
@@ -20,7 +19,4 @@ class MfJobLine extends Model
      * @var string
      */
     protected $table = 'mf_job_line';
-
-
-
 }

@@ -2,13 +2,12 @@
 
 namespace App\Console\Commands\Maintenance;
 
-use Carbon\Carbon;
 use App\TransportJob;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class CloseStagnantTransportJobs extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -49,23 +48,22 @@ class CloseStagnantTransportJobs extends Command
                 ->orderBy('date_requested', 'ASC')
                 ->get();
 
-        $this->info($transportJobs->count() . ' transport jobs found');
+        $this->info($transportJobs->count().' transport jobs found');
 
         foreach ($transportJobs as $transportJob) {
-
             $datetime = Carbon::now();
 
             $transportJob->close($datetime, '* NO POD RECEIVED *', 0, null, false);
 
-            $this->info($transportJob->number . ' closed!');
+            $this->info($transportJob->number.' closed!');
 
             if ($transportJob->shipment) {
                 if (strlen($transportJob->shipment->pod_signature) == 0) {
                     $transportJob->shipment->setStatus('unknown', 0, $datetime, false);
-                    $this->info($transportJob->shipment->consignment_number . ' set to status "unknown"');
+                    $this->info($transportJob->shipment->consignment_number.' set to status "unknown"');
                 } else {
                     $transportJob->shipment->setStatus('delivered', 0, $transportJob->shipment->delivery_date, false);
-                    $this->info($transportJob->shipment->consignment_number . ' set to status "DELIVERED"');
+                    $this->info($transportJob->shipment->consignment_number.' set to status "DELIVERED"');
                 }
             }
         }
@@ -77,23 +75,20 @@ class CloseStagnantTransportJobs extends Command
         $transportJobs = \App\TransportJob::whereNotNull('shipment_id')->whereType('d')->groupBy('shipment_id')->havingRaw('count(*) > 1')->orderBy('shipment_id')->get();
 
         foreach ($transportJobs as $job) {
-
             $duplicateTransportJobs = \App\TransportJob::whereShipmentId($job->shipment_id)->whereType($job->type)->whereCompleted(0)->get();
 
             foreach ($duplicateTransportJobs as $dup) {
-
                 $count = \App\TransportJob::whereShipmentId($job->shipment_id)->whereType($job->type)->count();
 
                 if ($count > 1) {
-                    $this->error('Deleting ' . $dup->number . ' / ' . $job->reference);
+                    $this->error('Deleting '.$dup->number.' / '.$job->reference);
                     $dup->delete();
                 } else {
                     $this->info('No duplicates');
                 }
             }
         }
-        
+
         $this->info('Finished');
     }
-
 }

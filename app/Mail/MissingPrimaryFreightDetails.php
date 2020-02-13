@@ -8,7 +8,6 @@ use Illuminate\Queue\SerializesModels;
 
 class MissingPrimaryFreightDetails extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -33,10 +32,8 @@ class MissingPrimaryFreightDetails extends Mailable
      */
     public function build()
     {
-
         return $this->view('emails.shipments.missing_shipment_details')
                         ->subject($this->subject)
                         ->with(['subject' => $this->subject, 'shipments' => $this->shipments]);
     }
-
 }

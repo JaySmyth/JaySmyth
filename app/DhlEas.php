@@ -16,7 +16,7 @@ class DhlEas extends Model
         $response = null;
 
         $length = strlen($postcode);
-        for ($i=$length; $i>=4; $i--) {
+        for ($i = $length; $i >= 4; $i--) {
             if ($this->checkForMatch($countryCode, '', substr($postcode, 0, $i))) {
                 return true;
             }
@@ -29,7 +29,6 @@ class DhlEas extends Model
         if ($this->checkForMatch($countryCode)) {
             return true;
         }
-
 
         return false;
     }

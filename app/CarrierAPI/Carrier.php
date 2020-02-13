@@ -5,12 +5,12 @@ namespace App\CarrierAPI;
 use Illuminate\Support\Facades\Validator;
 
 /**
- * Description of DHLWebAPI
+ * Description of DHLWebAPI.
  *
  * @author gmcbroom
  */
-class Carrier {
-
+class Carrier
+{
     public $siteId;
     public $password;
     public $accounts;
@@ -23,7 +23,8 @@ class Carrier {
     public $logo;
     public $transactionHeader = 'Test Transaction';
 
-    function __construct($mode) {
+    public function __construct($mode)
+    {
 
         /*
          * *****************************************
@@ -34,15 +35,18 @@ class Carrier {
         $this->initCarrier();                                                   // Set Carrier Defaults and conversion tables
     }
 
-    function initCarrier() {
+    public function initCarrier()
+    {
         // Carrier Specific Code
     }
 
-    function setVersion() {
-        return "IFS_API_1.1";
+    public function setVersion()
+    {
+        return 'IFS_API_1.1';
     }
 
-    function logMsg($data = '', $msg = '', $type = '') { //log a transaction to the database
+    public function logMsg($data = '', $msg = '', $type = '')
+    { //log a transaction to the database
 
         /*
           if (isset($data['ShipCompanyName'])) {
@@ -69,12 +73,12 @@ class Carrier {
           $FX_Log->SetField('date', date('d-m-y'));
           $FX_Log->SetField('time', date('H:i:s'));
           $FX_Log->Insert();
-         * 
+         *
          */
     }
 
-    public function validateShipment($shipment) {
-
+    public function validateShipment($shipment)
+    {
         $errors = [];
 
         $shipmentValidation = Validator::make($shipment, [
@@ -82,15 +86,14 @@ class Carrier {
         ]);
 
         if ($shipmentValidation->fails()) {
-
             $errors = $this->buildValidationErrors($shipmentValidation->errors());
         }
 
         return $errors;
     }
 
-    public function buildValidationErrors($messages) {
-
+    public function buildValidationErrors($messages)
+    {
         foreach ($messages->all() as $message) {
             $errors[] = $message;
         }
@@ -98,22 +101,22 @@ class Carrier {
         return $errors;
     }
 
-    public function generateErrors($response, $errors) {
-
-        $response['Result'] = "ERROR";
+    public function generateErrors($response, $errors)
+    {
+        $response['Result'] = 'ERROR';
         if (is_array($errors)) {
             foreach ($errors as $error) {
-                $response["Errors"][] = $error;
+                $response['Errors'][] = $error;
             }
         } else {
-            $response["Errors"][] = $errors;
+            $response['Errors'][] = $errors;
         }
 
         return $response;
     }
 
-    public function getElement($shipment, $target) {
-
+    public function getElement($shipment, $target)
+    {
         $locArr = explode('.', $target);
         $data = '';
 
@@ -153,7 +156,8 @@ class Carrier {
         return $data;
     }
 
-    public function getData($data, $key) {
+    public function getData($data, $key)
+    {
 
         // Check to see if data contains a multivalue item
         $pos = strpos($key, '.*.');
@@ -180,8 +184,8 @@ class Carrier {
         return $result;
     }
 
-    public function getPayorAccount($data, $terms) {
-
+    public function getPayorAccount($data, $terms)
+    {
         switch ($terms) {
             case 'SHIPPER':
                 $payor = $this->getData($data, 'Shipper.Contact.Account');
@@ -203,8 +207,8 @@ class Carrier {
         return $payor;
     }
 
-    public function getPayorCountry($data, $terms) {
-
+    public function getPayorCountry($data, $terms)
+    {
         switch ($terms) {
             case 'SHIPPER':
                 $country = $this->getData($data, 'Shipper.Address.CountryCode');
@@ -226,8 +230,8 @@ class Carrier {
         return $country;
     }
 
-    public function generateError($errors, $source) {
-
+    public function generateError($errors, $source)
+    {
         $response['TransactionHeader'] = $this->transactionHeader;
         $response['Result'] = 'ERROR';
         // $response['Notifications']['Source'] = $source;
@@ -238,8 +242,8 @@ class Carrier {
         return $response;
     }
 
-    public function generateSuccess($source = "API") {
-
+    public function generateSuccess($source = 'API')
+    {
         $response['TransactionHeader'] = $this->transactionHeader;
         $response['Result'] = 'SUCCESS';
         // $response['Notifications']['Source'] = $source;
@@ -258,42 +262,48 @@ class Carrier {
      * *********************************************
      */
 
-    public function checkAddress($address) {
+    public function checkAddress($address)
+    {
         // Carrier Specific Code
     }
 
-    public function requestPickup($pickup_request) {
+    public function requestPickup($pickup_request)
+    {
         // Carrier Specific Code
     }
 
-    private function createPickupResponse($reply) {
+    private function createPickupResponse($reply)
+    {
         // Carrier Specific Code
     }
 
-    public function cancelPickup($cancel_request) {
+    public function cancelPickup($cancel_request)
+    {
         // Carrier Specific Code
     }
 
-    private function cancelPickupResponse($reply) {
+    private function cancelPickupResponse($reply)
+    {
         // Carrier Specific Code
     }
 
-    public function checkAvailServices($shipment) {
+    public function checkAvailServices($shipment)
+    {
         // Carrier Specific Code
     }
 
-    private function createAvailabilityResponse($data) {
+    private function createAvailabilityResponse($data)
+    {
         // Carrier Specific Code
     }
 
-    public function createShipment($shipment) {
+    public function createShipment($shipment)
+    {
         // Carrier Specific Code
     }
 
-    private function createShipmentResponse($reply) {
+    private function createShipmentResponse($reply)
+    {
         // Carrier Specific Code
     }
-
 }
-
-?>

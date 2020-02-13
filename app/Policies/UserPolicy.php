@@ -7,13 +7,12 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 
 class UserPolicy
 {
-
     use HandlesAuthorization;
 
     /**
      * Index policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function index(User $user)
     {
@@ -25,7 +24,7 @@ class UserPolicy
     /**
      * Show policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function view(User $user, User $otherUser)
     {
@@ -37,7 +36,7 @@ class UserPolicy
     /**
      * Create policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function create(User $user)
     {
@@ -49,7 +48,7 @@ class UserPolicy
     /**
      * Update policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function update(User $user, User $otherUser)
     {
@@ -61,7 +60,7 @@ class UserPolicy
     /**
      * Delete policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function delete(User $user, User $otherUser)
     {
@@ -73,7 +72,7 @@ class UserPolicy
     /**
      * Add company policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function addCompany(User $user, User $otherUser)
     {
@@ -85,7 +84,7 @@ class UserPolicy
     /**
      * Remove company policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function removeCompany(User $user, User $otherUser)
     {
@@ -97,14 +96,12 @@ class UserPolicy
     /**
      * Reset password policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function resetPassword(User $user, User $otherUser)
     {
-
         if ($user->hasPermission('reset_password') && $user->relatedTo($otherUser)) {
             return true;
         }
     }
-
 }

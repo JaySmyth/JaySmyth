@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Http\Request;
-use App\PurchaseInvoice;
-use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Storage;
 use App\Exports\PurchaseInvoicesExport;
+use App\Http\Controllers\Controller;
+use App\PurchaseInvoice;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PurchaseInvoicesController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -67,7 +66,7 @@ class PurchaseInvoicesController extends Controller
             $query->limit($limit);
         }
 
-        if (!$paginate) {
+        if (! $paginate) {
             return $query->get();
         }
 
@@ -135,11 +134,13 @@ class PurchaseInvoicesController extends Controller
         $purchaseInvoice = PurchaseInvoice::findOrFail($id);
 
         if ($purchaseInvoice->setPassed($request->user()->id)) {
-            flash()->success('Invoice Passed!', $purchaseInvoice->carrier->name . " invoice $purchaseInvoice->invoice_number has been passed.", true);
+            flash()->success('Invoice Passed!', $purchaseInvoice->carrier->name." invoice $purchaseInvoice->invoice_number has been passed.", true);
+
             return back();
         }
 
-        flash()->info('Already Passed!', $purchaseInvoice->carrier->name . " invoice $purchaseInvoice->invoice_number has already been passed.", true);
+        flash()->info('Already Passed!', $purchaseInvoice->carrier->name." invoice $purchaseInvoice->invoice_number has already been passed.", true);
+
         return back();
     }
 
@@ -157,11 +158,13 @@ class PurchaseInvoicesController extends Controller
         $purchaseInvoice = PurchaseInvoice::findOrFail($id);
 
         if ($purchaseInvoice->setExported()) {
-            flash()->success('Invoice Exported!', $purchaseInvoice->carrier->name . " invoice $purchaseInvoice->invoice_number will be included in the next XML generation.", true);
+            flash()->success('Invoice Exported!', $purchaseInvoice->carrier->name." invoice $purchaseInvoice->invoice_number will be included in the next XML generation.", true);
+
             return back();
         }
 
-        flash()->info('Already xported!', $purchaseInvoice->carrier->name . " invoice $purchaseInvoice->invoice_number has already been exported.", true);
+        flash()->info('Already xported!', $purchaseInvoice->carrier->name." invoice $purchaseInvoice->invoice_number has already been exported.", true);
+
         return back();
     }
 
@@ -178,11 +181,13 @@ class PurchaseInvoicesController extends Controller
         $purchaseInvoice = PurchaseInvoice::findOrFail($id);
 
         if ($purchaseInvoice->setReceived()) {
-            flash()->success('Invoice Received!', $purchaseInvoice->carrier->name . " invoice $purchaseInvoice->invoice_number has been flagged as physically received.", true);
+            flash()->success('Invoice Received!', $purchaseInvoice->carrier->name." invoice $purchaseInvoice->invoice_number has been flagged as physically received.", true);
+
             return back();
         }
 
-        flash()->info('Receipt Flag Removed!', $purchaseInvoice->carrier->name . " invoice $purchaseInvoice->invoice_number has been flagged as not rceived.", true);
+        flash()->info('Receipt Flag Removed!', $purchaseInvoice->carrier->name." invoice $purchaseInvoice->invoice_number has been flagged as not rceived.", true);
+
         return back();
     }
 
@@ -199,11 +204,13 @@ class PurchaseInvoicesController extends Controller
         $purchaseInvoice = PurchaseInvoice::findOrFail($id);
 
         if ($purchaseInvoice->setQueried()) {
-            flash()->success('Invoice Queried!', $purchaseInvoice->carrier->name . " invoice $purchaseInvoice->invoice_number has been flagged as queried.", true);
+            flash()->success('Invoice Queried!', $purchaseInvoice->carrier->name." invoice $purchaseInvoice->invoice_number has been flagged as queried.", true);
+
             return back();
         }
 
-        flash()->info('Query Flag Removed!', "The query flag has been removed from " . $purchaseInvoice->carrier->name . " invoice $purchaseInvoice->invoice_number.", true);
+        flash()->info('Query Flag Removed!', 'The query flag has been removed from '.$purchaseInvoice->carrier->name." invoice $purchaseInvoice->invoice_number.", true);
+
         return back();
     }
 
@@ -220,11 +227,13 @@ class PurchaseInvoicesController extends Controller
         $purchaseInvoice = PurchaseInvoice::findOrFail($id);
 
         if ($purchaseInvoice->setCosts()) {
-            flash()->success('Costs Entered!', $purchaseInvoice->carrier->name . " invoice $purchaseInvoice->invoice_number has been flagged as having SCS costs entered.", true);
+            flash()->success('Costs Entered!', $purchaseInvoice->carrier->name." invoice $purchaseInvoice->invoice_number has been flagged as having SCS costs entered.", true);
+
             return back();
         }
 
-        flash()->info('Costs Flag Removed!', "The costs flag has been removed from " . $purchaseInvoice->carrier->name . " invoice $purchaseInvoice->invoice_number.", true);
+        flash()->info('Costs Flag Removed!', 'The costs flag has been removed from '.$purchaseInvoice->carrier->name." invoice $purchaseInvoice->invoice_number.", true);
+
         return back();
     }
 
@@ -241,11 +250,13 @@ class PurchaseInvoicesController extends Controller
         $purchaseInvoice = PurchaseInvoice::findOrFail($id);
 
         if ($purchaseInvoice->setCopyDocs()) {
-            flash()->success('Copy Docs Flag Set!', $purchaseInvoice->carrier->name . " invoice $purchaseInvoice->invoice_number will be included within the next copy docs email request.", true);
+            flash()->success('Copy Docs Flag Set!', $purchaseInvoice->carrier->name." invoice $purchaseInvoice->invoice_number will be included within the next copy docs email request.", true);
+
             return back();
         }
 
-        flash()->info('Copy Docs Flag Removed!', "The copy docs flag has been removed from " . $purchaseInvoice->carrier->name . " invoice $purchaseInvoice->invoice_number.", true);
+        flash()->info('Copy Docs Flag Removed!', 'The copy docs flag has been removed from '.$purchaseInvoice->carrier->name." invoice $purchaseInvoice->invoice_number.", true);
+
         return back();
     }
 
@@ -283,7 +294,7 @@ class PurchaseInvoicesController extends Controller
 
         $purchaseInvoiceLines = $purchaseInvoice->getNegativeVariances();
 
-        return Excel::download(new \App\Exports\PurchaseInvoiceNegativeVariancesExport($purchaseInvoiceLines), 'NV_' . $purchaseInvoice->invoice_number . '.xlsx');
+        return Excel::download(new \App\Exports\PurchaseInvoiceNegativeVariancesExport($purchaseInvoiceLines), 'NV_'.$purchaseInvoice->invoice_number.'.xlsx');
     }
 
     /**
@@ -298,7 +309,7 @@ class PurchaseInvoicesController extends Controller
 
         $purchaseInvoice = PurchaseInvoice::findOrFail($id);
 
-        return Excel::download(new \App\Exports\PurchaseInvoiceCostComparisonExport($purchaseInvoice), $purchaseInvoice->invoice_number . '.xlsx');
+        return Excel::download(new \App\Exports\PurchaseInvoiceCostComparisonExport($purchaseInvoice), $purchaseInvoice->invoice_number.'.xlsx');
     }
 
     /**
@@ -316,7 +327,6 @@ class PurchaseInvoicesController extends Controller
         $purchaseInvoices = PurchaseInvoice::whereCopyDocs(1)->whereCopyDocsEmailSent(0)->get();
 
         if ($purchaseInvoices->count() > 0) {
-
             PurchaseInvoice::whereCopyDocs(1)->whereCopyDocsEmailSent(0)->update(['copy_docs_email_sent' => 1]);
 
             dispatch(new \App\Jobs\RequestPurchaseInvoiceCopyDocs($purchaseInvoices, $request->user()));
@@ -327,6 +337,7 @@ class PurchaseInvoicesController extends Controller
         }
 
         flash()->error('No invoices flagged for copy docs request!');
+
         return back();
     }
 
@@ -343,7 +354,6 @@ class PurchaseInvoicesController extends Controller
         $purchaseInvoices = PurchaseInvoice::whereExported(1)->whereXmlGenerated(0)->pluck('id');
 
         if ($purchaseInvoices->count() > 0) {
-
             dispatch(new \App\Jobs\ExportPurchaseInvoices($purchaseInvoices, $request->user()));
 
             flash()->success('Exporting Invoices', 'Invoices are being processed, you will receive an email once complete.');
@@ -387,7 +397,7 @@ class PurchaseInvoicesController extends Controller
 
         $xml = $purchaseInvoice->getMultifreightXml();
 
-        $pathToFile = 'temp/' . $purchaseInvoice->invoice_number . '.xml';
+        $pathToFile = 'temp/'.$purchaseInvoice->invoice_number.'.xml';
 
         // Write to temp storage
         Storage::disk('local')->put($pathToFile, $xml);
@@ -397,10 +407,10 @@ class PurchaseInvoicesController extends Controller
             'Content-Description' => 'File Transfer',
             'Content-Disposition' => "attachment; filename=$purchaseInvoice->invoice_number.xml",
             'Content-Transfer-Encoding' => 'binary',
-            'Content-Type' => 'text/xml'
+            'Content-Type' => 'text/xml',
         ];
 
-        return response()->file(storage_path() . '/app/' . $pathToFile, $headers);
+        return response()->file(storage_path().'/app/'.$pathToFile, $headers);
     }
 
     /*
@@ -426,5 +436,4 @@ class PurchaseInvoicesController extends Controller
 
         return Excel::download(new PurchaseInvoicesExport($invoices), 'invoices.xlsx');
     }
-
 }

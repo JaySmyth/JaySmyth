@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\FailedJobCollection;
+use App\Http\Resources\FailedJobResource;
+use App\Http\Resources\JobCollection;
+use App\Http\Resources\JobResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Http\Resources\JobResource;
-use App\Http\Resources\JobCollection;
-use App\Http\Resources\FailedJobResource;
-use App\Http\Resources\FailedJobCollection;
 
 class JobsController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -24,7 +23,7 @@ class JobsController extends Controller
 
     /**
      * List jobs.
-     * 
+     *
      * @param Request $request
      * @return type
      */
@@ -35,18 +34,16 @@ class JobsController extends Controller
 
     /**
      * Retry job.
-     * 
+     *
      * @param Request $request
      * @return type
      */
     public function retryJob(Request $request)
     {
         if ($request->ajax()) {
-
             $job = DB::table('failed_jobs')->where('id', $request->id)->first();
 
             if ($job) {
-
                 exec("cd /var/www/ifs; php artisan queue:retry $request->id", $output);
 
                 return response()->json($output);
@@ -56,19 +53,17 @@ class JobsController extends Controller
 
     /**
      * Retry all.
-     * 
+     *
      * @param Request $request
      * @return type
      */
     public function retryAll(Request $request)
     {
         if ($request->ajax()) {
-
             $jobs = DB::table('failed_jobs')->get();
 
             if ($jobs->count() > 0) {
-
-                exec("cd /var/www/ifs; php artisan queue:retry all", $output);
+                exec('cd /var/www/ifs; php artisan queue:retry all', $output);
 
                 return response()->json($output);
             }
@@ -77,7 +72,7 @@ class JobsController extends Controller
 
     /**
      * Get jobs.
-     * 
+     *
      * @return json
      */
     public function getJobs()
@@ -89,7 +84,7 @@ class JobsController extends Controller
 
     /**
      * Get failed jobs.
-     * 
+     *
      * @return json
      */
     public function getFailedJobs()
@@ -101,7 +96,7 @@ class JobsController extends Controller
 
     /**
      * List jobs.
-     * 
+     *
      * @param Request $request
      * @return type
      */
@@ -112,14 +107,13 @@ class JobsController extends Controller
 
     /**
      * Get running php processes.
-     * 
+     *
      * @return json
      */
     public function getProcesses()
     {
         if (request()->wantsJson()) {
-
-            exec("ps -ef | grep php", $output);
+            exec('ps -ef | grep php', $output);
 
             foreach ($output as $key => $value):
                 if (stristr($value, 'grep php')) {
@@ -130,5 +124,4 @@ class JobsController extends Controller
             return response()->json($output);
         }
     }
-
 }

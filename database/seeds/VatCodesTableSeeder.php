@@ -4,7 +4,6 @@ use Illuminate\Database\Seeder;
 
 class VatCodesTableSeeder extends Seeder
 {
-
     /**
      * Run the database seeds.
      *
@@ -22,9 +21,8 @@ class VatCodesTableSeeder extends Seeder
 
         // Modify a few records
         DB::table('vat_codes')->insert($data);
-        
+
         // Enable Foreign Key Checks
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
-
 }

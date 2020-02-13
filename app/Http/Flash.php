@@ -6,7 +6,6 @@ use Illuminate\Support\Arr;
 
 class Flash
 {
-
     protected $key = 'flash';
 
     public function info($title, $message = null, $overlay = false, $html = false)
@@ -17,7 +16,7 @@ class Flash
     public function create($type, $title, $message = null, $overlay = false, $html = false)
     {
         if ($html) {
-            $message = str_replace(["\r\n", "\r", "\n"], "<br/>", $message);
+            $message = str_replace(["\r\n", "\r", "\n"], '<br/>', $message);
         }
 
         $message = str_replace("'", '', $message);
@@ -27,7 +26,7 @@ class Flash
             'title' => $title,
             'message' => is_array($message) ? Arr::flatten($message) : $message,
             'overlay' => $overlay,
-            'html' => $html
+            'html' => $html,
         ]);
     }
 
@@ -50,5 +49,4 @@ class Flash
     {
         return $this->create('question', $title, $message, $overlay, $html);
     }
-
 }

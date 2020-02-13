@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class JobCol extends Model
 {
-
     /**
      * The connection name for the model.
      *
@@ -35,7 +34,7 @@ class JobCol extends Model
 
     /**
      * A collection belongs to a header.
-     * 
+     *
      * @return type
      */
     public function header()
@@ -45,7 +44,7 @@ class JobCol extends Model
 
     /**
      * Get the scs job number.
-     * 
+     *
      * @return type
      */
     public function getScsJobNumberAttribute()
@@ -61,5 +60,4 @@ class JobCol extends Model
         $this->dirty = 0;
         $this->save();
     }
-
 }

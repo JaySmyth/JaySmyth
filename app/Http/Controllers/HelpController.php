@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Requests;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
 class HelpController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -20,7 +19,6 @@ class HelpController extends Controller
     }
 
     /**
-     * 
      * @return type
      */
     public function index()
@@ -29,7 +27,6 @@ class HelpController extends Controller
     }
 
     /**
-     * 
      * @return type
      */
     public function feedback()
@@ -38,7 +35,6 @@ class HelpController extends Controller
     }
 
     /**
-     * 
      * @return type
      */
     public function sendFeedback(Request $request)
@@ -62,5 +58,4 @@ class HelpController extends Controller
 
         return redirect('/');
     }
-
 }

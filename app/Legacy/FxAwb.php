@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\DB;
 
 class FxAwb extends Model
 {
-
     /**
      * The connection name for the model.
      *
@@ -44,11 +43,11 @@ class FxAwb extends Model
 
     /**
      * Sets a package to received and inserts a tracking event.
-     * 
+     *
      * @param type $userId
      * @param type $dateReceived
      * @param type $carrierScan
-     * @return boolean
+     * @return bool
      */
     public function setReceived($dateReceived = null, $userId = 0, $carrierScan = false)
     {
@@ -68,8 +67,8 @@ class FxAwb extends Model
          * Add a tracking event to the shipment
          */
 
-        $message = 'Package ' .  $this->shipment->getPackageScanCount() . ' received';
-        $message = ($carrierScan) ? $message . ' (carrier scan)' : $message;
+        $message = 'Package '.$this->shipment->getPackageScanCount().' received';
+        $message = ($carrierScan) ? $message.' (carrier scan)' : $message;
 
         DB::connection('legacy')->table('ShipTrack')->insert(
                 [
@@ -82,7 +81,7 @@ class FxAwb extends Model
                     'eventtype' => 'FirstScan',
                     'location' => 'IFS Global Logistics',
                     'city' => 'Antrim',
-                    'countrycode' => 'GB'
+                    'countrycode' => 'GB',
                 ]
         );
 
@@ -108,5 +107,4 @@ class FxAwb extends Model
 
         return true;
     }
-
 }

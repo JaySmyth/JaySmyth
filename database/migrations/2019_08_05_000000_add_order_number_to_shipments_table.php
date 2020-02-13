@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AddOrderNumberToShipmentsTable extends Migration
 {
@@ -15,7 +15,6 @@ class AddOrderNumberToShipmentsTable extends Migration
     {
         Schema::table('shipments', function (Blueprint $table) {
             $table->string('order_number')->nullable()->after('shipment_reference');
-
         });
     }
 

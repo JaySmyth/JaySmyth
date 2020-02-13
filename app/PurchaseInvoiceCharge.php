@@ -3,14 +3,14 @@
 namespace App;
 
 use App\CarrierChargeCode;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Mail;
 
 class PurchaseInvoiceCharge extends Model
 {
     /*
      * Black list of NON mass assignable - all others are mass assignable.
-     * 
+     *
      * @var array
      */
 
@@ -56,14 +56,13 @@ class PurchaseInvoiceCharge extends Model
     /**
      * Set the carrier charge code id. If charge is not recognised, a charge will be created
      * in the carrier charge codes table. Notification email sent to advise.
-     *
      */
     public function setCarrierChargeId()
     {
         $carrierChargeCode = CarrierChargeCode::whereCarrierId($this->purchaseInvoice->carrier_id)->whereCode($this->code)->first();
 
         // We don't know about this charge code, add it to the carrier charge codes table
-        if (!$carrierChargeCode) {
+        if (! $carrierChargeCode) {
             $carrierChargeCode = new CarrierChargeCode();
             $carrierChargeCode->code = $this->code;
             $carrierChargeCode->description = ($this->description) ? $this->description : 'Unknown';
@@ -91,8 +90,6 @@ class PurchaseInvoiceCharge extends Model
         if ($this->carrierChargeCode) {
             return $this->carrierChargeCode->scs_code;
         }
-
-        return null;
     }
 
     /**
@@ -110,18 +107,18 @@ class PurchaseInvoiceCharge extends Model
     }
 
     /**
-     * Returns true/false - checks the string against the charge type description
+     * Returns true/false - checks the string against the charge type description.
      *
      * @param type $chargeType
      * @param type $string
-     * @return boolean
+     * @return bool
      */
-    function hasDescription($description)
+    public function hasDescription($description)
     {
         if ($this->carrierChargeCode && stristr($this->carrierChargeCode->description, $description)) {
             return true;
         }
+
         return false;
     }
-
 }

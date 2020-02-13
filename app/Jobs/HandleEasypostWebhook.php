@@ -2,18 +2,17 @@
 
 namespace App\Jobs;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Mail;
-use App\Tracking;
 use App\ProblemEvent;
+use App\Tracking;
 use Carbon\Carbon;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Mail;
 
 class HandleEasypostWebhook implements ShouldQueue
 {
-
     use InteractsWithQueue,
         Queueable,
         SerializesModels;
@@ -41,14 +40,13 @@ class HandleEasypostWebhook implements ShouldQueue
     public function handle()
     {
         foreach ($this->result['tracking_details'] as $event) {
-
             $event = $this->tidyUpEvent($event);
 
             /*
              * Ignore tracking events prior to date shipment was created.
              * This is to combat situations where easypost have sent old tracking
              * for duplicate trackers on their system.
-             * 
+             *
              */
 
             $createdAt = $this->shipment->created_at->subHours(2);
@@ -89,6 +87,7 @@ class HandleEasypostWebhook implements ShouldQueue
         $event['local_estimated_delivery_date'] = ($this->result['est_delivery_date']) ? Carbon::parse($this->result['est_delivery_date']) : null;
         $event['user_id'] = 0;
         $event['message'] = ($event['message']) ? $event['message'] : $event['status'];
+
         return $event;
     }
 
@@ -101,10 +100,10 @@ class HandleEasypostWebhook implements ShouldQueue
     {
         $ignore = ['pre_transit', 'cancelled', 'unknown', 'error', 'failure'];
 
-        if (!in_array($event['status'], $ignore)) {
+        if (! in_array($event['status'], $ignore)) {
 
             // Set to received
-            if (!$this->shipment->received) {
+            if (! $this->shipment->received) {
                 $this->shipment->setReceived($event['datetime'], 0, true);
             }
 
@@ -115,7 +114,7 @@ class HandleEasypostWebhook implements ShouldQueue
             }
 
             // Add shipment to last manifest closed out.
-            if (!is_numeric($this->shipment->manifest_id)) {
+            if (! is_numeric($this->shipment->manifest_id)) {
                 //$this->shipment->addToLastManifest();
             }
         }
@@ -148,8 +147,8 @@ class HandleEasypostWebhook implements ShouldQueue
 
                 break;
 
-            case 'out_for_delivery' :
-            case 'cancelled' :
+            case 'out_for_delivery':
+            case 'cancelled':
                 $this->shipment->setStatus($event['status'], 0, false, false);
 
                 if ($event['message'] == 'On carrier vehicle for delivery' && $event['city'] == 'ANTRIM GB') {
@@ -160,7 +159,7 @@ class HandleEasypostWebhook implements ShouldQueue
 
                 break;
 
-            case 'delivered' :
+            case 'delivered':
                 $this->shipment->setDelivered($event['datetime'], $this->result['signed_by']);
                 break;
 
@@ -170,7 +169,7 @@ class HandleEasypostWebhook implements ShouldQueue
             case 'return_to_sender':
             case 'available_for_pickup':
 
-                if ($event['status'] != 'failure' && !stristr($event['message'], 'clearance delay')) {
+                if ($event['status'] != 'failure' && ! stristr($event['message'], 'clearance delay')) {
                     $this->shipment->setStatus($event['status'], 0, false, false);
                 }
 
@@ -180,11 +179,11 @@ class HandleEasypostWebhook implements ShouldQueue
 
             default:
                 // unknown status
-                Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Unknown tracking status (' . $event['status'] . ')', $event['tracker_id']));
+                Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Unknown tracking status ('.$event['status'].')', $event['tracker_id']));
                 break;
         }
 
-        if (!$sentProblem) {
+        if (! $sentProblem) {
             $this->alertProblem($event['message']);
         }
     }
@@ -199,7 +198,6 @@ class HandleEasypostWebhook implements ShouldQueue
         $problemEvents = ProblemEvent::all();
 
         foreach ($problemEvents as $problemEvent) {
-
             $relevance = explode(',', $problemEvent->relevance);
 
             if (stristr($message, $problemEvent->event)) {
@@ -220,14 +218,13 @@ class HandleEasypostWebhook implements ShouldQueue
     {
         $countryCode = getCountryCode($country);
 
-        if (!$countryCode) {
-
+        if (! $countryCode) {
             $countries = \App\Country::all();
 
             foreach ($countries as $country) :
 
                 // Check message for full country name or DHL append the country code as 3 digit alpha code onto the message
-                if (stristr($message, $country->country) || stristr($message, '-' . $country->alpha) || stristr($city, '-' . $country->alpha) || stristr($country, '-' . $country->alpha)) {
+                if (stristr($message, $country->country) || stristr($message, '-'.$country->alpha) || stristr($city, '-'.$country->alpha) || stristr($country, '-'.$country->alpha)) {
                     $countryCode = $country->country_code;
                     break;
                 }
@@ -235,7 +232,7 @@ class HandleEasypostWebhook implements ShouldQueue
             endforeach;
         }
 
-        if (!$countryCode && substr($city, -3) == ' GB') {
+        if (! $countryCode && substr($city, -3) == ' GB') {
             $countryCode = 'GB';
         }
 
@@ -250,7 +247,6 @@ class HandleEasypostWebhook implements ShouldQueue
      */
     public function failed($exception)
     {
-        Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Handle Easypost Webhook (' . $this->shipment->carrier_tracking_number . ')', $exception));
+        Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Handle Easypost Webhook ('.$this->shipment->carrier_tracking_number.')', $exception));
     }
-
 }

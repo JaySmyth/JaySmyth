@@ -4,15 +4,13 @@ namespace App;
 
 use App\Exports\RatesExport;
 use Carbon\Carbon;
-use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Database\Eloquent\Model;
+use Maatwebsite\Excel\Facades\Excel;
 
 class Rate extends Model
 {
-
     public function details()
     {
-
         if (strtolower($this->model) == 'domestic') {
             return $this->hasMany(DomesticRate::class)
                 ->orderBy('area');
@@ -27,8 +25,7 @@ class Rate extends Model
 
     public function getRateDetails($rateId, $service, $packagingType, $zone, $pieces, $weight, $shipDate)
     {
-
-        return Rate::find($rateId)
+        return self::find($rateId)
             ->details()
             ->hasPackageType($packagingType)
             ->hasZone($zone)
@@ -41,7 +38,6 @@ class Rate extends Model
 
     public function getRateView($company, $service, $discount, $shipDate = null, $viewFormat = 'html')
     {
-
         $companyRates = new CompanyRates();
         $companyRates->getRateTable($company->id, $this, $service, $shipDate);
         $rateTable = $companyRates->rateTable;
@@ -61,17 +57,18 @@ class Rate extends Model
 
                     $rate = $this;
                     $charges = $this->getSurcharges($company->id);
+
                     return view('rates.show_'.$tableFormat,
-                        compact("tableFormat", "rate", "table", "zones", "charges"));
+                        compact('tableFormat', 'rate', 'table', 'zones', 'charges'));
                     break;
             }
         }
+
         return view('errors.404');
     }
 
     public function getRateAsArray($tableformat, $table, $zones)
     {
-
         switch ($tableformat) {
             case 'domestic':
                 return $this->getDomesticRateAsArray($table, $zones);
@@ -85,7 +82,6 @@ class Rate extends Model
 
     public function getDomesticRateAsArray($table, $zones)
     {
-
         $data = [];
         foreach ($table as $row) {
             $tmp['service'] = $row->service;
@@ -103,7 +99,6 @@ class Rate extends Model
 
     public function getIntlRateAsArray($table, $zones)
     {
-
         $tableRows = [];
         $customerTypes = ['0' => 'N', '1' => 'Y'];
         $rateTypes = ['weight_rate', 'package_rate', 'consignment_rate'];
@@ -124,7 +119,6 @@ class Rate extends Model
                         // Build a row of rates
                         $rateType = '';
                         foreach ($lineDetails as $zone => $rateDetails) {
-
                             $data['residential'] = $customerTypes[$residential];
                             $data['piece_limit'] = $pieceLimit;
                             $data['package_type'] = $packageType;
@@ -151,13 +145,10 @@ class Rate extends Model
      */
     public function downloadCompanyRate($company, $service, $discount = 0, $effectiveDate = '', $download = true)
     {
-
         if ($service) {
-
             $effectiveDate = ($effectiveDate) ? $effectiveDate : Carbon::today()->toDateString();
             $rate = $this;
             if ($rate) {
-
                 if ($rate->model == 'domestic') {
                     $data = $this->getRateView($company, '', $discount, $effectiveDate, 'data');
                 } else {
@@ -165,13 +156,11 @@ class Rate extends Model
                 }
             }
 
-            if (!empty($data)) {
-
+            if (! empty($data)) {
                 if ($download) {
                     return Excel::download(new RatesExport($data),
                         $company->company_name.'-'.strtoupper($service->code).'.csv');
                 } else {
-
                     return $data;
                 }
             }
@@ -213,7 +202,6 @@ class Rate extends Model
 
     public function getRateObject()
     {
-
         switch ($this->model) {
             case 'domestic':
                 return new DomesticRate();
@@ -233,7 +221,7 @@ class Rate extends Model
     public function getSurcharges($companyId, $code = '', $shipDate = '')
     {
         $surcharge = new Surcharge();
+
         return $surcharge->getCharges($this->surcharge_id, $code, $companyId, $shipDate);
     }
-
 }

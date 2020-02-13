@@ -8,7 +8,6 @@ use Illuminate\Queue\SerializesModels;
 
 class TransportJobCancelled extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -31,16 +30,14 @@ class TransportJobCancelled extends Mailable
      */
     public function build()
     {
-
         if ($this->transportJob->type == 'c') {
-            $subject = 'CANCELLED - Collection ' . $this->transportJob->number . '/' . $this->transportJob->reference . ' (' . $this->transportJob->from_company_name . ')';
+            $subject = 'CANCELLED - Collection '.$this->transportJob->number.'/'.$this->transportJob->reference.' ('.$this->transportJob->from_company_name.')';
         } else {
-            $subject = 'CANCELLED - Delivery ' . $this->transportJob->number . '/' . $this->transportJob->reference . ' (' . $this->transportJob->to_company_name . ')';
+            $subject = 'CANCELLED - Delivery '.$this->transportJob->number.'/'.$this->transportJob->reference.' ('.$this->transportJob->to_company_name.')';
         }
 
         return $this->view('emails.transport_jobs.cancelled')
             ->subject($subject)
             ->with(['transportJob' => $this->transportJob]);
     }
-
 }

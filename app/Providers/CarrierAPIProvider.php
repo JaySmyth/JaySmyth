@@ -4,14 +4,15 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-class CarrierAPIProvider extends ServiceProvider {
-
+class CarrierAPIProvider extends ServiceProvider
+{
     /**
      * Bootstrap any application services.
      *
      * @return void
      */
-    public function boot() {
+    public function boot()
+    {
         //
     }
 
@@ -20,10 +21,10 @@ class CarrierAPIProvider extends ServiceProvider {
      *
      * @return void
      */
-    public function register() {
-        $this->app->bind('CarrierAPI', function() {
+    public function register()
+    {
+        $this->app->bind('CarrierAPI', function () {
             return new \App\CarrierAPI\CarrierAPI;
         });
     }
-
 }

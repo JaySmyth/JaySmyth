@@ -2,23 +2,22 @@
 
 namespace App\Policies;
 
-use App\User;
 use App\Quotation;
+use App\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class QuotationPolicy
 {
-
     use HandlesAuthorization;
 
     /**
      * Intercept all checks - ensure IFS user.
      *
-     * @return boolean
+     * @return bool
      */
     public function before(User $user)
     {
-        if (!$user->hasIfsRole()) {
+        if (! $user->hasIfsRole()) {
             return false;
         }
     }
@@ -26,7 +25,7 @@ class QuotationPolicy
     /**
      * Index policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function index(User $user)
     {
@@ -38,7 +37,7 @@ class QuotationPolicy
     /**
      * Show policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function view(User $user)
     {
@@ -50,7 +49,7 @@ class QuotationPolicy
     /**
      * Create policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function create(User $user)
     {
@@ -62,7 +61,7 @@ class QuotationPolicy
     /**
      * Update policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function update(User $user)
     {
@@ -74,7 +73,7 @@ class QuotationPolicy
     /**
      * Set status of quotation.
      *
-     * @return boolean
+     * @return bool
      */
     public function status(User $user)
     {
@@ -86,7 +85,7 @@ class QuotationPolicy
     /**
      * View PDF.
      *
-     * @return boolean
+     * @return bool
      */
     public function pdf(User $user)
     {
@@ -98,7 +97,7 @@ class QuotationPolicy
     /**
      * Delete quotation.
      *
-     * @return boolean
+     * @return bool
      */
     public function delete(User $user, Quotation $quotation)
     {
@@ -106,5 +105,4 @@ class QuotationPolicy
             return true;
         }
     }
-
 }

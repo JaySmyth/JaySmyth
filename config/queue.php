@@ -34,7 +34,7 @@ return [
         'sync' => [
             'driver' => 'sync',
         ],
-        
+
         'database' => [
             'driver' => 'database',
             'table'  => 'jobs',
@@ -50,7 +50,7 @@ return [
             'expire' => 300,
             'retry_after' => 450,
         ],
-        
+
         'default' => [
             'driver' => 'database',
             'table'  => 'jobs',
@@ -58,7 +58,7 @@ return [
             'expire' => 300,
             'retry_after' => 450,
         ],
-                
+
         'redis' => [
             'driver'     => 'redis',
             'connection' => 'default',

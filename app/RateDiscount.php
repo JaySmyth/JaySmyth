@@ -19,5 +19,4 @@ class RateDiscount extends Model
      */
     protected $dates = ['from_date', 'to_date', 'created_at', 'updated_at'];
     public $timestamps = true;
-
 }

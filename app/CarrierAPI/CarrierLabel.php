@@ -24,11 +24,10 @@ abstract class CarrierLabel
     protected $font = 'helvetica';
 
     /**
-     *
      * @param type $shipment
      * @param type $data
      */
-    function __construct($shipment = null, $serviceCode = null, $data = null, $routeId = 1, $splitServiceBox = false)
+    public function __construct($shipment = null, $serviceCode = null, $data = null, $routeId = 1, $splitServiceBox = false)
     {
         $this->shipment = $shipment;
         $this->data = $data;
@@ -90,7 +89,7 @@ abstract class CarrierLabel
     {
         $this->pdf->StartTransform();
         $this->pdf->Rotate(-90);
-        $this->pdf->Image('@' . base64_decode($base64Image), $options[0], $options[1], $options[2], $options[3]);
+        $this->pdf->Image('@'.base64_decode($base64Image), $options[0], $options[1], $options[2], $options[3]);
         $this->pdf->StopTransform();
     }
 
@@ -126,18 +125,18 @@ abstract class CarrierLabel
             'border' => false,
             'hpadding' => 0,
             'vpadding' => 0,
-            'fgcolor' => array(0, 0, 0),
+            'fgcolor' => [0, 0, 0],
             'bgcolor' => false,
             'text' => $text,
             'font' => 'helvetica',
             'fontsize' => $fontsize,
-            'stretchtext' => 4
+            'stretchtext' => 4,
         ];
     }
 
     protected function addServiceBox($x, $y, $w, $h, $service)
     {
-        // Create IFS Service Box       
+        // Create IFS Service Box
         $this->pdf->SetXY($x - 2, $y);
         $this->pdf->SetFont('', 'BI', 28);
 
@@ -195,7 +194,7 @@ abstract class CarrierLabel
         // Display and center Service code
         $this->pdf->SetXY($x - 1, $y + 2);
         $this->pdf->SetFont('', 'BI', 16);
-        $this->pdf->cell($w, 7, 'IFS - ' . strtoupper($this->serviceCode), 0, 1, 'C', false);
+        $this->pdf->cell($w, 7, 'IFS - '.strtoupper($this->serviceCode), 0, 1, 'C', false);
     }
 
     protected function removeLogo($x, $y, $w, $h)
@@ -205,5 +204,4 @@ abstract class CarrierLabel
         $this->pdf->SetXY($x, $y);
         $this->pdf->Cell($w, $h, '', 0, 0, 0, true);
     }
-
 }

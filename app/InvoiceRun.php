@@ -6,10 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class InvoiceRun extends Model
 {
-
     public $timestamps = false;
     public $status;
-    
+
     /**
      * The attributes that are not assignable.
      *
@@ -25,7 +24,7 @@ class InvoiceRun extends Model
     protected $dates = ['created_at', 'updated_at', 'last_run'];
 
     /**
-     * An invoice run has many shipments
+     * An invoice run has many shipments.
      *
      * @return
      */
@@ -35,7 +34,6 @@ class InvoiceRun extends Model
     }
 
     /**
-     * 
      * @return type
      */
     public function user()
@@ -44,7 +42,6 @@ class InvoiceRun extends Model
     }
 
     /**
-     * 
      * @return type
      */
     public function department()
@@ -53,7 +50,6 @@ class InvoiceRun extends Model
     }
 
     /**
-     * 
      * @return type
      */
     public function getTotalShipmentsAttribute()
@@ -62,7 +58,6 @@ class InvoiceRun extends Model
     }
 
     /**
-     * 
      * @return type
      */
     public function getTotalSalesAttribute()
@@ -71,7 +66,6 @@ class InvoiceRun extends Model
     }
 
     /**
-     * 
      * @return type
      */
     public function getTotalCostsAttribute()
@@ -80,7 +74,7 @@ class InvoiceRun extends Model
     }
 
     /**
-     * Return the difference
+     * Return the difference.
      *
      * @return type
      */
@@ -90,19 +84,18 @@ class InvoiceRun extends Model
     }
 
     /**
-     * Return the difference
+     * Return the difference.
      *
      * @return type
      */
     public function getDifferenceFormattedAttribute()
     {
         if ($this->total_costs > $this->total_sales) {
-            return '-' . number_format($this->difference, 2);
+            return '-'.number_format($this->difference, 2);
         } elseif ($this->total_sales > $this->total_costs) {
-            return '+' . number_format($this->difference, 2);
+            return '+'.number_format($this->difference, 2);
         } else {
             return number_format($this->difference, 2);
         }
     }
-
 }

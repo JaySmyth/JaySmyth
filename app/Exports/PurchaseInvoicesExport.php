@@ -3,12 +3,11 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class PurchaseInvoicesExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
-
     public function __construct($invoices)
     {
         $this->invoices = $invoices;
@@ -34,7 +33,7 @@ class PurchaseInvoicesExport implements FromCollection, WithHeadings, ShouldAuto
             'Queried',
             'Costs',
             'Copy Docs',
-            'Status'
+            'Status',
         ];
     }
 
@@ -62,14 +61,13 @@ class PurchaseInvoicesExport implements FromCollection, WithHeadings, ShouldAuto
                 'Queried' => $invoice->queried,
                 'Costs' => $invoice->costs,
                 'Copy Docs' => $invoice->copy_docs,
-                'Status' => $invoice->status_name
+                'Status' => $invoice->status_name,
             ]);
 
-            $collection->push($row);
+        $collection->push($row);
 
         endforeach;
 
         return $collection;
     }
-
 }

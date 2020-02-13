@@ -12,15 +12,15 @@ return [
       |
      */
     'env' => env('APP_ENV', 'production'),
-    
+
      /*
       |--------------------------------------------------------------------------
       | Host IP
       |--------------------------------------------------------------------------
       |
-     */   
+     */
     'host' => env('APP_HOST', '127.0.0.1'),
-    
+
      /*
       |--------------------------------------------------------------------------
       | Default mail address
@@ -144,7 +144,7 @@ return [
         App\Providers\PricingProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Jenssegers\Agent\AgentServiceProvider::class,
-        Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class
+        Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class,
     ],
     /*
       |--------------------------------------------------------------------------
@@ -194,6 +194,6 @@ return [
         'CarrierAPI' => App\CarrierAPI\Facades\CarrierAPI::class,
         'APIResponse' => App\CarrierAPI\Facades\APIResponse::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
-        'Agent' => Jenssegers\Agent\Facades\Agent::class
+        'Agent' => Jenssegers\Agent\Facades\Agent::class,
     ],
 ];

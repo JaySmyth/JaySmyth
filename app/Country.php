@@ -6,12 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Country extends Model
 {
-
     /**
      * Accepts a country name and attempts to find it's code.
-     * 
+     *
      * @param type string $countryName
-     * 
+     *
      * @return string
      */
     public function getCode($countryName)
@@ -53,8 +52,8 @@ class Country extends Model
         if (count($result) > 0) {
             // Sort the array by simularity
             $result = array_values(array_sort($result, function ($value) {
-                        return $value['simularity'];
-                    }));
+                return $value['simularity'];
+            }));
 
             // Get the result with the highest simularity
             $result = last($result);
@@ -68,7 +67,7 @@ class Country extends Model
 
     /**
      * Find country code for likely domestic country strings.
-     * 
+     *
      * @param type $string
      * @return string
      */
@@ -93,8 +92,7 @@ class Country extends Model
             case 'I.E':
                 return 'IE';
             default:
-                return null;
+                return;
         }
     }
-
 }

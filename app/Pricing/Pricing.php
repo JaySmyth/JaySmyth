@@ -23,8 +23,6 @@ use App\Carrier;
 use App\Company;
 use App\CompanyRate;
 use App\Package;
-use App\Service;
-use App\Shipment;
 use App\Pricing\PricingModel0;
 use App\Pricing\PricingModel1;
 use App\Pricing\PricingModel2;
@@ -32,13 +30,15 @@ use App\Pricing\PricingModel3;
 use App\Pricing\PricingModel4;
 use App\Pricing\PricingModel5;
 use App\Pricing\PricingModel6;
+use App\Service;
+use App\Shipment;
 
 /**
  * ********************************
  * buildModel() builds the correct
  * Pricing Model to allow the
  * shipment to be priced.
- * ********************************
+ * ********************************.
  */
 class Pricing
 {
@@ -74,7 +74,7 @@ class Pricing
 
             return $this->price($shipmentArray, $shipmentArray['service_id']);
         } else {
-            return null;
+            return;
         }
     }
 
@@ -111,7 +111,7 @@ class Pricing
      * Perform any necessary processing prior to
      * processing the shipment. eg to fill in missing
      * information
-     * **********************************************
+     * **********************************************.
      */
     public function preProcess()
     {
@@ -130,7 +130,7 @@ class Pricing
         $this->shipment['carrier_code'] = $this->carrier->code;
 
         // If no Shipment date set use today
-        if (!isset($this->shipment['ship_date']) || $this->shipment['ship_date'] == '') {
+        if (! isset($this->shipment['ship_date']) || $this->shipment['ship_date'] == '') {
             $this->shipment['ship_date'] = date('Y-m-d');
         }
 
@@ -180,6 +180,7 @@ class Pricing
                     }
                 }
             }
+
             return $total;
         }
 
@@ -233,16 +234,16 @@ class Pricing
             $response['costs_detail'] = [];
             $response['sales'] = [];
             $response['sales_detail'] = [];
-            $response['costs_zone'] = "";
-            $response['sales_zone'] = "";
-            $response['costs_packaging'] = "";
-            $response['sales_packaging'] = "";
+            $response['costs_zone'] = '';
+            $response['sales_zone'] = '';
+            $response['costs_packaging'] = '';
+            $response['sales_packaging'] = '';
         }
         $response['errors'] = $errors;
 
         if ($this->debug) {
             $response['Pricinglog'] = $this->log;
-            mail("debug@antrim.ifsgroup.com", "Pricing Analysis - Errors", json_encode($errors) . "/n" . json_encode($this->log));
+            mail('debug@antrim.ifsgroup.com', 'Pricing Analysis - Errors', json_encode($errors).'/n'.json_encode($this->log));
         }
 
         return $response;
@@ -297,7 +298,7 @@ class Pricing
         // Get Cost Rate - No Fuel Cap on costs
         $this->costRate = Company::find($this->shipment['company_id'])->costRateForService($this->shipment['service_id']);
         $this->costRate['fuel_cap'] = 999;
-        $this->log("Fuel Cap: ". $this->costRate['fuel_cap']);
+        $this->log('Fuel Cap: '.$this->costRate['fuel_cap']);
 
         // Price Shipment
         $this->costs = $this->getPrice($this->costRate, 'Costs');
@@ -368,7 +369,7 @@ class Pricing
         }
 
         // If no Cost/ Sale then set to empty array
-        if (!isset($response['charges'])) {
+        if (! isset($response['charges'])) {
             $response['charges'] = [];
         }
 
@@ -379,6 +380,6 @@ class Pricing
     {
         echo "$desc : <pre>";
         print_r($var);
-        echo "</pre><br>";
+        echo '</pre><br>';
     }
 }

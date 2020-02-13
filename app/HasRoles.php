@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\DB;
 
 trait HasRoles
 {
-
     /**
      * A user may have multiple roles.
      *
@@ -34,7 +33,7 @@ trait HasRoles
      * Update user's roles.
      *
      * @param  array $roles
-     * @param  integer $role_id
+     * @param  int $role_id
      * @return mixed
      */
     public function syncRoles($roles, $role_id = null)
@@ -43,7 +42,7 @@ trait HasRoles
             return $this->roles()->sync(array_prepend($roles, $role_id));
         }
 
-        if (is_array($roles) && !$role_id) {
+        if (is_array($roles) && ! $role_id) {
             return $this->roles()->sync($roles);
         }
 
@@ -65,7 +64,8 @@ trait HasRoles
         if (is_string($role)) {
             return $this->roles->contains('name', $role);
         }
-        return !!$role->intersect($this->roles)->count();
+
+        return (bool) $role->intersect($this->roles)->count();
     }
 
     /**
@@ -83,6 +83,7 @@ trait HasRoles
         if (is_string($permission)) {
             $permission = Permission::whereName($permission)->firstOrFail();
         }
+
         return $this->hasRole($permission->roles);
     }
 
@@ -95,7 +96,7 @@ trait HasRoles
     public function hasIfsRole()
     {
         // Rudimentary check for IFS Group email address
-        if (!stristr($this->email, 'ifsgroup.com')) {
+        if (! stristr($this->email, 'ifsgroup.com')) {
             return false;
         }
 
@@ -104,11 +105,12 @@ trait HasRoles
                 return true;
             }
         }
+
         return false;
     }
 
     /**
-     * Determine if the user has more than one shipping role available (courier, air etc.)
+     * Determine if the user has more than one shipping role available (courier, air etc.).
      *
      * @return boolean
      */
@@ -146,7 +148,7 @@ trait HasRoles
             return true;
         }
 
-        if (!$this->hasPermission('view_reports')) {
+        if (! $this->hasPermission('view_reports')) {
             return false;
         }
 
@@ -165,25 +167,24 @@ trait HasRoles
     /*
      * If a user does not have multiple modes enabled, this method will return
      * the one mode permission that they do have.
-     * 
+     *
      * @return string
      */
 
     public function getOnlyMode()
     {
-        if (!$this->hasMultipleModes()) {
-
+        if (! $this->hasMultipleModes()) {
             $role = $this->roles->where('primary', 0)->first();
 
             if ($role) {
                 return $role->name;
             }
         }
+
         return false;
     }
 
     /**
-     *
      * @return string
      */
     public function getOnlyShipRoute()
@@ -198,7 +199,6 @@ trait HasRoles
     }
 
     /**
-     *
      * @return string
      */
     public function getDefaultRoute()
@@ -207,7 +207,7 @@ trait HasRoles
             return '/customs-entries';
         }
 
-        if ($this->hasRole('cudv') && !$this->hasRole('courier')) {
+        if ($this->hasRole('cudv') && ! $this->hasRole('courier')) {
             return '/customs-entries';
         }
 
@@ -215,14 +215,14 @@ trait HasRoles
             case 'sea':
                 return 'sea-freight/create';
             default:
-                return "/";
+                return '/';
         }
     }
 
     /*
      * Returns the modes avaliable to the user.
-     * 
-     * @return 
+     *
+     * @return
      */
 
     public function modes()
@@ -240,8 +240,8 @@ trait HasRoles
 
     /*
      * Get the IDs of the modes available to the user.
-     * 
-     * 
+     *
+     *
      * @return array
      */
 
@@ -317,8 +317,8 @@ trait HasRoles
 
     /*
      * Returns the user's associated depots
-     * 
-     * @return 
+     *
+     * @return
      */
 
     public function depots()
@@ -352,7 +352,6 @@ trait HasRoles
     public function relatedTo($related)
     {
         if ($related instanceof User) {
-
             $allowedCompanyIds = $this->getAllowedCompanyIds()->toArray();
 
             foreach ($related->companies as $company) {
@@ -360,6 +359,7 @@ trait HasRoles
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -372,6 +372,7 @@ trait HasRoles
         if ($this->getAllowedCompanyIds()->contains($companyId)) {
             return true;
         }
+
         return false;
     }
 
@@ -404,7 +405,7 @@ trait HasRoles
     }
 
     /**
-     * Check if a user has more than one depot
+     * Check if a user has more than one depot.
      *
      * @return boolean
      */
@@ -433,7 +434,7 @@ trait HasRoles
 
     /*
      * Returns the user's associated company site names
-     * 
+     *
      * @return array
      */
 
@@ -444,7 +445,7 @@ trait HasRoles
 
     /*
      * Checks if the user has more than one enabled company.
-     * 
+     *
      * @return boolean
      */
 
@@ -453,6 +454,7 @@ trait HasRoles
         if ($this->companies->where('enabled', 1)->count() > 0) {
             return true;
         }
+
         return false;
     }
 
@@ -487,14 +489,13 @@ trait HasRoles
     /*
      * Check that the user account has been configured correctly. A user must
      * have at least one company association and a one primary role defined.
-     * 
+     *
      * @return boolean
      */
 
     public function isConfigured()
     {
         if ($this->hasEnabledCompanies() && $this->primary_role) {
-
             if ($this->hasRole('cudv') || $this->hasRole('ifsc')) {
                 return true;
             }
@@ -503,7 +504,7 @@ trait HasRoles
                 return true;
             }
         }
+
         return false;
     }
-
 }

@@ -2,8 +2,8 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 class Message extends Model
 {
@@ -31,7 +31,7 @@ class Message extends Model
     }
 
     /**
-     * Users that have viewed a message
+     * Users that have viewed a message.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
@@ -41,7 +41,7 @@ class Message extends Model
     }
 
     /**
-     * Companies that have been excluded
+     * Companies that have been excluded.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
@@ -51,9 +51,9 @@ class Message extends Model
     }
 
     /**
-     * Scope - enabled messages within the date range
-     * 
-     * @param type $query 
+     * Scope - enabled messages within the date range.
+     *
+     * @param type $query
      */
     public function scopeActive($query)
     {
@@ -61,5 +61,4 @@ class Message extends Model
                         ->where('valid_to', '>=', Carbon::now())
                         ->whereEnabled(1);
     }
-
 }

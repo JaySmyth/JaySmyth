@@ -12,5 +12,4 @@ class RfSession extends Model
 
     public $timestamps = false;
     public $guarded = ['id'];
-
 }

@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Tracking extends Model
 {
-
     protected $table = 'tracking';
 
     /*
@@ -50,8 +49,8 @@ class Tracking extends Model
     }
 
     /**
-     * Returns a user's name if the tracking event has been created manually
-     * 
+     * Returns a user's name if the tracking event has been created manually.
+     *
      * @return string or null
      */
     public function getUserNameAttribute()
@@ -61,8 +60,5 @@ class Tracking extends Model
         if ($user) {
             return $user->name;
         }
-
-        return null;
     }
-
 }

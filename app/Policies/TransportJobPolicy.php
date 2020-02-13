@@ -7,17 +7,16 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 
 class TransportJobPolicy
 {
-
     use HandlesAuthorization;
 
     /**
      * Intercept all checks - ensure IFS user.
      *
-     * @return boolean
+     * @return bool
      */
     public function before(User $user)
     {
-        if (!$user->hasIfsRole()) {
+        if (! $user->hasIfsRole()) {
             return false;
         }
     }
@@ -25,7 +24,7 @@ class TransportJobPolicy
     /**
      * Index policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function index(User $user)
     {
@@ -37,7 +36,7 @@ class TransportJobPolicy
     /**
      * Show policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function view(User $user)
     {
@@ -49,7 +48,7 @@ class TransportJobPolicy
     /**
      * Create policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function create(User $user)
     {
@@ -61,7 +60,7 @@ class TransportJobPolicy
     /**
      * Update policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function update(User $user)
     {
@@ -73,7 +72,7 @@ class TransportJobPolicy
     /**
      * Allocate jobs to driver.
      *
-     * @return boolean
+     * @return bool
      */
     public function manifestJobs(User $user)
     {
@@ -85,7 +84,7 @@ class TransportJobPolicy
     /**
      * Close job.
      *
-     * @return boolean
+     * @return bool
      */
     public function close(User $user)
     {
@@ -97,7 +96,7 @@ class TransportJobPolicy
     /**
      * Cancel job.
      *
-     * @return boolean
+     * @return bool
      */
     public function cancel(User $user)
     {
@@ -109,7 +108,7 @@ class TransportJobPolicy
     /**
      * Unmanifest - remove a transport job from a driver manifest.
      *
-     * @return boolean
+     * @return bool
      */
     public function unmanifest(User $user)
     {
@@ -117,5 +116,4 @@ class TransportJobPolicy
             return true;
         }
     }
-
 }

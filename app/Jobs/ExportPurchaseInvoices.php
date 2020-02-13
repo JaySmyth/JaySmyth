@@ -5,15 +5,14 @@ namespace App\Jobs;
 use App\PurchaseInvoice;
 use App\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class ExportPurchaseInvoices implements ShouldQueue
 {
-
     use InteractsWithQueue,
         Queueable,
         SerializesModels;
@@ -61,8 +60,7 @@ class ExportPurchaseInvoices implements ShouldQueue
         $freightInvoices = $this->invoices->where('type', '!=', 'D');
 
         foreach ($freightInvoices as $invoice) {
-
-            $filename = $this->storageDirectory . '/' . $this->getFilename($invoice->invoice_number);
+            $filename = $this->storageDirectory.'/'.$this->getFilename($invoice->invoice_number);
 
             // Generate the XML
             $xml = $invoice->getMultifreightXml();
@@ -71,7 +69,7 @@ class ExportPurchaseInvoices implements ShouldQueue
             Storage::disk('local')->put($filename, $xml);
 
             // Add the filename to array of filenames
-            $this->filesGenerated[] = storage_path() . '/app/' . $filename;
+            $this->filesGenerated[] = storage_path().'/app/'.$filename;
 
             $this->setInvoiceToProcessed($invoice);
         }
@@ -90,7 +88,6 @@ class ExportPurchaseInvoices implements ShouldQueue
         }
 
         foreach ($groupedByCarrier as $carrier => $invoices) {
-
             $xml = null;
 
             foreach ($invoices as $invoice) {
@@ -100,15 +97,15 @@ class ExportPurchaseInvoices implements ShouldQueue
 
             $enc = '<?xml version="1.0" encoding="ISO-8859-1"?>';
             $xml = str_replace($enc, '', $xml);
-            $xml = $enc . "\n<Multifreight>" . $xml . "\n</Multifreight>";
+            $xml = $enc."\n<Multifreight>".$xml."\n</Multifreight>";
 
-            $filename = $this->storageDirectory . '/' . $this->getFilename(false, $carrier);
+            $filename = $this->storageDirectory.'/'.$this->getFilename(false, $carrier);
 
             // Write to storage
             Storage::disk('local')->put($filename, $xml);
 
             // Add the filename to array of filenames
-            $this->filesGenerated[] = storage_path() . '/app/' . $filename;
+            $this->filesGenerated[] = storage_path().'/app/'.$filename;
         }
     }
 
@@ -121,10 +118,10 @@ class ExportPurchaseInvoices implements ShouldQueue
     private function getFilename($invoiceNumber = false, $carrier = false)
     {
         if ($carrier) {
-            return $carrier . 'Bulk_' . date('dmy') . '_' . strtoupper(str_random(3)) . '.xml';
+            return $carrier.'Bulk_'.date('dmy').'_'.strtoupper(str_random(3)).'.xml';
         }
 
-        return $invoiceNumber . '_' . date('dmy') . '_' . strtoupper(str_random(3)) . '.xml';
+        return $invoiceNumber.'_'.date('dmy').'_'.strtoupper(str_random(3)).'.xml';
     }
 
     /**
@@ -132,11 +129,10 @@ class ExportPurchaseInvoices implements ShouldQueue
      *
      * @param type $invoice
      */
-    function setInvoiceToProcessed($invoice)
+    public function setInvoiceToProcessed($invoice)
     {
         $invoice->xml_generated = 1;
         $invoice->status = 2;
         $invoice->save();
     }
-
 }

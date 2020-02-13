@@ -2,12 +2,11 @@
 
 namespace App\Console\Commands\Transend;
 
-use Illuminate\Console\Command;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
 
 class SendJobs extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -24,10 +23,10 @@ class SendJobs extends Command
 
     /**
      * Array of company ids that jobs will be sent for.
-     * 
-     * @var array 
+     *
+     * @var array
      */
-    protected $companyIds = array();
+    protected $companyIds = [];
 
     /**
      * Create a new job instance.
@@ -57,13 +56,12 @@ class SendJobs extends Command
 
         foreach ($jobs as $job) :
             if ($this->sendToTransend($job)) {
-
-                $this->info("Sending " . $job->number . " to transend");
+                $this->info('Sending '.$job->number.' to transend');
 
                 dispatch(new \App\Jobs\TransendOrderImport($job));
 
-                $message = ($job->is_resend) ? 'Re-sent to transend (' . $job->transend_route . ')' : 'Sent to transend (' . $job->transend_route . ')';
-                
+                $message = ($job->is_resend) ? 'Re-sent to transend ('.$job->transend_route.')' : 'Sent to transend ('.$job->transend_route.')';
+
                 $job->log($message);
             }
         endforeach;
@@ -71,23 +69,24 @@ class SendJobs extends Command
 
     /**
      * Determine if a job should be sent to Transend.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     protected function sendToTransend($job)
     {
         if (Carbon::now()->isWeekend()) {
             $this->error('No jobs processed over the weekend');
+
             return false;
         }
 
-        // If it's a resend, only send on date resend defined 
+        // If it's a resend, only send on date resend defined
         if ($job->is_resend && $job->resend_date) {
-
-            $this->info("Resend identified for " . $job->number);
+            $this->info('Resend identified for '.$job->number);
 
             if ($job->resend_date->startOfDay()->gt(Carbon::today()->startOfDay())) {
-                $this->error("Ignoring resend: " . $job->resend_date->startOfDay() . " > " . Carbon::today()->startOfDay());
+                $this->error('Ignoring resend: '.$job->resend_date->startOfDay().' > '.Carbon::today()->startOfDay());
+
                 return false;
             }
         }
@@ -109,7 +108,8 @@ class SendJobs extends Command
             return true;
         }
 
-        $this->error($job->number . ' rejected. Date requested ' . $job->date_requested->startOfDay() . ' is not equal to ' . Carbon::today()->startOfDay());
+        $this->error($job->number.' rejected. Date requested '.$job->date_requested->startOfDay().' is not equal to '.Carbon::today()->startOfDay());
+
         return false;
     }
 
@@ -129,5 +129,4 @@ class SendJobs extends Command
             exit;
         }
     }
-
 }

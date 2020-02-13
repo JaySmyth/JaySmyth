@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Validator;
  */
 class CarrierBase
 {
-
     protected $siteId;
     protected $password;
     protected $accounts;
@@ -81,14 +80,13 @@ class CarrierBase
      * Use by calling $this->timer('start'); to start the timer
      * and
      * echo "Time taken : " . $this->timer('finish') . " Secs<br>";
-     * to display
-     * 
+     * to display.
+     *
      * @param type $mode
      * @return decimal seconds
      */
     private function timer($mode)
     {
-
         $diff = '';
         switch ($mode) {
             case 'start':
@@ -110,7 +108,6 @@ class CarrierBase
 
     public function deleteShipment($shipment)
     {
-
         $response['errors'] = [];
         $response['carrier_code'] = Carrier::find($shipment['carrier_id'])->code;
         $response['consignment_number'][0] = $shipment['consignment_number'];
@@ -123,8 +120,8 @@ class CarrierBase
 
         // Check Carrier/ Service combination is valid
         $carrier = Carrier::where('code', $shipment['carrier_code'])->first();
-        if (!$carrier->getServices($shipment['service_code'])) {
-            $rules['service_code'] = 'not_in:' . $shipment['service_code'];
+        if (! $carrier->getServices($shipment['service_code'])) {
+            $rules['service_code'] = 'not_in:'.$shipment['service_code'];
         }
 
         return $rules;
@@ -209,7 +206,6 @@ class CarrierBase
 
     public function setElement($data, $target, $value)
     {
-
         $locArr = explode('.', $target);
         switch (count($locArr)) {
             case '1':
@@ -272,15 +268,15 @@ class CarrierBase
     }
 
     /**
-     * Validate shipment details using supplied rules
+     * Validate shipment details using supplied rules.
      * @param array $rules
      * @param array $shipment
-     * 
+     *
      * @return array $errors
      */
-    public function applyRules($rules, $shipment, $messages = array())
+    public function applyRules($rules, $shipment, $messages = [])
     {
-        $errors = array();
+        $errors = [];
         if ($rules != '') {
             $shipmentValidation = Validator::make($shipment, $rules, $messages);
 
@@ -292,5 +288,4 @@ class CarrierBase
 
         return $errors;
     }
-
 }

@@ -3,14 +3,13 @@
 namespace App\Console\Commands;
 
 use App\Package;
-use Carbon\Carbon;
 use App\ScanningKpi;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
 class LogScanningKpis extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -56,14 +55,13 @@ class LogScanningKpis extends Command
      */
     public function handle()
     {
-        $startDate = ($this->option('start-date')) ? Carbon::parse($this->option('start-date')) : Carbon::today()->modify("last weekday");
-        $finishDate = Carbon::today()->modify("last weekday");
+        $startDate = ($this->option('start-date')) ? Carbon::parse($this->option('start-date')) : Carbon::today()->modify('last weekday');
+        $finishDate = Carbon::today()->modify('last weekday');
 
         $this->info('** Logging Scanning KPIs **');
 
         while ($startDate->lessThanOrEqualTo($finishDate)) {
-
-            $this->info('Logging KPIs for ' . $startDate);
+            $this->info('Logging KPIs for '.$startDate);
 
             $this->logKpis($startDate);
 
@@ -77,7 +75,7 @@ class LogScanningKpis extends Command
      * Insert KPI record.
      *
      * @param type $date
-     * @return boolean
+     * @return bool
      */
     protected function logKpis($date)
     {
@@ -106,13 +104,12 @@ class LogScanningKpis extends Command
             inc($totals['route'], $package->loaded);
 
             if ($package->collected || $package->received || $package->loaded) {
-
-                if (!$package->true_receipt_scan) {
+                if (! $package->true_receipt_scan) {
                     inc($totals['receipt_missed'], 1);
                     $receiptMissed[] = $package;
                 }
 
-                if (!$package->loaded) {
+                if (! $package->loaded) {
                     inc($totals['route_missed'], 1);
                     $routeMissed[] = $package;
                 }
@@ -133,9 +130,8 @@ class LogScanningKpis extends Command
         ]);
 
         // Only send the email when start date option has not been supplied
-        if (!$this->option('start-date')) {
-            Mail::to($this->recipient)->cc($this->cc)->send(new \App\Mail\MissedScans($receiptMissed, $routeMissed, 'Missed Scans (receipt: ' . $totals['receipt_missed'] . ' / route: ' . $totals['route_missed'] . ') - ' . $date->format('d-m-y')));
+        if (! $this->option('start-date')) {
+            Mail::to($this->recipient)->cc($this->cc)->send(new \App\Mail\MissedScans($receiptMissed, $routeMissed, 'Missed Scans (receipt: '.$totals['receipt_missed'].' / route: '.$totals['route_missed'].') - '.$date->format('d-m-y')));
         }
     }
-
 }

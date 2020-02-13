@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AddLimitsToCompanyServiceTable extends Migration
 {
@@ -16,7 +16,6 @@ class AddLimitsToCompanyServiceTable extends Migration
         Schema::table('company_service', function (Blueprint $table) {
             $table->integer('monthly_limit')->unsigned()->nullable()->after('country_filter');
             $table->integer('max_weight_limit')->unsigned()->nullable()->after('monthly_limit');
-
         });
     }
 

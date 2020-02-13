@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class PackagingType extends Model
 {
-
-    public function getRateCode() {
+    public function getRateCode()
+    {
         return $this->belongsToMany('App\CarrierPackaging');
     }
 }

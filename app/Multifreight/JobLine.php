@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class JobLine extends Model
 {
-
     /**
      * The connection name for the model.
      *
@@ -35,7 +34,7 @@ class JobLine extends Model
 
     /**
      * A line belongs to a job header.
-     * 
+     *
      * @return type
      */
     public function header()
@@ -45,12 +44,11 @@ class JobLine extends Model
 
     /**
      * Get the scs job number.
-     * 
+     *
      * @return type
      */
     public function getScsJobNumberAttribute()
-    {        
+    {
         return optional($this->header)->job_disp;
     }
-
 }

@@ -2,8 +2,8 @@
 
 namespace App;
 
-use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 
 trait ShipmentAlerting
 {
@@ -23,16 +23,16 @@ trait ShipmentAlerting
         // ensure lower case
         $statusCode = strtolower($statusCode);
 
-        if (!in_array($statusCode, $this->genericAlerts)) {
+        if (! in_array($statusCode, $this->genericAlerts)) {
             return false;
         }
 
         // define the fields that we want to update
-        $fieldSent = $statusCode . '_sent';
-        $fieldSentAt = $fieldSent . '_at';
+        $fieldSent = $statusCode.'_sent';
+        $fieldSentAt = $fieldSent.'_at';
 
         foreach ($this->alerts as $alert) {
-            if ($alert->$statusCode && !$alert->$fieldSent) {
+            if ($alert->$statusCode && ! $alert->$fieldSent) {
                 Mail::to($alert->email)->queue(new \App\Mail\ShippingAlertGeneric($this, $statusCode));
 
                 $alert->$fieldSent = true;
@@ -51,10 +51,10 @@ trait ShipmentAlerting
     public function alertProblem($problemEvent, $relevance)
     {
         foreach ($this->alerts as $alert) {
-            if ($alert->problems && in_array($alert->type, $relevance) && !stristr($alert->problems_sent, $problemEvent)) {
+            if ($alert->problems && in_array($alert->type, $relevance) && ! stristr($alert->problems_sent, $problemEvent)) {
                 Mail::to($alert->email)->queue(new \App\Mail\ShippingAlertProblem($this, $problemEvent));
 
-                $alert->problems_sent .= '|' . $problemEvent;
+                $alert->problems_sent .= '|'.$problemEvent;
                 $alert->update();
             }
         }
@@ -63,7 +63,7 @@ trait ShipmentAlerting
     /**
      * Insert a record to the alerts table for the associated department.
      *
-     * @param boolean $allAlerts
+     * @param bool $allAlerts
      * @return type
      */
     public function setDepartmentAlerts()
@@ -79,7 +79,7 @@ trait ShipmentAlerting
         return $this->alerts()->create([
             'email' => $email,
             'type' => 'd',
-            'problems' => 1
+            'problems' => 1,
         ]);
     }
 
@@ -103,7 +103,7 @@ trait ShipmentAlerting
     private function sendArrangePickup()
     {
         // If sender postcode not "BT", alert the department. This is required so that any mainland pickups can be arranged etc.
-        if (!$this->originatesFromBtPostcode() && strtoupper($this->sender_country_code != 'US')) {
+        if (! $this->originatesFromBtPostcode() && strtoupper($this->sender_country_code != 'US')) {
             Mail::to('courier@antrim.ifsgroup.com')->cc('courieruk@antrim.ifsgroup.com')->queue(new \App\Mail\ArrangePickup($this));
         }
     }
@@ -146,7 +146,7 @@ trait ShipmentAlerting
      */
     private function sendHazardousBooked()
     {
-        $batteries = (!empty($this->lithium_batteries) && $this->lithium_batteries > 0) ? true : false;
+        $batteries = (! empty($this->lithium_batteries) && $this->lithium_batteries > 0) ? true : false;
 
         if (is_numeric($this->hazardous) || strtoupper($this->hazardous) == 'E' || $this->dry_ice_flag || $batteries) {
             Mail::to('courier@antrim.ifsgroup.com')->queue(new \App\Mail\ShipmentWarning($this, 'hazardous'));
@@ -154,7 +154,7 @@ trait ShipmentAlerting
     }
 
     /**
-     * Check for shipment insurance
+     * Check for shipment insurance.
      */
     private function sendInsuranceRequested()
     {
@@ -170,11 +170,11 @@ trait ShipmentAlerting
     }
 
     /**
-     * Check for loss making shipment
+     * Check for loss making shipment.
      */
     private function sendLossMaking()
     {
-        if ($this->shipping_cost > $this->shipping_charge && !in_array($this->company_id, [113])) {
+        if ($this->shipping_cost > $this->shipping_charge && ! in_array($this->company_id, [113])) {
             if ($this->isUkDomestic()) {
                 $recipient = 'gmcnicholl@antrim.ifsgroup.com';
                 $ccEmails = ['aplatt@antrim.ifsgroup.com', 'it@antrim.ifsgroup.com', 'sanderton@antrim.ifsgroup.com', 'dclarke@antrim.ifsgroup.com'];
@@ -192,7 +192,7 @@ trait ShipmentAlerting
      */
     private function sendShipReason()
     {
-        if (in_array($this->ship_reason, ['temp', 'repair']) && !$this->isWithinEu()) {
+        if (in_array($this->ship_reason, ['temp', 'repair']) && ! $this->isWithinEu()) {
             Mail::to('courier@antrim.ifsgroup.com')->queue(new \App\Mail\ShipmentWarning($this, 'ship_reason'));
         }
     }

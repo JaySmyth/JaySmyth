@@ -2,12 +2,11 @@
 
 namespace App\Console\Commands\Transend;
 
-use Illuminate\Console\Command;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
 
 class CancelJobs extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -43,12 +42,11 @@ class CancelJobs extends Command
         $jobs = \App\TransportJob::whereSent(0)->whereCompleted(1)->whereStatusId(7)->get();
 
         foreach ($jobs as $job) :
-            if (!Carbon::now()->isWeekend()) {
-                $this->info("Sending " . $job->number . " cancellation to transend");
+            if (! Carbon::now()->isWeekend()) {
+                $this->info('Sending '.$job->number.' cancellation to transend');
                 dispatch(new \App\Jobs\TransendOrderImport($job, 'D'));
                 $job->log('Cancelled');
             }
         endforeach;
     }
-
 }

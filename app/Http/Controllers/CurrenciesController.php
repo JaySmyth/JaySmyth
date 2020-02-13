@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Http\Requests\CurrencyRequest;
 use App\Currency;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\CurrencyRequest;
+use Illuminate\Http\Request;
 
 class CurrenciesController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -21,10 +20,8 @@ class CurrenciesController extends Controller
     }
 
     /**
-     * 
-     *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function index(Request $request)
     {
@@ -36,10 +33,8 @@ class CurrenciesController extends Controller
     }
 
     /**
-     * 
-     *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function create()
     {
@@ -49,10 +44,8 @@ class CurrenciesController extends Controller
     }
 
     /**
-     * 
-     *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function store(CurrencyRequest $request)
     {
@@ -66,10 +59,8 @@ class CurrenciesController extends Controller
     }
 
     /**
-     * 
-     *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function edit($id)
     {
@@ -81,10 +72,8 @@ class CurrenciesController extends Controller
     }
 
     /**
-     * 
-     *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function update(CurrencyRequest $request, $id)
     {
@@ -98,5 +87,4 @@ class CurrenciesController extends Controller
 
         return redirect('currencies');
     }
-
 }

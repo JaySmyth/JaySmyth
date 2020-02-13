@@ -2,8 +2,8 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 class FileUpload extends Model
 {
@@ -57,7 +57,7 @@ class FileUpload extends Model
 
     /**
      * Returns last 20 log entries.
-     * 
+     *
      * @return type
      */
     public function getLatestLogs()
@@ -67,17 +67,17 @@ class FileUpload extends Model
 
     /**
      * Determine if a file upload is scheduled to run.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function isScheduled()
     {
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             return false;
         }
 
         // Next upload within 2 minutes or never ran before
-        if (Carbon::now()->diffInMinutes($this->next_upload) <= 2 || (!$this->last_upload && !$this->next_upload)) {
+        if (Carbon::now()->diffInMinutes($this->next_upload) <= 2 || (! $this->last_upload && ! $this->next_upload)) {
             return true;
         }
 
@@ -87,7 +87,7 @@ class FileUpload extends Model
     /**
      * Schedule an upload to run again.
      *
-     * @param integer $minutes
+     * @param int $minutes
      */
     public function retry($minutes = 2)
     {
@@ -109,38 +109,37 @@ class FileUpload extends Model
                 break;
 
             case 'daily':
-                $this->next_upload = new Carbon('tomorrow ' . $this->time);
+                $this->next_upload = new Carbon('tomorrow '.$this->time);
                 break;
 
             case 'twiceDaily':
                 $times = explode(',', $this->time);
 
-                $time1 = new Carbon('today ' . $times[0]);
-                $time2 = new Carbon('today ' . $times[1]);
+                $time1 = new Carbon('today '.$times[0]);
+                $time2 = new Carbon('today '.$times[1]);
 
                 if (Carbon::now()->hour == $time2->hour) {
-                    $this->next_upload = new Carbon('tomorrow ' . $times[0]);
+                    $this->next_upload = new Carbon('tomorrow '.$times[0]);
                 } else {
-                    $this->next_upload = new Carbon('today ' . $times[1]);
+                    $this->next_upload = new Carbon('today '.$times[1]);
                 }
                 break;
 
             case 'weekly':
-                $nextUpload = new Carbon('today ' . $this->time);
+                $nextUpload = new Carbon('today '.$this->time);
                 $this->next_upload = $nextUpload->addWeek();
                 break;
 
             case 'monthly':
-                $nextUpload = new Carbon('today ' . $this->time);
+                $nextUpload = new Carbon('today '.$this->time);
                 $this->next_upload = $nextUpload->addMonth();
                 break;
 
             default:
-                $this->next_upload = new Carbon('tomorrow ' . $this->time);
+                $this->next_upload = new Carbon('tomorrow '.$this->time);
                 break;
         }
 
         $this->update();
     }
-
 }

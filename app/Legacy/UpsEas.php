@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class UpsEas extends Model
 {
-
     /**
      * The connection name for the model.
      *
@@ -36,20 +35,19 @@ class UpsEas extends Model
 
         // Look to see if an EAS applies
         for ($i = strlen($postcode); $i >= 2; $i--) {
-
             $eas = $this->where('country_code', strtoupper($countryCode))
                     ->where('postal_low', '<=', substr($postcode, 0, $i))
                     ->where('postal_high', '>=', substr($postcode, 0, $i))
                     ->first();
 
-            if ($eas)
+            if ($eas) {
                 return $eas;
+            }
         }
     }
 
     public function calcCostOaa($countryCode, $postcode, $chargeableWeight)
     {
-
         $charge = 0;
         $eas = $this->checkEas($countryCode, $postcode);
 
@@ -65,7 +63,6 @@ class UpsEas extends Model
 
     public function calcSalesOaa($countryCode, $postcode, $chargeableWeight)
     {
-
         $charge = 0;
         $eas = $this->checkEas($countryCode, $postcode);
 
@@ -78,5 +75,4 @@ class UpsEas extends Model
 
         return $charge;
     }
-
 }

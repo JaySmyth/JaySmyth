@@ -8,7 +8,7 @@ class CustomsProcedureCode extends Model
 {
     /*
      * Black list of NON mass assignable - all others are mass assignable.
-     * 
+     *
      * @var array
      */
 
@@ -18,5 +18,4 @@ class CustomsProcedureCode extends Model
      *  No timestamps.
      */
     public $timestamps = false;
-
 }

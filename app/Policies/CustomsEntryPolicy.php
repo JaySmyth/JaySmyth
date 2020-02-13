@@ -2,22 +2,21 @@
 
 namespace App\Policies;
 
-use App\User;
 use App\CustomsEntry;
+use App\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CustomsEntryPolicy
 {
-
     use HandlesAuthorization;
 
     /**
      * Index policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function index(User $user)
-    {           
+    {
         if ($user->hasPermission('view_customs_entry')) {
             return true;
         }
@@ -26,10 +25,10 @@ class CustomsEntryPolicy
     /**
      * Show policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function view(User $user, CustomsEntry $customsEntry)
-    {        
+    {
         if ($user->hasPermission('view_customs_entry') && $user->relatedTo($customsEntry)) {
             return true;
         }
@@ -38,7 +37,7 @@ class CustomsEntryPolicy
     /**
      * Create policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function create(User $user)
     {
@@ -50,7 +49,7 @@ class CustomsEntryPolicy
     /**
      * Update policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function update(User $user, CustomsEntry $customsEntry)
     {
@@ -62,7 +61,7 @@ class CustomsEntryPolicy
     /**
      * Delete policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function delete(User $user, CustomsEntry $customsEntry)
     {
@@ -74,7 +73,7 @@ class CustomsEntryPolicy
     /**
      * Add commodity policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function addCommodity(User $user, CustomsEntry $customsEntry)
     {
@@ -82,5 +81,4 @@ class CustomsEntryPolicy
             return true;
         }
     }
-
 }

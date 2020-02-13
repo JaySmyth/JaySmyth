@@ -13,10 +13,10 @@ class Surcharge extends Model
      */
 
     protected $dates = ['from_date', 'to_date', 'created_at', 'updated_at'];
-    
+
     /*
      * The fields that are mass-assignable
-     * 
+     *
      * @var array
      */
     protected $fillable = ['name',
@@ -32,11 +32,11 @@ class Surcharge extends Model
         'service_id',
         'company_id',
         'from_date',
-        'to_date'
+        'to_date',
     ];
 
     /**
-     * A surcharge has many surcharge details
+     * A surcharge has many surcharge details.
      *
      * @return
      */
@@ -46,7 +46,7 @@ class Surcharge extends Model
     }
 
     /**
-     * Get the type (verbose)
+     * Get the type (verbose).
      *
      * @return string
      */
@@ -54,7 +54,7 @@ class Surcharge extends Model
     {
         return ($this->type == 'c') ? 'Cost' : 'Sale';
     }
-    
+
     /**
      * Scope filter.
      *
@@ -63,14 +63,14 @@ class Surcharge extends Model
     public function scopeFilter($query, $filter)
     {
         if ($filter) {
-            return $query->where('name', 'LIKE', '%' . $filter . '%')
-                            ->orWhere('code', 'LIKE', '%' . $filter . '%');
+            return $query->where('name', 'LIKE', '%'.$filter.'%')
+                            ->orWhere('code', 'LIKE', '%'.$filter.'%');
         }
     }
 
     /**
      * Scope company.
-     * 
+     *
      * @return
      */
     public function scopeHasCompany($query, $companyId)
@@ -82,7 +82,7 @@ class Surcharge extends Model
 
     /**
      * Scope category.
-     * 
+     *
      * @return
      */
     public function scopeHasService($query, $serviceId)
@@ -99,11 +99,11 @@ class Surcharge extends Model
      */
     public function scopeDateBetween($query, $dateFrom, $dateTo)
     {
-        if (!empty($dateFrom)) {
+        if (! empty($dateFrom)) {
             $query->where('from_date', '>=', Carbon::parse($dateFrom));
         }
 
-        if (!empty($dateTo)) {
+        if (! empty($dateTo)) {
             $query->where('to_date', '<=', Carbon::parse($dateTo));
         }
 
@@ -111,15 +111,13 @@ class Surcharge extends Model
     }
 
     /**
-     * A user may belong to multiple companies
+     * A user may belong to multiple companies.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function getCharges($surchargeId, $code = '', $companyId = "0", $shipDate = null)
+    public function getCharges($surchargeId, $code = '', $companyId = '0', $shipDate = null)
     {
-
-        if (!$shipDate) {
-
+        if (! $shipDate) {
             $shipDate = date('Y-m-d');
         }
 
@@ -127,7 +125,7 @@ class Surcharge extends Model
         $surCharges = $surCharges->newQuery();
         $surCharges = $surCharges->whereIn('company_id', ['0', $companyId]);
 
-        if ($code > "") {
+        if ($code > '') {
             $surCharges = $surCharges->where('code', $code);
         }
 
@@ -141,9 +139,9 @@ class Surcharge extends Model
 
             /*
              * ****************************************
-             * Cycle through charges and remove default 
+             * Cycle through charges and remove default
              * charge if company specific charge exists
-             * 
+             *
              * Company charge will always appear first
              * ****************************************
              */
@@ -152,7 +150,6 @@ class Surcharge extends Model
 
                 // If Charge already added then ignore
                 if (in_array($surCharge->code, $chargeCodes)) {
-
                     $surCharges->forget($key);
                 } else {
 
@@ -164,5 +161,4 @@ class Surcharge extends Model
 
         return $surCharges;
     }
-
 }

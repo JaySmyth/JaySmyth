@@ -11,5 +11,4 @@ class Container extends Model
      */
 
     protected $guarded = ['id'];
-
 }

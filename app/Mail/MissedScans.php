@@ -8,7 +8,6 @@ use Illuminate\Queue\SerializesModels;
 
 class MissedScans extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -37,5 +36,4 @@ class MissedScans extends Mailable
     {
         return $this->view('emails.shipments.missed_scans')->subject($this->subject);
     }
-
 }

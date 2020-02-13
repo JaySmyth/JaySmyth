@@ -7,17 +7,16 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 
 class DriverManifestPolicy
 {
-
     use HandlesAuthorization;
 
     /**
      * Intercept all checks - ensure IFS user.
      *
-     * @return boolean
+     * @return bool
      */
     public function before(User $user)
     {
-        if (!$user->hasIfsRole()) {
+        if (! $user->hasIfsRole()) {
             return false;
         }
     }
@@ -25,7 +24,7 @@ class DriverManifestPolicy
     /**
      * Index policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function index(User $user)
     {
@@ -37,7 +36,7 @@ class DriverManifestPolicy
     /**
      * Show policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function view(User $user)
     {
@@ -49,7 +48,7 @@ class DriverManifestPolicy
     /**
      * Create policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function create(User $user)
     {
@@ -61,7 +60,7 @@ class DriverManifestPolicy
     /**
      * Close manifest.
      *
-     * @return boolean
+     * @return bool
      */
     public function close(User $user)
     {
@@ -73,7 +72,7 @@ class DriverManifestPolicy
     /**
      * Open manifest.
      *
-     * @return boolean
+     * @return bool
      */
     public function open(User $user)
     {
@@ -81,5 +80,4 @@ class DriverManifestPolicy
             return true;
         }
     }
-
 }

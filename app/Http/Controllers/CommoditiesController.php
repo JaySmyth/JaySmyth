@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Commodity;
-use App\Http\Requests\CommodityRequest;
 use App\Http\Requests;
+use App\Http\Requests\CommodityRequest;
+use Illuminate\Http\Request;
 
 class CommoditiesController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -22,7 +21,7 @@ class CommoditiesController extends Controller
 
     /**
      * List commodities.
-     * 
+     *
      * @param Request $request
      * @return type
      */
@@ -39,7 +38,7 @@ class CommoditiesController extends Controller
 
     /**
      * Show a commodity.
-     * 
+     *
      * @param type $id
      * @param Request $request
      * @return type
@@ -60,8 +59,8 @@ class CommoditiesController extends Controller
     /**
      * Displays new commodity form.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function create()
     {
@@ -71,7 +70,7 @@ class CommoditiesController extends Controller
 
     /**
      * Save a new commodity.
-     * 
+     *
      * @param CommodityRequest $request
      * @return type
      */
@@ -84,12 +83,13 @@ class CommoditiesController extends Controller
         }
 
         flash()->success('Created!', 'Commodity created successfully.');
+
         return redirect('commodities');
     }
 
     /**
      * Display edit commodity form.
-     * 
+     *
      * @param type $id
      * @return type
      */
@@ -104,7 +104,7 @@ class CommoditiesController extends Controller
 
     /**
      * Update commodity.
-     * 
+     *
      * @param type $id
      * @param CommodityRequest $request
      */
@@ -116,15 +116,16 @@ class CommoditiesController extends Controller
 
         $commodity->update($request->all());
 
-        if (!$request->ajax()) {
+        if (! $request->ajax()) {
             flash()->success('Updated!', 'Commodity updated successfully.');
+
             return redirect('commodities');
         }
     }
 
     /**
      * Delete a commodity.
-     * 
+     *
      * @param type $id
      * @return type
      */
@@ -139,7 +140,7 @@ class CommoditiesController extends Controller
 
     /**
      * Search commodities.
-     * 
+     *
      * @param type $request
      * @param type $paginate
      * @return type
@@ -153,11 +154,10 @@ class CommoditiesController extends Controller
                 ->orderBy('description')
                 ->with('company');
 
-        if (!$paginate) {
+        if (! $paginate) {
             return $query->get();
         }
 
         return $query->paginate(50);
     }
-
 }

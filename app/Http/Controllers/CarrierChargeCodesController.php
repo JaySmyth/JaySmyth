@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\CarrierChargeCode;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\CarrierChargeCode;
 
 class CarrierChargeCodesController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -20,10 +19,8 @@ class CarrierChargeCodesController extends Controller
     }
 
     /**
-     * 
-     *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function index(Request $request)
     {
@@ -35,10 +32,8 @@ class CarrierChargeCodesController extends Controller
     }
 
     /**
-     * 
-     *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function edit($id)
     {
@@ -50,10 +45,8 @@ class CarrierChargeCodesController extends Controller
     }
 
     /**
-     * 
-     *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function update(Request $request, $id)
     {
@@ -72,10 +65,10 @@ class CarrierChargeCodesController extends Controller
 
     /*
      * User search.
-     * 
+     *
      * @param   $request
      * @param   $paginate
-     * 
+     *
      * @return
      */
 
@@ -87,5 +80,4 @@ class CarrierChargeCodesController extends Controller
                         ->hasScsCode($request->scs_code)
                         ->paginate(50);
     }
-
 }

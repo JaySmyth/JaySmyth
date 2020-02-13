@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Carrier extends Model
 {
-
     public $timestamps = false;
 
     /**
@@ -21,7 +20,7 @@ class Carrier extends Model
     }
 
     /**
-     * Return equivilent carrier services to an IFS service code
+     * Return equivilent carrier services to an IFS service code.
      *
      * @return
      */
@@ -49,5 +48,4 @@ class Carrier extends Model
     {
         return $this->hasMany('App\CarrierPackagingType');
     }
-
 }

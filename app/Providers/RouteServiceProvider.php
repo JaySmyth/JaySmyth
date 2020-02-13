@@ -2,12 +2,11 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
-
     /**
      * This namespace is applied to your controller routes.
      *
@@ -53,8 +52,8 @@ class RouteServiceProvider extends ServiceProvider
             'middleware' => 'web',
             'namespace' => $this->namespace,
                 ], function ($router) {
-            require base_path('routes/web.php');
-        });
+                    require base_path('routes/web.php');
+                });
     }
 
     /**
@@ -71,8 +70,7 @@ class RouteServiceProvider extends ServiceProvider
             'namespace' => $this->namespace,
             'prefix' => 'api',
                 ], function ($router) {
-            require base_path('routes/api.php');
-        });
+                    require base_path('routes/api.php');
+                });
     }
-
 }

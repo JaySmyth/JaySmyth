@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class SurchargeDetail extends Model
 {
-
     protected $fillable = [
         'name',
         'code',
@@ -18,7 +17,7 @@ class SurchargeDetail extends Model
         'surcharge_id',
         'company_id',
         'from_date',
-        'to_date'
+        'to_date',
     ];
 
     /*
@@ -73,7 +72,6 @@ class SurchargeDetail extends Model
     }
 
     /**
-     * 
      * @return type
      */
     public function addCharge()
@@ -82,7 +80,6 @@ class SurchargeDetail extends Model
     }
 
     /**
-     * 
      * @return type
      */
     public function company()
@@ -98,8 +95,8 @@ class SurchargeDetail extends Model
     public function scopeFilter($query, $filter)
     {
         if ($filter) {
-            return $query->where('surcharge_details.name', 'LIKE', '%' . $filter . '%')
-                            ->orWhere('code', 'LIKE', '%' . $filter . '%');
+            return $query->where('surcharge_details.name', 'LIKE', '%'.$filter.'%')
+                            ->orWhere('code', 'LIKE', '%'.$filter.'%');
         }
     }
 
@@ -110,11 +107,11 @@ class SurchargeDetail extends Model
      */
     public function scopeDateBetween($query, $dateFrom, $dateTo)
     {
-        if (!empty($dateFrom)) {
+        if (! empty($dateFrom)) {
             $query->where('from_date', '>=', Carbon::parse($dateFrom));
         }
 
-        if (!empty($dateTo)) {
+        if (! empty($dateTo)) {
             $query->where('to_date', '<=', Carbon::parse($dateTo));
         }
 
@@ -123,7 +120,7 @@ class SurchargeDetail extends Model
 
     /**
      * Scope company.
-     * 
+     *
      * @return
      */
     public function scopeHasCompany($query, $companyId)
@@ -135,7 +132,7 @@ class SurchargeDetail extends Model
 
     /**
      * Scope surcharge_id.
-     * 
+     *
      * @return
      */
     public function scopeHasSurcharge($query, $surchargeId)
@@ -144,5 +141,4 @@ class SurchargeDetail extends Model
             return $query->where('surcharge_id', $surchargeId);
         }
     }
-
 }

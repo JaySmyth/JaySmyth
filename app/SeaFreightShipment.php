@@ -2,8 +2,8 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 class SeaFreightShipment extends Model
 {
@@ -61,7 +61,7 @@ class SeaFreightShipment extends Model
     }
 
     /**
-     * A shipment has many tracking events
+     * A shipment has many tracking events.
      *
      * @return
      */
@@ -72,7 +72,7 @@ class SeaFreightShipment extends Model
 
     /**
      * A customs entry has many documents.
-     * 
+     *
      * @return
      */
     public function documents()
@@ -91,8 +91,8 @@ class SeaFreightShipment extends Model
     }
 
     /**
-     * A shipment has one status
-     * 
+     * A shipment has one status.
+     *
      * @return
      */
     public function seaFreightStatus()
@@ -224,7 +224,7 @@ class SeaFreightShipment extends Model
     /**
      * Get the number of days that the shipment has been in transit.
      *
-     * @return  integer (days in transit)
+     * @return  int (days in transit)
      */
     public function getTimeInTransitAttribute()
     {
@@ -242,7 +242,7 @@ class SeaFreightShipment extends Model
     /**
      * Get the time remaining until on dock date.
      *
-     * @return  integer (hours in transit)
+     * @return  int (hours in transit)
      */
     public function getTimeRemainingAttribute()
     {
@@ -258,8 +258,8 @@ class SeaFreightShipment extends Model
     }
 
     /**
-     * Get the shipper
-     * 
+     * Get the shipper.
+     *
      * @return string
      */
     public function getShipperAttribute()
@@ -277,9 +277,9 @@ class SeaFreightShipment extends Model
     public function scopeFilter($query, $filter)
     {
         if ($filter) {
-            return $query->where('number', 'LIKE', '%' . $filter . '%')
-                            ->orWhere('final_destination', 'LIKE', '%' . $filter . '%')
-                            ->orWhere('reference', 'LIKE', '%' . $filter . '%');
+            return $query->where('number', 'LIKE', '%'.$filter.'%')
+                            ->orWhere('final_destination', 'LIKE', '%'.$filter.'%')
+                            ->orWhere('reference', 'LIKE', '%'.$filter.'%');
         }
     }
 
@@ -290,11 +290,11 @@ class SeaFreightShipment extends Model
      */
     public function scopeDateBetween($query, $dateFrom, $dateTo)
     {
-        if (!$dateFrom && $dateTo) {
+        if (! $dateFrom && $dateTo) {
             return $query->where('required_on_dock_date', '<', Carbon::parse($dateTo)->endOfDay());
         }
 
-        if ($dateFrom && !$dateTo) {
+        if ($dateFrom && ! $dateTo) {
             return $query->where('created_at', '>', Carbon::parse($dateFrom)->startOfDay());
         }
 
@@ -306,7 +306,7 @@ class SeaFreightShipment extends Model
 
     /**
      * Scope company.
-     * 
+     *
      * @return
      */
     public function scopeHasCompany($query, $companyId)
@@ -333,7 +333,6 @@ class SeaFreightShipment extends Model
         }
 
         if ($status) {
-
             $query->select('sea_freight_shipments.*')->join('sea_freight_statuses', 'sea_freight_shipments.sea_freight_status_id', '=', 'sea_freight_statuses.id');
 
             if (is_array($status)) {
@@ -346,7 +345,7 @@ class SeaFreightShipment extends Model
 
     /**
      * Scope restrict results by company.
-     * 
+     *
      * @param type $query
      * @param type $companyIds
      * @return type
@@ -361,14 +360,13 @@ class SeaFreightShipment extends Model
      *
      * @param   string  $podSignature
      * @param   carbon  $deliveryDate
-     * 
+     *
      * @return  void
      */
     public function setDelivered($podSignature = 'Unknown', $deliveryDate = null, $userId = 0, $timeZone = false)
     {
-        if (!$this->delivered) {
-
-            if (!$deliveryDate instanceof Carbon) {
+        if (! $this->delivered) {
+            if (! $deliveryDate instanceof Carbon) {
                 $deliveryDate = Carbon::now();
             }
 
@@ -387,13 +385,13 @@ class SeaFreightShipment extends Model
     }
 
     /**
-     * Set the status of the shipment and adds a tracking event to show that 
+     * Set the status of the shipment and adds a tracking event to show that
      * the status has changed.
-     * 
+     *
      * @param string  $statusCode Status that the shipment will be changed to
-     * @param integer $userId User changing the shipment status
-     * @param boolean $withTrackingEvent
-     * 
+     * @param int $userId User changing the shipment status
+     * @param bool $withTrackingEvent
+     *
      * @return null
      */
     public function setStatus($status, $userId = 0, $datetime = false, $message = false, $withTrackingEvent = true)
@@ -405,14 +403,13 @@ class SeaFreightShipment extends Model
             $status = SeaFreightStatus::whereCode($status)->first();
         }
 
-        // Only update if we have been given a valid status and the shipment is not currently set to this status         
+        // Only update if we have been given a valid status and the shipment is not currently set to this status
         if ($status && $this->sea_freight_status_id != $status->id) {
-
-            if ($status->id > 4 && $this->isActive() && !$this->departure_date) {
+            if ($status->id > 4 && $this->isActive() && ! $this->departure_date) {
                 $this->departure_date = Carbon::parse($datetime);
             }
 
-            if ($status->id > 6 && $this->isActive() && !$this->arrival_date) {
+            if ($status->id > 6 && $this->isActive() && ! $this->arrival_date) {
                 $this->arrival_date = Carbon::parse($datetime);
             }
 
@@ -430,14 +427,14 @@ class SeaFreightShipment extends Model
     /**
      * Adds a tracking event to the shipment. Defaults the tracking location
      * to that of the shipment's associated depot. Requires a valid status as
-     * a minimum requirement. If no message has been provided, a standard 
+     * a minimum requirement. If no message has been provided, a standard
      * message is retreived from the statuses table.
      *
      * @param string $status Status that the shipment will be changed to
-     * @param integer $userId User adding the tracking event
+     * @param int $userId User adding the tracking event
      * @param string $message Tracking message
      * @param string $datetime Date/time of the event
-     * 
+     *
      * @return mixed
      */
     public function addTracking($status, $userId = 0, $datetime = false, $message = false)
@@ -446,12 +443,11 @@ class SeaFreightShipment extends Model
         $status = SeaFreightStatus::whereCode($status)->first();
 
         if ($status) {
-
-            if (!$message) {
+            if (! $message) {
                 $message = $status->description;
             }
 
-            if (!$datetime) {
+            if (! $datetime) {
                 $datetime = Carbon::now();
             }
 
@@ -461,7 +457,7 @@ class SeaFreightShipment extends Model
                         'message' => $message,
                         'datetime' => $datetime,
                         'user_id' => $userId,
-                        'sea_freight_shipment_id' => $this->id
+                        'sea_freight_shipment_id' => $this->id,
             ]);
         }
 
@@ -469,22 +465,23 @@ class SeaFreightShipment extends Model
     }
 
     /**
-     * Shipment active - i.e. not cancelled or delivered
-     * 
-     * @return boolean
+     * Shipment active - i.e. not cancelled or delivered.
+     *
+     * @return bool
      */
     public function isActive()
     {
         if ($this->seaFreightStatus->code == 'cancelled' || $this->seaFreightStatus->code == 'delivered') {
             return false;
         }
+
         return true;
     }
 
     /**
-     * A shipment is cancellable 
-     * 
-     * @return boolean
+     * A shipment is cancellable.
+     *
+     * @return bool
      */
     public function isCancellable()
     {
@@ -493,7 +490,7 @@ class SeaFreightShipment extends Model
         if (in_array($this->seaFreightStatus->code, $cancellableStatuses)) {
             return true;
         }
+
         return false;
     }
-
 }

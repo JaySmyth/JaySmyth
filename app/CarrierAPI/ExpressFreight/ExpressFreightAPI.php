@@ -3,11 +3,10 @@
 namespace App\CarrierAPI\ExpressFreight;
 
 use App\CarrierAPI\ExpressFreight\ExpressFreightLabel;
-
 use App\TransactionLog;
 
 /**
- * Description of IFSWebAPI
+ * Description of IFSWebAPI.
  *
  * @author gmcbroom
  */
@@ -19,10 +18,8 @@ class ExpressFreightAPI extends \App\CarrierAPI\CarrierBase
 
     public $mode;
 
-
     public function preProcess($shipment)
     {
-
     }
 
     public function createShipment($shipment)
@@ -46,7 +43,8 @@ class ExpressFreightAPI extends \App\CarrierAPI\CarrierBase
             if (isset($reply['errors']) && $reply['errors'] > '') {
 
                 // Request unsuccessful - return errors
-                $errorMsg = 'Carrier Error : ' . ((string)$reply['errors']);
+                $errorMsg = 'Carrier Error : '.((string) $reply['errors']);
+
                 return $this->generateErrorResponse($response, $errorMsg);
             } else {
 
@@ -69,9 +67,8 @@ class ExpressFreightAPI extends \App\CarrierAPI\CarrierBase
         return $this->applyRules($rules, $shipment);
     }
 
-    function initCarrier()
+    public function initCarrier()
     {
-
     }
 
     public function buildCarrierShipment($shipment)
@@ -116,10 +113,10 @@ class ExpressFreightAPI extends \App\CarrierAPI\CarrierBase
             // Build the tracking number
             $trackingNumber = nextAvailable('EXPCONSIGNMENT');  // express freight sequence (required at piece level)
             $trackingNumber = str_pad($trackingNumber, 8, 0, STR_PAD_LEFT);
-            $trackingNumber .= mod11CheckDigit((string)$trackingNumber);                        // Then add check digit
+            $trackingNumber .= mod11CheckDigit((string) $trackingNumber);                        // Then add check digit
 
             $trackingNumber .= strtoupper($shipment['recipient_country_code']);
-            $trackingNumber = 'XE' . $trackingNumber;
+            $trackingNumber = 'XE'.$trackingNumber;
 
             $data['packages'][$i]['carrier_tracking_number'] = $trackingNumber;         // Store tracking no for package
             $data['packages'][$i]['barcode'] = $trackingNumber;                         // Store tracking no for package
@@ -150,7 +147,7 @@ class ExpressFreightAPI extends \App\CarrierAPI\CarrierBase
         $response['volumetric_divisor'] = getVolumetricDivisor('IFS', $serviceCode);       // From Helper functions
 
         $response['pieces'] = $reply['pieces'];
-        for ($i = 0; $i < $response['pieces']; ++$i) {
+        for ($i = 0; $i < $response['pieces']; $i++) {
             $response['packages'][$i]['sequence_number'] = $i + 1;
             $response['packages'][$i]['carrier_tracking_code'] = $reply['packages'][$i]['carrier_tracking_number'];
             $response['packages'][$i]['barcode'] = $reply['packages'][$i]['carrier_tracking_number'];
@@ -167,15 +164,12 @@ class ExpressFreightAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     *
      * @param type $reply
      */
     private function generatePdf($shipment, $serviceCode, $labelData)
     {
         $label = new ExpressFreightLabel($shipment, $serviceCode, $labelData);
+
         return $label->create();
     }
-
 }
-
-?>

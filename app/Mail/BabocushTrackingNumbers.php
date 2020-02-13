@@ -8,7 +8,6 @@ use Illuminate\Queue\SerializesModels;
 
 class BabocushTrackingNumbers extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -38,8 +37,7 @@ class BabocushTrackingNumbers extends Mailable
         }
 
         return $this->view('emails.shipments.babocush_tracking_numbers')
-                        ->subject('Babocush USA tracking numbers - ' . count($this->results['success']))
+                        ->subject('Babocush USA tracking numbers - '.count($this->results['success']))
                         ->with(['results' => $this->results]);
     }
-
 }

@@ -3,13 +3,12 @@
 namespace App\Console\Commands\PurchaseInvoices;
 
 use App\PurchaseInvoice;
-use App\PurchaseInvoiceLine;
 use App\PurchaseInvoiceCharge;
+use App\PurchaseInvoiceLine;
 use Illuminate\Console\Command;
 
 class ImportTntPurchaseInvoices extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -53,7 +52,6 @@ class ImportTntPurchaseInvoices extends Command
     protected $purchaseInvoiceLine;
 
     /**
-     *
      * @var type
      */
     protected $row;
@@ -69,7 +67,7 @@ class ImportTntPurchaseInvoices extends Command
 
         $this->sftpDirectory = '/home/tntinv/invoices/';
         $this->archiveDirectory = 'archive';
-        $this->fields = array('Pick Up Date', 'Account Number', 'Invoice Number', 'Invoice Date', 'Consignment Number', 'Customer Reference', 'Company Name', 'Address 1', 'Country', 'Delivery Company Name', 'Delivery Contact 1', 'Delivery Contact 2', 'Delivery Address 1', 'Delivery Address 2', 'Delivery Address 3', 'Delivery Post Code', 'Delivery Country', 'Product Description', 'Division and Product codes', 'Total Pieces', 'Billed Weight', 'Total Charges', 'Consignment Net Value (excl. VAT)', 'Net Amount (FRT)', 'Net Amount (FSC)', 'Description', 'Net Amount (INS)', 'Description', 'Net Amount (RES)', 'Description', 'Net Amount (ADH)', 'Description', 'Net Amount', 'Description', 'Net Amount', 'Description', 'Net Amount', 'Description', 'Net Amount', 'Description', 'Net Amount (VAT)');
+        $this->fields = ['Pick Up Date', 'Account Number', 'Invoice Number', 'Invoice Date', 'Consignment Number', 'Customer Reference', 'Company Name', 'Address 1', 'Country', 'Delivery Company Name', 'Delivery Contact 1', 'Delivery Contact 2', 'Delivery Address 1', 'Delivery Address 2', 'Delivery Address 3', 'Delivery Post Code', 'Delivery Country', 'Product Description', 'Division and Product codes', 'Total Pieces', 'Billed Weight', 'Total Charges', 'Consignment Net Value (excl. VAT)', 'Net Amount (FRT)', 'Net Amount (FSC)', 'Description', 'Net Amount (INS)', 'Description', 'Net Amount (RES)', 'Description', 'Net Amount (ADH)', 'Description', 'Net Amount', 'Description', 'Net Amount', 'Description', 'Net Amount', 'Description', 'Net Amount', 'Description', 'Net Amount (VAT)'];
     }
 
     /**
@@ -79,11 +77,11 @@ class ImportTntPurchaseInvoices extends Command
      */
     public function handle()
     {
-        $this->info('Checking ' . $this->sftpDirectory . ' for files to process');
+        $this->info('Checking '.$this->sftpDirectory.' for files to process');
 
         if ($handle = opendir($this->sftpDirectory)) {
             while (false !== ($file = readdir($handle))) {
-                if (!is_dir($file) && $file != $this->archiveDirectory) {
+                if (! is_dir($file) && $file != $this->archiveDirectory) {
                     $this->processFile($file);
                     $this->archiveFile($file);
                 }
@@ -110,12 +108,9 @@ class ImportTntPurchaseInvoices extends Command
         $totalTaxable = 0;
         $totalNonTaxable = 0;
 
-        if (($handle = fopen($this->sftpDirectory . $file, 'r')) !== false) {
-
+        if (($handle = fopen($this->sftpDirectory.$file, 'r')) !== false) {
             while (($data = fgetcsv($handle, 2000, ',')) !== false) {
-
                 if ($rowNumber >= 2) {
-
                     $row = $this->assignFieldNames($data);
 
                     $this->createPurchaseInvoice($row);
@@ -179,7 +174,6 @@ class ImportTntPurchaseInvoices extends Command
                     } else {
                         $totalNonTaxable += $purchaseInvoiceLine->charges->sum('billed_amount');
                     }
-
                 }
 
                 $rowNumber++;
@@ -212,19 +206,18 @@ class ImportTntPurchaseInvoices extends Command
         $chargeField = 0;
 
         foreach ($this->fields as $field) {
-
             if ($field == 'Net Amount' || $field == 'Description') {
-
                 if ($field == 'Net Amount') {
                     $chargeField++;
                 }
 
-                $field = $field . $chargeField;
+                $field = $field.$chargeField;
             }
 
             $row[$field] = (isset($data[$i])) ? trim($data[$i]) : null;
             $i++;
         }
+
         return $row;
     }
 
@@ -241,6 +234,7 @@ class ImportTntPurchaseInvoices extends Command
 
         if ($this->purchaseInvoice) {
             $this->error("Invoice $invoiceNumber skipped (already exists)");
+
             return false;
         }
 
@@ -254,7 +248,7 @@ class ImportTntPurchaseInvoices extends Command
             'currency_code' => 'GBP',
             'type' => 'F',
             'carrier_id' => 4,
-            'date' => strtotime(str_replace('/', '.', $row['Invoice Date']))
+            'date' => strtotime(str_replace('/', '.', $row['Invoice Date'])),
         ]);
 
         $this->invoices[] = $invoiceNumber;
@@ -285,7 +279,7 @@ class ImportTntPurchaseInvoices extends Command
                 'vat' => 0,
                 'vat_rate' => 0,
                 'purchase_invoice_id' => $this->purchaseInvoice->id,
-                'purchase_invoice_line_id' => $purchaseInvoiceLineId
+                'purchase_invoice_line_id' => $purchaseInvoiceLineId,
             ]);
 
             $purchaseInvoiceCharge->setCarrierChargeId();
@@ -296,25 +290,24 @@ class ImportTntPurchaseInvoices extends Command
      * Move file to archive directory.
      *
      * @param string $file
-     * @return boolean
+     * @return bool
      */
-    function archiveFile($file)
+    public function archiveFile($file)
     {
         $this->info("Archiving file $file");
 
-        $originalFile = $this->sftpDirectory . $file;
-        $archiveFile = $this->sftpDirectory . $this->archiveDirectory . '/' . $file;
+        $originalFile = $this->sftpDirectory.$file;
+        $archiveFile = $this->sftpDirectory.$this->archiveDirectory.'/'.$file;
 
         $this->info("Moving $originalFile to archive");
 
-        if (!file_exists($originalFile)) {
+        if (! file_exists($originalFile)) {
             $this->error("Problem archiving $file  - file not found");
         }
 
         if (copy($originalFile, $archiveFile)) {
             unlink($originalFile);
-            $this->info("File archived successfully");
+            $this->info('File archived successfully');
         }
     }
-
 }

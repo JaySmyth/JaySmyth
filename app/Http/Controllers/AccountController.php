@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests;
 use App\User;
 use Auth;
+use Illuminate\Http\Request;
 
 class AccountController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -20,16 +19,16 @@ class AccountController extends Controller
     {
         $this->middleware('auth', [
             'except' => [
-                'ip'
-            ]
+                'ip',
+            ],
         ]);
     }
 
     /**
      * Display the authenticated user's account.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function show()
     {
@@ -39,8 +38,8 @@ class AccountController extends Controller
     /**
      * Displays update settings form the for authenticated user.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function edit()
     {
@@ -50,8 +49,8 @@ class AccountController extends Controller
     /**
      * Updates user's account settings.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function update(Request $request)
     {
@@ -59,7 +58,7 @@ class AccountController extends Controller
         $user = Auth::user();
 
         $this->validate($request, [
-            'email' => 'email|required|unique:users,email,' . $user->id,
+            'email' => 'email|required|unique:users,email,'.$user->id,
             'telephone' => 'required|min:3|max:17',
         ]);
 
@@ -74,8 +73,8 @@ class AccountController extends Controller
     /**
      * Displays change password form the for authenticated user.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function password()
     {
@@ -85,16 +84,15 @@ class AccountController extends Controller
     /**
      * Updates user's password.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function changePassword(Request $request)
     {
-
         $user = Auth::user();
 
         $this->validate($request, [
-            'old_password' => 'required|old_password:' . $user->password,
+            'old_password' => 'required|old_password:'.$user->password,
             'password' => 'required|confirmed|min:6',
         ]);
 
@@ -105,5 +103,4 @@ class AccountController extends Controller
 
         return redirect('account');
     }
-
 }

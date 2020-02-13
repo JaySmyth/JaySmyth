@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\DriverManifest;
-use App\Driver;
-use Carbon\Carbon;
 use App\CarrierAPI\Pdf;
+use App\Driver;
+use App\DriverManifest;
+use App\Http\Controllers\Controller;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class DriverManifestsController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -89,19 +88,20 @@ class DriverManifestsController extends Controller
                     ->where('depot_id', 1)
                     ->first();
 
-            if (!$driverManifest) {
-                DriverManifest::create([
+        if (! $driverManifest) {
+            DriverManifest::create([
                     'number' => \App\Sequence::whereCode('DRIVER')->lockForUpdate()->first()->getNextAvailable(),
                     'driver_id' => $driverId,
                     'vehicle_id' => $request->driver[$driverId]['vehicle'],
                     'date' => strtotime($request->driver[$driverId]['date']),
-                    'depot_id' => 1
+                    'depot_id' => 1,
                 ]);
-            }
+        }
 
         endforeach;
 
         flash()->success('Created!', 'Driver manifests created successfully.');
+
         return redirect('driver-manifests');
     }
 
@@ -121,6 +121,7 @@ class DriverManifestsController extends Controller
         $driverManifest->save();
 
         flash()->success('Manifest opened');
+
         return back();
     }
 
@@ -139,6 +140,7 @@ class DriverManifestsController extends Controller
         $driverManifest->close();
 
         flash()->success('Manifest closed');
+
         return back();
     }
 
@@ -188,7 +190,7 @@ class DriverManifestsController extends Controller
     private function search($request, $paginate = true)
     {
         // Default results to "today"
-        if (!$request->date) {
+        if (! $request->date) {
             $request->date = Carbon::today();
         }
 
@@ -202,11 +204,10 @@ class DriverManifestsController extends Controller
                 ->hasJobs()
                 ->join('drivers', 'driver_manifests.driver_id', '=', 'drivers.id');
 
-        if (!$paginate) {
+        if (! $paginate) {
             return $query->get();
         }
 
         return $query->paginate(50);
     }
-
 }

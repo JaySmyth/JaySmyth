@@ -5,15 +5,14 @@ namespace App\Jobs;
 use App\Address;
 use App\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class ImportAddresses implements ShouldQueue
 {
-
     use InteractsWithQueue,
         Queueable,
         SerializesModels;
@@ -32,7 +31,7 @@ class ImportAddresses implements ShouldQueue
      */
     public function __construct($path, $companyId, User $user)
     {
-        $this->path = storage_path('app/' . $path);
+        $this->path = storage_path('app/'.$path);
         $this->companyId = $companyId;
         $this->user = $user;
         $this->fields = ['name', 'company_name', 'address1', 'address2', 'address3', 'city', 'state', 'postcode', 'country_code', 'telephone', 'email', 'type'];
@@ -59,14 +58,13 @@ class ImportAddresses implements ShouldQueue
 
     /**
      * Read through the CSV and insert a record for each valid row.
-     * 
      */
     private function processCsv()
     {
         $rowNumber = 1;
 
         if (($handle = fopen($this->path, 'r')) !== false) {
-            while (($data = fgetcsv($handle, 1000, ",")) !== false) {
+            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
                 if ($this->validateRow($rowNumber, $data)) {
                     $this->insertAddress($rowNumber);
                 }
@@ -80,7 +78,7 @@ class ImportAddresses implements ShouldQueue
 
     /**
      * Validate a csv row.
-     * 
+     *
      * @param type $row
      * @param type $data
      */
@@ -90,7 +88,8 @@ class ImportAddresses implements ShouldQueue
 
         // Invalid number of fields, return false
         if ($numberOfFields != count($this->fields)) {
-            $this->results['rows'][$rowNumber]['errors'][] = "Invalid number of fields detected. Detected $numberOfFields fields. " . count($this->fields) . "required";
+            $this->results['rows'][$rowNumber]['errors'][] = "Invalid number of fields detected. Detected $numberOfFields fields. ".count($this->fields).'required';
+
             return false;
         }
 
@@ -110,7 +109,7 @@ class ImportAddresses implements ShouldQueue
                     'country_code' => 'required|alpha|size:2',
                     'telephone' => 'max:20',
                     'email' => 'email|max:60',
-                    'type' => 'required|alpha|size:1'
+                    'type' => 'required|alpha|size:1',
         ]);
 
         // Check for errors
@@ -118,10 +117,9 @@ class ImportAddresses implements ShouldQueue
 
         // Found errors, return false and add to error array
         if (count($errors) > 0) {
-
             $this->results['rows'][$rowNumber]['data'] = $this->row;
             $this->results['rows'][$rowNumber]['errors'] = $errors->all();
-            $this->results['summary']['failed'] ++;
+            $this->results['summary']['failed']++;
 
             foreach ($this->fields as $field) {
                 if ($errors->has($field)) {
@@ -137,7 +135,7 @@ class ImportAddresses implements ShouldQueue
 
     /**
      * Create a new array with field names.
-     * 
+     *
      * @param type $data
      * @return type
      */
@@ -149,12 +147,13 @@ class ImportAddresses implements ShouldQueue
             $row[$field] = trim($data[$i]);
             $i++;
         }
+
         return $row;
     }
 
     /**
      * Insert a record to the database.
-     * 
+     *
      * @param type $data
      */
     private function insertAddress($rowNumber)
@@ -165,10 +164,9 @@ class ImportAddresses implements ShouldQueue
 
         // Add to our results array
         $this->results['rows'][$rowNumber]['data'] = $this->row;
-        $this->results['summary']['inserted'] ++;
+        $this->results['summary']['inserted']++;
 
         // Save the record to the database
         Address::firstOrCreate($this->row);
     }
-
 }

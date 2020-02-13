@@ -3,13 +3,12 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class PodShipments extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -36,5 +35,4 @@ class PodShipments extends Mailable
                         ->subject('High number of shipments need POD')
                         ->with(['shipments' => $this->shipments]);
     }
-
 }

@@ -1,8 +1,7 @@
 <?php
 
 /**
- * Page-level DocBlock
- * @package unfinished
+ * Page-level DocBlock.
  * @todo Complete the following functions
  *
  *      setDepartmentID
@@ -13,7 +12,6 @@
  *      pallet_flag     - Not Required
  *
  * Clean up fields in data array
- *
  */
 
 namespace App\Http\Controllers;
@@ -33,20 +31,18 @@ use App\Scan;
 use App\Shipment;
 use App\TransactionLog;
 use Auth;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Input;
 
-use Illuminate\Http\Request;
-
 class APIController extends Controller
 {
-
     private $transactionHeader;
     private $dummyPrices = ['FRT' => 25.00, 'OOA' => 3.50, 'Fuel' => 1.11];
     private $input;
 
     /**
-     * Returns a new controller instance
+     * Returns a new controller instance.
      *
      * @return
      */
@@ -62,7 +58,7 @@ class APIController extends Controller
 
     /**
      * Accepts a POST object, validates it
-     * and creates a shipment and documentation
+     * and creates a shipment and documentation.
      *
      * @param Request
      * @return Response
@@ -87,12 +83,10 @@ class APIController extends Controller
         $this->preProcessShipment();
 
         if ($this->input['data']['errors'] == []) {
-
             $isAPITest = $this->checkIfApiTest();
 
             // If this is an APITEST then return dummy transaction
             if ($isAPITest) {
-
                 $data = json_decode('{"errors":[],"route_id":1,"carrier":"APITest Carrier","ifs_consignment_number":"10009999999","consignment_number":"10009999999","volumetric_divisor":5000,"pieces":1,"packages":[{"index":1,"carrier_tracking_number":"1000100099999999999999","barcode":"1000638144501525076895","carrier_tracking_code":"1000100099999999999999"}],"label_format_type":"PDF","label_size":"6X4","label_base64":[{"carrier_tracking_number":"10009999999","base64":""}],"pricing":{"charges":[{"code":"FRT","description":"Some Package(s) to Area 1","value":"22.50"}],"vat_code":"Z","vat_amount":0,"total_cost":22.5},"token":"DUMMYjzo7ekO","tracking_url":"https://ship.ifsgroup.com/tracking/DUMMYjzo7ekO"}', true);
                 $response = APIResponse::respondCreatedShipment($data, $version);        // Reformat response for API user
             } else {
@@ -104,7 +98,6 @@ class APIController extends Controller
                     $reply = CarrierAPI::createShipment($this->input['data'], $this->mode);
 
                     if ($reply['errors'] == []) {
-
                         if (isset($reply['carrier_code'])) {
                             $reply['carrier'] = $reply['carrier_code'];
                             unset($reply['carrier_code']);
@@ -117,7 +110,6 @@ class APIController extends Controller
                 }
             }
         } else {
-
             $response = APIResponse::respondInvalid($this->input['data']);      // Errors in data
         }
 
@@ -127,7 +119,7 @@ class APIController extends Controller
     /**
      * Retrieves data from the Request object
      * Decodes the JSON data element and adds
-     * User_id and Company_id
+     * User_id and Company_id.
      *
      * @param Request
      * @return none Updates $this->input
@@ -161,7 +153,6 @@ class APIController extends Controller
 
     public function setMode($version)
     {
-
         switch ($version) {
             case 'test':
             case 'testv1':
@@ -185,11 +176,11 @@ class APIController extends Controller
         }
     }
 
-    public function returnUnauthorized($message = "")
+    public function returnUnauthorized($message = '')
     {
 
         // Missing data - Return error
-        $this->input['data']['user_id'] = "UnAuthorized";
+        $this->input['data']['user_id'] = 'UnAuthorized';
         $this->input['data']['errors'][] = $message;
     }
 
@@ -222,12 +213,9 @@ class APIController extends Controller
 
     public function getInput()
     {
-
-        if (Input::get('data') <> null) {
-
+        if (Input::get('data') != null) {
             $msg = json_decode(Input::get('data'), true);
         } else {
-
             $msg = Input::all();
         }
 
@@ -245,7 +233,7 @@ class APIController extends Controller
 
         // If API TEST then do Not Log
         if (isset($data['options']) && is_array($data['options'])) {
-            if (!in_array('APITEST', array_map('strtolower', $data['options']))) {
+            if (! in_array('APITEST', array_map('strtolower', $data['options']))) {
                 return $jsonData;
             }
         }
@@ -253,10 +241,10 @@ class APIController extends Controller
         // Save Transaction
         $log = TransactionLog::create([
             'type' => 'API',
-            'carrier' => "",
+            'carrier' => '',
             'direction' => 'O',
             'msg' => $jsonData,
-            'mode' => $this->mode
+            'mode' => $this->mode,
         ]);
 
         return $jsonData;
@@ -264,7 +252,7 @@ class APIController extends Controller
 
     /**
      * Get the api_token used whether in body
-     * of data or in http headers
+     * of data or in http headers.
      *
      * @param
      * @return
@@ -305,7 +293,7 @@ class APIController extends Controller
      * Using the Authenticated user and the
      * supplied company_code fn checks user
      * is authenticated for the requested
-     * company and if so returns the company id
+     * company and if so returns the company id.
      *
      * @param array Shipment data
      * @return string company id or "UnAuthorized"
@@ -318,7 +306,6 @@ class APIController extends Controller
 
         $companyId = 'UnAuthorized';
         if (Auth::guard('api')->check()) {
-
             if ($user->hasIfsRole()) {
 
                 // Allow IFS employees to access all companies
@@ -338,18 +325,15 @@ class APIController extends Controller
 
     public function decodeDeleteShipment($ifsConsignmentNumber, $companyCode)
     {
-
         if ($ifsConsignmentNumber > '' && $companyCode > '') {
 
             //Get Users id and shipment details
             $userId = $this->getUserID();
 
             if ($this->mode == 'test') {
-
                 $authorized = true;
                 $company = Company::where('company_code', $companyCode)->first();
                 if ($company) {
-
                     $this->input['api_token'] = $this->getApiKey();
                     $this->input['data']['errors'] = [];
                     $this->input['data']['user_id'] = $userId;                   // Retrieve authenticated User
@@ -360,13 +344,10 @@ class APIController extends Controller
                     return;
                 }
             } else {
-
                 $shipment = Shipment::where('consignment_number', $ifsConsignmentNumber)->first();
                 if ($shipment) {
-
                     $code = Company::find($shipment->company_id)->company_code;
                     if ($code == $companyCode) {
-
                         $authorized = true;
                         $this->input['api_token'] = $this->getApiKey();
                         $this->input['data']['errors'] = [];
@@ -386,30 +367,27 @@ class APIController extends Controller
 
     /**
      * Function to PreProcess the shipment details
-     * It calculates any additional fields required
+     * It calculates any additional fields required.
      *
      * @param type $shipment
      * @return array $shipment
      */
     private function preProcessShipment($mode = 'create')
     {
-
-        if ($mode == "create") {
+        if ($mode == 'create') {
 
             // Get Company Setting
             $carrierChoice = strtolower(Company::find($this->input['data']['company_id'])->carrier_choice);
 
             // If no carrier defined or company not set to user - set to auto
-            if ($carrierChoice == 'cost' || !isset($this->input['data']['carrier_code']) || $this->input['data']['carrier_code'] == '') {
-
+            if ($carrierChoice == 'cost' || ! isset($this->input['data']['carrier_code']) || $this->input['data']['carrier_code'] == '') {
                 $this->input['data']['carrier_choice'] = 'cost';
             }
         } else {
-
         }
 
         // Temporary Patch for Twinings
-        if (in_array($this->input['data']['company_id'], ["608", "807"])) {
+        if (in_array($this->input['data']['company_id'], ['608', '807'])) {
             $this->input['data']['sender_address3'] = 'Mallusk';
             $this->input['data']['sender_city'] = 'Newtownabbey';
             $this->input['data']['sender_county'] = 'Antrim';
@@ -425,20 +403,20 @@ class APIController extends Controller
         $this->input['data']['mode_id'] = 1;
 
         // Identify Carrier
-        if ($mode == "create" || $this->input['data']['carrier_code'] == '')
+        if ($mode == 'create' || $this->input['data']['carrier_code'] == '') {
             $this->chooseCarrier();
+        }
 
         // Do Package level preProcessing
         $this->preProcessPackages();
 
         // Set Collection Date format if not supplied
-        if (!isset($this->input['data']['date_format'])) {
+        if (! isset($this->input['data']['date_format'])) {
             $this->input['data']['date_format'] = 'yyyy-mm-dd';
         }
 
         // Set Collection Date if not supplied or set to today
-        if (!isset($this->input['data']['collection_date']) || $this->input['data']['collection_date'] == '' || $this->input['data']['collection_date'] <= date('Y-m-d')) {
-
+        if (! isset($this->input['data']['collection_date']) || $this->input['data']['collection_date'] == '' || $this->input['data']['collection_date'] <= date('Y-m-d')) {
             $timeZone = Company::find($this->input['data']['company_id'])->localisation->time_zone;
             $pickUpTimes = new Postcode();
             $this->input['data']['collection_date'] = $pickUpTimes->getPickUpDate(
@@ -470,52 +448,58 @@ class APIController extends Controller
         }
 
         // Set recipient name if not specified
-        if (!isset($this->input['data']['recipient_name'])) {
+        if (! isset($this->input['data']['recipient_name'])) {
             $this->input['data']['recipient_name'] = '';
         }
 
         // Set recipient company name if not specified
-        if (!isset($this->input['data']['recipient_company_name'])) {
+        if (! isset($this->input['data']['recipient_company_name'])) {
             $this->input['data']['recipient_company_name'] = '';
         }
 
         // Add any Alerts based on user preferences
         $preferences = json_decode(Auth::guard('api')->user()->getPreferences($this->input['data']['company_id'], '1'), true);
-        if (!isset($this->input['data']['alerts']) || $this->input['data']['alerts'] == '') {
+        if (! isset($this->input['data']['alerts']) || $this->input['data']['alerts'] == '') {
 
             // Get sender_email if not specified
-            if (!isset($this->input['data']['sender_email']) || $this->input['data']['sender_email'] == '') {
-                if (isset($preferences['sender_email']) && $preferences['sender_email'] > '')
+            if (! isset($this->input['data']['sender_email']) || $this->input['data']['sender_email'] == '') {
+                if (isset($preferences['sender_email']) && $preferences['sender_email'] > '') {
                     $this->input['data']['sender_email'] = $preferences['sender_email'];
+                }
             }
 
             // Get other_email if not specified
-            if (!isset($this->input['data']['other_email']) || $this->input['data']['other_email'] == '') {
-                if (isset($preferences['other_email']) && $preferences['other_email'] > '')
+            if (! isset($this->input['data']['other_email']) || $this->input['data']['other_email'] == '') {
+                if (isset($preferences['other_email']) && $preferences['other_email'] > '') {
                     $this->input['data']['other_email'] = $preferences['other_email'];
+                }
             }
 
             // If Sender Email defined, set alert to preference
-            if (isset($this->input['data']['sender_email']) && $this->input['data']['sender_email'] > '')
+            if (isset($this->input['data']['sender_email']) && $this->input['data']['sender_email'] > '') {
                 $this->input['data']['alerts']['sender'] = $this->extractAlertPreferences('sender', $preferences);
+            }
 
             // If Recipient Email defined, set alert to preference
-            if (isset($this->input['data']['recipient_email']) && $this->input['data']['recipient_email'] > '')
+            if (isset($this->input['data']['recipient_email']) && $this->input['data']['recipient_email'] > '') {
                 $this->input['data']['alerts']['recipient'] = $this->extractAlertPreferences('recipient', $preferences);
+            }
 
             // If Broker Email defined, set alert to preference
-            if (isset($this->input['data']['broker_email']) && $this->input['data']['broker_email'] > '')
+            if (isset($this->input['data']['broker_email']) && $this->input['data']['broker_email'] > '') {
                 $this->input['data']['alerts']['broker'] = $this->extractAlertPreferences('broker', $preferences);
+            }
 
             // If Other Email defined, set alert to preference
-            if (isset($this->input['data']['other_email']) && $this->input['data']['other_email'] > '')
+            if (isset($this->input['data']['other_email']) && $this->input['data']['other_email'] > '') {
                 $this->input['data']['alerts']['other'] = $this->extractAlertPreferences('other', $preferences);
+            }
         }
     }
 
     /**
      * Identifies the correct carrier\ service to use for the
-     * Shipment held in $this->input
+     * Shipment held in $this->input.
      * @param array $possibleCarriers
      * @return string carrierCode
      */
@@ -536,7 +520,7 @@ class APIController extends Controller
 
             case '0':
                 // No Carrier\ Services found so throw error
-                $this->input['data']['errors'][] = "No Carrier Available";
+                $this->input['data']['errors'][] = 'No Carrier Available';
                 break;
 
             case '1':
@@ -563,8 +547,7 @@ class APIController extends Controller
         if (isset($this->input['data']['company_id']) && $this->input['data']['company_id'] > 0) {
 
             // If not set identify customers default setting
-            if (!isset($this->input['data']['carrier_choice']) || $this->input['data']['carrier_choice'] == '') {
-
+            if (! isset($this->input['data']['carrier_choice']) || $this->input['data']['carrier_choice'] == '') {
                 $company = Company::find($this->input['data']['company_id']);
                 if ($company) {
                     $this->input['data']['carrier_choice'] = $company->carrier_choice;
@@ -577,7 +560,6 @@ class APIController extends Controller
 
     private function chooseCarrierService($possibleCarriers, $carrierChoice)
     {
-
         $notMatched = true;
         $services = [];
         $defaultService = '';
@@ -586,30 +568,32 @@ class APIController extends Controller
         foreach ($possibleCarriers as $possibleCarrier) {
 
             // Identify what services have been offered
-            if (!in_array($possibleCarrier['code'], $services))
+            if (! in_array($possibleCarrier['code'], $services)) {
                 $services[] = $possibleCarrier['code'];
+            }
 
             // If choice is based on Cost to IFS
-            if ($carrierChoice == 'cost')
+            if ($carrierChoice == 'cost') {
                 $thisValue = $possibleCarrier['cost'];
+            }
 
             // If choice is based on Cost to Customer
-            if ($carrierChoice == 'price')
+            if ($carrierChoice == 'price') {
                 $thisValue = $possibleCarrier['price'];
+            }
 
             // If first service or this is the cheapest provisionally choose this Carrier\ Service
             if ($defaultService == '' || $thisValue < $cheapestValue) {
-
                 $defaultService = $possibleCarrier['code'];
                 $cheapestValue = $thisValue;
             }
         }
 
         // If User has not specified a service then use the default service just calculated
-        if (!isset($this->input['data']['service_code']) || $this->input['data']['service_code'] == '') {
-
-            if ($carrierChoice != 'user')
+        if (! isset($this->input['data']['service_code']) || $this->input['data']['service_code'] == '') {
+            if ($carrierChoice != 'user') {
                 $this->input['data']['service_code'] = $defaultService;
+            }
         }
 
         foreach ($possibleCarriers as $possibleCarrier) {
@@ -625,7 +609,7 @@ class APIController extends Controller
         }
 
         if ($notMatched) {
-            $this->input['data']['errors'][] = "Please select service : " . strtoupper(implode(',', $services));
+            $this->input['data']['errors'][] = 'Please select service : '.strtoupper(implode(',', $services));
         }
     }
 
@@ -633,7 +617,7 @@ class APIController extends Controller
      * Do Package level preprocessing eg
      * Check for Dry Ice, add dims/ weight
      * for Customer defined packaging and
-     * determine the largest dimension
+     * determine the largest dimension.
      */
     private function preProcessPackages()
     {
@@ -653,52 +637,53 @@ class APIController extends Controller
 
             if ($pkg) {
                 // if no length supplied but defined for package use definition
-                if (!isset($this->input['data']['packages'][$i]['length']) || $this->input['data']['packages'][$i]['length'] == 0) {
+                if (! isset($this->input['data']['packages'][$i]['length']) || $this->input['data']['packages'][$i]['length'] == 0) {
                     $this->input['data']['packages'][$i]['length'] = $pkg->length;
                 }
                 // if no width supplied but defined for package use definition
-                if (!isset($this->input['data']['packages'][$i]['width']) || $this->input['data']['packages'][$i]['width'] == 0) {
+                if (! isset($this->input['data']['packages'][$i]['width']) || $this->input['data']['packages'][$i]['width'] == 0) {
                     $this->input['data']['packages'][$i]['width'] = $pkg->width;
                 }
                 // if no height supplied but defined for package use definition
-                if (!isset($this->input['data']['packages'][$i]['height']) || $this->input['data']['packages'][$i]['height'] == 0) {
+                if (! isset($this->input['data']['packages'][$i]['height']) || $this->input['data']['packages'][$i]['height'] == 0) {
                     $this->input['data']['packages'][$i]['height'] = $pkg->height;
                 }
                 // if no weight supplied but defined for package use definition
-                if (!isset($this->input['data']['packages'][$i]['weight']) || $this->input['data']['packages'][$i]['weight'] == 0) {
+                if (! isset($this->input['data']['packages'][$i]['weight']) || $this->input['data']['packages'][$i]['weight'] == 0) {
                     $this->input['data']['packages'][$i]['weight'] = $pkg->weight;
                 }
             }
         }
     }
 
-    private
-    function extractAlertPreferences($preference, $preferences)
+    private function extractAlertPreferences($preference, $preferences)
     {
-
         $prefs = [];
-        if (isset($preferences['alerts.' . $preference . '.despatched']))
-            $prefs['despatched'] = $preferences['alerts.' . $preference . '.despatched'];
+        if (isset($preferences['alerts.'.$preference.'.despatched'])) {
+            $prefs['despatched'] = $preferences['alerts.'.$preference.'.despatched'];
+        }
 
-        if (isset($preferences['alerts.' . $preference . '.out_for_delivery']))
-            $prefs['out_for_delivery'] = $preferences['alerts.' . $preference . '.out_for_delivery'];
+        if (isset($preferences['alerts.'.$preference.'.out_for_delivery'])) {
+            $prefs['out_for_delivery'] = $preferences['alerts.'.$preference.'.out_for_delivery'];
+        }
 
-        if (isset($preferences['alerts.' . $preference . '.delivered']))
-            $prefs['delivered'] = $preferences['alerts.' . $preference . '.delivered'];
+        if (isset($preferences['alerts.'.$preference.'.delivered'])) {
+            $prefs['delivered'] = $preferences['alerts.'.$preference.'.delivered'];
+        }
 
-        if (isset($preferences['alerts.' . $preference . '.cancelled']))
-            $prefs['cancelled'] = $preferences['alerts.' . $preference . '.cancelled'];
+        if (isset($preferences['alerts.'.$preference.'.cancelled'])) {
+            $prefs['cancelled'] = $preferences['alerts.'.$preference.'.cancelled'];
+        }
 
-        if (isset($preferences['alerts.' . $preference . '.problems']))
-            $prefs['problems'] = $preferences['alerts.' . $preference . '.problems'];
+        if (isset($preferences['alerts.'.$preference.'.problems'])) {
+            $prefs['problems'] = $preferences['alerts.'.$preference.'.problems'];
+        }
 
         return $prefs;
     }
 
-    public
-    function checkIfApitest()
+    public function checkIfApitest()
     {
-
         if (isset($this->input['data']['options'])) {
 
             // If Array check APITEST is one of its values
@@ -707,14 +692,12 @@ class APIController extends Controller
                 // Convert everything to uppercase and return true if APITEST
                 $search_array = array_map('strtoupper', $this->input['data']['options']);
                 if (in_array('APITEST', $search_array)) {
-
                     return true;
                 }
             } else {
 
                 // If a string check to see if it matches
                 if (strtoupper($this->input['data']['options']) == 'APITEST') {
-
                     return true;
                 }
             }
@@ -725,15 +708,14 @@ class APIController extends Controller
 
     /**
      * Accepts a DELETE object, validates it
-     * and deletes the requested shipment
+     * and deletes the requested shipment.
      *
      * @param string Shipment Token
      * @param string Company Token
      *
      * @return Response
      */
-    public
-    function deleteShipment($version, $ifsConsignmentNumber = '', $companyCode = '')
+    public function deleteShipment($version, $ifsConsignmentNumber = '', $companyCode = '')
     {
 
         // Decode data and insert user_id of Authenticated User etc.
@@ -744,13 +726,11 @@ class APIController extends Controller
             // Authentication Failed
             $response = APIResponse::respondUnauthorized();
         } else {
-
             if ($this->mode == 'test') {
-
                 $reply = [
                     'errors' => '',
                     'consignment_number' => $ifsConsignmentNumber,
-                    'carrier' => "IFS"
+                    'carrier' => 'IFS',
                 ];
 
                 $response = APIResponse::respondDeletedShipment($reply, $version); // Reformat response for API user
@@ -765,7 +745,6 @@ class APIController extends Controller
                     $isAuthorized = Company::find($shipment->company_id)->hasUser($this->input['data']['user_id']);
                 }
                 if ($isAuthorized) {
-
                     $this->input['data']['shipment_token'] = $shipment->token;
                     $reply = CarrierAPI::deleteShipment($this->input['data'], $this->mode);
 
@@ -778,7 +757,6 @@ class APIController extends Controller
                     }
                     $response = APIResponse::respondDeletedShipment($reply, $version); // Reformat response for API user
                 } else {
-
                     $response = APIResponse::respondNotFound();                     // Reformat response for API user
                 }
             }
@@ -787,11 +765,9 @@ class APIController extends Controller
         return $response;
     }
 
-    public
-    function labelTest()
+    public function labelTest()
     {
-
-        $awbs = ["654896508720"];
+        $awbs = ['654896508720'];
         $labelLoc = 'http://192.168.10.34/';
 
         $pdf = new \TCPDI();
@@ -804,27 +780,24 @@ class APIController extends Controller
 
         $labelNumber = 0;
         foreach ($awbs as $awb) {
-
             $labelNumber++;
-            if ($labelNumber == 1 && $this->checkRemoteFile($labelLoc . $awb . '.PNG')) {
+            if ($labelNumber == 1 && $this->checkRemoteFile($labelLoc.$awb.'.PNG')) {
 
                 // If Master Label exists add it.
                 $pdf->AddPage('P', [102.00, 153.00]);
-                $pdf->Image($labelLoc . $awb . '.PNG', 0, 0, 102, 153);
+                $pdf->Image($labelLoc.$awb.'.PNG', 0, 0, 102, 153);
             }
 
             // Add Package Label
             $pdf->AddPage('P', [102.00, 153.00]);
-            $pdf->Image($labelLoc . $awb . 'AWB.PNG', 0, 0, 102, 153);
+            $pdf->Image($labelLoc.$awb.'AWB.PNG', 0, 0, 102, 153);
         }
 
-
-        Header('Content-type: application/pdf');
-        echo $pdf->Output($awbs[0] . '.PDF', 'S');
+        header('Content-type: application/pdf');
+        echo $pdf->Output($awbs[0].'.PDF', 'S');
     }
 
-    private
-    function checkRemoteFile($url)
+    private function checkRemoteFile($url)
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -832,19 +805,17 @@ class APIController extends Controller
         curl_setopt($ch, CURLOPT_NOBODY, 1);
         curl_setopt($ch, CURLOPT_FAILONERROR, 1);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        if (curl_exec($ch) !== FALSE) {
+        if (curl_exec($ch) !== false) {
             return true;
         } else {
             return false;
         }
     }
 
-    public
-    function printLabel($id)
+    public function printLabel($id)
     {
-
         $json = TransactionLog::find($id)->msg;
-        $data = json_decode($json, TRUE);
+        $data = json_decode($json, true);
 
         $upsLabel = new \App\CarrierAPI\UPS\UPSLabel('', $data);
         $response = $upsLabel->create();
@@ -854,13 +825,12 @@ class APIController extends Controller
 
     /**
      * Receive shipment as JSON and price it
-     * Returning Pricing info as JSON
+     * Returning Pricing info as JSON.
      *
      * @param type $version
      * @return type
      */
-    public
-    function priceShipment($version)
+    public function priceShipment($version)
     {
 
         // Decode data and insert user_id of Authenticated User
@@ -880,9 +850,7 @@ class APIController extends Controller
         $this->preProcessShipment();
 
         if ($this->input['data']['errors'] == []) {
-
             if (isset($this->input['data']['carrier_id']) && $this->input['data']['carrier_id'] > '') {
-
                 if ($shipment['bill_shipping'] == 'recipient' && $shipment['bill_tax_duty'] == 'recipient') {
 
                     // Recipient pays freight so no costs/ sales
@@ -897,7 +865,6 @@ class APIController extends Controller
                     // Shipper/ Other pays Freight so try to Price shipment
                     $reply = Pricing::price($this->input['data'], $this->input['data']['service_id']);
                     if ($reply['errors'] == []) {
-
                         if (isset($reply['carrier_code'])) {
                             $reply['carrier'] = $reply['carrier_code'];
                             unset($reply['carrier_code']);
@@ -910,19 +877,15 @@ class APIController extends Controller
                 $response = APIResponse::respondNoCarrierAvailable();
             }
         } else {
-
             $response = APIResponse::respondInvalid($this->input['data']);      // Errors in data
         }
 
         return $response;
     }
 
-    public
-    function reprice(Shipment $shipment)
+    public function reprice(Shipment $shipment)
     {
-
         if ($shipment) {
-
             $packages = [];
             foreach ($shipment->packages as $package) {
                 $packages[] = $package->toArray();
@@ -946,24 +909,22 @@ class APIController extends Controller
 
     public function test1()
     {
-
         $quotedRate['min_discount'] = 0;
         $quotedRate['max_discount'] = 0;
-        $test = !($quotedRate['min_discount'] == 0 && $quotedRate['max_discount'] == 0);
+        $test = ! ($quotedRate['min_discount'] == 0 && $quotedRate['max_discount'] == 0);
 
         dd($test);
     }
 
     /**
      * Function accepts a Carrier code
-     * and returns the Carrier object
+     * and returns the Carrier object.
      *
      * @param string Carrier Code
      * @return Carrier
      */
     private function getCarrier($carrierCode)
     {
-
         $carrierCode = Carrier::where('code', $carrierCode)->first();
 
         return $carrierCode;
@@ -971,7 +932,7 @@ class APIController extends Controller
 
     /**
      * Formats data to be returned to the user
-     * in the correct format
+     * in the correct format.
      *
      * @param array $data
      * @return Response
@@ -988,7 +949,6 @@ class APIController extends Controller
 
         return $response;
     }
-
 
     /**
      * Returns the user/company details for a valid api_token/company_code.
@@ -1020,12 +980,12 @@ class APIController extends Controller
                 'postcode' => $company->postcode,
                 'country_code' => $company->country_code,
                 'email' => $user->email,
-                'telephone' => $user->telephone
+                'telephone' => $user->telephone,
             ]);
         }
 
         return response()->json([
-            'error' => 'Unauthenticated.'
+            'error' => 'Unauthenticated.',
         ], 401);
     }
 
@@ -1052,14 +1012,13 @@ class APIController extends Controller
             $shipment->setCancelled($request->user()->id);
 
             return response()->json([
-                'message' => 'Shipment ' . $shipment->consignment_number . ' cancelled'
+                'message' => 'Shipment '.$shipment->consignment_number.' cancelled',
             ], 200);
         }
 
         return response()->json([
-            'error' => 'Unable to cancel shipment.'
+            'error' => 'Unable to cancel shipment.',
         ], 422);
-
     }
 
     /**
@@ -1080,8 +1039,7 @@ class APIController extends Controller
         }
 
         return response()->json([
-            'error' => 'Labels unavailable.'
+            'error' => 'Labels unavailable.',
         ], 422);
     }
-
 }

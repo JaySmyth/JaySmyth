@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class MfJobHdr extends Model
 {
-
     /**
      * The connection name for the model.
      *
@@ -23,12 +22,11 @@ class MfJobHdr extends Model
 
     /**
      * A job has many costs.
-     * 
+     *
      * @return type
      */
     public function costs()
     {
         return $this->hasMany(MfRecCost::class, 'rec_id', 'job_id')->select('rec_id', 'cost_rate', 'description', 'charge_type');
     }
-
 }

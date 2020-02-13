@@ -7,9 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PricingZones extends Model
 {
-
     /**
-     *
      * @param array containing key/ value pairs of criteria to identify zone
      *
      * @return $zone
@@ -23,7 +21,7 @@ class PricingZones extends Model
          * ***************************************
          */
 
-        if ($model > "") {
+        if ($model > '') {
 
             // Request to use specific pricing model
             $criteria['model_id'] = $model;
@@ -61,12 +59,10 @@ class PricingZones extends Model
         } else {
             return $zone;
         }
-
-        return null;
     }
 
     /**
-     * Tries different combinations of parameters to find appropriate zone
+     * Tries different combinations of parameters to find appropriate zone.
      * @param array containing key/ value pairs of criteria to identify zone
      *
      * @return $zone
@@ -110,17 +106,17 @@ class PricingZones extends Model
                 switch ($parameter) {
                     case 'sender_postcode':
                     case 'recipient_postcode':
-                        $query->where("from_$parameter", "<=", $value);
-                        $query->where("to_$parameter", ">=", $value);
+                        $query->where("from_$parameter", '<=', $value);
+                        $query->where("to_$parameter", '>=', $value);
                         break;
 
                     case 'ship_date':
-                        $query->where("from_date", "<=", $value);
-                        $query->where("to_date", ">=", $value);
+                        $query->where('from_date', '<=', $value);
+                        $query->where('to_date', '>=', $value);
                         break;
 
                     default:
-                        $query->where($parameter, "=", $value);
+                        $query->where($parameter, '=', $value);
                         break;
                 }
             }

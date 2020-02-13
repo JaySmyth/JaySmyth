@@ -45,5 +45,4 @@ class Alert extends Model
     {
         $this->attributes['problems_sent'] = strtoupper($value);
     }
-
 }

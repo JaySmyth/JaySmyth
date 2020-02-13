@@ -8,7 +8,6 @@ use Illuminate\Queue\SerializesModels;
 
 class Feedback extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -35,8 +34,7 @@ class Feedback extends Mailable
     {
         return $this->from($this->user->email)
                         ->view('emails.users.feedback')
-                        ->subject('Customer Feedback: ' . $this->user->companies->first()->company_name)
+                        ->subject('Customer Feedback: '.$this->user->companies->first()->company_name)
                         ->with(['user' => $this->user, 'answers' => $this->answers]);
     }
-
 }

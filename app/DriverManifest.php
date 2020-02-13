@@ -2,8 +2,8 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class DriverManifest extends Model
@@ -61,10 +61,9 @@ class DriverManifest extends Model
     public function scopeFilter($query, $filter)
     {
         if ($filter) {
-
             $filter = trim($filter);
 
-            return $query->where('number', 'LIKE', '%' . $filter . '%');
+            return $query->where('number', 'LIKE', '%'.$filter.'%');
         }
     }
 
@@ -129,7 +128,7 @@ class DriverManifest extends Model
     }
 
     /**
-     * A manifest has many jobs
+     * A manifest has many jobs.
      *
      * @return
      */
@@ -149,7 +148,6 @@ class DriverManifest extends Model
     }
 
     /**
-     *
      * @return type
      */
     public function collections()
@@ -158,7 +156,6 @@ class DriverManifest extends Model
     }
 
     /**
-     *
      * @return type
      */
     public function deliveries()
@@ -167,8 +164,6 @@ class DriverManifest extends Model
     }
 
     /**
-     *
-     *
      * @return int
      */
     public function getCollectionCountAttribute()
@@ -177,8 +172,6 @@ class DriverManifest extends Model
     }
 
     /**
-     *
-     *
      * @return int
      */
     public function getDeliveryCountAttribute()
@@ -187,8 +180,6 @@ class DriverManifest extends Model
     }
 
     /**
-     *
-     *
      * @return int
      */
     public function getTotalCountAttribute()
@@ -213,14 +204,13 @@ class DriverManifest extends Model
      */
     public function getPiecesToDeliverAttribute()
     {
-
         return $this->deliveries()->sum('pieces');
     }
 
     /**
      * Count locations.
-     * 
-     * @return integer
+     *
+     * @return int
      */
     public function getLocationCountAttribute()
     {
@@ -249,20 +239,19 @@ class DriverManifest extends Model
 
     /**
      * Takes a collection of transport jobs and returns as a formatted array.
-     * 
+     *
      * @return array
      */
     public function getJobsByLocation()
     {
-        $jobsByLocation = array();
+        $jobsByLocation = [];
 
         foreach ($this->transportJobs as $job) {
-
             if ($job->type == 'c') {
-                $key = $job->from_address1 . $job->from_postcode;
+                $key = $job->from_address1.$job->from_postcode;
                 inc($jobsByLocation[$key]['collections'], 1);
             } else {
-                $key = $job->to_address1 . $job->to_postcode;
+                $key = $job->to_address1.$job->to_postcode;
                 inc($jobsByLocation[$key]['deliveries'], 1);
             }
 
@@ -277,7 +266,6 @@ class DriverManifest extends Model
     }
 
     /**
-     *
      * @return type
      */
     public function getOpenManifests()
@@ -307,15 +295,15 @@ class DriverManifest extends Model
 
     /**
      * Determine if it is possible to reopen a manifest.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function isOpenable()
     {
         if ($this->closed && \Carbon\Carbon::today() <= $this->date) {
             return true;
         }
+
         return false;
     }
-
 }

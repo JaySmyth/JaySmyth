@@ -2,17 +2,16 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 class PurchaseInvoice extends Model
 {
-
     use PurchaseInvoiceToMultifreightXml;
 
     /*
      * Black list of NON mass assignable - all others are mass assignable.
-     * 
+     *
      * @var array
      */
 
@@ -36,7 +35,7 @@ class PurchaseInvoice extends Model
     }
 
     /**
-     * A purchase invoice has many lines
+     * A purchase invoice has many lines.
      *
      * @return
      */
@@ -46,7 +45,7 @@ class PurchaseInvoice extends Model
     }
 
     /**
-     * A purchase invoice has many lines
+     * A purchase invoice has many lines.
      *
      * @return
      */
@@ -56,7 +55,7 @@ class PurchaseInvoice extends Model
     }
 
     /**
-     * A purchase invoice has many charges
+     * A purchase invoice has many charges.
      *
      * @return
      */
@@ -74,6 +73,7 @@ class PurchaseInvoice extends Model
     {
         $lines['negative'] = $this->linesWithScsJob->where('overcharge', 1);
         $lines['positive'] = $this->linesWithScsJob->where('overcharge', 0);
+
         return $lines;
     }
 
@@ -130,7 +130,7 @@ class PurchaseInvoice extends Model
                     return '0170759';
                 }
 
-                // FedEx UK supplier code   
+                // FedEx UK supplier code
                 if ($this->account_number == '811732648' || $this->account_number == 'MCA-118740') {
                     return '0159965';
                 }
@@ -174,7 +174,7 @@ class PurchaseInvoice extends Model
                         $invoiceType = 'F'; // freight
                     case 'C':
                     case 'DT':
-                        $invoiceType = 'D'; // duty & taxes                
+                        $invoiceType = 'D'; // duty & taxes
                 }
                 break;
             case 'ups':
@@ -211,8 +211,7 @@ class PurchaseInvoice extends Model
     public function setScsJobNumbersAndShipmentIds()
     {
         foreach ($this->lines as $line) {
-
-            if (!$line->carrier_tracking_number) {
+            if (! $line->carrier_tracking_number) {
                 continue;
             }
 
@@ -222,9 +221,7 @@ class PurchaseInvoice extends Model
                 $shipment = Shipment::whereCarrierId($this->carrier_id)->whereCarrierTrackingNumber($line->carrier_tracking_number)->first();
             }
 
-
             if ($shipment) {
-
                 if (preg_match('/[a-zA-Z]{6}[0-9]{8}/', $shipment->scs_job_number)) {
                     $line->scs_job_number = $shipment->scs_job_number;
                 }
@@ -240,7 +237,7 @@ class PurchaseInvoice extends Model
             } else {
 
                 // Check job header for SCS job number
-                $withHypen = substr($line->carrier_tracking_number, 0, 3) . '-' . substr($line->carrier_tracking_number, 3);
+                $withHypen = substr($line->carrier_tracking_number, 0, 3).'-'.substr($line->carrier_tracking_number, 3);
 
                 $jobHdr = \App\Multifreight\JobHdr::select('job_disp')
                     ->orWhere('hawb_char', $line->carrier_tracking_number)
@@ -258,7 +255,7 @@ class PurchaseInvoice extends Model
     }
 
     /**
-     * Set import / export flag for duty invoices
+     * Set import / export flag for duty invoices.
      */
     public function setImportExport()
     {
@@ -335,22 +332,25 @@ class PurchaseInvoice extends Model
             }
             $this->status = 1;
             $this->save();
+
             return true;
         }
+
         return false;
     }
 
     /**
-     *
-     * @return boolean
+     * @return bool
      */
     public function setExported()
     {
         if ($this->status == 1) {
             $this->exported = true;
             $this->save();
+
             return true;
         }
+
         return false;
     }
 
@@ -407,8 +407,8 @@ class PurchaseInvoice extends Model
     public function scopeFilter($query, $filter)
     {
         if ($filter) {
-            return $query->where('invoice_number', 'LIKE', '%' . $filter . '%')
-                ->orWhere('account_number', 'LIKE', '%' . $filter . '%');
+            return $query->where('invoice_number', 'LIKE', '%'.$filter.'%')
+                ->orWhere('account_number', 'LIKE', '%'.$filter.'%');
         }
     }
 
@@ -534,11 +534,11 @@ class PurchaseInvoice extends Model
      */
     public function scopeDateBetween($query, $dateFrom, $dateTo)
     {
-        if (!$dateFrom && $dateTo) {
+        if (! $dateFrom && $dateTo) {
             return $query->where('date', '<', Carbon::parse($dateTo)->endOfDay());
         }
 
-        if ($dateFrom && !$dateTo) {
+        if ($dateFrom && ! $dateTo) {
             return $query->where('date', '>', Carbon::parse($dateFrom)->startOfDay());
         }
 
@@ -546,5 +546,4 @@ class PurchaseInvoice extends Model
             return $query->whereBetween('date', [Carbon::parse($dateFrom)->startOfDay(), Carbon::parse($dateTo)->endOfDay()]);
         }
     }
-
 }

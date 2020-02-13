@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Company;
+use Illuminate\Http\Request;
 
 class CompanyPackagingTypesController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -29,22 +28,23 @@ class CompanyPackagingTypesController extends Controller
     {
         if ($request->ajax()) {
             $company = Company::find($request->company_id);
+
             return $company->getPackagingTypes($request->mode_id);
         }
     }
 
     /**
      * Get the DIMS for the package.
-     * 
+     *
      * @param Request $request
      * @return type
      */
     public function dims(Request $request)
     {
-        if ($request->ajax()) {            
-            $company = Company::find($request->company_id);            
-            return $company->getPackagingTypes($request->mode_id)->where('code', $request->code)->first()->only(['weight', 'length', 'width', 'height']);            
+        if ($request->ajax()) {
+            $company = Company::find($request->company_id);
+
+            return $company->getPackagingTypes($request->mode_id)->where('code', $request->code)->first()->only(['weight', 'length', 'width', 'height']);
         }
     }
-
 }

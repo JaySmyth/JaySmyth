@@ -6,7 +6,6 @@ use App\Http\Requests\Request;
 
 class ContainerRequest extends Request
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -26,11 +25,10 @@ class ContainerRequest extends Request
     {
         return [
             'size' => 'required',
-            'number' => 'required',          
+            'number' => 'required',
             'goods_description' => 'required',
             'number_of_cartons' => 'required',
-            'weight' => 'required'
+            'weight' => 'required',
         ];
     }
-
 }

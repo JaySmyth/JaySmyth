@@ -2,14 +2,13 @@
 
 namespace App\Console\Commands\ExpressFreight;
 
-use Validator;
 use App\Tracking;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Validator;
 
 class ProcessExpressFreightTracking extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -43,7 +42,7 @@ class ProcessExpressFreightTracking extends Command
      *
      * @var array
      */
-    protected $fields = array('carrier_tracking_number', 'status', 'datetime', 'location', 'name', 'attempted_status');
+    protected $fields = ['carrier_tracking_number', 'status', 'datetime', 'location', 'name', 'attempted_status'];
 
     /**
      * Create a new command instance.
@@ -62,14 +61,11 @@ class ProcessExpressFreightTracking extends Command
      */
     public function handle()
     {
-
-        $this->info('Checking ' . $this->directory . ' for files to process');
+        $this->info('Checking '.$this->directory.' for files to process');
 
         if ($handle = opendir($this->directory)) {
-
             while (false !== ($file = readdir($handle))) {
-
-                if (!is_dir($file) && $file != $this->archiveDirectory) {
+                if (! is_dir($file) && $file != $this->archiveDirectory) {
                     $this->processFile($file);
                     $this->archiveFile($file);
                 }
@@ -91,10 +87,8 @@ class ProcessExpressFreightTracking extends Command
         $rowNumber = 1;
         $data = null;
 
-        if (($handle = fopen($this->directory . $file, 'r')) !== false) {
-
+        if (($handle = fopen($this->directory.$file, 'r')) !== false) {
             while (($data = fgetcsv($handle, 1000)) !== false) {
-
                 $this->processRow($rowNumber, $data);
                 $rowNumber++;
             }
@@ -102,7 +96,6 @@ class ProcessExpressFreightTracking extends Command
             fclose($handle);
         }
     }
-
 
     /**
      * Process a row read from the uploaded file.
@@ -124,14 +117,13 @@ class ProcessExpressFreightTracking extends Command
             $shipment = \App\Shipment::where('carrier_tracking_number', $row['carrier_tracking_number'])->whereIn('carrier_id', [14, 15])->first();
 
             if ($shipment) {
-
                 $datetime = Carbon::createFromformat('YmdHis', $row['datetime']);
                 $datetime = gmtToCarbonUtc($datetime);
 
                 $message = $row['status'];
 
                 if (strlen($row['attempted_status']) > 0 && $row['status'] != $row['attempted_status']) {
-                    $message . ' - ' . $row['attempted_status'];
+                    $message.' - '.$row['attempted_status'];
                 }
 
                 Tracking::firstOrCreate([
@@ -142,7 +134,7 @@ class ProcessExpressFreightTracking extends Command
                     'carrier' => 'Express Freight',
                     'city' => $row['location'],
                     'country_code' => ($row['location'] == 'CRAIGAVON') ? 'GB' : $shipment->recipient_country_code,
-                    'source' => 'Express Freight'
+                    'source' => 'Express Freight',
                 ]);
 
                 $shipment->setStatus('in_transit', 0, false, false);
@@ -150,15 +142,11 @@ class ProcessExpressFreightTracking extends Command
                 if (strtolower(trim($row['status'])) == 'delivered') {
                     $shipment->setDelivered($datetime, $row['name']);
                 }
-
             }
-
         } else {
-            $this->error('Could not find shipment with carrier tracking number: ' . $row['carrier_tracking_number']);
+            $this->error('Could not find shipment with carrier tracking number: '.$row['carrier_tracking_number']);
         }
-
     }
-
 
     /**
      * Read one line at a time and create an array of field names and values.
@@ -169,7 +157,7 @@ class ProcessExpressFreightTracking extends Command
      */
     protected function assignFieldNames($data)
     {
-        $row = array();
+        $row = [];
 
         $i = 0;
         foreach ($this->fields as $field) {
@@ -186,43 +174,42 @@ class ProcessExpressFreightTracking extends Command
      * @param type $rowNumber
      * @param type $data
      * @param type $row
-     * @return boolean
+     * @return bool
      */
     protected function validateRow($rowNumber, $data, $row)
     {
         // First check for correct number of fields
         if (count($data) != count($this->fields)) {
             $this->error('invalid number of fields detected');
+
             return false;
         }
 
         return true;
     }
 
-
     /**
      * Move file to archive directory.
      *
      * @param string $file
-     * @return boolean
+     * @return bool
      */
     protected function archiveFile($file)
     {
         $this->info("Archiving file $file");
 
-        $originalFile = $this->directory . $file;
-        $archiveFile = $this->directory . $this->archiveDirectory . '/' . $file;
+        $originalFile = $this->directory.$file;
+        $archiveFile = $this->directory.$this->archiveDirectory.'/'.$file;
 
         $this->info("Moving $originalFile to archive");
 
-        if (!file_exists($originalFile)) {
+        if (! file_exists($originalFile)) {
             $this->error("Problem archiving $file  - file not found");
         }
 
         if (copy($originalFile, $archiveFile)) {
             unlink($originalFile);
-            $this->info("File archived successfully");
+            $this->info('File archived successfully');
         }
     }
-
 }

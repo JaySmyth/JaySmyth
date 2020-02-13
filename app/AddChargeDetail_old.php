@@ -5,11 +5,11 @@ namespace App;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
-class AddChargeDetail extends Model
+class AddChargeDetail_old extends Model
 {
     /*
      * Black list of NON mass assignable - all others are mass assignable.
-     * 
+     *
      * @var array
      */
 
@@ -45,7 +45,6 @@ class AddChargeDetail extends Model
     }
 
     /**
-     * 
      * @return type
      */
     public function addCharge()
@@ -54,7 +53,6 @@ class AddChargeDetail extends Model
     }
 
     /**
-     * 
      * @return type
      */
     public function company()
@@ -70,8 +68,8 @@ class AddChargeDetail extends Model
     public function scopeFilter($query, $filter)
     {
         if ($filter) {
-            return $query->where('add_charge_details.name', 'LIKE', '%' . $filter . '%')
-                            ->orWhere('code', 'LIKE', '%' . $filter . '%');
+            return $query->where('add_charge_details.name', 'LIKE', '%'.$filter.'%')
+                            ->orWhere('code', 'LIKE', '%'.$filter.'%');
         }
     }
 
@@ -82,11 +80,11 @@ class AddChargeDetail extends Model
      */
     public function scopeDateBetween($query, $dateFrom, $dateTo)
     {
-        if (!empty($dateFrom)) {
+        if (! empty($dateFrom)) {
             $query->where('from_date', '>=', Carbon::parse($dateFrom));
         }
 
-        if (!empty($dateTo)) {
+        if (! empty($dateTo)) {
             $query->where('to_date', '<=', Carbon::parse($dateTo));
         }
 
@@ -95,7 +93,7 @@ class AddChargeDetail extends Model
 
     /**
      * Scope company.
-     * 
+     *
      * @return
      */
     public function scopeHasCompany($query, $companyId)
@@ -107,7 +105,7 @@ class AddChargeDetail extends Model
 
     /**
      * Scope category.
-     * 
+     *
      * @return
      */
     public function scopeHasCategory($query, $categoryId)
@@ -119,14 +117,13 @@ class AddChargeDetail extends Model
 
     /**
      * Scope company.
-     * 
+     *
      * @return
      */
     public function scopeHasType($query, $type)
     {
-        if (!empty($type)) {
+        if (! empty($type)) {
             return $query->where('type', $type);
         }
     }
-
 }

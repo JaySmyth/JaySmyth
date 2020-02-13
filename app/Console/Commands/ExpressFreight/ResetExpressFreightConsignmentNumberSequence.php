@@ -7,7 +7,6 @@ use Illuminate\Console\Command;
 
 class ResetExpressFreightConsignmentNumberSequence extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -46,6 +45,4 @@ class ResetExpressFreightConsignmentNumberSequence extends Command
         $sequence->next_available = 1;
         $sequence->save();
     }
-
-
 }

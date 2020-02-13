@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use App\TransportJob;
 use App\CarrierAPI\Pdf;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TransportJobRequest;
+use App\TransportJob;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class TransportJobsController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -82,18 +81,18 @@ class TransportJobsController extends Controller
 
         $values = [
             'number' => \App\Sequence::whereCode('JOB')->lockForUpdate()->first()->getNextAvailable(),
-            'date_requested' => gmtToCarbonUtc($request->date . ' ' . $request->time),
-            $address . '_type' => 'c',
-            $address . '_name' => 'Transport Department',
-            $address . '_company_name' => $depot->address1,
-            $address . '_address1' => $depot->address2,
-            $address . '_city' => $depot->city,
-            $address . '_state' => $depot->state,
-            $address . '_postcode' => $depot->postcode,
-            $address . '_country_code' => $depot->country_code,
-            $address . '_telephone' => $depot->telephone,
-            $address . '_email' => $depot->email,
-            'instructions' => $request->instructions
+            'date_requested' => gmtToCarbonUtc($request->date.' '.$request->time),
+            $address.'_type' => 'c',
+            $address.'_name' => 'Transport Department',
+            $address.'_company_name' => $depot->address1,
+            $address.'_address1' => $depot->address2,
+            $address.'_city' => $depot->city,
+            $address.'_state' => $depot->state,
+            $address.'_postcode' => $depot->postcode,
+            $address.'_country_code' => $depot->country_code,
+            $address.'_telephone' => $depot->telephone,
+            $address.'_email' => $depot->email,
+            'instructions' => $request->instructions,
         ];
 
         $array = array_merge($request->all(), $values);
@@ -114,7 +113,7 @@ class TransportJobsController extends Controller
     }
 
     /**
-     * Display edit job form
+     * Display edit job form.
      *
      * @param type $id
      * @return type
@@ -149,7 +148,7 @@ class TransportJobsController extends Controller
 
         $this->authorize($transportJob);
 
-        $array = array_merge($request->all(), ['date_requested' => gmtToCarbonUtc($request->date . ' ' . $request->time)]);
+        $array = array_merge($request->all(), ['date_requested' => gmtToCarbonUtc($request->date.' '.$request->time)]);
 
         $transportJob->updateWithLog($array);
 
@@ -182,7 +181,7 @@ class TransportJobsController extends Controller
     }
 
     /**
-     * Set job to closed
+     * Set job to closed.
      *
      * @param Request $request
      * @return type
@@ -193,15 +192,14 @@ class TransportJobsController extends Controller
 
         $this->validate($request, ['number' => 'required', 'signature' => 'required|regex:/^[a-zA-Z ]+$/']);
 
-        $transportJob = TransportJob::where(function($query) use ($request) {
-                    $query->where('number', $request->number)->orWhere('reference', $request->number);
-                })
+        $transportJob = TransportJob::where(function ($query) use ($request) {
+            $query->where('number', $request->number)->orWhere('reference', $request->number);
+        })
                 ->orderBy('id', 'DESC')
                 ->first();
 
         if ($transportJob) {
-
-            $datetime = gmtToCarbonUtc($request->date . ' ' . $request->time);
+            $datetime = gmtToCarbonUtc($request->date.' '.$request->time);
 
             // Completed collection, try find ROI shipment that requires POD
             if ($transportJob->shipment && $transportJob->completed && $transportJob->type == 'c' && in_array(strtoupper($transportJob->shipment->service->carrier_code), ['IE24', 'IE48'])) {
@@ -212,10 +210,12 @@ class TransportJobsController extends Controller
             }
 
             flash()->success('Job Closed');
+
             return back();
         }
 
-        flash()->error('Error!', "Job Number not recognised.", true);
+        flash()->error('Error!', 'Job Number not recognised.', true);
+
         return back();
     }
 
@@ -228,7 +228,6 @@ class TransportJobsController extends Controller
     public function cancel(Request $request, $id)
     {
         if ($request->ajax()) {
-
             $transportJob = TransportJob::findOrFail($id);
 
             $this->authorize($transportJob);
@@ -248,7 +247,6 @@ class TransportJobsController extends Controller
     public function collect(Request $request, $id)
     {
         if ($request->ajax()) {
-
             $transportJob = TransportJob::findOrFail($id);
 
             $this->authorize('unmanifest', $transportJob);
@@ -295,7 +293,7 @@ class TransportJobsController extends Controller
         $unmanifestedJobs = $transportJob->unmanifested();
         $totalJobs = $unmanifestedJobs->count();
 
-        $transportJobs = array();
+        $transportJobs = [];
 
         // Collections - sorted by postcode, then grouped by route
         foreach ($unmanifestedJobs->where('type', 'c')->sortBy('from_postcode', SORT_NATURAL) as $job) {
@@ -331,18 +329,18 @@ class TransportJobsController extends Controller
         TransportJob::whereIn('id', $jobIds)->update([
             'driver_manifest_id' => $request->driver_manifest_id,
             'date_manifested' => Carbon::now(),
-            'status_id' => 14
+            'status_id' => 14,
         ]);
 
         $count = '1 job';
 
         if (count($jobIds) > 1) {
-            $count = count($jobIds) . ' jobs';
+            $count = count($jobIds).' jobs';
         }
 
         $driverManifest = \App\DriverManifest::find($request->driver_manifest_id);
 
-        flash()->success('Jobs Manifested!', $count . ' manifested to ' . $driverManifest->driver->name . ' successfully.', true);
+        flash()->success('Jobs Manifested!', $count.' manifested to '.$driverManifest->driver->name.' successfully.', true);
 
         return redirect('transport-jobs/unmanifested');
     }
@@ -401,11 +399,10 @@ class TransportJobsController extends Controller
             $query->limit($limit);
         }
 
-        if (!$paginate) {
+        if (! $paginate) {
             return $query->get();
         }
 
         return $query->paginate(50);
     }
-
 }

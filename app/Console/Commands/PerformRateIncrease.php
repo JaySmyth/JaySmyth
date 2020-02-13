@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Storage;
 
 class PerformRateIncrease extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -82,18 +81,18 @@ class PerformRateIncrease extends Command
         $this->checkAbleToIncrease();
         $multiplier = 1 + $this->increasePercentage / 100;
 
-        $this->info("");
-        $this->info("Increasing all rates by " . $this->increasePercentage . "%");
-        $this->info("Please wait, this may take a while...");
+        $this->info('');
+        $this->info('Increasing all rates by '.$this->increasePercentage.'%');
+        $this->info('Please wait, this may take a while...');
         $this->increaseDomesticRates($multiplier);
         $this->increaseIntlRates($multiplier);
-        $this->info("Rates Increased Successfully");
-        $this->info("");
+        $this->info('Rates Increased Successfully');
+        $this->info('');
         $this->createEmail();
     }
 
     /**
-     * Check there are no conflicting rates already in place
+     * Check there are no conflicting rates already in place.
      */
     protected function checkAbleToIncrease()
     {
@@ -114,15 +113,15 @@ class PerformRateIncrease extends Command
 
     protected function unableToApplyIncrease($table)
     {
-        $blank = "                                                                 ";
+        $blank = '                                                                 ';
         $this->error($blank);
-        $this->error("  Unable to perform Increase.                                    ");
+        $this->error('  Unable to perform Increase.                                    ');
         $this->error($blank);
         $this->error("  Table : $table already contains rates for the period   ");
         $this->error($blank);
-        $this->error("                    " . $this->fromDate . ' to ' . $this->toDate . '                     ');
+        $this->error('                    '.$this->fromDate.' to '.$this->toDate.'                     ');
         $this->error($blank);
-        $this->error("  Please remove these rates and try again.                       ");
+        $this->error('  Please remove these rates and try again.                       ');
         $this->error($blank);
         exit();
     }
@@ -135,17 +134,17 @@ class PerformRateIncrease extends Command
             }
         }
 
-        $blank = "                                                          ";
+        $blank = '                                                          ';
         $this->error($blank);
-        $this->error("  Invalid Percentage.                                     ");
+        $this->error('  Invalid Percentage.                                     ');
         $this->error($blank);
-        $this->error("  Please enter command in the following format            ");
+        $this->error('  Please enter command in the following format            ');
         $this->error($blank);
-        $this->error("      php artisan ifs:perform-rate-increase {percentage}  ");
+        $this->error('      php artisan ifs:perform-rate-increase {percentage}  ');
         $this->error($blank);
-        $this->error("  e.g.                                                    ");
+        $this->error('  e.g.                                                    ');
         $this->error($blank);
-        $this->error("      php artisan ifs:perform-rate-increase 3.5           ");
+        $this->error('      php artisan ifs:perform-rate-increase 3.5           ');
         $this->error($blank);
         exit();
     }
@@ -203,11 +202,11 @@ class PerformRateIncrease extends Command
     {
 
         // Set email subject
-        $subject = "Courier Rate Increase";
+        $subject = 'Courier Rate Increase';
 
         // Build Message text
-        $message = "Please note that all customer rates have been increased by " . $this->increasePercentage . "%";
-        $message .= " effective " . $this->fromDate . ". These rates will remain active until " . $this->toDate . " unless further changes are applied.\n\n";
+        $message = 'Please note that all customer rates have been increased by '.$this->increasePercentage.'%';
+        $message .= ' effective '.$this->fromDate.'. These rates will remain active until '.$this->toDate." unless further changes are applied.\n\n";
 
         mail($this->contactEmail, $subject, $message);
     }

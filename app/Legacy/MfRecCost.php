@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class MfRecCost extends Model
 {
-
     /**
      * The connection name for the model.
      *
@@ -20,5 +19,4 @@ class MfRecCost extends Model
      * @var string
      */
     protected $table = 'mf_rec_cost';
-
 }

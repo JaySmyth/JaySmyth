@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CustomsEntryCommodityRequest;
 use App\CustomsEntryCommodity;
+use App\Http\Requests\CustomsEntryCommodityRequest;
 
 class CustomsEntryCommoditiesController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -21,8 +20,8 @@ class CustomsEntryCommoditiesController extends Controller
     /**
      * Displays edit commodity form.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function edit($id)
     {
@@ -34,8 +33,8 @@ class CustomsEntryCommoditiesController extends Controller
     /**
      * Updates an existing user.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function update(CustomsEntryCommodityRequest $request, $id)
     {
@@ -46,12 +45,12 @@ class CustomsEntryCommoditiesController extends Controller
 
         flash()->success('Updated!', 'Commodity updated successfully.');
 
-        return redirect('customs-entries/' . $customsEntryCommodity->customs_entry_id);
+        return redirect('customs-entries/'.$customsEntryCommodity->customs_entry_id);
     }
 
     /**
      * Delete a commodity line.
-     * 
+     *
      * @param CustomsEntryCommodity $customsEntryCommodity
      * @return type
      */
@@ -63,5 +62,4 @@ class CustomsEntryCommoditiesController extends Controller
 
         return response()->json(null, 204);
     }
-
 }

@@ -6,13 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class TransactionLog extends Model
 {
-
     protected $fillable = [
         'type',
         'carrier',
         'direction',
         'msg',
-        'mode'
+        'mode',
     ];
 
     /**
@@ -21,5 +20,4 @@ class TransactionLog extends Model
      * @var array
      */
     protected $dates = ['created_at', 'updated_at'];
-
 }

@@ -12,9 +12,9 @@ class OldCompany extends Model
      * @var string
      */
     protected $connection = 'legacy';
-    
+
     /**
-     * Specify primary key
+     * Specify primary key.
      */
     protected $primaryKey = 'company';
 

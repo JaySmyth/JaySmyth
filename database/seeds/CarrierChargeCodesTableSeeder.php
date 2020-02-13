@@ -4,7 +4,6 @@ use Illuminate\Database\Seeder;
 
 class CarrierChargeCodesTableSeeder extends Seeder
 {
-
     /**
      * Run the database seeds.
      *
@@ -2789,5 +2788,4 @@ class CarrierChargeCodesTableSeeder extends Seeder
         // Modify a few records
         DB::table('carrier_charge_codes')->insert($charges);
     }
-
 }

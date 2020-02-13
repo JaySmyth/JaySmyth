@@ -25,6 +25,5 @@ class SecureHeaders
         $response->headers->set('Feature-Policy', 'vibrate=none');
 
         return $response;
-
     }
 }

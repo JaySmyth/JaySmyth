@@ -4,7 +4,6 @@ use Illuminate\Database\Seeder;
 
 class ModesTableSeeder extends Seeder
 {
-
     /**
      * Run the database seeds.
      *
@@ -13,12 +12,11 @@ class ModesTableSeeder extends Seeder
     public function run()
     {
         // Modify a few records
-        DB::table('modes')->insert(array(
-            array('name' => 'courier', 'label' => 'Courier'),
-            array('name' => 'air', 'label' => 'Air Freight'),
-            array('name' => 'road', 'label' => 'Road Freight'),
-            array('name' => 'sea', 'label' => 'Sea Freight')
-        ));
+        DB::table('modes')->insert([
+            ['name' => 'courier', 'label' => 'Courier'],
+            ['name' => 'air', 'label' => 'Air Freight'],
+            ['name' => 'road', 'label' => 'Road Freight'],
+            ['name' => 'sea', 'label' => 'Sea Freight'],
+        ]);
     }
-
 }

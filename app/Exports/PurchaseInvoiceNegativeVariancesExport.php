@@ -3,19 +3,17 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class PurchaseInvoiceNegativeVariancesExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
-
     public function __construct($purchaseInvoiceLines)
     {
         $this->purchaseInvoiceLines = $purchaseInvoiceLines;
     }
 
     /**
-     * 
      * @return array
      */
     public function headings(): array
@@ -34,12 +32,11 @@ class PurchaseInvoiceNegativeVariancesExport implements FromCollection, WithHead
             'Other IFS',
             'Total Carrier',
             'Total IFS',
-            'Difference'
+            'Difference',
         ];
     }
 
     /**
-     * 
      * @return type
      */
     public function collection()
@@ -65,11 +62,10 @@ class PurchaseInvoiceNegativeVariancesExport implements FromCollection, WithHead
                 'Difference' => $line->difference_formatted,
             ]);
 
-            $collection->push($row);
+        $collection->push($row);
 
         endforeach;
 
         return $collection;
     }
-
 }

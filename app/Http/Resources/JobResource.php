@@ -6,7 +6,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class JobResource extends JsonResource
 {
-
     /**
      * Transform the resource into an array.
      *
@@ -28,5 +27,4 @@ class JobResource extends JsonResource
             'running' => ($this->reserved_at) ? 1 : 0,
         ];
     }
-
 }

@@ -6,9 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 trait Logable
 {
-
     /**
-     *
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
     public function logs()
@@ -23,7 +21,6 @@ trait Logable
      */
     public function log($information = 'Record created', $comments = null, $data = null)
     {
-
         if (is_array($data)) {
             $data = array_except($data, ['_token']);
         }
@@ -32,7 +29,7 @@ trait Logable
             'information' => ucwords(strtolower($information)),
             'comments' => ucfirst(strtolower($comments)),
             'data' => ($data) ? json_encode($data) : false,
-            'user_id' => (auth()->id()) ? auth()->id() : 2
+            'user_id' => (auth()->id()) ? auth()->id() : 2,
         ];
 
         return $this->logs()->create($attributes);
@@ -40,7 +37,7 @@ trait Logable
 
     /**
      * Update record and log the values that have changed.
-     * 
+     *
      * @param type $attributes
      * @return type
      */
@@ -54,5 +51,4 @@ trait Logable
 
         return $this->update($attributes);
     }
-
 }

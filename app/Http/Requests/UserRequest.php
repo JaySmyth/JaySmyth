@@ -6,7 +6,6 @@ use App\Http\Requests\Request;
 
 class UserRequest extends Request
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -26,7 +25,7 @@ class UserRequest extends Request
     {
         $rules = [
             'name' => 'required|min:4',
-            'email' => 'email|required|unique:users,email,' . $this->id,
+            'email' => 'email|required|unique:users,email,'.$this->id,
             'role_id' => 'required|sometimes|integer',
             'telephone' => 'required|min:3|max:17',
         ];
@@ -37,5 +36,4 @@ class UserRequest extends Request
 
         return $rules;
     }
-
 }

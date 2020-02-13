@@ -2,19 +2,17 @@
 
 namespace App\CarrierAPI\TNT;
 
-use App\Service;
 use App\CarrierAPI\TNT\TNT;
+use App\Service;
 
 /**
- * Description of TNTAPI
+ * Description of TNTAPI.
  *
  * @author gmcbroom
  */
 class TNTAPI extends \App\CarrierAPI\CarrierBase
 {
-
     /**
-     *
      * @param type $shipment
      * @return type
      */
@@ -32,7 +30,6 @@ class TNTAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     *
      * @param type $shipment
      * @return type
      */
@@ -46,11 +43,11 @@ class TNTAPI extends \App\CarrierAPI\CarrierBase
         $rules['hazardous'] = 'not_supported';
         $rules['insurance_value'] = 'not_supported';
         $rules['lithium_batteries'] = 'not_supported';
+
         return $this->applyRules($rules, $shipment);
     }
 
     /**
-     *
      * @param type $shipment
      * @return type
      */
@@ -61,7 +58,7 @@ class TNTAPI extends \App\CarrierAPI\CarrierBase
 
         $errors = $this->validateShipment($shipment);
 
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             return $this->generateErrorResponse($response, $errors);
         }
 
@@ -74,8 +71,9 @@ class TNTAPI extends \App\CarrierAPI\CarrierBase
         }
 
         // Ensure we catch invalid carrier consignment number
-        if (!isset($reply['carrier_consignment_number']) || !is_numeric($reply['carrier_consignment_number'])) {
+        if (! isset($reply['carrier_consignment_number']) || ! is_numeric($reply['carrier_consignment_number'])) {
             $arr['errors'][] = 'Unable to obtain a consignment number from carrier. Please check shipment details.';
+
             return $this->generateErrorResponse($response, $arr);
         }
 
@@ -92,7 +90,6 @@ class TNTAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     *
      * @param type $shipment
      * @return int
      */
@@ -102,17 +99,16 @@ class TNTAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     *
      * @param type $reply
      */
     private function generatePdf($shipment, $serviceCode, $labelData)
     {
         $label = new TNTLabel($shipment, $serviceCode, $labelData);
+
         return $label->create();
     }
 
     /**
-     *
      * @param type $reply
      * @param type $serviceCode
      * @param type $route_id
@@ -130,7 +126,7 @@ class TNTAPI extends \App\CarrierAPI\CarrierBase
         $response['volumetric_divisor'] = getVolumetricDivisor('TNT', $serviceCode);       // From Helper functions
         $response['pieces'] = $shipment['pieces'];
 
-        for ($i = 0; $i < $shipment['pieces']; ++$i) {
+        for ($i = 0; $i < $shipment['pieces']; $i++) {
             $response['packages'][$i]['index'] = $i + 1;
             $response['packages'][$i]['carrier_tracking_number'] = $reply['barcode'][$i];
             $response['packages'][$i]['barcode'] = $reply['barcode'][$i];
@@ -156,9 +152,7 @@ class TNTAPI extends \App\CarrierAPI\CarrierBase
         if (strtoupper($shipment['recipient_country_code']) == 'GB') {
             return 'TNTUK';
         }
+
         return 'TNTExpress';
     }
-
 }
-
-?>

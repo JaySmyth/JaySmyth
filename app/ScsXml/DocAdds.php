@@ -9,38 +9,37 @@
 namespace App\ScsXml;
 
 /**
- * Description of DocAdds
+ * Description of DocAdds.
  *
  * @author gmcbroom
  */
-class DocAdds extends SCSTable {
-
-    public function __construct() {
-
-        $this->tableName = "doc-adds";
+class DocAdds extends SCSTable
+{
+    public function __construct()
+    {
+        $this->tableName = 'doc-adds';
 
         $this->attributes = [
-            "rec-id" => "",
-            "address-1" => "",
-            "address-2" => "",
-            "address-3" => "",
-            "address-code" => "",
-            "address-type" => "",
-            "contact-name" => "",
-            "country-code" => "",
-            "county" => "",
-            "email" => "",
-            "fax" => "",
-            "keyname" => "",
-            "line-no" => "",
-            "name" => "",
-            "postcode" => "",
-            "record-link" => "",
-            "reference" => "",
-            "telephone" => "",
-            "telex" => "",
-            "town" => "",
+            'rec-id' => '',
+            'address-1' => '',
+            'address-2' => '',
+            'address-3' => '',
+            'address-code' => '',
+            'address-type' => '',
+            'contact-name' => '',
+            'country-code' => '',
+            'county' => '',
+            'email' => '',
+            'fax' => '',
+            'keyname' => '',
+            'line-no' => '',
+            'name' => '',
+            'postcode' => '',
+            'record-link' => '',
+            'reference' => '',
+            'telephone' => '',
+            'telex' => '',
+            'town' => '',
         ];
     }
-
 }

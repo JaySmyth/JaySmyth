@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Auth;
-use App\Document;
-use App\Shipment;
 use App\CustomsEntry;
-use App\SeaFreightShipment;
-use Illuminate\Http\Request;
+use App\Document;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DocumentRequest;
+use App\SeaFreightShipment;
+use App\Shipment;
+use Auth;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class DocumentsController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -74,7 +73,7 @@ class DocumentsController extends Controller
         $this->authorize('view', $parentModel);
 
         // Generate a file path for the document
-        $filePath = 'documents/' . $request->parent . '/' . $parentModel->id . '/' . time() . str_random(8) . '.pdf';
+        $filePath = 'documents/'.$request->parent.'/'.$parentModel->id.'/'.time().str_random(8).'.pdf';
 
         // Uploaded file
         $file = $request->file('file');
@@ -92,13 +91,13 @@ class DocumentsController extends Controller
         }
         */
 
-
         // Upload the file to S3
         $s3 = Storage::disk('s3');
         $s3->put($filePath, $fileContents, 'public');
 
-        if (!$s3->exists($filePath)) {
+        if (! $s3->exists($filePath)) {
             flash()->error('Problem Uploading!', 'Unable to upload document. Please try again.');
+
             return back();
         }
 
@@ -110,12 +109,12 @@ class DocumentsController extends Controller
             'public_url' => $s3->url($filePath),
             'type' => $file->getMimeType(),
             'size' => $file->getSize(),
-            'user_id' => Auth::user()->id
+            'user_id' => Auth::user()->id,
         ]);
 
         // Save a copy to the temp directory for batch printing later in the day
         if ($request->parent == 'shipment' && $request->document_type == 'invoice') {
-            Storage::disk('local')->put('temp/invoice' . $result->id . '.pdf', $fileContents);
+            Storage::disk('local')->put('temp/invoice'.$result->id.'.pdf', $fileContents);
         }
 
         flash()->success('Document Added!', 'Document uploaded successfully.');
@@ -128,7 +127,7 @@ class DocumentsController extends Controller
                 return redirect('sea-freight');
                 break;
             default:
-                return redirect($request->parent . 's');
+                return redirect($request->parent.'s');
                 break;
         }
     }
@@ -137,12 +136,11 @@ class DocumentsController extends Controller
      * Deletes a file that has been uploaded to S3 and removes the
      * associated record from the database.
      *
-     * @param integer $id document id.
-     * @return boolean
+     * @param int $id document id.
+     * @return bool
      */
     public function destroy(Request $request, $id)
     {
-
         $parentModel = $this->instantiateModel($request->parent, $request->parentId);
 
         $this->authorize('view', $parentModel);
@@ -157,11 +155,9 @@ class DocumentsController extends Controller
         $s3 = Storage::disk('s3');
 
         if ($s3->delete($document->path)) {
-
             $document->delete();
 
             return response()->json(null, 204);
         }
     }
-
 }

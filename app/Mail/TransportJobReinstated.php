@@ -8,7 +8,6 @@ use Illuminate\Queue\SerializesModels;
 
 class TransportJobReinstated extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -31,16 +30,14 @@ class TransportJobReinstated extends Mailable
      */
     public function build()
     {
-
         if ($this->transportJob->type == 'c') {
-            $subject = 'REINSTATED - Collection ' . $this->transportJob->number . ' (' . $this->transportJob->from_company_name . ')';
+            $subject = 'REINSTATED - Collection '.$this->transportJob->number.' ('.$this->transportJob->from_company_name.')';
         } else {
-            $subject = 'REINSTATED - Delivery ' . $this->transportJob->number . ' (' . $this->transportJob->to_company_name . ')';
+            $subject = 'REINSTATED - Delivery '.$this->transportJob->number.' ('.$this->transportJob->to_company_name.')';
         }
 
         return $this->view('emails.transport_jobs.reinstated')
                         ->subject($subject)
                         ->with(['transportJob' => $this->transportJob]);
     }
-
 }

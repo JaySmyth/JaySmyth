@@ -9,12 +9,12 @@ namespace App\ScsXml;
  */
 
 /**
- * Description of Context
+ * Description of Context.
  *
  * @author gmcbroom
  */
-class ISLContext {
-
+class ISLContext
+{
     private $interface = '';
     private $notifyEmail = '';
     private $rejectEmail = '';
@@ -25,13 +25,13 @@ class ISLContext {
     private $customer = '';
     private $postProcess = '';
 
-    public function __construct() {
-
+    public function __construct()
+    {
         $this->setPreProcess(new PreProcess);
     }
 
-    public function setPreProcess($preProcess) {
-
+    public function setPreProcess($preProcess)
+    {
         $this->preProcess = $preProcess;
     }
 
@@ -40,8 +40,8 @@ class ISLContext {
      *
      * @return Context
      */
-    public function addReference(Reference $reference) {
-
+    public function addReference(Reference $reference)
+    {
         $references = $this->getReferences();
         $references[] = $reference;
         $this->setReferences($references);
@@ -54,7 +54,8 @@ class ISLContext {
      *
      * @return Context
      */
-    public function setReferences(array $references) {
+    public function setReferences(array $references)
+    {
         $this->references = $references;
 
         return $this;
@@ -63,8 +64,8 @@ class ISLContext {
     /**
      * @return Reference[]
      */
-    public function getReferences() {
-
+    public function getReferences()
+    {
         return $this->reference;
     }
 
@@ -73,7 +74,8 @@ class ISLContext {
      *
      * @return Context
      */
-    public function setInterface($interface) {
+    public function setInterface($interface)
+    {
         $this->interface = $interface;
 
         return $this;
@@ -82,8 +84,8 @@ class ISLContext {
     /**
      * @return interface
      */
-    public function getInterface() {
-
+    public function getInterface()
+    {
         return $this->interface;
     }
 
@@ -92,7 +94,8 @@ class ISLContext {
      *
      * @return Context
      */
-    public function setNotifyEmail($email) {
+    public function setNotifyEmail($email)
+    {
         $this->notifyEmail = $email;
 
         return $this;
@@ -101,8 +104,8 @@ class ISLContext {
     /**
      * @return Notify_Email
      */
-    public function getNotifyEmail() {
-
+    public function getNotifyEmail()
+    {
         return $this->email;
     }
 
@@ -111,7 +114,8 @@ class ISLContext {
      *
      * @return Context
      */
-    public function setRejectEmail($email) {
+    public function setRejectEmail($email)
+    {
         $this->rejectEmail = $email;
 
         return $this;
@@ -120,8 +124,8 @@ class ISLContext {
     /**
      * @return Notify_Email
      */
-    public function getRejectEmail() {
-
+    public function getRejectEmail()
+    {
         return $this->rejectEmail;
     }
 
@@ -130,7 +134,8 @@ class ISLContext {
      *
      * @return Context
      */
-    public function setAction($action) {
+    public function setAction($action)
+    {
         $this->action = $action;
 
         return $this;
@@ -139,8 +144,8 @@ class ISLContext {
     /**
      * @return $action
      */
-    public function getAction() {
-
+    public function getAction()
+    {
         return $this->action;
     }
 
@@ -149,7 +154,8 @@ class ISLContext {
      *
      * @return Context
      */
-    public function setCustomer($customer) {
+    public function setCustomer($customer)
+    {
         $this->customer = $customer;
 
         return $this;
@@ -158,8 +164,8 @@ class ISLContext {
     /**
      * @return $customer
      */
-    public function getCustomer() {
-
+    public function getCustomer()
+    {
         return $this->customer;
     }
 
@@ -168,7 +174,8 @@ class ISLContext {
      *
      * @return Context
      */
-    public function setReferenceType($referenceType) {
+    public function setReferenceType($referenceType)
+    {
         $this->referenceType = $referenceType;
 
         return $this;
@@ -177,8 +184,8 @@ class ISLContext {
     /**
      * @return $customer
      */
-    public function getReferenceType() {
-
+    public function getReferenceType()
+    {
         return $this->referenceType;
     }
 
@@ -187,7 +194,8 @@ class ISLContext {
      *
      * @return Context
      */
-    public function setPostProcess($string) {
+    public function setPostProcess($string)
+    {
         $this->postProcess = $string;
 
         return $this;
@@ -196,31 +204,30 @@ class ISLContext {
     /**
      * @return $customer
      */
-    public function getPostProcess() {
-
+    public function getPostProcess()
+    {
         return $this->postProcess;
     }
 
-    public function toXML() {
-
+    public function toXML()
+    {
         $xml = '<Context>';
-        $xml .= '<Interface>' . $this->interface . '</Interface>';
-        $xml .= '<Notify_email>' . $this->notifyEmail . '</Notify_email>';
-        $xml .= '<Reject_email>' . $this->rejectEmail . '</Reject_email>';
-        $xml .= '<Action>' . $this->action . '</Action>';
-        $xml .= '<Reference_type>' . $this->referenceType . '</Reference_type>';
+        $xml .= '<Interface>'.$this->interface.'</Interface>';
+        $xml .= '<Notify_email>'.$this->notifyEmail.'</Notify_email>';
+        $xml .= '<Reject_email>'.$this->rejectEmail.'</Reject_email>';
+        $xml .= '<Action>'.$this->action.'</Action>';
+        $xml .= '<Reference_type>'.$this->referenceType.'</Reference_type>';
         $xml .= $this->preProcess->toXML();
 
         foreach ($this->references as $reference) {
             $xml .= $reference->toXML();
         }
 
-        $xml .= '<Customer>' . $this->action . '</Customer>';
-        $xml .= '<Reference-type>' . $this->action . '</Reference-type>';
-        $xml .= '<PostProcess>' . $this->action . '</PostProcess>';
+        $xml .= '<Customer>'.$this->action.'</Customer>';
+        $xml .= '<Reference-type>'.$this->action.'</Reference-type>';
+        $xml .= '<PostProcess>'.$this->action.'</PostProcess>';
         $xml .= '</Context>';
 
         return $xml;
     }
-
 }

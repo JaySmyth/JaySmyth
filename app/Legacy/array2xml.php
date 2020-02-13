@@ -17,110 +17,104 @@ namespace App\Legacy;
  *
  * @author Mikael "Lilleman" Goransson <lilleman@strangeways.se>
  * @version 0.1
- * @package SW-CMS
  */
 
 /**
- * XML class
+ * XML class.
  *
  * Contributions made by:
  * Fredrik Carlbom <fredrik.carlbom@gmail.com>
  *
  * @author Mikael "Lilleman" Goransson <lilleman@strangeways.se>
  * @version 0.1
- * @package SW-CMS
- * @subpackage xml
  */
 class array2xml
 {
-
     /**
-     * Content as array
+     * Content as array.
      *
      * @var arr
      */
-    var $array = array();
+    public $array = [];
 
     /**
-     * Errors
+     * Errors.
      *
      * @var arr
      */
-    var $errors = array();
+    public $errors = [];
 
     /**
-     * The XML
+     * The XML.
      *
-     * @var str
+     * @var string
      */
-    var $XML = '';
+    public $XML = '';
 
     /**
-     * XML Encoding
+     * XML Encoding.
      *
-     * @var str
+     * @var string
      */
-    var $XMLEncoding = 'ISO-8859-1';
+    public $XMLEncoding = 'ISO-8859-1';
 
     /**
-     * XML default indent char
+     * XML default indent char.
      *
-     * @var str
+     * @var string
      */
-    var $XMLIndentChar = ' ';
+    public $XMLIndentChar = ' ';
 
     /**
-     * XML number of indents per level
+     * XML number of indents per level.
      *
      * @var int
      */
-    var $XMLIndentNum = 4;
+    public $XMLIndentNum = 4;
 
     /**
-     * XML Line Break
+     * XML Line Break.
      *
-     * @var str
+     * @var string
      */
-    var $XMLLineBreak = "\n";
+    public $XMLLineBreak = "\n";
 
     /**
-     * Sets if the values of each tag should be fixed for forbidden characters (like <> etc)
+     * Sets if the values of each tag should be fixed for forbidden characters (like <> etc).
      *
      * @var bol
      */
-    var $XMLSafe = true;
+    public $XMLSafe = true;
 
     /**
-     * XML Version
+     * XML Version.
      *
-     * @var str
+     * @var string
      */
-    var $XMLVersion = '1.0';
+    public $XMLVersion = '1.0';
 
     /**
-     * Class constructor
+     * Class constructor.
      *
-     * @return boolean
-     * @access Public
+     * @return bool
      */
-    function xml()
+    public function xml()
     {
         return true;
     }
 
-// End of xml()
+    // End of xml()
 
     /**
      * Generate tags recursive
-     * (This is the magic XML-creator)
+     * (This is the magic XML-creator).
      *
      * @param arr $arr
      * @param int $lvl
      * @param int $prev_lvl - will be one less than lvl if this is the first row, else it'll be the same
-     * @return str
-     * @access Private
+     * @return string
      */
-    function generateTag($arr, $lvl = 0, $prev_lvl = 0)
+    public function generateTag($arr, $lvl = 0, $prev_lvl = 0)
     {
         $str = '';
 
@@ -130,25 +124,27 @@ class array2xml
                 if ($prev_lvl != $lvl) {
                     $this->XML .= $this->XMLLineBreak;
                 } // End of if ($prev_lvl != $lvl)
-                $this->XML .= $this->indent($lvl) . '<' . $this->strToXMLKeySafe($value) . ' />' . $this->XMLLineBreak;
+                $this->XML .= $this->indent($lvl).'<'.$this->strToXMLKeySafe($value).' />'.$this->XMLLineBreak;
                 $prev_lvl = $lvl;
             } else { // End of if ($key == '0' && !isset($arr['1']))
                 if ($prev_lvl != $lvl) {
                     $this->XML .= $this->XMLLineBreak;
                 } // End of if ($prev_lvl != $lvl)
-                $this->XML .= $this->indent($lvl) . '<' . $this->strToXMLKeySafe($key) . '>';
+                $this->XML .= $this->indent($lvl).'<'.$this->strToXMLKeySafe($key).'>';
 
-                if (is_array($value))
+                if (is_array($value)) {
                     $this->XML .= $this->generateTag($value, $lvl + 1, $lvl);
-                else
+                } else {
                     $this->XML .= $this->strToXMLSafe($value);
+                }
 
                 // Remove attributes from closing key
                 list($key) = explode(' ', $key);
 
-                if (is_array($value))
+                if (is_array($value)) {
                     $this->XML .= $this->indent($lvl);
-                $this->XML .= '</' . $this->strToXMLKeySafe($key) . '>' . $this->XMLLineBreak;
+                }
+                $this->XML .= '</'.$this->strToXMLKeySafe($key).'>'.$this->XMLLineBreak;
 
                 $prev_lvl = $lvl;
             } // End of else to if ($key == '0' && !isset($arr['1']))
@@ -157,16 +153,15 @@ class array2xml
         return $str;
     }
 
-// End of generateTag()
+    // End of generateTag()
 
     /**
-     * Create an indent string
+     * Create an indent string.
      *
      * @param int $num - number of indents
-     * @return str
-     * @access Private
+     * @return string
      */
-    function indent($num)
+    public function indent($num)
     {
         $str = '';
         for ($i = 1; $i <= ($this->XMLIndentNum * ($num)); $i++) {
@@ -176,37 +171,36 @@ class array2xml
         return $str;
     }
 
-// End of indent()
+    // End of indent()
 
     /**
-     * Generate XML from $this->array
+     * Generate XML from $this->array.
      *
      * @param bol $xmlHead - if the XML head should be included
-     * @return boolean
-     * @access Private
+     * @return bool
      */
-    function generateXML($xmlHead = true)
+    public function generateXML($xmlHead = true)
     {
         $this->XML = '';
 
-        if ($xmlHead)
+        if ($xmlHead) {
             $this->XML .= $this->getXMLHead();
+        }
 
         $this->XML .= $this->generateTag($this->array);
 
         return true;
     }
 
-// End of generateXML()
+    // End of generateXML()
 
     /**
-     * Output XML Data
+     * Output XML Data.
      *
-     * @param str $method - Either "return" or "echo" - "return" will make the function return, "echo" will print it to screen with header 'n all
+     * @param string $method - Either "return" or "echo" - "return" will make the function return, "echo" will print it to screen with header 'n all
      * @param bol $xmlHead - if the XML head should be included
-     * @access Public
      */
-    function outputXML($method = 'return', $xmlHead = true)
+    public function outputXML($method = 'return', $xmlHead = true)
     {
         $this->generateXML($xmlHead);
 
@@ -215,209 +209,205 @@ class array2xml
         } elseif ($method == 'echo') { // End of if ($method == 'return')
             header('Content-Type: text/xml');
             echo $this->XML;
+
             return true;
         } else { // End of elseif ($method == 'echo')
             return false;
         } // End of elseif ($method == 'echo')
     }
 
-// End of outputXML()
+    // End of outputXML()
 
     /**
-     * Set the array of contents
+     * Set the array of contents.
      *
      * @param arr $arr
-     * @return boolean
-     * @access Public
+     * @return bool
      */
-    function setArray($arr)
+    public function setArray($arr)
     {
         $this->array = $arr;
+
         return true;
     }
 
-// End of setArray()
+    // End of setArray()
 
     /**
-     * Set indent character
+     * Set indent character.
      *
-     * @param str $str
-     * @return boolean
-     * @access Public
+     * @param string $str
+     * @return bool
      */
-    function setIndentChar($str)
+    public function setIndentChar($str)
     {
         $this->XMLIndentChar = strval($str);
+
         return true;
     }
 
-// End of setIndentChar()
+    // End of setIndentChar()
 
     /**
-     * Set number of indents
+     * Set number of indents.
      *
      * @param int $int
-     * @return boolean
-     * @access Public
+     * @return bool
      */
-    function setIndentNum($int)
+    public function setIndentNum($int)
     {
         $this->XMLIndentNum = intval($int);
+
         return true;
     }
 
-// End of setIndentNum()
+    // End of setIndentNum()
 
     /**
-     * Set XML line breaks
+     * Set XML line breaks.
      *
-     * @param str $str
-     * @return boolean
-     * @access Public
+     * @param string $str
+     * @return bool
      */
-    function setLineBreak($str)
+    public function setLineBreak($str)
     {
         $this->XMLLineBreak = strval($str);
+
         return true;
     }
 
-// End of setLineBreak()
+    // End of setLineBreak()
 
     /**
-     * Set the line break to the default for Mac OS
+     * Set the line break to the default for Mac OS.
      *
-     * @return boolean
-     * @access Public
+     * @return bool
      */
-    function setLineBreakForMacOS()
+    public function setLineBreakForMacOS()
     {
         return $this->setLineBreak("\r");
     }
 
-// End of setLineBreakForMacOS()
+    // End of setLineBreakForMacOS()
 
     /**
-     * Set the line break to the default for UNIX (and Linux)
+     * Set the line break to the default for UNIX (and Linux).
      *
-     * @return boolean
-     * @access Public
+     * @return bool
      */
-    function setLineBreakForUNIX()
+    public function setLineBreakForUNIX()
     {
         return $this->setLineBreak("\n");
     }
 
-// End of setLineBreakForUNIX()
+    // End of setLineBreakForUNIX()
 
     /**
-     * Set the line break to the default for Microsoft Windows
+     * Set the line break to the default for Microsoft Windows.
      *
-     * @return boolean
-     * @access Public
+     * @return bool
      */
-    function setLineBreakForWindows()
+    public function setLineBreakForWindows()
     {
         return $this->setLineBreak("\r\n");
     }
 
-// End of setLineBreakForWindows()
+    // End of setLineBreakForWindows()
 
     /**
-     * Set XML Encoding
+     * Set XML Encoding.
      *
-     * @param str $str
-     * @return boolean
+     * @param string $str
+     * @return bool
      */
-    function setXMLEncoding($str)
+    public function setXMLEncoding($str)
     {
         $this->XMLEncoding = strval($str);
+
         return true;
     }
 
-// End of setXMLEncoding()
+    // End of setXMLEncoding()
 
     /**
-     * Gets the XML Head for use in XML output
+     * Gets the XML Head for use in XML output.
      *
-     * @return str
-     * @access Private
+     * @return string
      */
-    function getXMLHead()
+    public function getXMLHead()
     {
-        return '<?xml version="' . $this->XMLVersion . '" encoding="' . $this->XMLEncoding . '"?>' . $this->XMLLineBreak;
+        return '<?xml version="'.$this->XMLVersion.'" encoding="'.$this->XMLEncoding.'"?>'.$this->XMLLineBreak;
     }
 
-// End of setXMLHead();
+    // End of setXMLHead();
 
-    function setXMLSafe($mode)
+    public function setXMLSafe($mode)
     {
         if (is_bool($mode)) {
             $this->XMLSafe = $mode;
+
             return true;
         } else { // End of if (is_bool($mode))
             return false;
         } // End of else to if (is_bool($mode))
     }
 
-// End of setXMLSafe()
+    // End of setXMLSafe()
 
     /**
      * Set XML Version (as a string)
-     * example: "1.0"
+     * example: "1.0".
      *
-     * @param str $str
-     * @return boolean
-     * @access Public
+     * @param string $str
+     * @return bool
      */
-    function setXMLVersion($str)
+    public function setXMLVersion($str)
     {
         $this->XMLVersion = strval($str);
+
         return true;
     }
 
-// End of setXMLVersion()
+    // End of setXMLVersion()
 
     /**
-     * String to XML Safe for key (tag) values
+     * String to XML Safe for key (tag) values.
      *
-     * @param str $str
-     * @return str
-     * @access Private
+     * @param string $str
+     * @return string
      */
-    function strToXMLKeySafe($str)
+    public function strToXMLKeySafe($str)
     {
         if (is_numeric($str)) {
             // Due to rules in $this->generateTag(), this should not happend, so just for safety
-            $str = 'a' . $str;
+            $str = 'a'.$str;
         } elseif (is_numeric(substr($str, 0, 1))) { // End of if (is_numeric($str))
-            $str = preg_replace("/^(\\d*)/", "", $str);
+            $str = preg_replace('/^(\\d*)/', '', $str);
         } // End of elseif (is_numeric(substr($str,0,1)))
 
         return $str;
     }
 
-// End of strToXMLKeySafe()
+    // End of strToXMLKeySafe()
 
     /**
-     * String to XML Safe
+     * String to XML Safe.
      *
-     * @param str $str
-     * @return str
-     * @access Private
+     * @param string $str
+     * @return string
      */
-    function strToXMLSafe($str)
+    public function strToXMLSafe($str)
     {
         if ($this->XMLSafe) {
-            $searchArray = array('<', '>', "'", '"');
-            $replaceArray = array('&lt;', '&gt;', '&apos;', '&quot;');
+            $searchArray = ['<', '>', "'", '"'];
+            $replaceArray = ['&lt;', '&gt;', '&apos;', '&quot;'];
             $str = str_replace($searchArray, $replaceArray, $str);
         } // End of if ($this->xmlSafe)
 
         return $str;
     }
 
-// End of strToXMLSafe()
+    // End of strToXMLSafe()
 }
 
 // End of class xml
-?>

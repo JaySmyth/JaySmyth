@@ -12,17 +12,17 @@ class DepartmentsTableSeeder extends Seeder
     public function run()
     {
         // Modify a few records
-        DB::table('departments')->insert(array(
-            array('code' => 'IFCEX', 'name' => 'Courier (Export)'),
-            array('code' => 'IFCIM', 'name' => 'Courier (Import)'),
-            array('code' => 'IFFRD', 'name' => 'Road (Domestic)'),
-            array('code' => 'IFFRI', 'name' => 'Road Import'),
-            array('code' => 'IFFRX', 'name' => 'Road Export'),
-            array('code' => 'IFFAI', 'name' => 'Air Import'),
-            array('code' => 'IFFAX', 'name' => 'Air Export'),
-            array('code' => 'IFFSI', 'name' => 'Sea Import'),
-            array('code' => 'IFFSX', 'name' => 'Sea Export'),
-            array('code' => 'IFCUK', 'name' => 'Courier (UK)'),
-        ));
+        DB::table('departments')->insert([
+            ['code' => 'IFCEX', 'name' => 'Courier (Export)'],
+            ['code' => 'IFCIM', 'name' => 'Courier (Import)'],
+            ['code' => 'IFFRD', 'name' => 'Road (Domestic)'],
+            ['code' => 'IFFRI', 'name' => 'Road Import'],
+            ['code' => 'IFFRX', 'name' => 'Road Export'],
+            ['code' => 'IFFAI', 'name' => 'Air Import'],
+            ['code' => 'IFFAX', 'name' => 'Air Export'],
+            ['code' => 'IFFSI', 'name' => 'Sea Import'],
+            ['code' => 'IFFSX', 'name' => 'Sea Export'],
+            ['code' => 'IFCUK', 'name' => 'Courier (UK)'],
+        ]);
     }
 }

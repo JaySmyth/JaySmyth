@@ -6,7 +6,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class FailedJobResource extends JsonResource
 {
-
     /**
      * Transform the resource into an array.
      *
@@ -23,5 +22,4 @@ class FailedJobResource extends JsonResource
             'failed_at' => $this->failed_at,
         ];
     }
-
 }

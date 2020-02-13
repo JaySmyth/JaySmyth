@@ -2,13 +2,12 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\ManifestProfile;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
 
 class AutoManifest extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -44,20 +43,19 @@ class AutoManifest extends Command
         $autoManifests = ManifestProfile::whereAuto(1)->get();
 
         foreach ($autoManifests as $manifest) {
-
             if ($this->isRunable($manifest->last_run, $manifest->time)) {
                 $manifest->run();
-                $this->info($manifest->name . ' manifested');
+                $this->info($manifest->name.' manifested');
             }
         }
     }
 
     /**
-     * Determine if the manifest should be run. 
-     * 
+     * Determine if the manifest should be run.
+     *
      * @param type $lastRun
      * @param type $time
-     * @return boolean
+     * @return bool
      */
     private function isRunable($lastRun, $time)
     {
@@ -66,7 +64,7 @@ class AutoManifest extends Command
             return false;
         }
 
-        $runTime = new Carbon('today ' . $time);
+        $runTime = new Carbon('today '.$time);
 
         // within 2 minutes
         if (Carbon::now()->diffInMinutes($runTime) <= 2) {
@@ -75,5 +73,4 @@ class AutoManifest extends Command
 
         return false;
     }
-
 }

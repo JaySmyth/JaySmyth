@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 
 class ShipmentUploadsController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -62,8 +61,8 @@ class ShipmentUploadsController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'directory' => 'required|min:8|max:150|unique:shipment_uploads,directory,' . $request->directory,
-            'import_config_id' => 'required'
+            'directory' => 'required|min:8|max:150|unique:shipment_uploads,directory,'.$request->directory,
+            'import_config_id' => 'required',
         ]);
 
         $shipmentUpload = ShipmentUpload::create(array_except($request->all(), ['create_sftp_account']));
@@ -71,7 +70,7 @@ class ShipmentUploadsController extends Controller
         $shipmentUpload->log();
 
         if ($request->create_sftp_account) {
-            if (!file_exists($shipmentUpload->directory)) {
+            if (! file_exists($shipmentUpload->directory)) {
                 $username = substr($shipmentUpload->directory, 6, stripos($shipmentUpload->directory, '/uploads') - 6);
             }
         }
@@ -102,7 +101,7 @@ class ShipmentUploadsController extends Controller
     {
         $request->validate([
             'directory' => 'required|min:8|max:150',
-            'import_config_id' => 'required'
+            'import_config_id' => 'required',
         ]);
 
         $shipmentUpload->updateWithLog($request->all());
@@ -124,5 +123,4 @@ class ShipmentUploadsController extends Controller
 
         return response()->json(null, 204);
     }
-
 }

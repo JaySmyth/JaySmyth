@@ -6,7 +6,6 @@ use App\Http\Requests\Request;
 
 class CustomsEntryCommodityRequest extends Request
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -31,8 +30,7 @@ class CustomsEntryCommodityRequest extends Request
             'duty_percent' => 'required',
             'vat' => 'required',
             'weight' => 'required',
-            'customs_procedure_code_id' => 'required'
+            'customs_procedure_code_id' => 'required',
         ];
     }
-
 }

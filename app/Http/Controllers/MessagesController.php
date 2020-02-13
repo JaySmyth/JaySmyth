@@ -3,14 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Message;
 use App\Http\Requests\MessageRequest;
-use Carbon\Carbon;
+use App\Message;
 use Auth;
+use Carbon\Carbon;
 
 class MessagesController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -61,6 +60,7 @@ class MessagesController extends Controller
     public function create()
     {
         $this->authorize('index', new Message);
+
         return view('messages.create');
     }
 
@@ -81,7 +81,7 @@ class MessagesController extends Controller
                     'valid_to' => Carbon::parse($request->valid_to),
                     'sticky' => $request->sticky,
                     'ifs_only' => $request->ifs_only,
-                    'enabled' => $request->enabled
+                    'enabled' => $request->enabled,
         ]);
 
         $message->depots()->sync($request->depots);
@@ -128,7 +128,7 @@ class MessagesController extends Controller
             'valid_to' => Carbon::parse($request->valid_to),
             'sticky' => $request->sticky,
             'ifs_only' => $request->ifs_only,
-            'enabled' => $request->enabled
+            'enabled' => $request->enabled,
         ]);
 
         $message->depots()->sync($request->depots);
@@ -141,5 +141,4 @@ class MessagesController extends Controller
 
         return redirect('messages');
     }
-
 }

@@ -2,14 +2,13 @@
 
 namespace App\Console\Commands;
 
+use App\Shipment;
+use App\Vmi\VvOrders;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
-use App\Vmi\VvOrders;
-use App\Shipment;
 
 class UpdateShopify extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -39,7 +38,7 @@ class UpdateShopify extends Command
     public function __construct()
     {
         parent::__construct();
-        $this->tempFile = storage_path('app/temp/tracking_' . time() . '.csv');
+        $this->tempFile = storage_path('app/temp/tracking_'.time().'.csv');
     }
 
     /**
@@ -51,14 +50,13 @@ class UpdateShopify extends Command
     {
         $shipments = Shipment::whereReceived(1)->whereReceivedSent(0)->whereCompanyId(995)->orderBy('id', 'DESC')->get();
 
-        $this->info($shipments->count() . " shipments found");
+        $this->info($shipments->count().' shipments found');
 
-        $handle = fopen($this->tempFile, "w");
+        $handle = fopen($this->tempFile, 'w');
 
         $ids = [];
 
         foreach ($shipments as $shipment) {
-
             $order = VvOrders::whereOrderNumber($shipment->shipment_reference)->first();
 
             if ($order) {
@@ -78,11 +76,10 @@ class UpdateShopify extends Command
 
             // Set the source field on all shipments to that of the filename
             \App\Shipment::whereIn('id', $ids)->update([
-                'received_sent' => 1
+                'received_sent' => 1,
             ]);
 
-            Mail::to('supernova-hair-tools1572962736@in.uptracker.app')->bcc(['it@antrim.ifsgroup.com'])->send(new \App\Mail\GenericError('We Are Paradoxx Tracking Numbers - ' . count($ids) . ' shipments', null, $this->tempFile));
+            Mail::to('supernova-hair-tools1572962736@in.uptracker.app')->bcc(['it@antrim.ifsgroup.com'])->send(new \App\Mail\GenericError('We Are Paradoxx Tracking Numbers - '.count($ids).' shipments', null, $this->tempFile));
         }
     }
-
 }

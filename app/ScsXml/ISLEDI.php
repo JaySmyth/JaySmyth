@@ -2,26 +2,26 @@
 
 namespace App\ScsXml;
 
+use App\Carrier;
+use App\ChargeCodes;
 use App\Company;
 use App\Department;
-use App\Carrier;
-use App\Service;
-use App\Shipment;
 use App\Package;
 use App\Pricing\Pricing;
-use App\ScsXml\Job;
 use App\ScsXml\Context;
+use App\ScsXml\DocAdds;
 use App\ScsXml\Groupage;
-use App\ScsXml\JobHdr;
-use App\ScsXml\JobLine;
+use App\ScsXml\Job;
 use App\ScsXml\JobCol;
 use App\ScsXml\JobDel;
 use App\ScsXml\JobDims;
-use App\ScsXml\RecCost;
+use App\ScsXml\JobHdr;
+use App\ScsXml\JobLine;
 use App\ScsXml\RecChg;
+use App\ScsXml\RecCost;
 use App\ScsXml\RecJny;
-use App\ScsXml\DocAdds;
-use App\ChargeCodes;
+use App\Service;
+use App\Shipment;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -30,13 +30,12 @@ use App\ChargeCodes;
  */
 
 /**
- * Description of ISLEDI
+ * Description of ISLEDI.
  *
  * @author gmcbroom
  */
 class ISLEDI
 {
-
     public $context;
     public $groupage;
     public $job;
@@ -58,7 +57,6 @@ class ISLEDI
 
     public function createXMLSalesInvoice($shipments)
     {
-
         foreach (Shipment::whereIn('id', $shipments)->cursor() as $shipment) {
 
             /*
@@ -77,7 +75,7 @@ class ISLEDI
                 }
             }
 
-            $prices = json_decode($shipment->quoted, TRUE);
+            $prices = json_decode($shipment->quoted, true);
 
             /*
              * *********************************
@@ -86,12 +84,10 @@ class ISLEDI
              */
             $okToGenerate = $this->isOkToGenerate($shipment, $prices);
             if ($okToGenerate) {
-
                 $this->shipment = $shipment;
                 $this->carrier = Carrier::find($shipment->carrier_id);
                 $this->company = Company::find($shipment->company_id);
                 $this->department = Department::find($this->shipment->department_id);
-
 
                 $job = new Job();
 
@@ -107,7 +103,6 @@ class ISLEDI
 
                 $this->summarizePackages();
                 foreach ($this->packageSummary as $package) {
-
                     $job->addDims($this->setJobDims(new JobDims(), $package));
                 }
 
@@ -124,16 +119,14 @@ class ISLEDI
                 }
 
                 // Add Costs
-                if (isset($prices['costs']) && !empty($prices['costs'])) {
-
+                if (isset($prices['costs']) && ! empty($prices['costs'])) {
                     foreach ($prices['costs'] as $charge) {
                         $job->addCost($this->setRecCost($charge));
                     }
                 }
 
                 // Add Sales
-                if (isset($prices['sales']) && !empty($prices['sales'])) {
-
+                if (isset($prices['sales']) && ! empty($prices['sales'])) {
                     foreach ($prices['sales'] as $charge) {
                         $job->addCharge($this->setRecChg($charge, $prices['sales_vat_code']));
                     }
@@ -141,7 +134,6 @@ class ISLEDI
 
                 // store job
                 $this->job[] = $job;
-
             }
         }
 
@@ -172,19 +164,22 @@ class ISLEDI
         }
 
         // Not Priced or priced with errors so cannot Invoice
-        if (!isset($prices) || ($prices['errors'] != []))
+        if (! isset($prices) || ($prices['errors'] != [])) {
             return false;
+        }
 
         // Sales price zero
-        if (isset($prices['shipping_charge']) && $prices['shipping_charge'] == '0')
+        if (isset($prices['shipping_charge']) && $prices['shipping_charge'] == '0') {
             return false;
+        }
 
         // Cost zero
         if (isset($prices['shipping_cost']) && $prices['shipping_cost'] == '0') {
 
             // Zero costs not allowed
-            if (!$this->service->allow_zero_cost)
+            if (! $this->service->allow_zero_cost) {
                 return false;
+            }
         }
 
         return true;
@@ -192,7 +187,6 @@ class ISLEDI
 
     private function setJobHdr($jobHdr)
     {
-
         $chargeableWeight = ($this->shipment->weight > $this->shipment->volumetric_weight ? $this->shipment->weight : $this->shipment->volumetric_weight);
 
         $department = Department::find($this->shipment->department_id);
@@ -215,16 +209,16 @@ class ISLEDI
             // If Carrier Consignment Number is numeric then use it as AWB no.
             if (is_numeric($this->shipment->carrier_consignment_number)) {
                 $jobHdr->setAttribute('mawb-char', $this->shipment->carrier_consignment_number);
-                $jobHdr->setAttribute('product-desc', '{AWB:' . $this->shipment->consignment_number . '}');
-                $jobHdr->setAttribute('cust-ref', $this->shipment->shipment_reference . '/' . $this->shipment->carrier_consignment_number);                     // Customer Ref
+                $jobHdr->setAttribute('product-desc', '{AWB:'.$this->shipment->consignment_number.'}');
+                $jobHdr->setAttribute('cust-ref', $this->shipment->shipment_reference.'/'.$this->shipment->carrier_consignment_number);                     // Customer Ref
             } else {
                 $jobHdr->setAttribute('mawb-char', $this->shipment->consignment_number);
-                $jobHdr->setAttribute('product-desc', '{AWB:' . $this->shipment->carrier_consignment_number . '}');
+                $jobHdr->setAttribute('product-desc', '{AWB:'.$this->shipment->carrier_consignment_number.'}');
                 $jobHdr->setAttribute('cust-ref', $this->shipment->shipment_reference);                     // Customer Ref
             }
         } else {
             $jobHdr->setAttribute('mawb-char', $this->shipment->consignment_number);
-            $jobHdr->setAttribute('product-desc', '{AWB:' . $this->shipment->carrier_consignment_number . '}');
+            $jobHdr->setAttribute('product-desc', '{AWB:'.$this->shipment->carrier_consignment_number.'}');
             $jobHdr->setAttribute('cust-ref', $this->shipment->shipment_reference);                     // Customer Ref
         }
 
@@ -236,7 +230,7 @@ class ISLEDI
         $jobHdr->setAttribute('chg-weight', $chargeableWeight);
         $jobHdr->setAttribute('entered-wgt', $this->shipment->weight);
         $jobHdr->setAttribute('entered-cube', ($this->shipment->volumetric_weight * $this->shipment->volumetric_divisor) / 1000000);
-        $jobHdr->setAttribute('wgt-type', $this->shipment->weight_uom . 's');
+        $jobHdr->setAttribute('wgt-type', $this->shipment->weight_uom.'s');
         $jobHdr->setAttribute('terms-code', strtoupper($this->shipment->terms_of_sale));
         $jobHdr->setAttribute('cw-divisor', $this->shipment->volumetric_divisor / 1000);
         $jobHdr->setAttribute('job-country-code', $this->shipment->recipient_country_code);
@@ -246,13 +240,12 @@ class ISLEDI
 
     private function setJobLine($jobLine)
     {
-
         $weightTypes = ['kg' => 'kgs', 'lb' => 'lbs'];
         $chargeableWeight = ($this->shipment->weight > $this->shipment->volumetric_weight ? $this->shipment->weight : $this->shipment->volumetric_weight);
 
         if ($this->company->legacy_invoice) {
             $jobLine->setAttribute('contacts-ref', $this->shipment->carrier_consignment_number);        // SCS uses this for docketno for IFCUK
-            $jobLine->setAttribute('shippers-ref', $this->shipment->shipment_reference . '/' . $this->shipment->carrier_consignment_number);                // Customer Ref
+            $jobLine->setAttribute('shippers-ref', $this->shipment->shipment_reference.'/'.$this->shipment->carrier_consignment_number);                // Customer Ref
         } else {
             $jobLine->setAttribute('contacts-ref', $this->shipment->consignment_number);                // SCS uses this for docketno for IFCUK
             $jobLine->setAttribute('shippers-ref', $this->shipment->shipment_reference);                // Customer Ref
@@ -270,19 +263,17 @@ class ISLEDI
         $jobLine->setAttribute('wgt-type', $weightTypes[$this->shipment->weight_uom]);
 
         if ($this->company->legacy_invoice) {
-
             if (is_numeric($this->shipment->carrier_consignment_number)) {
 
                 // If Carrier Consignment Number is numeric then use it as AWB no. and add IFS AWB here
-                $jobLine->setAttribute('cargo-desc', '{AWB:' . $this->shipment->consignment_number . '}');
+                $jobLine->setAttribute('cargo-desc', '{AWB:'.$this->shipment->consignment_number.'}');
             } else {
 
                 // Use IFS Consignment Number as MAWB and add Carrier here
-                $jobLine->setAttribute('cargo-desc', '{AWB:' . $this->shipment->carrier_consignment_number . '}');
+                $jobLine->setAttribute('cargo-desc', '{AWB:'.$this->shipment->carrier_consignment_number.'}');
             }
         } else {
-
-            $jobLine->setAttribute('cargo-desc', '{AWB:' . $this->shipment->carrier_consignment_number . '}');
+            $jobLine->setAttribute('cargo-desc', '{AWB:'.$this->shipment->carrier_consignment_number.'}');
         }
 
         return $jobLine;
@@ -290,7 +281,6 @@ class ISLEDI
 
     private function setJobCol($jobCol)
     {
-
         $jobCol->setAttribute('col-date', $this->shipment->ship_date);
         $jobCol->setAttribute('contact-name', $this->shipment->sender_name);
         $jobCol->setAttribute('name', $this->shipment->sender_company_name);
@@ -311,7 +301,7 @@ class ISLEDI
     {
 
         // $jobDel->setAttribute('col-date', $this->shipment->ship_date);
-        if ($this->shipment->recipient_company_name > "") {
+        if ($this->shipment->recipient_company_name > '') {
 
             // If Company name defined set contact name & company name
             $jobDel->setAttribute('contact-name', $this->shipment->recipient_name);
@@ -337,22 +327,21 @@ class ISLEDI
 
     private function setDocAdds($docAdds, $type)
     {
-
         $addressTypes = ['CONSEE' => 'recipient', 'CONSOR' => 'sender'];
         $addressType = $addressTypes[$type];
 
         $docAdds->setAttribute('address-type', $type);
-        $docAdds->setAttribute('contact-name', $this->getField($addressType . "_name"));
-        $docAdds->setAttribute('name', $this->getField($addressType . "_company_name"));
-        $docAdds->setAttribute('address-1', $this->getField($addressType . "_address1"));
-        $docAdds->setAttribute('address-2', $this->getField($addressType . "_address2"));
-        $docAdds->setAttribute('address-3', $this->getField($addressType . "_address3"));
-        $docAdds->setAttribute('town', $this->getField($addressType . "_city"));
-        $docAdds->setAttribute('county', $this->getField($addressType . "_state"));
-        $docAdds->setAttribute('country-code', $this->getField($addressType . "_country_code"));
-        $docAdds->setAttribute('email', $this->getField($addressType . "_email"));
-        $docAdds->setAttribute('postcode', $this->getField($addressType . "_postcode"));
-        $docAdds->setAttribute('telephone', $this->getField($addressType . "_telephone"));
+        $docAdds->setAttribute('contact-name', $this->getField($addressType.'_name'));
+        $docAdds->setAttribute('name', $this->getField($addressType.'_company_name'));
+        $docAdds->setAttribute('address-1', $this->getField($addressType.'_address1'));
+        $docAdds->setAttribute('address-2', $this->getField($addressType.'_address2'));
+        $docAdds->setAttribute('address-3', $this->getField($addressType.'_address3'));
+        $docAdds->setAttribute('town', $this->getField($addressType.'_city'));
+        $docAdds->setAttribute('county', $this->getField($addressType.'_state'));
+        $docAdds->setAttribute('country-code', $this->getField($addressType.'_country_code'));
+        $docAdds->setAttribute('email', $this->getField($addressType.'_email'));
+        $docAdds->setAttribute('postcode', $this->getField($addressType.'_postcode'));
+        $docAdds->setAttribute('telephone', $this->getField($addressType.'_telephone'));
 
         return $docAdds;
     }
@@ -364,7 +353,6 @@ class ISLEDI
 
     public function summarizePackages()
     {
-
         $weightUom = ['kg' => 'kgs', 'lb' => 'lbs'];
         $dimsUom = ['cm' => 'C', 'in' => 'I', 'inch' => 'I'];
         $this->packageSummary = [];
@@ -374,14 +362,11 @@ class ISLEDI
 
         // Summarize them
         foreach ($packages as $package) {
-
-            $size = $package->length . $package->width . $package->height;
+            $size = $package->length.$package->width.$package->height;
 
             if (isset($this->packageSummary[$size])) {
-
                 $this->packageSummary[$size]['pieces']++;
             } else {
-
                 $this->packageSummary[$size]['length'] = $package->length;
                 $this->packageSummary[$size]['width'] = $package->width;
                 $this->packageSummary[$size]['height'] = $package->height;
@@ -397,17 +382,16 @@ class ISLEDI
 
     private function setjobDims($jobDims, $package)
     {
-
-        $jobDims->setAttribute("entered-length", $package['length']);
-        $jobDims->setAttribute("entered-width", $package['width']);
-        $jobDims->setAttribute("entered-height", $package['height']);
-        $jobDims->setAttribute("entered-weight", $package['weight']);
-        $jobDims->setAttribute("entered-unit-type", $package['unit-type']);
-        $jobDims->setAttribute("weight-type", $package['weight-type']);
+        $jobDims->setAttribute('entered-length', $package['length']);
+        $jobDims->setAttribute('entered-width', $package['width']);
+        $jobDims->setAttribute('entered-height', $package['height']);
+        $jobDims->setAttribute('entered-weight', $package['weight']);
+        $jobDims->setAttribute('entered-unit-type', $package['unit-type']);
+        $jobDims->setAttribute('weight-type', $package['weight-type']);
         // $jobDims->setAttribute("package-type", $package['package-type']);
-        $jobDims->setAttribute("package-type", 'PIECES');
-        $jobDims->setAttribute("pieces", $package['pieces']);
-        $jobDims->setAttribute("entered-cube", $package['cube'] * $package['pieces']);
+        $jobDims->setAttribute('package-type', 'PIECES');
+        $jobDims->setAttribute('pieces', $package['pieces']);
+        $jobDims->setAttribute('entered-cube', $package['cube'] * $package['pieces']);
 
         return $jobDims;
     }
@@ -428,23 +412,20 @@ class ISLEDI
 
     private function setRecCost($charge)
     {
-
-        if (!isset($charge['description'])) {
+        if (! isset($charge['description'])) {
             $charge['description'] = $charge['code'];
         }
 
         $chargeCode = ChargeCodes::where('code', $charge['code'])->first();
         if ($chargeCode) {
-
             $chargeType = $chargeCode->scs_code;
         } else {
-
             $chargeType = 'MIS';
         }
 
         // Identify Supplier SCS Account
         $service = Company::find($this->shipment['company_id'])->services()->where('services.id', $this->shipment['service_id'])->first();
-        if (isset($service->pivot->scs_account) && $service->pivot->scs_account > "") {
+        if (isset($service->pivot->scs_account) && $service->pivot->scs_account > '') {
 
             // Use Customer specific Supplier SCS cost account
             $supplierAccount = $service->pivot->scs_account;
@@ -454,7 +435,7 @@ class ISLEDI
             $supplierAccount = Service::find($this->shipment['service_id'])->scs_account_code;
         }
 
-        $xml = new ISLEDI();
+        $xml = new self();
         $recCost = new RecCost();
         $recCost->setAttribute('supplier', $supplierAccount);
         $recCost->setAttribute('supplier-currency', $this->shipment->cost_currency);
@@ -470,14 +451,11 @@ class ISLEDI
 
     private function setRecChg($charge, $vatCode)
     {
-
         $chargeCode = ChargeCodes::where('code', $charge['code'])->first();
 
         if ($chargeCode) {
-
             $chargeType = $chargeCode->scs_code;
         } else {
-
             $chargeType = 'MIS';
         }
 
@@ -497,13 +475,11 @@ class ISLEDI
 
     public function toXML()
     {
-
         $xml = $this->getXMLHeadings();
         $xml .= $this->context->toXML();
         $xml .= $this->groupage->toXML();
 
         if ($this->job) {
-
             foreach ($this->job as $job) {
                 $xml .= $job->toXML();
             }
@@ -516,8 +492,6 @@ class ISLEDI
 
     private function getXMLHeadings()
     {
-
         return '<?xml version="1.0" encoding="utf-8"?><ISLEDI xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">';
     }
-
 }

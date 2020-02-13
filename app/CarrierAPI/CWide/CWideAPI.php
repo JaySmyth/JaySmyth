@@ -3,18 +3,18 @@
 namespace App\CarrierAPI\CWide;
 
 use App\Carrier;
-use App\Service;
+use App\CarrierPackagingType;
 use App\Company;
 use App\Country;
 use App\PackagingType;
-use App\CarrierPackagingType;
+use App\Service;
 use App\TransactionLog;
-use TCPDI;
 use Exception;
 use Illuminate\Support\Facades\Validator;
+use TCPDI;
 
 /**
- * Description of IFSWebAPI
+ * Description of IFSWebAPI.
  *
  * @author gmcbroom
  */
@@ -30,30 +30,25 @@ class CWideAPI extends \App\CarrierAPI\CarrierBase
     public $mode;
     private $client;
 
-    function initCarrier()
+    public function initCarrier()
     {
-        
     }
 
     public function buildCarrierShipment($shipment)
     {
-
         return $shipment;
     }
 
     private function extract_errors($errorsFound)
     {
-        
     }
 
     public function preProcess($shipment)
     {
-        
     }
 
     public function validateShipment($shipment)
     {
-
         $errors = [];
 
         // $rules['bill_shipping_account'] = 'required|digits:9';
@@ -66,7 +61,6 @@ class CWideAPI extends \App\CarrierAPI\CarrierBase
 
     private function sendMessageToCarrier($shipment)
     {
-
         $response = [];
         $msgType = 'MSG';
 
@@ -95,14 +89,12 @@ class CWideAPI extends \App\CarrierAPI\CarrierBase
      */
     public function addAdditionalInfo($shipment)
     {
-
         $data['consignment_number'] = nextAvailable('CONSIGNMENT');                     // Generate an IFS Consignment Number
         $data['carrier_consignment_number'] = $data['consignment_number'];              // Use it for the Carrier number
         $data['pieces'] = $shipment['pieces'];
 
         for ($i = 0; $i < $data['pieces']; $i++) {
-
-            $trackingNumber = $data['consignment_number'] . sprintf('%04d', $i + 1);    // concatenate consignment no with package no
+            $trackingNumber = $data['consignment_number'].sprintf('%04d', $i + 1);    // concatenate consignment no with package no
             $trackingNumber .= mod10CheckDigit($trackingNumber);                        // Then add check digit
 
             if ($i == 0) {
@@ -136,7 +128,8 @@ class CWideAPI extends \App\CarrierAPI\CarrierBase
             if (isset($reply['errors']) && $reply['errors'] > '') {
 
                 // Request unsuccessful - return errors
-                $errorMsg = 'Carrier Error : ' . ((string) $reply['errors']);
+                $errorMsg = 'Carrier Error : '.((string) $reply['errors']);
+
                 return $this->generateErrorResponse($response, $errorMsg);
             } else {
 
@@ -157,12 +150,12 @@ class CWideAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     *
      * @param type $reply
      */
     private function generatePdf($shipment, $serviceCode, $labelData)
     {
         $label = new CWideLabel($shipment, $serviceCode, $labelData);
+
         return $label->create();
     }
 
@@ -181,7 +174,7 @@ class CWideAPI extends \App\CarrierAPI\CarrierBase
         $response['volumetric_divisor'] = getVolumetricDivisor('cwide', $serviceCode);       // From Helper functions
 
         $response['pieces'] = $reply['pieces'];
-        for ($i = 0; $i < $response['pieces']; ++$i) {
+        for ($i = 0; $i < $response['pieces']; $i++) {
             $response['packages'][$i]['sequence_number'] = $i + 1;
             $response['packages'][$i]['carrier_tracking_code'] = $reply['packages'][$i]['carrier_tracking_number'];
             $response['packages'][$i]['barcode'] = $reply['packages'][$i]['carrier_tracking_number'];
@@ -196,7 +189,4 @@ class CWideAPI extends \App\CarrierAPI\CarrierBase
 
         return $response;
     }
-
 }
-
-?>

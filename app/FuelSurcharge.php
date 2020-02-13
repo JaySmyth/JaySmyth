@@ -2,8 +2,8 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 class FuelSurcharge extends Model
 {
@@ -71,6 +71,7 @@ class FuelSurcharge extends Model
     {
         if ($filter) {
             $filter = trim($filter);
+
             return $query->where('service_code', $filter);
         }
     }
@@ -88,7 +89,6 @@ class FuelSurcharge extends Model
     }
 
     /**
-     * 
      * @param type $query
      * @param type $fromDate
      * @return type
@@ -101,7 +101,6 @@ class FuelSurcharge extends Model
     }
 
     /**
-     * 
      * @param type $query
      * @param type $fromDate
      * @return type
@@ -114,7 +113,6 @@ class FuelSurcharge extends Model
     }
 
     /**
-     * 
      * @param type $carrierId
      * @param type $serviceCode
      * @param type $shipDate
@@ -122,13 +120,12 @@ class FuelSurcharge extends Model
      */
     public function getFuelPercentage($carrierId, $serviceCode, $shipDate)
     {
-
         $shipDate = date('Y-m-d', strtotime($shipDate));
+
         return $this->where('carrier_id', $carrierId)
                         ->where('service_code', $serviceCode)
                         ->where('from_date', '<=', $shipDate)
                         ->where('to_date', '>=', $shipDate)
                         ->first();
     }
-
 }

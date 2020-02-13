@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class VvStock extends Model
 {
-
     /**
      * The connection name for the model.
      *
@@ -30,6 +29,4 @@ class VvStock extends Model
      * No timestamps.
      */
     public $timestamps = false;
-
-
 }

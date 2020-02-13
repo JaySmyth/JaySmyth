@@ -4,12 +4,11 @@ namespace App\CarrierAPI\DHL;
 
 class DHLLabel extends \App\CarrierAPI\CarrierLabel
 {
-
     /**
      * Accepts Shipment and Carrier Response data
-     * and stores these to use to generate labels
+     * and stores these to use to generate labels.
      */
-    function __construct($shipment = null, $serviceCode = null, $data = null)
+    public function __construct($shipment = null, $serviceCode = null, $data = null)
     {
         parent::__construct($shipment, $serviceCode, $data);
     }
@@ -17,7 +16,7 @@ class DHLLabel extends \App\CarrierAPI\CarrierLabel
     /**
      * Takes stored Shipment and Carrier Response data
      * and uses it to create a PDF containing all the
-     * necessary labels in the following format :-
+     * necessary labels in the following format :-.
      *
      * Label 1 is a Master Label, others Package Labels
      */
@@ -42,5 +41,4 @@ class DHLLabel extends \App\CarrierAPI\CarrierLabel
     {
         $this->addLongServiceBox(67, 1, 35, 9, $this->serviceCode);
     }
-
 }

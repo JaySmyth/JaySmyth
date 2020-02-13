@@ -6,9 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class MailReport extends Model
 {
-
     /**
-     * A mail report has many recipients
+     * A mail report has many recipients.
      *
      * @return
      */
@@ -16,5 +15,4 @@ class MailReport extends Model
     {
         return $this->hasMany(MailReportRecipient::class)->orderBy('name');
     }
-
 }

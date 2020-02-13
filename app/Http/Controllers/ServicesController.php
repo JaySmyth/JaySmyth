@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Service;
-use App\Country;
-use App\Company;
 use App\CarrierAPI\Facades\CarrierAPI;
-use App\Http\Requests\ServiceRequest;
+use App\Company;
+use App\Country;
 use App\Http\Requests;
+use App\Http\Requests\ServiceRequest;
+use App\Service;
+use Illuminate\Http\Request;
 use Response;
 
-class ServicesController extends Controller {
-
+class ServicesController extends Controller
+{
     /**
      * Create a new controller instance.
      *
@@ -24,21 +24,16 @@ class ServicesController extends Controller {
     }
 
     /**
-     * 
-     *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function index(Request $request)
     {
-        
     }
 
     /**
-     * 
-     *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function show($id, Request $request)
     {
@@ -52,10 +47,8 @@ class ServicesController extends Controller {
     }
 
     /**
-     * 
-     *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function available(Request $request)
     {
@@ -97,5 +90,4 @@ class ServicesController extends Controller {
             }
         }
     }
-
 }

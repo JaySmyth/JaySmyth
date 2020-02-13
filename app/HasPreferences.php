@@ -20,14 +20,13 @@ trait HasPreferences
     }
 
     /**
-     * 
      * @param type $companyId
      * @param type $modeId
      * @param type $values
      */
     public function setPreferences($companyId, $modeId, $values)
     {
-        if (!is_array($values)) {
+        if (! is_array($values)) {
             parse_str($values, $values);
         }
 
@@ -38,17 +37,17 @@ trait HasPreferences
         $this->resetPreferences($companyId, $modeId);
 
         // Construct an array for bulk insert
-        $preferences = array();
+        $preferences = [];
 
         foreach ($values as $field => $value) {
-            if (strlen($value) > 0 && !in_array($field, $this->exclude)) {
-                $preferences[] = array(
+            if (strlen($value) > 0 && ! in_array($field, $this->exclude)) {
+                $preferences[] = [
                     'field' => $field,
                     'value' => $value,
                     'company_id' => $companyId,
                     'mode_id' => $modeId,
                     'user_id' => $this->id,
-                );
+                ];
             }
         }
 
@@ -56,14 +55,13 @@ trait HasPreferences
     }
 
     /**
-     * 
      * @param type $companyId
      * @param type $modeId
      * @return type
      */
     public function getPreferences($companyId, $modeId, $asArray = false)
     {
-        $values = array();
+        $values = [];
 
         $preferences = $this->preferences()
                 ->where('company_id', $companyId)
@@ -77,7 +75,6 @@ trait HasPreferences
 
         // User has no preferences defined, so prepopulate with system defaults
         if ($preferences->count() <= 0) {
-
             $company = Company::findOrFail($companyId);
 
             $values = [
@@ -95,7 +92,7 @@ trait HasPreferences
                 'sender_email' => $this->email,
                 'terms_of_sale' => 'DAP',
                 'bill_tax_duty' => 'recipient',
-                'eori' => $company->eori
+                'eori' => $company->eori,
             ];
         }
 
@@ -107,7 +104,6 @@ trait HasPreferences
     }
 
     /**
-     * 
      * @param type $companyId
      * @param type $modeId
      */
@@ -118,5 +114,4 @@ trait HasPreferences
                 ->where('mode_id', $modeId)
                 ->delete();
     }
-
 }

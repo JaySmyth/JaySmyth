@@ -15,11 +15,11 @@ class PricingModel4 extends PricingModel
 {
     /*
      * *************************************
-     * Class contains Carrier specific 
+     * Class contains Carrier specific
      * extensions for the PricingModel class
-     * 
+     *
      * Available functions
-     * 
+     *
      *      price($shipment, $rate, $priceType)
      *      getZone()
      *      getPackagingType($pkgNo = 0)
@@ -36,7 +36,6 @@ class PricingModel4 extends PricingModel
 
     public function __construct()
     {
-
         parent::__construct();
     }
 
@@ -48,13 +47,8 @@ class PricingModel4 extends PricingModel
     // Extended Area Surcharge
     public function isRAS()
     {
-
         $eas = new TntEas();
         // Implemented at child level
         return $eas->isEas($this->shipment['recipient_country_code'], $this->shipment['recipient_postcode']);
     }
-
-
 }
-
-?>

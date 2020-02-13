@@ -19,7 +19,7 @@ function flash()
 }
 
 /**
- * Dump out data for debugging
+ * Dump out data for debugging.
  *
  * @param type $data
  * @param type $msg
@@ -27,9 +27,9 @@ function flash()
 function display($data, $msg = '')
 {
     echo "$msg<br>";
-    echo "<pre>";
+    echo '<pre>';
     print_r($data);
-    echo "</pre>";
+    echo '</pre>';
 }
 
 /*
@@ -46,7 +46,7 @@ function inc(&$var, $value)
 }
 
 /**
- * Un-dot a flattened array
+ * Un-dot a flattened array.
  *
  * @param array $array
  * @return array
@@ -93,8 +93,6 @@ function getRouteValue($postcode, $value = 'collection_route', $day = 1)
     if ($routing) {
         return $routing[$value];
     }
-
-    return null;
 }
 
 /**
@@ -142,11 +140,12 @@ function getCountry($countryCode)
 function getCountryCode($string)
 {
     $country = new App\Country();
+
     return $country->getCode($string);
 }
 
 /**
- * Get ANSI state code from given country/state
+ * Get ANSI state code from given country/state.
  *
  * @param type $countryCode
  * @param type $state
@@ -213,7 +212,7 @@ function verboseCollectionDelivery($value)
         case 'D':
             return 'Delivery';
         default:
-            return null;
+            return;
     }
 }
 
@@ -257,6 +256,7 @@ function getCarrierName($carrierId)
 function getPickupTime($countryCode, $postcode)
 {
     $pickupTime = new Postcode();
+
     return $pickupTime->getPickupTime($countryCode, $postcode);
 }
 
@@ -266,7 +266,7 @@ function getPickupTime($countryCode, $postcode)
  *
  * @param string dropDown   the dropdown to generate
  * @param string prepend    prepend to the array with a default value
- * @param integer modeID    mode specific results
+ * @param int modeID    mode specific results
  *
  * @return array
  */
@@ -434,7 +434,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             break;
         case 'fileFormats':
             $result = [
-                'csv' => 'Csv', 'xls' => 'Excel (xls)', 'xlsx' => 'Excel (xlsx)', 'html' => 'HTML (no attachments)'
+                'csv' => 'Csv', 'xls' => 'Excel (xls)', 'xlsx' => 'Excel (xlsx)', 'html' => 'HTML (no attachments)',
             ];
             break;
         case 'frequency':
@@ -443,14 +443,14 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
         case 'containerSizes':
             $result = [
                 '20ft' => '20ft Container', '40ft' => '40ft Container', '45ft' => '45ft Container',
-                '40ft High Cube' => '40ft High Cube Container'
+                '40ft High Cube' => '40ft High Cube Container',
             ];
             break;
         case 'traffic':
             $result = [
                 'D' => 'Domestic (same country)', 'EU' => 'European Union', 'ED' => 'EU Excluding UK Domestic',
                 'I' => 'International (all non UK Domestic)', 'N' => 'Non EU (everything outside of EU)',
-                'UD' => 'UK Domestic'
+                'UD' => 'UK Domestic',
             ];
             break;
         case 'numeric':
@@ -476,7 +476,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             break;
         case 'monthsPrevious':
             for ($i = 0; $i <= 24; $i++) {
-                $result[] = date("F Y", strtotime(date('Y-m-01') . " -$i months"));
+                $result[] = date('F Y', strtotime(date('Y-m-01')." -$i months"));
             }
             $result = array_combine($result, $result);
             break;
@@ -490,7 +490,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             $result = [
                 'pre_transit' => 'Pre-Transit', 'received' => 'Received', 'in_transit' => 'In Transit',
                 'out_for_delivery' => 'Out For Delivery', 'delivered' => 'Delivered', 'on_hold' => 'On Hold',
-                'failure' => 'Failure', 'return_to_sender' => 'Return To Sender'
+                'failure' => 'Failure', 'return_to_sender' => 'Return To Sender',
             ];
             break;
         case 'jobType':
@@ -529,7 +529,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
                 'OSS' => 'OSS - Oversize Surcharge',
                 'RAS' => 'RAS - Remote Area Surcharge',
                 'RES' => 'RES - Residential Surcharge',
-                'RTN' => 'RTN - Return Goods Fee'
+                'RTN' => 'RTN - Return Goods Fee',
             ];
             break;
         case 'ifsChargeCodes':
@@ -593,10 +593,11 @@ function getTimes($interval = 1)
 {
     for ($hours = 0; $hours < 24; $hours++) {
         for ($mins = 0; $mins < 60; $mins += $interval) {
-            $time = str_pad($hours, 2, '0', STR_PAD_LEFT) . ':' . str_pad($mins, 2, '0', STR_PAD_LEFT);
+            $time = str_pad($hours, 2, '0', STR_PAD_LEFT).':'.str_pad($mins, 2, '0', STR_PAD_LEFT);
             $times[$time] = $time;
         }
     }
+
     return $times;
 }
 
@@ -635,7 +636,7 @@ function getDateFormat($format)
             return 'm-d-Y';
             break;
         default:
-            return null;
+            return;
             break;
     }
 }
@@ -646,13 +647,13 @@ function getDateFormat($format)
 
 function formatBytes($bytes, $precision = 2)
 {
-    $units = array('B', 'KB', 'MB', 'GB', 'TB');
+    $units = ['B', 'KB', 'MB', 'GB', 'TB'];
     $bytes = max($bytes, 0);
     $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
     $pow = min($pow, count($units) - 1);
     $bytes /= pow(1024, $pow);
 
-    return round($bytes, $precision) . ' ' . $units[$pow];
+    return round($bytes, $precision).' '.$units[$pow];
 }
 
 /*
@@ -670,6 +671,7 @@ function isJoined($query, $table)
             return true;
         }
     }
+
     return false;
 }
 
@@ -687,13 +689,14 @@ function getUkDomesticCountries()
  * Determines if a shipment is classified as UK domestic.
  *
  * @param type $recipientCountryCode
- * @return boolean
+ * @return bool
  */
 function isUkDomestic($recipientCountryCode)
 {
     if (in_array($recipientCountryCode, getUkDomesticCountries())) {
         return true;
     }
+
     return false;
 }
 
@@ -701,7 +704,7 @@ function isUkDomestic($recipientCountryCode)
  * Determines if a shipment is classified as domestic.
  *
  * @param type $recipientCountryCode
- * @return boolean
+ * @return bool
  */
 function isDomestic($senderCountryCode, $recipientCountryCode)
 {
@@ -723,18 +726,19 @@ function isDomestic($senderCountryCode, $recipientCountryCode)
  * Convert y/n to boolean.
  *
  * @param string $value
- * @return boolean
+ * @return bool
  */
 function yesNoToBoolean($value)
 {
     if (strtoupper($value) == 'Y') {
         return 1;
     }
+
     return 0;
 }
 
 /**
- * convert boolean to y/n
+ * convert boolean to y/n.
  *
  * @param mixed $value
  * @return string
@@ -744,6 +748,7 @@ function booleanToYn($value)
     if ($value) {
         return 'Y';
     }
+
     return 'N';
 }
 
@@ -751,7 +756,7 @@ function booleanToYn($value)
  * Accepts a string or array and attempts to guess
  * the encoding used. It then converts the string
  * or array to UTF-8 encoding and returns the same
- * datatype as received
+ * datatype as received.
  *
  * @param mixed $data (string or array)
  * @return mixed in UTF-8 encoding
@@ -776,25 +781,25 @@ function convertToUTF8($data)
 }
 
 /**
- * Calculate the checksum digit from provided number
+ * Calculate the checksum digit from provided number.
  *
  * @param $number
  * @return int
  */
 function mod10CheckDigit($number)
 {
-    $matrix = array(
-        array(0, 3, 1, 7, 5, 9, 8, 6, 4, 2),
-        array(7, 0, 9, 2, 1, 5, 4, 8, 6, 3),
-        array(4, 2, 0, 6, 8, 7, 1, 3, 5, 9),
-        array(1, 7, 5, 0, 9, 8, 3, 4, 2, 6),
-        array(6, 1, 2, 3, 0, 4, 5, 9, 7, 8),
-        array(3, 6, 7, 4, 2, 0, 9, 5, 8, 1),
-        array(5, 8, 6, 9, 7, 2, 0, 1, 3, 4),
-        array(8, 9, 4, 5, 3, 6, 2, 0, 1, 7),
-        array(9, 4, 3, 8, 6, 1, 7, 2, 0, 5),
-        array(2, 5, 8, 1, 4, 3, 6, 7, 9, 0),
-    );
+    $matrix = [
+        [0, 3, 1, 7, 5, 9, 8, 6, 4, 2],
+        [7, 0, 9, 2, 1, 5, 4, 8, 6, 3],
+        [4, 2, 0, 6, 8, 7, 1, 3, 5, 9],
+        [1, 7, 5, 0, 9, 8, 3, 4, 2, 6],
+        [6, 1, 2, 3, 0, 4, 5, 9, 7, 8],
+        [3, 6, 7, 4, 2, 0, 9, 5, 8, 1],
+        [5, 8, 6, 9, 7, 2, 0, 1, 3, 4],
+        [8, 9, 4, 5, 3, 6, 2, 0, 1, 7],
+        [9, 4, 3, 8, 6, 1, 7, 2, 0, 5],
+        [2, 5, 8, 1, 4, 3, 6, 7, 9, 0],
+    ];
 
     /* @var $interim int */
     $interim = 0;
@@ -808,18 +813,18 @@ function mod10CheckDigit($number)
 }
 
 /**
- * Calculate the modulo 11 check digit from provided number
+ * Calculate the modulo 11 check digit from provided number.
  *
  * @param $number
  * @return int
  */
 function mod11CheckDigit($number)
 {
-    $weight = array(8, 6, 4, 2, 3, 5, 9, 7);
+    $weight = [8, 6, 4, 2, 3, 5, 9, 7];
     $sum = 0;
 
     for ($i = 0; $i < strlen($number); $i++) {
-        $digit = (int)substr($number, $i, 1);
+        $digit = (int) substr($number, $i, 1);
         $sum += ($digit * $weight[$i]);
     }
 
@@ -854,14 +859,14 @@ function mod11CheckDigit($number)
 }
 
 /**
- * Checks the checksum digit from provided number
+ * Checks the checksum digit from provided number.
  *
  * @param $number
  * @return bool
  */
 function checkMod10($number)
 {
-    return (0 == mod10CheckDigit($number));
+    return 0 == mod10CheckDigit($number);
 }
 
 /**
@@ -891,7 +896,7 @@ function toCarbon($datetime)
 
     $newDatetime = Carbon::parse($datetime);
 
-    if (!$newDatetime) {
+    if (! $newDatetime) {
         $newDatetime = Carbon::now();
     }
 
@@ -928,7 +933,7 @@ function getTimezone($countryCode, $state = false, $city = false)
 {
     $countryCode = getCountryCode($countryCode);
 
-    if (!$countryCode) {
+    if (! $countryCode) {
         return 'Europe/London';
     }
 
@@ -942,7 +947,7 @@ function getTimezone($countryCode, $state = false, $city = false)
     }
 
     // Get timezone using country code
-    if (!$timezone) {
+    if (! $timezone) {
         $countryTimezones = DateTimeZone::listIdentifiers(DateTimeZone::PER_COUNTRY, $countryCode);
 
         if (count($countryTimezones) > 0) {
@@ -961,11 +966,11 @@ function getTimezone($countryCode, $state = false, $city = false)
 
 /**
  * Determine what VAT is liable and return the
- * amount and relevant vat_code
+ * amount and relevant vat_code.
  *
  * @param string $countryCode
  * @param decimal $valueOfGoods
- * @param boolean $vatExempt
+ * @param bool $vatExempt
  * @return string
  */
 function calcVat($countryCode, $valueOfGoods, $vatExempt)
@@ -982,7 +987,7 @@ function calcVat($countryCode, $valueOfGoods, $vatExempt)
             $vatDetails['vat_amount'] = 0;
             $vatDetails['vat_code'] = 'Z';
         } else {
-            $percent = (float)VatCodes::where('code', '1')->first()->percent;
+            $percent = (float) VatCodes::where('code', '1')->first()->percent;
 
             // Goods are not Exempt
             if ($valueOfGoods > 0) {
@@ -1004,10 +1009,9 @@ function calcVat($countryCode, $valueOfGoods, $vatExempt)
 }
 
 /**
- *
  * @param type $senderCountry_code
  * @param type $recipientCountryCode
- * @return boolean
+ * @return bool
  */
 function customsEntryRequired($senderCountryCode, $recipientCountryCode)
 {
@@ -1054,11 +1058,12 @@ function isWithinEu($senderCountryCode, $recipientCountryCode)
     if ($sender && $recipient) {
         return true;
     }
+
     return false;
 }
 
 /**
- * Identify direction of travel
+ * Identify direction of travel.
  *
  * @param type $shipment
  *
@@ -1069,21 +1074,21 @@ function identifyDirection($shipment)
     $customer_country_code = Company::find($shipment['company_id'])->country_code;
 
     // Shipper and Recipient in UK
-    if ($shipment['sender_country_code'] == $shipment['recipient_country_code'] && $shipment['sender_country_code'] == "GB") {
+    if ($shipment['sender_country_code'] == $shipment['recipient_country_code'] && $shipment['sender_country_code'] == 'GB') {
         if ((substr($shipment['sender_postcode'], 0, 2) == 'BT') && (substr(
             $shipment['recipient_postcode'],
             0,
             2
         ) == 'BT')) {
-            $direction = "internal";
+            $direction = 'internal';
         } elseif ((substr($shipment['sender_postcode'], 0, 2) == 'BT') && (substr(
             $shipment['recipient_postcode'],
             0,
             2
         ) != 'BT')) {
-            $direction = "export";
+            $direction = 'export';
         } else {
-            $direction = "import";
+            $direction = 'import';
         }
     } else {
         $direction = getDirection(
@@ -1097,7 +1102,6 @@ function identifyDirection($shipment)
 }
 
 /**
- *
  * @param type $homeCountry
  * @param type $fromCountry
  * @param type $toCountry
@@ -1106,18 +1110,17 @@ function identifyDirection($shipment)
 function getDirection($homeCountry, $fromCountry, $toCountry)
 {
     if ($fromCountry == $toCountry) {
-        return "internal";
+        return 'internal';
     } elseif ($homeCountry == $fromCountry) {
-        return "export";
+        return 'export';
     } elseif ($homeCountry == $toCountry) {
-        return "import";
+        return 'import';
     } else {
-        return "unknown";
+        return 'unknown';
     }
 }
 
 /**
- *
  * @param type $shipment
  * @return string
  */
@@ -1125,44 +1128,44 @@ function identifyDepartment($shipment)
 {
     $direction = identifyDirection($shipment);
 
-    if ($direction == "unknown") {
-        return "unknown";
+    if ($direction == 'unknown') {
+        return 'unknown';
     }
 
     switch ($shipment['mode']) {
 
-        case "courier":
+        case 'courier':
             if (isUkDomestic($shipment['sender_country_code']) && isUkDomestic($shipment['recipient_country_code'])) {
-                return ($direction == "import" ? "IFCUK" : "IFCUK");
+                return $direction == 'import' ? 'IFCUK' : 'IFCUK';
             } else {
-                return ($direction == "import" ? "IFCIM" : "IFCEX");
+                return $direction == 'import' ? 'IFCIM' : 'IFCEX';
             }
             break;
 
-        case "seafreight":
-            return ($direction == "import" ? "IFFSI" : "IFFSX");
+        case 'seafreight':
+            return $direction == 'import' ? 'IFFSI' : 'IFFSX';
             break;
 
-        case "airfreight":
-            return ($direction == "import" ? "IFFAI" : "IFFAX");
+        case 'airfreight':
+            return $direction == 'import' ? 'IFFAI' : 'IFFAX';
             break;
 
-        case "roadfreight":
-            if ($direction == "import") {
-                $department = "IFFRI";
+        case 'roadfreight':
+            if ($direction == 'import') {
+                $department = 'IFFRI';
             }
 
-            if ($direction == "export") {
-                $department = "IFFRX";
+            if ($direction == 'export') {
+                $department = 'IFFRX';
             }
 
-            if ($direction == "internal") {
-                $department = "IFFRD";
+            if ($direction == 'internal') {
+                $department = 'IFFRD';
             }
             break;
 
         default:
-            $department = "unknown";
+            $department = 'unknown';
             break;
     }
 
@@ -1180,10 +1183,9 @@ function getValueFromJson($json, $key)
 {
     $array = json_decode($json, true);
 
-    if (!empty($array[$key])) {
+    if (! empty($array[$key])) {
         return $array[$key];
     }
-    return null;
 }
 
 /**
@@ -1236,7 +1238,7 @@ function getProgressBarColour($statusCode)
 
 /**
  * Get Next available number in a sequence,
- * locking records to prevent duplication
+ * locking records to prevent duplication.
  *
  * @param type $sequenceType
  * @return Next Available number
@@ -1281,9 +1283,9 @@ function writeCsv($path, $data, $mode = 'w', $delimiter = ',')
 
     if (file_exists($path)) {
         chmod($path, 777);
+
         return $path;
     }
-    return null;
 }
 
 /**
@@ -1301,13 +1303,12 @@ function getExcelColumNames($numberOfColumns = 52)
             $prefix = 'A';
         }
 
-        $r = $prefix . chr($n % 26 + 0x41);
+        $r = $prefix.chr($n % 26 + 0x41);
         $columns[] = $r;
     }
 
     return $columns;
 }
-
 
 // *********************************************************************************************************************************************************** //
 // **************************************************************** LEGACY CONVERSION FUNCTIONS ************************************************************ //
@@ -1354,6 +1355,7 @@ function getLegacyTestingStatus($testing)
     if ($testing) {
         return 'T';
     }
+
     return 'L';
 }
 
@@ -1471,7 +1473,7 @@ function convertLegacyDepartment($consignmentNumber, $senderCountry, $recipientC
         return 7;
     }
 
-    if (!isUkDomestic($senderCountry) && isUkDomestic($recipientCountry)) {
+    if (! isUkDomestic($senderCountry) && isUkDomestic($recipientCountry)) {
         return 2;
     }
 
@@ -1487,6 +1489,7 @@ function convertLegacyRoute($route, $depot)
     if ($route == 'BFS') {
         return 2;
     }
+
     return 1;
 }
 
@@ -1553,7 +1556,7 @@ function convertLegacyService($service, $gateway)
                 case 'IPU':
                     return '11';
                 case '65':
-                    if ($gateway == "IGNORE") {
+                    if ($gateway == 'IGNORE') {
                         return '16'; // UK24
                     } else {
                         return '11'; // IP
@@ -1624,8 +1627,9 @@ function convertLegacyTrackingCarrier($depot)
 function convertLegacyShipDate($createdAt, $recieved, $date, $time)
 {
     if ($recieved == 'Y' && $date) {
-        return gmtToCarbonUtc($date . ' ' . $time);
+        return gmtToCarbonUtc($date.' '.$time);
     }
+
     return gmtToCarbonUtc($createdAt);
 }
 
@@ -1673,7 +1677,7 @@ function legacyGatewayToCarrierId($gateway)
 }
 
 /**
- * Get manifest id
+ * Get manifest id.
  *
  * @param type $manifestNumber
  * @param type $domestic
@@ -1697,12 +1701,10 @@ function convertLegacyManifestNumber($manifestNumber, $domestic)
     if ($manifest) {
         return $manifest->id;
     }
-
-    return null;
 }
 
 /**
- * Consolidate charges
+ * Consolidate charges.
  *
  * @param type $charges
  * @return string
@@ -1713,7 +1715,7 @@ function consolidateCharges($charges)
         $code = $charge['code'];
 
         if ($code == 'DISC') {
-            $code = "FRT";
+            $code = 'FRT';
         } else {
             $sumCharges[$code]['description'] = $charge['description'];
         }
@@ -1727,7 +1729,7 @@ function consolidateCharges($charges)
 
     $charges = null;
 
-    if (!empty($sumCharges)) {
+    if (! empty($sumCharges)) {
         foreach ($sumCharges as $code => $charge) {
             $charges[] = ['code' => $code, 'description' => $charge['description'], 'value' => $charge['value']];
         }
@@ -1746,8 +1748,8 @@ function fixShipmentCase($shipment)
 {
     // UPPERCASE (Note: important no spaces in list)
     $fields = 'bill_shipping_account,bill_tax_duty_account,country_of_destination,currency_code,sender_country_code,'
-        . 'sender_postcode,recipient_postcode,other_country_code,recipient_country_code,other_postcode,'
-        . 'customs_value_currency_code';
+        .'sender_postcode,recipient_postcode,other_country_code,recipient_country_code,other_postcode,'
+        .'customs_value_currency_code';
     $changeArray = explode(',', $fields);
     foreach ($changeArray as $field) {
         if (isset($shipment[$field])) {
@@ -1757,7 +1759,7 @@ function fixShipmentCase($shipment)
 
     // LOWERCASE (Note: important no spaces in list)
     $fields = 'carrier_code,service_code,bill_shipping,bill_tax_duty,ship_reason,weight_uom,dimension_uom,'
-        . 'recipient_type,other_type,terms_of_sale,commodity_uom,dims_uom';
+        .'recipient_type,other_type,terms_of_sale,commodity_uom,dims_uom';
 
     $changeArray = explode(',', $fields);
     foreach ($changeArray as $field) {
@@ -1771,7 +1773,7 @@ function fixShipmentCase($shipment)
 
 function calcVolume($length, $width, $height, $divisor = 5000)
 {
-    if (!is_numeric($divisor)) {
+    if (! is_numeric($divisor)) {
         $divisor = 5000;
     }
 
@@ -1782,26 +1784,24 @@ function whoPaysDuty($terms)
 {
     $terms = strtoupper($terms);
     $whoPaysDuty = [
-        "EXW" => "recipient",
-        "FCA" => "recipient",
-        "CPT" => "recipient",
-        "DDP" => "sender",
-        "DAP" => "recipient",
-        "DAT" => "recipient",
-        "CIP" => "recipient"
+        'EXW' => 'recipient',
+        'FCA' => 'recipient',
+        'CPT' => 'recipient',
+        'DDP' => 'sender',
+        'DAP' => 'recipient',
+        'DAT' => 'recipient',
+        'CIP' => 'recipient',
     ];
 
     if (array_key_exists($terms, $whoPaysDuty)) {
         return $whoPaysDuty[$terms];
     }
-
-    return null;
 }
 
 function calcDiscPercentage($currentVal, $uploadedVal)
 {
     $discount = 0;
-    if ($currentVal <> 0) {
+    if ($currentVal != 0) {
         $discount = (($currentVal - $uploadedVal) / $currentVal) * 100;
     }
 
@@ -1814,7 +1814,7 @@ function calcDiscPercentage($currentVal, $uploadedVal)
 }
 
 /**
- * Log changes to Rates Tables
+ * Log changes to Rates Tables.
  *
  * @param type $userId
  * @param type $companyId
@@ -1840,7 +1840,6 @@ function logRateChange($userId, $companyId, $serviceId, $rateId, $directory = ''
 }
 
 /**
- *
  * @param type $sql
  * @param type $params
  * @return SQL_String
@@ -1849,7 +1848,7 @@ function rawToSql($sql, $params = [])
 {
     $quote = '"';
     foreach ($params as $key => $value) {
-        $sql = str_ireplace(":$key", $quote . $value . $quote, $sql);
+        $sql = str_ireplace(":$key", $quote.$value.$quote, $sql);
     }
 
     return $sql;
@@ -1876,5 +1875,6 @@ function intToDay($day)
     if (is_numeric($day) && $day >= 0 && $day <= 6) {
         return jddayofweek($day - 1, 1);
     }
+
     return 'Unknown';
 }

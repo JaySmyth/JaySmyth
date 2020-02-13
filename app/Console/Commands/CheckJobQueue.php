@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Storage;
 
 class CheckJobQueue extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -54,7 +53,7 @@ class CheckJobQueue extends Command
     /**
      * Number of times an alarm has been raised
      * Starts at zero so first alarm does not
-     * send an email
+     * send an email.
      *
      * @var string
      */
@@ -81,7 +80,6 @@ class CheckJobQueue extends Command
      */
     public function handle()
     {
-
         $this->queueSize = DB::table('jobs')->count();
         if ($this->queueSize > $this->maxQueueSize) {
 
@@ -101,9 +99,9 @@ class CheckJobQueue extends Command
     }
 
     /**
-     * Raise the alarm by sending emails when appropriate
+     * Raise the alarm by sending emails when appropriate.
      */
-    function raiseAlarm()
+    public function raiseAlarm()
     {
 
         /*
@@ -127,17 +125,17 @@ class CheckJobQueue extends Command
         }
     }
 
-    function createEmail($emailType)
+    public function createEmail($emailType)
     {
 
         // Set email subject
         $subject = "Possible AWS Job Queue Failure - $this->queueSize Jobs - ";
-        if ($emailType == "reminder") {
+        if ($emailType == 'reminder') {
             $subject = "Reminder - $subject";
         }
 
         if ($this->loopCount <= $this->maxEmails) {
-            $subject .= "Msg " . $this->loopCount;
+            $subject .= 'Msg '.$this->loopCount;
         }
 
         // Build Message text
@@ -148,7 +146,6 @@ class CheckJobQueue extends Command
 
         // If the 5th time or greater then attempt to restart the Queue
         if ($this->loopCount >= $this->maxEmails) {
-
             $message .= "******************************************************************\n";
             $message .= "  The system will now attempt to automatically restart the Queue\n";
             $message .= "******************************************************************\n\n";
@@ -162,12 +159,11 @@ class CheckJobQueue extends Command
 
             if (is_array($resp)) {
                 foreach ($resp as $line) {
-                    $message .= $line . "\n";
+                    $message .= $line."\n";
                 }
             }
         }
 
         mail($this->contactEmail, $subject, $message);
     }
-
 }

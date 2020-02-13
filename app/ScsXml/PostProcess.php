@@ -9,34 +9,32 @@ namespace App\ScsXml;
  */
 
 /**
- * Description of PostProcess
+ * Description of PostProcess.
  *
  * @author gmcbroom
  */
-class PostProcess {
-
+class PostProcess
+{
     private $string;
 
     /**
-     * 
      * @param type $string
      * @return PostProcess
      */
-    public function setString($string) {
-
+    public function setString($string)
+    {
         $this->string = $string;
 
         return $this;
     }
 
-    public function getString() {
-
+    public function getString()
+    {
         return $this->string;
     }
 
-    public function toXML() {
-
-        return '<PostProcess>' . $this->string . '</PostProcess>';
+    public function toXML()
+    {
+        return '<PostProcess>'.$this->string.'</PostProcess>';
     }
-
 }

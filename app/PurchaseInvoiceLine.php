@@ -2,9 +2,9 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Shipment;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 class PurchaseInvoiceLine extends Model
 {
@@ -41,12 +41,12 @@ class PurchaseInvoiceLine extends Model
     public function shipment()
     {
         return $this->belongsTo(Shipment::class)->select('id', 'company_id', 'carrier_tracking_number', 'scs_job_number')->with(['company' => function ($query) {
-                        $query->select('id', 'company_name');
-                    }]);
+            $query->select('id', 'company_name');
+        }]);
     }
 
     /**
-     * A purchase invoice line has many charges
+     * A purchase invoice line has many charges.
      *
      * @return
      */
@@ -87,7 +87,7 @@ class PurchaseInvoiceLine extends Model
     {
         $total = 0;
 
-        if (!$this->scsJob) {
+        if (! $this->scsJob) {
             return $total;
         }
 
@@ -99,10 +99,11 @@ class PurchaseInvoiceLine extends Model
         }
 
         foreach ($this->scsJob->costs as $cost) {
-            if (!in_array($cost->charge_type, $ignore)) {
+            if (! in_array($cost->charge_type, $ignore)) {
                 $total += $cost->cost_rate;
             }
         }
+
         return round($total, 2);
     }
 
@@ -111,7 +112,7 @@ class PurchaseInvoiceLine extends Model
      */
     public function getTotalFreightIfsAttribute()
     {
-        if (!$this->scsJob) {
+        if (! $this->scsJob) {
             return 0;
         }
 
@@ -123,7 +124,7 @@ class PurchaseInvoiceLine extends Model
      */
     public function getTotalFuelSurchargeIfsAttribute()
     {
-        if (!$this->scsJob) {
+        if (! $this->scsJob) {
             return 0;
         }
 
@@ -135,7 +136,7 @@ class PurchaseInvoiceLine extends Model
      */
     public function getTotalMiscellaneousIfsAttribute()
     {
-        if (!$this->scsJob) {
+        if (! $this->scsJob) {
             return 0;
         }
 
@@ -149,7 +150,7 @@ class PurchaseInvoiceLine extends Model
     {
         $total = 0;
 
-        if (!$this->scsJob) {
+        if (! $this->scsJob) {
             return $total;
         }
 
@@ -161,10 +162,11 @@ class PurchaseInvoiceLine extends Model
         }
 
         foreach ($this->scsJob->costs as $cost) {
-            if (!in_array($cost->charge_type, $ignore)) {
+            if (! in_array($cost->charge_type, $ignore)) {
                 $total += $cost->cost_rate;
             }
         }
+
         return round($total, 2);
     }
 
@@ -183,8 +185,7 @@ class PurchaseInvoiceLine extends Model
     }
 
     /**
-     * Get the total FREIGHT charge from the CARRIER (sum of FRT - discounts)
-     *
+     * Get the total FREIGHT charge from the CARRIER (sum of FRT - discounts).
      */
     public function getTotalFreightAttribute()
     {
@@ -194,8 +195,7 @@ class PurchaseInvoiceLine extends Model
     }
 
     /**
-     * Get the total FUEL SURCHARGE from the CARRIER
-     *
+     * Get the total FUEL SURCHARGE from the CARRIER.
      */
     public function getTotalFuelSurchargeAttribute()
     {
@@ -203,8 +203,7 @@ class PurchaseInvoiceLine extends Model
     }
 
     /**
-     * Get the total MISCELLANEOUS charges from the CARRIER
-     *
+     * Get the total MISCELLANEOUS charges from the CARRIER.
      */
     public function getTotalMiscellaneousAttribute()
     {
@@ -212,17 +211,17 @@ class PurchaseInvoiceLine extends Model
     }
 
     /**
-     * Get the total of ALL OTHER charges from the CARRIER (all charges excluding FRT and FSC)
-     *
+     * Get the total of ALL OTHER charges from the CARRIER (all charges excluding FRT and FSC).
      */
     public function getTotalOtherChargesAttribute()
     {
         $total = 0;
         foreach ($this->charges as $charge) {
-            if (!in_array($charge->scs_charge_code, ['FRT', 'FSC']) && !$charge->hasDescription('DISCOUNT') && !$charge->hasDescription('VAT')) {
+            if (! in_array($charge->scs_charge_code, ['FRT', 'FSC']) && ! $charge->hasDescription('DISCOUNT') && ! $charge->hasDescription('VAT')) {
                 $total += $charge->billed_amount;
             }
         }
+
         return round($total, 2);
     }
 
@@ -248,6 +247,7 @@ class PurchaseInvoiceLine extends Model
                 }
             }
         }
+
         return round($total, 2);
     }
 
@@ -264,6 +264,7 @@ class PurchaseInvoiceLine extends Model
                 $total += abs($charge->billed_amount);
             }
         }
+
         return round($total, 2);
     }
 
@@ -288,20 +289,21 @@ class PurchaseInvoiceLine extends Model
     /**
      * True/false if carrier has charged more FRT than IFS have allowed.
      *
-     * @return boolean
+     * @return bool
      */
     public function getFreightOverchargeAttribute()
     {
         if ($this->total_freight > $this->total_freight_ifs) {
             return true;
         }
+
         return false;
     }
 
     /**
      * True/false if carrier has charged more FSC than IFS have allowed.
      *
-     * @return boolean
+     * @return bool
      */
     public function getFuelSurchargeOverchargeAttribute()
     {
@@ -343,13 +345,14 @@ class PurchaseInvoiceLine extends Model
     /**
      * True/false if carrier has charged more "other" than IFS have allowed.
      *
-     * @return boolean
+     * @return bool
      */
     public function getOtherChargesOverchargeAttribute()
     {
         if ($this->total_other_charges > $this->total_other_charges_ifs) {
             return true;
         }
+
         return false;
     }
 
@@ -372,7 +375,7 @@ class PurchaseInvoiceLine extends Model
     }
 
     /**
-     * Return the difference
+     * Return the difference.
      *
      * @return type
      */
@@ -382,16 +385,16 @@ class PurchaseInvoiceLine extends Model
     }
 
     /**
-     * Return the difference
+     * Return the difference.
      *
      * @return type
      */
     public function getDifferenceFormattedAttribute()
     {
         if ($this->total > $this->total_ifs) {
-            return '-' . number_format($this->difference, 2);
+            return '-'.number_format($this->difference, 2);
         } elseif ($this->total_ifs > $this->total) {
-            return '+' . number_format($this->difference, 2);
+            return '+'.number_format($this->difference, 2);
         } else {
             return number_format($this->difference, 2);
         }
@@ -420,7 +423,7 @@ class PurchaseInvoiceLine extends Model
     }
 
     /**
-     * Determine the line "type" - domestic / import / export
+     * Determine the line "type" - domestic / import / export.
      *
      * @return string
      */
@@ -447,7 +450,7 @@ class PurchaseInvoiceLine extends Model
         $service = $this->purchaseInvoice->carrier->services->where('carrier_code', $this->carrier_service)->first();
 
         if ($service) {
-            return $service->carrier_name . ' (' . $this->carrier_service . ')';
+            return $service->carrier_name.' ('.$this->carrier_service.')';
         }
 
         return $this->carrier_service;
@@ -463,7 +466,7 @@ class PurchaseInvoiceLine extends Model
         $packagingType = $this->purchaseInvoice->carrier->packagingTypes->where('code', $this->carrier_packaging_code)->first();
 
         if ($packagingType) {
-            return $packagingType->rate_code . ' (' . $this->carrier_packaging_code . ')';
+            return $packagingType->rate_code.' ('.$this->carrier_packaging_code.')';
         }
 
         return $this->carrier_packaging_code;
@@ -490,8 +493,7 @@ class PurchaseInvoiceLine extends Model
     public function scopeHasCarrier($query, $carrierId)
     {
         if (is_numeric($carrierId)) {
-
-            if (!isJoined($query, 'purchase_invoices')) {
+            if (! isJoined($query, 'purchase_invoices')) {
                 $query->join('purchase_invoices', 'purchase_invoice_lines.purchase_invoice_id', '=', 'purchase_invoices.id');
             }
 
@@ -506,11 +508,11 @@ class PurchaseInvoiceLine extends Model
      */
     public function scopeShipDateBetween($query, $dateFrom, $dateTo)
     {
-        if (!$dateFrom && $dateTo) {
+        if (! $dateFrom && $dateTo) {
             return $query->where('ship_date', '<=', Carbon::parse($dateTo)->endOfDay());
         }
 
-        if ($dateFrom && !$dateTo) {
+        if ($dateFrom && ! $dateTo) {
             return $query->where('ship_date', '>=', Carbon::parse($dateFrom)->startOfDay());
         }
 
@@ -526,17 +528,16 @@ class PurchaseInvoiceLine extends Model
      */
     public function scopeInvoiceDateBetween($query, $dateFrom, $dateTo)
     {
-
-        if (!isJoined($query, 'purchase_invoices')) {
+        if (! isJoined($query, 'purchase_invoices')) {
             $query->select('purchase_invoice_lines.*')
                     ->join('purchase_invoices', 'purchase_invoice_lines.purchase_invoice_id', '=', 'purchase_invoices.id');
         }
 
-        if (!$dateFrom && $dateTo) {
+        if (! $dateFrom && $dateTo) {
             return $query->where('purchase_invoices.date', '<=', Carbon::parse($dateTo)->endOfDay());
         }
 
-        if ($dateFrom && !$dateTo) {
+        if ($dateFrom && ! $dateTo) {
             return $query->where('purchase_invoices.date', '>=', Carbon::parse($dateFrom)->startOfDay());
         }
 
@@ -544,5 +545,4 @@ class PurchaseInvoiceLine extends Model
             return $query->whereBetween('purchase_invoices.date', [Carbon::parse($dateFrom)->startOfDay(), Carbon::parse($dateTo)->endOfDay()]);
         }
     }
-
 }

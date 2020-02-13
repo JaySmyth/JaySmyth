@@ -3,19 +3,17 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class DimsExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
-
     public function __construct($shipments)
     {
         $this->shipments = $shipments;
     }
 
     /**
-     * 
      * @return array
      */
     public function headings(): array
@@ -34,7 +32,7 @@ class DimsExport implements FromCollection, WithHeadings, ShouldAutoSize
             'Package Length',
             'Package Width',
             'Package Height',
-            'Package Weight'
+            'Package Weight',
         ];
     }
 
@@ -60,16 +58,15 @@ class DimsExport implements FromCollection, WithHeadings, ShouldAutoSize
                     'Package Length' => $package->length,
                     'Package Width' => $package->width,
                     'Package Height' => $package->height,
-                    'Package Weight' => $package->weight . strtoupper($shipment->weight_uom)
+                    'Package Weight' => $package->weight.strtoupper($shipment->weight_uom),
                 ]);
 
-                $collection->push($row);
+        $collection->push($row);
 
-            endforeach;
+        endforeach;
 
         endforeach;
 
         return $collection;
     }
-
 }

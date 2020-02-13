@@ -4,14 +4,13 @@ namespace App\Jobs;
 
 use App\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 
 class RequestPurchaseInvoiceCopyDocs implements ShouldQueue
 {
-
     use InteractsWithQueue,
         Queueable,
         SerializesModels;
@@ -38,7 +37,7 @@ class RequestPurchaseInvoiceCopyDocs implements ShouldQueue
     protected $upsContact;
 
     /*
-     * IFS reply address. 
+     * IFS reply address.
      */
     protected $importsDistributionList;
 
@@ -80,8 +79,8 @@ class RequestPurchaseInvoiceCopyDocs implements ShouldQueue
 
     /**
      * Send FedEx email.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     private function sendFedexEmails()
     {
@@ -100,8 +99,8 @@ class RequestPurchaseInvoiceCopyDocs implements ShouldQueue
 
     /**
      * Send UPS email.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     private function sendUpsEmails()
     {
@@ -111,5 +110,4 @@ class RequestPurchaseInvoiceCopyDocs implements ShouldQueue
             Mail::to($this->upsContact)->cc($this->user->email)->send(new \App\Mail\CopyDocs($upsInvoices));
         }
     }
-
 }

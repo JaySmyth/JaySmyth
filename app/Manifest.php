@@ -2,13 +2,12 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Service;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 class Manifest extends Model
 {
-
     /**
      * The attributes that are mass assignable.
      *
@@ -44,7 +43,7 @@ class Manifest extends Model
     }
 
     /**
-     * A manifest belongs to a mode of transport (courier, air, etc.)
+     * A manifest belongs to a mode of transport (courier, air, etc.).
      *
      * @return
      */
@@ -64,7 +63,7 @@ class Manifest extends Model
     }
 
     /**
-     * A manifest has one carrier
+     * A manifest has one carrier.
      *
      * @return
      */
@@ -97,7 +96,7 @@ class Manifest extends Model
     /**
      * Returns the number of different services that are found within the manifest.
      *
-     * @return integer
+     * @return int
      */
     public function getServicesAttribute()
     {
@@ -122,7 +121,7 @@ class Manifest extends Model
     public function scopeFilter($query, $filter)
     {
         if ($filter) {
-            return $query->where('number', 'LIKE', '%' . $filter . '%');
+            return $query->where('number', 'LIKE', '%'.$filter.'%');
         }
     }
 
@@ -151,11 +150,11 @@ class Manifest extends Model
      */
     public function scopeDateBetween($query, $dateFrom, $dateTo)
     {
-        if (!$dateFrom && $dateTo) {
+        if (! $dateFrom && $dateTo) {
             return $query->where('created_at', '<', Carbon::parse($dateTo)->endOfDay());
         }
 
-        if ($dateFrom && !$dateTo) {
+        if ($dateFrom && ! $dateTo) {
             return $query->where('created_at', '>', Carbon::parse($dateFrom)->startOfDay());
         }
 
@@ -199,5 +198,4 @@ class Manifest extends Model
             return $query->where('manifest_profile_id', $profileId);
         }
     }
-
 }

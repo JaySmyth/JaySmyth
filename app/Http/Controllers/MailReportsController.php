@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\MailReport;
 use App\Http\Requests\MailReportRecipientRequest;
+use App\MailReport;
+use Illuminate\Http\Request;
 
 class MailReportsController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -21,7 +20,7 @@ class MailReportsController extends Controller
 
     /**
      * List mail reports.
-     * 
+     *
      * @param Request $request
      * @return type
      */
@@ -37,8 +36,8 @@ class MailReportsController extends Controller
     /**
      * Displays a user record.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function show($id)
     {
@@ -50,10 +49,10 @@ class MailReportsController extends Controller
     }
 
     /**
-     * Displays add recipient form.     
-     * 
+     * Displays add recipient form.
+     *
      * @param int $id
-     * @return 
+     * @return
      */
     public function addRecipient($id)
     {
@@ -65,8 +64,8 @@ class MailReportsController extends Controller
     }
 
     /**
-     * Store recipient
-     * 
+     * Store recipient.
+     *
      * @param Request $request
      * @param type $id
      * @return type
@@ -85,8 +84,8 @@ class MailReportsController extends Controller
     /**
      * Displays edit recipient form.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function editRecipient($id, $recipientId)
     {
@@ -100,8 +99,8 @@ class MailReportsController extends Controller
     /**
      * Updates an existing recipient.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function updateRecipient(MailReportRecipientRequest $request, $id, $recipientId)
     {
@@ -113,7 +112,6 @@ class MailReportsController extends Controller
 
         flash()->success('Updated!', 'Recipient updated successfully.');
 
-        return redirect('mail-reports/' . $mailReport->id);
+        return redirect('mail-reports/'.$mailReport->id);
     }
-
 }

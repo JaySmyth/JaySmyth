@@ -48,8 +48,6 @@ class Driver extends Model
     }
 
     /**
-     * 
-     * 
      * @return int
      */
     public function getOpenManifestCountAttribute()
@@ -67,5 +65,4 @@ class Driver extends Model
     {
         $this->attributes['name'] = ucwords($value);
     }
-
 }

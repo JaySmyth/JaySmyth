@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\State;
+use Illuminate\Http\Request;
 
 class StatesController extends Controller
 {
@@ -42,5 +42,4 @@ class StatesController extends Controller
             return State::where('country_code', $request->country_code)->orderBy('name')->pluck('name', 'code');
         }
     }
-
 }

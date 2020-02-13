@@ -2,14 +2,13 @@
 
 namespace App\Console\Commands\PurchaseInvoices;
 
-use Illuminate\Console\Command;
 use App\PurchaseInvoice;
-use App\PurchaseInvoiceLine;
 use App\PurchaseInvoiceCharge;
+use App\PurchaseInvoiceLine;
+use Illuminate\Console\Command;
 
 class ImportPrimaryFreightPurchaseInvoices extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -53,7 +52,6 @@ class ImportPrimaryFreightPurchaseInvoices extends Command
     protected $purchaseInvoiceLine;
 
     /**
-     *
      * @var type
      */
     protected $row;
@@ -73,7 +71,7 @@ class ImportPrimaryFreightPurchaseInvoices extends Command
         /*
          * Order of fields in PF file
          */
-        $this->fields = array('Location', 'StartDate', 'EndDate', 'textbox45', 'Name', 'Date', 'ShipDate', 'TransactionID', 'ConsignmentNumber', 'TrackingNumber', 'QtyIn', 'QtyOut', 'Handling', 'Textbox80', 'Materials', 'Storage', 'textbox69', 'Special', 'FreightPP', 'Freight3', 'Total', 'Notes', 'textbox38', 'textbox39', 'textbox40', 'textbox41', 'Textbox83', 'textbox42', 'textbox43', 'textbox71', 'textbox65', 'textbox44', 'textbox59', 'textbox60', 'textbox13', 'textbox15', 'textbox17', 'Textbox84', 'textbox19', 'textbox21', 'textbox72', 'textbox66', 'textbox23', 'textbox25', 'textbox27');
+        $this->fields = ['Location', 'StartDate', 'EndDate', 'textbox45', 'Name', 'Date', 'ShipDate', 'TransactionID', 'ConsignmentNumber', 'TrackingNumber', 'QtyIn', 'QtyOut', 'Handling', 'Textbox80', 'Materials', 'Storage', 'textbox69', 'Special', 'FreightPP', 'Freight3', 'Total', 'Notes', 'textbox38', 'textbox39', 'textbox40', 'textbox41', 'Textbox83', 'textbox42', 'textbox43', 'textbox71', 'textbox65', 'textbox44', 'textbox59', 'textbox60', 'textbox13', 'textbox15', 'textbox17', 'Textbox84', 'textbox19', 'textbox21', 'textbox72', 'textbox66', 'textbox23', 'textbox25', 'textbox27'];
     }
 
     /**
@@ -83,11 +81,11 @@ class ImportPrimaryFreightPurchaseInvoices extends Command
      */
     public function handle()
     {
-        $this->info('Checking ' . $this->sftpDirectory . ' for files to process');
+        $this->info('Checking '.$this->sftpDirectory.' for files to process');
 
         if ($handle = opendir($this->sftpDirectory)) {
             while (false !== ($file = readdir($handle))) {
-                if (!is_dir($file) && $file != $this->archiveDirectory) {
+                if (! is_dir($file) && $file != $this->archiveDirectory) {
                     $this->processFile($file);
                     $this->archiveFile($file);
                 }
@@ -113,6 +111,7 @@ class ImportPrimaryFreightPurchaseInvoices extends Command
             $row[$field] = (isset($data[$i])) ? trim($data[$i]) : null;
             $i++;
         }
+
         return $row;
     }
 
@@ -130,20 +129,17 @@ class ImportPrimaryFreightPurchaseInvoices extends Command
         $rowNumber = 1;
         $total = 0;
 
-        if (($handle = fopen($this->sftpDirectory . $file, 'r')) !== false) {
-
+        if (($handle = fopen($this->sftpDirectory.$file, 'r')) !== false) {
             while (($data = fgetcsv($handle, 2000, ',')) !== false) {
-
                 if ($rowNumber >= 2) {
-
                     $row = $this->assignFieldNames($data);
 
                     $rowTotal = preg_replace('/[^0-9,"."]/', '', $row['Total']);
-                    
-                    if(is_numeric($rowTotal) && $rowTotal > 0){
+
+                    if (is_numeric($rowTotal) && $rowTotal > 0) {
                         $total += $rowTotal;
                     }
-                                        
+
                     if ($rowTotal > 0) {
                         // Lookup shipment
                         $shipment = \App\Shipment::whereConsignmentNumber($row['ConsignmentNumber'])->first();
@@ -199,7 +195,7 @@ class ImportPrimaryFreightPurchaseInvoices extends Command
                                     'vat' => 0,
                                     'vat_rate' => 0,
                                     'purchase_invoice_id' => $this->purchaseInvoice->id,
-                                    'purchase_invoice_line_id' => $purchaseInvoiceLine->id
+                                    'purchase_invoice_line_id' => $purchaseInvoiceLine->id,
                         ]);
 
                         $purchaseInvoiceCharge->setCarrierChargeId();
@@ -231,12 +227,13 @@ class ImportPrimaryFreightPurchaseInvoices extends Command
      */
     private function createPurchaseInvoice()
     {
-        $invoiceNumber = 'PF' . time();
+        $invoiceNumber = 'PF'.time();
 
         $this->purchaseInvoice = PurchaseInvoice::whereInvoiceNumber($invoiceNumber)->whereCarrierId(12)->first();
 
         if ($this->purchaseInvoice) {
             $this->error("Invoice $invoiceNumber skipped (already exists)");
+
             return false;
         }
 
@@ -250,7 +247,7 @@ class ImportPrimaryFreightPurchaseInvoices extends Command
                     'currency_code' => 'USD',
                     'type' => 'F',
                     'carrier_id' => 12,
-                    'date' => time()
+                    'date' => time(),
         ]);
 
         return true;
@@ -260,25 +257,24 @@ class ImportPrimaryFreightPurchaseInvoices extends Command
      * Move file to archive directory.
      *
      * @param string $file
-     * @return boolean
+     * @return bool
      */
-    function archiveFile($file)
+    public function archiveFile($file)
     {
         $this->info("Archiving file $file");
 
-        $originalFile = $this->sftpDirectory . $file;
-        $archiveFile = $this->sftpDirectory . $this->archiveDirectory . '/' . $file;
+        $originalFile = $this->sftpDirectory.$file;
+        $archiveFile = $this->sftpDirectory.$this->archiveDirectory.'/'.$file;
 
         $this->info("Moving $originalFile to archive");
 
-        if (!file_exists($originalFile)) {
+        if (! file_exists($originalFile)) {
             $this->error("Problem archiving $file  - file not found");
         }
 
         if (copy($originalFile, $archiveFile)) {
             unlink($originalFile);
-            $this->info("File archived successfully");
+            $this->info('File archived successfully');
         }
     }
-
 }

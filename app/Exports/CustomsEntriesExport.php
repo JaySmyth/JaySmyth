@@ -3,8 +3,8 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class CustomsEntriesExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
@@ -18,7 +18,6 @@ class CustomsEntriesExport implements FromCollection, WithHeadings, ShouldAutoSi
     }
 
     /**
-     *
      * @return array
      */
     public function headings(): array
@@ -42,7 +41,7 @@ class CustomsEntriesExport implements FromCollection, WithHeadings, ShouldAutoSi
                 'VAT (GBP)',
                 'Vendor',
                 'CPC',
-                'Country Of Origin'
+                'Country Of Origin',
             ];
         } else {
             return [
@@ -57,7 +56,6 @@ class CustomsEntriesExport implements FromCollection, WithHeadings, ShouldAutoSi
     }
 
     /**
-     *
      * @return type
      */
     public function collection()
@@ -96,7 +94,7 @@ class CustomsEntriesExport implements FromCollection, WithHeadings, ShouldAutoSi
                 'VAT (GBP)' => $entry->vat,
                 'Vendor' => $vendor,
                 'CPC' => $cpc,
-                'Country Of Origin' => $entry->country_of_origin
+                'Country Of Origin' => $entry->country_of_origin,
             ]);
         } else {
             $row = collect([
@@ -105,7 +103,7 @@ class CustomsEntriesExport implements FromCollection, WithHeadings, ShouldAutoSi
                     'Customer' => $entry->company->company_name,
                     'Reference' => $entry->reference,
                     'Addit. Reference' => $entry->additional_reference,
-                    'Consignment Number' => $entry->consignment_number
+                    'Consignment Number' => $entry->consignment_number,
                 ]);
         }
 

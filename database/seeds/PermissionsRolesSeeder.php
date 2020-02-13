@@ -4,7 +4,6 @@ use Illuminate\Database\Seeder;
 
 class PermissionsRolesSeeder extends Seeder
 {
-
     /**
      * Run the database seeds.
      *
@@ -12,7 +11,6 @@ class PermissionsRolesSeeder extends Seeder
      */
     public function run()
     {
-
         DB::table('roles')->insert([
             // Customer Roles
             ['name' => 'cust', 'label' => 'Customer', 'description' => 'Standard user access for customers.', 'primary' => 1, 'ifs_only' => 0],
@@ -25,13 +23,12 @@ class PermissionsRolesSeeder extends Seeder
             ['name' => 'ifss', 'label' => 'IFS Sales', 'description' => 'For IFS salespersons. Allows access to their specific customers and sales reports.', 'primary' => 1, 'ifs_only' => 1],
             ['name' => 'ifsc', 'label' => 'IFS Customs', 'description' => 'For IFS customs staff. Allows the creation of customs entries only, for Duty and VAT reporting purposes.', 'primary' => 1, 'ifs_only' => 1],
             ['name' => 'ifsa', 'label' => 'IFS Admin', 'description' => 'For complete access to all areas of the application and all depots. Should be restricted to IT only.', 'primary' => 1, 'ifs_only' => 1],
-            // Shipper Roles            
+            // Shipper Roles
             ['name' => 'courier', 'label' => 'Courier Shipper', 'description' => 'Allows a user to generate a Courier shipment.', 'primary' => 0, 'ifs_only' => 0],
             ['name' => 'air', 'label' => 'Air Shipper', 'description' => 'Allows a user to generate an Air Freight shipment.', 'primary' => 0, 'ifs_only' => 0],
             ['name' => 'road', 'label' => 'Road Shipper', 'description' => 'Allows a user to generate a Road Freight shipment.', 'primary' => 0, 'ifs_only' => 0],
             ['name' => 'sea', 'label' => 'Sea Shipper', 'description' => 'Allows a user to generate a Sea Freight shipment.', 'primary' => 0, 'ifs_only' => 0],
         ]);
-
 
         DB::table('permissions')->insert([
             /*
@@ -173,7 +170,6 @@ class PermissionsRolesSeeder extends Seeder
             ['name' => 'pod_shipments', 'label' => 'POD Shipments'],
         ]);
 
-
         /*
           |--------------------------------------------------------------------------
           | Assign permissions to the Customer role (cust)
@@ -293,5 +289,4 @@ class PermissionsRolesSeeder extends Seeder
         $role->assignPermission('delete_customs_entry');
         $role->assignPermission('download_customs_entry');
     }
-
 }

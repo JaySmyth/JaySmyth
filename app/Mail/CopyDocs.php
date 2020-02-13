@@ -3,18 +3,17 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class CopyDocs extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
     public $from;
-    protected $invoices;    
+    protected $invoices;
     protected $subject;
 
     /**
@@ -41,5 +40,4 @@ class CopyDocs extends Mailable
                         ->subject($this->subject)
                         ->with(['invoices' => $this->invoices]);
     }
-
 }

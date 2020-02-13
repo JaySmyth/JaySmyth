@@ -14,12 +14,11 @@ class CustomsEntryCommodity extends Model
 
     /**
      * CPC Relationship.
-     * 
+     *
      * @return type
      */
     public function customsProcedureCode()
     {
         return $this->belongsTo(CustomsProcedureCode::class);
     }
-
 }

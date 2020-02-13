@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Country;
 use App\ManifestProfile;
 use App\Service;
-use App\Country;
+use Illuminate\Http\Request;
 
 class ManifestProfilesController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -22,7 +21,7 @@ class ManifestProfilesController extends Controller
 
     /**
      * List manifest profiles.
-     * 
+     *
      * @param Request $request
      * @return type
      */
@@ -41,8 +40,8 @@ class ManifestProfilesController extends Controller
     /**
      * Display create manifest profile form.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function create()
     {
@@ -58,8 +57,8 @@ class ManifestProfilesController extends Controller
     /**
      * Store a new manifest profile.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function store(Request $request)
     {
@@ -81,10 +80,8 @@ class ManifestProfilesController extends Controller
     }
 
     /**
-     * 
-     *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function edit($id)
     {
@@ -101,10 +98,8 @@ class ManifestProfilesController extends Controller
     }
 
     /**
-     * 
-     *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function update(Request $request, $id)
     {
@@ -133,7 +128,7 @@ class ManifestProfilesController extends Controller
 
     /**
      * Shipments available for manifesting.
-     * 
+     *
      * @param Request $request
      * @return type
      */
@@ -165,7 +160,7 @@ class ManifestProfilesController extends Controller
 
     /**
      * Manifest shipments.
-     * 
+     *
      * @param type $id
      * @return type
      */
@@ -193,7 +188,7 @@ class ManifestProfilesController extends Controller
 
     /**
      * Bulk hold/release.
-     * 
+     *
      * @param Request $request
      */
     public function bulkHold(Request $request)
@@ -217,5 +212,4 @@ class ManifestProfilesController extends Controller
 
         return back();
     }
-
 }

@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\DB;
 
 class DeleteOldLogEntries extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -46,7 +45,7 @@ class DeleteOldLogEntries extends Command
          * Logs (transport jobs) over 3 months
          */
 
-        $this->info("Deleting transport job log entries before " . $cutOff->toDateTimeString());
+        $this->info('Deleting transport job log entries before '.$cutOff->toDateTimeString());
 
         \App\Log::where('logable_type', 'App\TransportJob')
                 ->where('created_at', '<=', $cutOff)
@@ -56,11 +55,11 @@ class DeleteOldLogEntries extends Command
          * Transaction logs over 3 months
          */
 
-        $this->info("Deleting transaction log entries before " . $cutOff->toDateTimeString());
+        $this->info('Deleting transaction log entries before '.$cutOff->toDateTimeString());
 
         \App\TransactionLog::where('created_at', '<=', $cutOff)->delete();
 
-        $this->info("Finished");
+        $this->info('Finished');
 
         /*
          * Logs over 2 years old
@@ -68,15 +67,13 @@ class DeleteOldLogEntries extends Command
 
         $cutOff = Carbon::now()->subYears(2)->startOfDay();
 
-        $this->info("Deleting log entries before " . $cutOff->toDateTimeString());
+        $this->info('Deleting log entries before '.$cutOff->toDateTimeString());
 
         \App\Log::where('created_at', '<=', $cutOff)->delete();
 
-
         /*
-         * Truncate the RF sessions table         
+         * Truncate the RF sessions table
          */
         DB::table('rf_sessions')->truncate();
     }
-
 }

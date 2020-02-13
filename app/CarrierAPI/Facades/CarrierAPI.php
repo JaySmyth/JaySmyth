@@ -10,8 +10,10 @@ namespace App\CarrierAPI\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
-class CarrierAPI extends Facade {
-    protected static function getFacadeAccessor() {
+class CarrierAPI extends Facade
+{
+    protected static function getFacadeAccessor()
+    {
         return 'CarrierAPI';
     }
 }

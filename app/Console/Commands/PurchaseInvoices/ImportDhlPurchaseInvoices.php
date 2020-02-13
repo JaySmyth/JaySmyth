@@ -2,14 +2,13 @@
 
 namespace App\Console\Commands\PurchaseInvoices;
 
-use Illuminate\Console\Command;
 use App\PurchaseInvoice;
-use App\PurchaseInvoiceLine;
 use App\PurchaseInvoiceCharge;
+use App\PurchaseInvoiceLine;
+use Illuminate\Console\Command;
 
 class ImportDhlPurchaseInvoices extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -60,7 +59,6 @@ class ImportDhlPurchaseInvoices extends Command
     protected $invoices;
 
     /**
-     *
      * @var type
      */
     protected $row;
@@ -76,12 +74,12 @@ class ImportDhlPurchaseInvoices extends Command
 
         $this->sftpDirectory = '/home/dhlinv/invoices/';
         $this->archiveDirectory = 'archive';
-        $this->invoices = array();
+        $this->invoices = [];
 
         /*
          * Order of fields in DHL file
          */
-        $this->fields = array('Line Type', 'Billing Source', 'Original Invoice Number', 'Invoice Number', 'Station Code', 'Invoice Identifier', 'Invoice Type', 'Invoice Date', 'Payment Terms', 'Due Date', 'Parent Account', 'Billing Account', 'Billing Account Name', 'Billing Account Name (Additional)', 'Billing Address 1', 'Billing Address 2', 'Billing Address 3', 'Billing Postcode', 'Billing City', 'Billing State/Province', 'Billing Country Code', 'Billing Contact', 'VAT Number', 'Shipment Number', 'Shipment Date', 'Country Specific Label', 'Country Specific Value', 'Shipment Reference 1', 'Shipment Reference 2', 'Shipment Reference 3', 'Product', 'Product Name', 'Pieces', 'Origin', 'Orig Name', 'Orig Country Code', 'Orig Country Name', 'Senders Name', 'Senders Address 1', 'Senders Address 2', 'Senders Address 3', 'Senders Postcode', 'Senders City', 'Senders State/Province', 'Senders Country', 'Senders Contact', 'Destination', 'Dest Name', 'Dest Country Code', 'Dest Country Name', 'Receivers Name', 'Receivers Address 1', 'Receivers Address 2', 'Receivers Address 3', 'Receivers Postcode', 'Receivers City', 'Receivers State/Province', 'Receivers Country', 'Receivers Contact', 'Proof of Delivery/Name', 'Description of Contents', 'Event Description', 'Dimensions', 'Cust Scale Weight (A)', 'DHL Scale Weight (B)', 'Cust Vol Weight (V)', 'DHL Vol Weight (W)', 'Weight Flag', 'Weight (kg)', 'Currency', 'Total amount (excl. VAT)', 'Total amount (incl. VAT)', 'Tax Code', 'Total Tax', 'Tax Adjustment', 'Invoice Fee', 'Weight Charge', 'Weight Tax (VAT)', 'Other Charges 1', 'Other Charges 1 Amount', 'Other Charges 2', 'Other Charges 2 Amount', 'Discount 1', 'Discount 1 Amount', 'Discount 2', 'Discount 2 Amount', 'Discount 3', 'Discount 3 Amount', 'Total Extra Charges (XC)', 'Total Extra Charges Tax', 'XC1 Code', 'XC1 Name', 'XC1 Charge', 'XC1 Tax Code', 'XC1 Tax', 'XC1 Discount', 'XC1 Total', 'XC2 Code', 'XC2 Name', 'XC2 Charge', 'XC2 Tax Code', 'XC2 Tax', 'XC2 Discount', 'XC2 Total', 'XC3 Code', 'XC3 Name', 'XC3 Charge', 'XC3 Tax Code', 'XC3 Tax', 'XC3 Discount', 'XC3 Total', 'XC4 Code', 'XC4 Name', 'XC4 Charge', 'XC4 Tax Code', 'XC4 Tax', 'XC4 Discount', 'XC4 Total', 'XC5 Code', 'XC5 Name', 'XC5 Charge', 'XC5 Tax Code', 'XC5 Tax', 'XC5 Discount', 'XC5 Total', 'XC6 Code', 'XC6 Name', 'XC6 Charge', 'XC6 Tax Code', 'XC6 Tax', 'XC6 Discount', 'XC6 Total', 'XC7 Code', 'XC7 Name', 'XC7 Charge', 'XC7 Tax Code', 'XC7 Tax', 'XC7 Discount', 'XC7 Total', 'XC8 Code', 'XC8 Name', 'XC8 Charge', 'XC8 Tax Code', 'XC8 Tax', 'XC8 Discount', 'XC8 Total', 'XC9 Code', 'XC9 Name', 'XC9 Charge', 'XC9 Tax Code', 'XC9 Tax', 'XC9 Discount', 'XC9 Total');
+        $this->fields = ['Line Type', 'Billing Source', 'Original Invoice Number', 'Invoice Number', 'Station Code', 'Invoice Identifier', 'Invoice Type', 'Invoice Date', 'Payment Terms', 'Due Date', 'Parent Account', 'Billing Account', 'Billing Account Name', 'Billing Account Name (Additional)', 'Billing Address 1', 'Billing Address 2', 'Billing Address 3', 'Billing Postcode', 'Billing City', 'Billing State/Province', 'Billing Country Code', 'Billing Contact', 'VAT Number', 'Shipment Number', 'Shipment Date', 'Country Specific Label', 'Country Specific Value', 'Shipment Reference 1', 'Shipment Reference 2', 'Shipment Reference 3', 'Product', 'Product Name', 'Pieces', 'Origin', 'Orig Name', 'Orig Country Code', 'Orig Country Name', 'Senders Name', 'Senders Address 1', 'Senders Address 2', 'Senders Address 3', 'Senders Postcode', 'Senders City', 'Senders State/Province', 'Senders Country', 'Senders Contact', 'Destination', 'Dest Name', 'Dest Country Code', 'Dest Country Name', 'Receivers Name', 'Receivers Address 1', 'Receivers Address 2', 'Receivers Address 3', 'Receivers Postcode', 'Receivers City', 'Receivers State/Province', 'Receivers Country', 'Receivers Contact', 'Proof of Delivery/Name', 'Description of Contents', 'Event Description', 'Dimensions', 'Cust Scale Weight (A)', 'DHL Scale Weight (B)', 'Cust Vol Weight (V)', 'DHL Vol Weight (W)', 'Weight Flag', 'Weight (kg)', 'Currency', 'Total amount (excl. VAT)', 'Total amount (incl. VAT)', 'Tax Code', 'Total Tax', 'Tax Adjustment', 'Invoice Fee', 'Weight Charge', 'Weight Tax (VAT)', 'Other Charges 1', 'Other Charges 1 Amount', 'Other Charges 2', 'Other Charges 2 Amount', 'Discount 1', 'Discount 1 Amount', 'Discount 2', 'Discount 2 Amount', 'Discount 3', 'Discount 3 Amount', 'Total Extra Charges (XC)', 'Total Extra Charges Tax', 'XC1 Code', 'XC1 Name', 'XC1 Charge', 'XC1 Tax Code', 'XC1 Tax', 'XC1 Discount', 'XC1 Total', 'XC2 Code', 'XC2 Name', 'XC2 Charge', 'XC2 Tax Code', 'XC2 Tax', 'XC2 Discount', 'XC2 Total', 'XC3 Code', 'XC3 Name', 'XC3 Charge', 'XC3 Tax Code', 'XC3 Tax', 'XC3 Discount', 'XC3 Total', 'XC4 Code', 'XC4 Name', 'XC4 Charge', 'XC4 Tax Code', 'XC4 Tax', 'XC4 Discount', 'XC4 Total', 'XC5 Code', 'XC5 Name', 'XC5 Charge', 'XC5 Tax Code', 'XC5 Tax', 'XC5 Discount', 'XC5 Total', 'XC6 Code', 'XC6 Name', 'XC6 Charge', 'XC6 Tax Code', 'XC6 Tax', 'XC6 Discount', 'XC6 Total', 'XC7 Code', 'XC7 Name', 'XC7 Charge', 'XC7 Tax Code', 'XC7 Tax', 'XC7 Discount', 'XC7 Total', 'XC8 Code', 'XC8 Name', 'XC8 Charge', 'XC8 Tax Code', 'XC8 Tax', 'XC8 Discount', 'XC8 Total', 'XC9 Code', 'XC9 Name', 'XC9 Charge', 'XC9 Tax Code', 'XC9 Tax', 'XC9 Discount', 'XC9 Total'];
     }
 
     /**
@@ -91,11 +89,11 @@ class ImportDhlPurchaseInvoices extends Command
      */
     public function handle()
     {
-        $this->info('Checking ' . $this->sftpDirectory . ' for files to process');
+        $this->info('Checking '.$this->sftpDirectory.' for files to process');
 
         if ($handle = opendir($this->sftpDirectory)) {
             while (false !== ($file = readdir($handle))) {
-                if (!is_dir($file) && $file != $this->archiveDirectory) {
+                if (! is_dir($file) && $file != $this->archiveDirectory) {
                     $this->processFile($file);
                     $this->archiveFile($file);
                 }
@@ -125,6 +123,7 @@ class ImportDhlPurchaseInvoices extends Command
             $row[$field] = (isset($data[$i])) ? trim($data[$i]) : null;
             $i++;
         }
+
         return $row;
     }
 
@@ -140,12 +139,9 @@ class ImportDhlPurchaseInvoices extends Command
         $rowNumber = 1;
         $invoiceCreated = false;
 
-        if (($handle = fopen($this->sftpDirectory . $file, 'r')) !== false) {
-
+        if (($handle = fopen($this->sftpDirectory.$file, 'r')) !== false) {
             while (($data = fgetcsv($handle, 2000, ',')) !== false) {
-
                 if ($rowNumber >= 2) {
-
                     $row = $this->assignFieldNames($data);
 
                     if ($row['Line Type'] == 'I') {
@@ -153,11 +149,10 @@ class ImportDhlPurchaseInvoices extends Command
                     }
 
                     if ($invoiceCreated && $row['Line Type'] == 'S') {
-
                         $purchaseInvoiceLine = PurchaseInvoiceLine::firstOrCreate([
                                     'carrier_consignment_number' => $row['Shipment Number'],
                                     'carrier_tracking_number' => $row['Shipment Number'],
-                                    'purchase_invoice_id' => $this->purchaseInvoice->id
+                                    'purchase_invoice_id' => $this->purchaseInvoice->id,
                         ]);
 
                         $purchaseInvoiceLine->sender_name = $row['Senders Contact'];
@@ -208,12 +203,11 @@ class ImportDhlPurchaseInvoices extends Command
                                         'vat' => $row['Weight Tax (VAT)'],
                                         'vat_rate' => ($row['Weight Tax (VAT)'] > 0) ? 20 : 0,
                                         'purchase_invoice_id' => $this->purchaseInvoice->id,
-                                        'purchase_invoice_line_id' => $purchaseInvoiceLine->id
+                                        'purchase_invoice_line_id' => $purchaseInvoiceLine->id,
                             ]);
 
                             $purchaseInvoiceCharge->setCarrierChargeId();
                         }
-
 
                         /*
                          * Other charges.
@@ -230,22 +224,19 @@ class ImportDhlPurchaseInvoices extends Command
                                             'billed_amount' => $row["Other Charges $i Amount"],
                                             'billed_amount_currency_code' => $row['Currency'],
                                             'purchase_invoice_id' => $this->purchaseInvoice->id,
-                                            'purchase_invoice_line_id' => $purchaseInvoiceLine->id
+                                            'purchase_invoice_line_id' => $purchaseInvoiceLine->id,
                                 ]);
 
                                 $purchaseInvoiceCharge->setCarrierChargeId();
                             }
                         }
 
-
                         /*
                          * Additional charges.
                          */
 
                         for ($i = 1; $i <= 9; $i++) {
-
                             if (strlen($row["XC$i Code"]) == 2) {
-
                                 $purchaseInvoiceCharge = PurchaseInvoiceCharge::firstOrCreate([
                                             'code' => $row["XC$i Code"],
                                             'description' => $row["XC$i Name"],
@@ -258,7 +249,7 @@ class ImportDhlPurchaseInvoices extends Command
                                             'vat' => $row["XC$i Tax"],
                                             'vat_rate' => ($row["XC$i Tax Code"] == 'A') ? 20 : 0,
                                             'purchase_invoice_id' => $this->purchaseInvoice->id,
-                                            'purchase_invoice_line_id' => $purchaseInvoiceLine->id
+                                            'purchase_invoice_line_id' => $purchaseInvoiceLine->id,
                                 ]);
 
                                 $purchaseInvoiceCharge->setCarrierChargeId();
@@ -273,7 +264,7 @@ class ImportDhlPurchaseInvoices extends Command
             fclose($handle);
         }
 
-        /**
+        /*
          * Update additional information after the invoice has been imported.
          */
         foreach ($this->invoices as $invoiceNumber) {
@@ -297,6 +288,7 @@ class ImportDhlPurchaseInvoices extends Command
 
         if (in_array($row['Invoice Type'], $ignoredInvoiceTypes)) {
             $this->error("Credit note $invoiceNumber ignored");
+
             return false;
         }
 
@@ -304,6 +296,7 @@ class ImportDhlPurchaseInvoices extends Command
 
         if ($this->purchaseInvoice) {
             $this->error("Invoice $invoiceNumber skipped (already exists)");
+
             return false;
         }
 
@@ -317,7 +310,7 @@ class ImportDhlPurchaseInvoices extends Command
                     'currency_code' => $row['Currency'],
                     'type' => $this->getInvoiceType($row['Invoice Type']),
                     'carrier_id' => 5,
-                    'date' => strtotime($row['Invoice Date'])
+                    'date' => strtotime($row['Invoice Date']),
         ]);
 
         $this->invoices[] = $invoiceNumber;
@@ -326,7 +319,7 @@ class ImportDhlPurchaseInvoices extends Command
     }
 
     /**
-     * Get the invoice type
+     * Get the invoice type.
      *
      * @param type $invoiceType
      * @return string
@@ -345,25 +338,24 @@ class ImportDhlPurchaseInvoices extends Command
      * Move file to archive directory.
      *
      * @param string $file
-     * @return boolean
+     * @return bool
      */
-    function archiveFile($file)
+    public function archiveFile($file)
     {
         $this->info("Archiving file $file");
 
-        $originalFile = $this->sftpDirectory . $file;
-        $archiveFile = $this->sftpDirectory . $this->archiveDirectory . '/' . $file;
+        $originalFile = $this->sftpDirectory.$file;
+        $archiveFile = $this->sftpDirectory.$this->archiveDirectory.'/'.$file;
 
         $this->info("Moving $originalFile to archive");
 
-        if (!file_exists($originalFile)) {
+        if (! file_exists($originalFile)) {
             $this->error("Problem archiving $file  - file not found");
         }
 
         if (copy($originalFile, $archiveFile)) {
             unlink($originalFile);
-            $this->info("File archived successfully");
+            $this->info('File archived successfully');
         }
     }
-
 }

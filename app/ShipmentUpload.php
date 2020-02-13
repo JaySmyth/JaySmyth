@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class ShipmentUpload extends Model
 {
-
     use Logable;
 
     /**
@@ -33,9 +32,6 @@ class ShipmentUpload extends Model
         return $this->belongsTo(ImportConfig::class)->with('company');
     }
 
-    /**
-     * 
-     */
     public function incrementTotalProcessed()
     {
         $this->total_processed++;
@@ -44,13 +40,13 @@ class ShipmentUpload extends Model
 
     /**
      * Ensure the directory has an opening and closing slash.
-     * 
+     *
      * @return string
      */
     public function setDirectoryAttribute($value)
     {
         if (substr($value, 0, 1) != '/') {
-            $value = '/' . $value;
+            $value = '/'.$value;
         }
 
         if (substr($value, -1) != '/') {
@@ -59,5 +55,4 @@ class ShipmentUpload extends Model
 
         $this->attributes['directory'] = strtolower($value);
     }
-
 }

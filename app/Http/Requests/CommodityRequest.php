@@ -6,7 +6,6 @@ use App\Http\Requests\Request;
 
 class CommodityRequest extends Request
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -40,5 +39,4 @@ class CommodityRequest extends Request
             'shipping_cost' => 'digits_between:0,9999',
         ];
     }
-
 }

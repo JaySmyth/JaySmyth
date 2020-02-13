@@ -29,10 +29,10 @@ class Fuk_Rate extends Model
      * No timestamps.
      */
     public $timestamps = false;
-    
-    public function getRate($tableNo, $packagingType, $zone, $pieces, $chargeableWeight, $shipDate) {
-        
-        return $rate = Fuk_Rate::where('table_no', $tableNo)
+
+    public function getRate($tableNo, $packagingType, $zone, $pieces, $chargeableWeight, $shipDate)
+    {
+        return $rate = self::where('table_no', $tableNo)
                 ->where('p_type', $packagingType)
                 ->where('zone', $zone)
                 ->where('b_point', '>=', $chargeableWeight)

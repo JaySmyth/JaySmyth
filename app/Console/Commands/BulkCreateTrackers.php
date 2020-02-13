@@ -8,7 +8,6 @@ use Illuminate\Console\Command;
 
 class BulkCreateTrackers extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -44,19 +43,15 @@ class BulkCreateTrackers extends Command
         $finishDate = $this->option('finish-date');
 
         if ($this->option('carrier-id')) {
-
-            $this->info('createing trackers for carrier ' . $this->option('carrier-id'));
+            $this->info('createing trackers for carrier '.$this->option('carrier-id'));
 
             $shipments = Shipment::whereBetween('created_at', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($finishDate)->endOfDay()])->hasCarrier($this->option('carrier-id'))->get();
-
         } else {
-
             if ($this->option('received')) {
                 $shipments = Shipment::whereBetween('created_at', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($finishDate)->endOfDay()])->isActive()->get();
             } else {
                 $shipments = Shipment::whereBetween('created_at', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($finishDate)->endOfDay()])->get();
             }
-
         }
 
         $count = $shipments->count();
@@ -69,14 +64,12 @@ class BulkCreateTrackers extends Command
         }
 
         foreach ($shipments as $shipment) {
-
             if ($shipment->carrier->easypost != '***') {
                 dispatch(new \App\Jobs\CreateEasypostTracker($shipment->carrier_consignment_number, $shipment->carrier->easypost));
-                $this->info('Dispatched job: CreateEasyPostTracker(' . $shipment->carrier_consignment_number . ',' . $shipment->carrier->easypost . ')');
+                $this->info('Dispatched job: CreateEasyPostTracker('.$shipment->carrier_consignment_number.','.$shipment->carrier->easypost.')');
             }
         }
 
         $this->info('Finished');
     }
-
 }

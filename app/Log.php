@@ -2,12 +2,11 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 class Log extends Model
 {
-
     /**
      * Mass assignment protection.
      *
@@ -49,7 +48,7 @@ class Log extends Model
     public function scopeFilter($query, $filter)
     {
         if ($filter) {
-            return $query->where('logable_type', 'LIKE', '%' . $filter . '%');
+            return $query->where('logable_type', 'LIKE', '%'.$filter.'%');
         }
     }
 
@@ -60,11 +59,11 @@ class Log extends Model
      */
     public function scopeDateBetween($query, $dateFrom, $dateTo)
     {
-        if (!$dateFrom && $dateTo) {
+        if (! $dateFrom && $dateTo) {
             return $query->where('created_at', '<', Carbon::parse($dateTo)->endOfDay());
         }
 
-        if ($dateFrom && !$dateTo) {
+        if ($dateFrom && ! $dateTo) {
             return $query->where('created_at', '>', Carbon::parse($dateFrom)->startOfDay());
         }
 
@@ -81,7 +80,7 @@ class Log extends Model
     public function scopeHasInformation($query, $information)
     {
         if ($information) {
-            return $query->where('information', 'LIKE', '%' . $information . '%');
+            return $query->where('information', 'LIKE', '%'.$information.'%');
         }
     }
 
@@ -93,8 +92,7 @@ class Log extends Model
     public function scopeHasComments($query, $comments)
     {
         if ($comments) {
-            return $query->where('comments', 'LIKE', '%' . $comments . '%');
+            return $query->where('comments', 'LIKE', '%'.$comments.'%');
         }
     }
-
 }

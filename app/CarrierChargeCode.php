@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class CarrierChargeCode extends Model
 {
-
     public $timestamps = false;
 
     /**
@@ -28,8 +27,9 @@ class CarrierChargeCode extends Model
     {
         if ($filter) {
             $filter = trim($filter);
-            return $query->where('code', 'LIKE', '%' . $filter . '%')
-                            ->orWhere('description', 'LIKE', '%' . $filter . '%');
+
+            return $query->where('code', 'LIKE', '%'.$filter.'%')
+                            ->orWhere('description', 'LIKE', '%'.$filter.'%');
         }
     }
 
@@ -56,5 +56,4 @@ class CarrierChargeCode extends Model
             return $query->where('carrier_id', $carrierId);
         }
     }
-
 }

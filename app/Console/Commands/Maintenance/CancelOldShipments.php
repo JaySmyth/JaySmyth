@@ -8,7 +8,6 @@ use Illuminate\Console\Command;
 
 class CancelOldShipments extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -57,7 +56,7 @@ class CancelOldShipments extends Command
 
         foreach ($shipments as $shipment) {
             $shipment->setCancelled(2);
-            $this->info('Shipment ' . $shipment->consignment_number . ' cancelled (ship date ' . $shipment->ship_date->format('d-m-Y') . ')');
+            $this->info('Shipment '.$shipment->consignment_number.' cancelled (ship date '.$shipment->ship_date->format('d-m-Y').')');
             $total++;
         }
 
@@ -76,11 +75,10 @@ class CancelOldShipments extends Command
 
         foreach ($shipments as $shipment) {
             $shipment->setCancelled(2);
-            $this->info('Test Shipment ' . $shipment->consignment_number . ' cancelled (ship date ' . $shipment->ship_date->format('d-m-Y') . ')');
+            $this->info('Test Shipment '.$shipment->consignment_number.' cancelled (ship date '.$shipment->ship_date->format('d-m-Y').')');
             $total++;
         }
 
         $this->info("** $total shipment(s) cancelled **");
     }
-
 }

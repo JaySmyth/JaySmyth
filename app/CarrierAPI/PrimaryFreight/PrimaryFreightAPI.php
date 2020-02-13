@@ -3,14 +3,11 @@
 namespace App\CarrierAPI\PrimaryFreight;
 
 /**
- *
  * @author gmcbroom
  */
 class PrimaryFreightAPI extends \App\CarrierAPI\CarrierBase
 {
-
     /**
-     * 
      * @param type $shipment
      * @return type
      */
@@ -20,7 +17,6 @@ class PrimaryFreightAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     * 
      * @param type $shipment
      * @return type
      */
@@ -35,17 +31,16 @@ class PrimaryFreightAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     * 
      * @param type $shipment
      * @return type
      */
     public function createShipment($shipment)
     {
-
         $shipment = $this->preProcess($shipment);
         $errors = $this->validateShipment($shipment);
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             $this->log('REPLY', 'I', json_encode($errors));
+
             return $this->generateErrorResponse($response, $errors);
         }
         $response = $this->createShipmentResponse([], $shipment['service_code'], 1, $shipment);
@@ -55,7 +50,6 @@ class PrimaryFreightAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     * 
      * @param type $reply
      */
     private function generatePdf($shipment, $serviceCode, $labelData)
@@ -64,7 +58,6 @@ class PrimaryFreightAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     * 
      * @param type $reply
      * @param type $serviceCode
      * @param type $route_id
@@ -84,8 +77,8 @@ class PrimaryFreightAPI extends \App\CarrierAPI\CarrierBase
         $response['volumetric_divisor'] = 5000;
         $response['pieces'] = $shipment['pieces'];
 
-        for ($i = 0; $i < $shipment['pieces']; ++$i) {
-            $bc = $consignment . $i . time();
+        for ($i = 0; $i < $shipment['pieces']; $i++) {
+            $bc = $consignment.$i.time();
             $response['packages'][$i]['index'] = $i + 1;
             $response['packages'][$i]['carrier_tracking_number'] = $bc;
             $response['packages'][$i]['barcode'] = $bc;
@@ -103,7 +96,7 @@ class PrimaryFreightAPI extends \App\CarrierAPI\CarrierBase
 
     /**
      * Create a transaction log.
-     * 
+     *
      * @param type $type
      * @param type $direction
      * @param type $msg
@@ -114,10 +107,7 @@ class PrimaryFreightAPI extends \App\CarrierAPI\CarrierBase
             'type' => $type,
             'carrier' => 'pri',
             'direction' => $direction,
-            'msg' => $msg
+            'msg' => $msg,
         ]);
     }
-
 }
-
-?>

@@ -2,18 +2,17 @@
 
 namespace App\Jobs;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Mail;
 use App\CarrierAPI\Pdf;
 use App\TransportJob;
 use Carbon\Carbon;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Mail;
 
 class GeneratePodDockets implements ShouldQueue
 {
-
     use InteractsWithQueue,
         Queueable,
         SerializesModels;
@@ -80,10 +79,10 @@ class GeneratePodDockets implements ShouldQueue
                 }
             }
 
-            // Delivery or non courier collection
-            if ($transportJob->type == 'd' || ($transportJob->type == 'c' && !is_numeric($transportJob->shipment_id))) {
-                $viable->push($transportJob);
-            }
+        // Delivery or non courier collection
+        if ($transportJob->type == 'd' || ($transportJob->type == 'c' && ! is_numeric($transportJob->shipment_id))) {
+            $viable->push($transportJob);
+        }
 
         endforeach;
 
@@ -92,6 +91,7 @@ class GeneratePodDockets implements ShouldQueue
             if ($this->user) {
                 Mail::to($this->email)->send(new \App\Mail\GenericError('POD Dockets', 'No jobs currently available - scan freight first'));
             }
+
             return true;
         }
 
@@ -101,12 +101,10 @@ class GeneratePodDockets implements ShouldQueue
             $pdf->createPodDocket($transportJob, false, false);
         }
 
-        $filePath = storage_path('app/temp/dockets_' . time() . '.pdf');
+        $filePath = storage_path('app/temp/dockets_'.time().'.pdf');
 
         $pdf->displayPdf($filePath, false);
 
-
         Mail::to($this->email)->cc(['transport@antrim.ifsgroup.com', 'it@antrim.ifsgroup.com'])->send(new \App\Mail\GenericError('POD Dockets', 'Please print and distribute to drivers', $filePath));
     }
-
 }

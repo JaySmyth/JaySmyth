@@ -2,22 +2,22 @@
 
 namespace App\CarrierAPI\UPS;
 
-class UPSLabel extends \App\CarrierAPI\CarrierLabel {
-
+class UPSLabel extends \App\CarrierAPI\CarrierLabel
+{
     /**
      * Accepts Shipment and Carrier Response data
-     * and stores these to use to generate labels
+     * and stores these to use to generate labels.
      */
-    function __construct($shipment = null, $serviceCode = null, $data = null)
+    public function __construct($shipment = null, $serviceCode = null, $data = null)
     {
         parent::__construct($shipment, $serviceCode, $data);
     }
 
     /**
      * Takes stored Shipment and Carrier Response data
-     * and uses it to create a PDF containing all the 
-     * necessary labels in the following format :-
-     * 
+     * and uses it to create a PDF containing all the
+     * necessary labels in the following format :-.
+     *
      * Label 1 is a Master Label, others Package Labels
      */
     public function create()
@@ -53,8 +53,6 @@ class UPSLabel extends \App\CarrierAPI\CarrierLabel {
 
     public function customizeLabel()
     {
-
         $this->addServiceBox(80, 23, 22, 20, $this->serviceCode);
     }
-
 }

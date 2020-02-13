@@ -11,5 +11,4 @@ class FileUploadLog extends Model
      */
 
     protected $guarded = ['id'];
-
 }

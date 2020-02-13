@@ -2,12 +2,11 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
 
 class UpdateScsJobNumbersOnShipments extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -49,24 +48,22 @@ class UpdateScsJobNumbersOnShipments extends Command
         }
 
         foreach ($shipments as $shipment) {
-
             $jobLine = \App\Multifreight\JobLine::select('id', 'job_id')
-                    ->orWhere('cargo_desc', 'LIKE', '%AWB:' . $shipment->consignment_number . '%')
-                    ->orWhere('cargo_desc', 'LIKE', '%AWB:' . $shipment->carrier_consignment_number . '%')
+                    ->orWhere('cargo_desc', 'LIKE', '%AWB:'.$shipment->consignment_number.'%')
+                    ->orWhere('cargo_desc', 'LIKE', '%AWB:'.$shipment->carrier_consignment_number.'%')
                     ->first();
 
             if ($jobLine && $jobLine->scs_job_number) {
-
                 $shipment->scs_job_number = $jobLine->scs_job_number;
                 $shipment->invoicing_status = 1;
                 $shipment->save();
 
-                $this->info($shipment->consignment_number . ' - FOUND: ' . $jobLine->scs_job_number);
+                $this->info($shipment->consignment_number.' - FOUND: '.$jobLine->scs_job_number);
                 continue;
             }
 
             // Check job header for consignment number
-            $withHypen = substr($shipment->carrier_consignment_number, 0, 3) . '-' . substr($shipment->carrier_consignment_number, 3);
+            $withHypen = substr($shipment->carrier_consignment_number, 0, 3).'-'.substr($shipment->carrier_consignment_number, 3);
 
             $jobHdr = \App\Multifreight\JobHdr::select('job_disp')
                     ->orWhere('hawb_char', $shipment->carrier_consignment_number)
@@ -84,8 +81,7 @@ class UpdateScsJobNumbersOnShipments extends Command
                 continue;
             }
 
-            $this->error("Couldn't find SCS job number for " . $shipment->consignment_number);
+            $this->error("Couldn't find SCS job number for ".$shipment->consignment_number);
         }
     }
-
 }

@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\CarrierAPI\Pdf;
 use App\Manifest;
 use App\Shipment;
-use Maatwebsite\Excel\Facades\Excel;
-use App\CarrierAPI\Pdf;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ManifestsController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -24,7 +23,7 @@ class ManifestsController extends Controller
 
     /**
      * List manifests.
-     * 
+     *
      * @param Request $request
      * @return type
      */
@@ -39,7 +38,7 @@ class ManifestsController extends Controller
 
     /**
      * Display a manifest.
-     * 
+     *
      * @param type $id
      * @return type
      */
@@ -51,7 +50,7 @@ class ManifestsController extends Controller
 
         $services = $manifest->getServicesArray();
 
-        $shipmentsByService = array();
+        $shipmentsByService = [];
 
         // Loop through the shipments, group them by service and total
         foreach ($manifest->shipments as $shipment) {
@@ -66,9 +65,9 @@ class ManifestsController extends Controller
     /**
      * Displays add shipment form. Allows a shipment to be added to a manifest
      * after it has been closed out.
-     * 
+     *
      * @param type $id  manifest id
-     * @return 
+     * @return
      */
     public function addShipment($id)
     {
@@ -81,7 +80,7 @@ class ManifestsController extends Controller
 
     /**
      * Updates the manifest id on a single shipment. Called from add shipment.
-     * 
+     *
      * @param Request $request
      * @param int $id   manifest id
      * @return void
@@ -99,7 +98,7 @@ class ManifestsController extends Controller
         // load the shipment record from the consignment number
         $shipment = Shipment::whereConsignmentNumber($request->consignment_number)->whereReceived(1)->first();
 
-        if (!$shipment) {
+        if (! $shipment) {
             return redirect()->back()->withInput()->withErrors(['consignment_number' => 'Invalid consignment number or shipment has not been received by IFS.']);
         }
 
@@ -127,12 +126,12 @@ class ManifestsController extends Controller
 
         $this->authorize('view', $manifest);
 
-        return Excel::download(new \App\Exports\ManifestExport($manifest, $request->user()), $manifest->number . '.xlsx');
+        return Excel::download(new \App\Exports\ManifestExport($manifest, $request->user()), $manifest->number.'.xlsx');
     }
 
     /**
      * Download manifest PDF.
-     * 
+     *
      * @param type $id
      * @return type
      */
@@ -149,7 +148,7 @@ class ManifestsController extends Controller
 
     /**
      * Display a summary screen detailing the shippers.
-     * 
+     *
      * @param type $id
      * @return type
      */
@@ -171,10 +170,10 @@ class ManifestsController extends Controller
 
     /*
      * Manifest search.
-     * 
+     *
      * @param   $request
      * @param   $paginate
-     * 
+     *
      * @return
      */
 
@@ -190,5 +189,4 @@ class ManifestsController extends Controller
                         ->with('shipments', 'manifestProfile', 'carrier', 'depot')
                         ->paginate(50);
     }
-
 }

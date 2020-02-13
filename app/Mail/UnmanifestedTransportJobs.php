@@ -3,9 +3,9 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class UnmanifestedTransportJobs extends Mailable
 {
@@ -35,5 +35,4 @@ class UnmanifestedTransportJobs extends Mailable
                         ->subject('High number of collections/deliveries need manifested')
                         ->with(['transportJobs' => $this->transportJobs]);
     }
-
 }

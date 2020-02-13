@@ -6,7 +6,6 @@ use App\Http\Requests\Request;
 
 class AddressRequest extends Request
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -40,5 +39,4 @@ class AddressRequest extends Request
             'definition' => 'alpha|min:6|max:9',
         ];
     }
-
 }

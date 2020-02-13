@@ -2,13 +2,12 @@
 
 namespace App\Console\Commands\Maintenance;
 
-use Carbon\Carbon;
 use App\TransportJob;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class CorrectStatusOnTransportJobs extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -46,29 +45,24 @@ class CorrectStatusOnTransportJobs extends Command
             ->orderBy('id', 'DESC')
             ->get();
 
-        $this->info($transportJobs->count() . ' transport jobs found');
+        $this->info($transportJobs->count().' transport jobs found');
 
         foreach ($transportJobs as $transportJob) {
-
             if ($transportJob->shipment) {
-
                 if ($transportJob->shipment->status_id == 7) {
-
-                    $this->info($transportJob->number . ': shipment canceled, updating status to CANCELLED');
+                    $this->info($transportJob->number.': shipment canceled, updating status to CANCELLED');
 
                     $transportJob->setStatus('cancelled');
                 } elseif ($transportJob->shipment->received || $transportJob->shipment->delivered) {
-
-                    $this->info($transportJob->number . ': shipment received, updating status to COMPLETED');
+                    $this->info($transportJob->number.': shipment received, updating status to COMPLETED');
 
                     $transportJob->setStatus('completed');
                 } else {
-                    $this->error($transportJob->number . ': unknown');
+                    $this->error($transportJob->number.': unknown');
                 }
             } else {
                 $transportJob->setStatus('completed');
             }
         }
     }
-
 }

@@ -7,15 +7,14 @@ use SimpleXMLElement;
 
 class TNT
 {
-
     private $shipment;
     private $conref;
-    private $express_connect_url = "https://express.tnt.com/expressconnect/shipping/ship";
+    private $express_connect_url = 'https://express.tnt.com/expressconnect/shipping/ship';
     private $express_label_url = 'https://express.tnt.com/expresslabel/documentation/getlabel';
     private $username;
     private $password;
 
-    function __construct($shipment, $mode)
+    public function __construct($shipment, $mode)
     {
         // Data array passed through
         $this->shipment = $shipment;
@@ -36,7 +35,7 @@ class TNT
                 $this->password = 'tnt12345';
                 break;
 
-            default :
+            default:
                 $this->username = 'ifsglobal';
                 $this->password = 'November12';
                 break;
@@ -69,7 +68,7 @@ class TNT
         }
 
         // Provided by the end user
-        if (!empty($this->shipment['bill_shipping_account'])) {
+        if (! empty($this->shipment['bill_shipping_account'])) {
             return $this->shipment['bill_shipping_account'];
         }
 
@@ -97,19 +96,19 @@ class TNT
         $this->log('REPLY-1', 'I', $result);
 
         // Obtain the access key from the response
-        if (!$access_key = $this->getAccessKey($result)) {
+        if (! $access_key = $this->getAccessKey($result)) {
             return $reply['errors'][] = 'Unable to obtain access key from carrier. Please try again.';
         }
 
-        $this->log('MSG-2', 'O', 'GET_RESULT:' . $access_key);
+        $this->log('MSG-2', 'O', 'GET_RESULT:'.$access_key);
 
         // Request the result by sending back the access key
-        $result = $this->postExpressConnect('GET_RESULT:' . $access_key);
+        $result = $this->postExpressConnect('GET_RESULT:'.$access_key);
 
         $this->log('REPLY-2', 'I', $result);
 
         // Obtain the XML portion of the string returned
-        if (!$xml = $this->getXmlResult($result)) {
+        if (! $xml = $this->getXmlResult($result)) {
             return $reply['errors'][] = 'Invalid reply from carrier. Please try again.';
         }
 
@@ -119,13 +118,13 @@ class TNT
         // Errors found: move them to our reply array
         if (isset($result->ERROR)) {
             foreach ($result->ERROR as $error) {
-                $reply['errors'][] = (string)$error->DESCRIPTION;
+                $reply['errors'][] = (string) $error->DESCRIPTION;
             }
 
             return $reply;
         }
 
-        if (!isset($result->CREATE->CONNUMBER)) {
+        if (! isset($result->CREATE->CONNUMBER)) {
             return $reply['errors'][] = 'Unable to obtain a consignment number from carrier.';
         }
 
@@ -139,7 +138,7 @@ class TNT
 
         $consignmentNumber = preg_replace('/[^0-9]+/', '', $result->CREATE->CONNUMBER);
 
-        if (!is_numeric($consignmentNumber)) {
+        if (! is_numeric($consignmentNumber)) {
             return $reply['errors'][] = 'Carrier consignment number is not numeric.';
         }
 
@@ -159,14 +158,15 @@ class TNT
         // Errors found, return the reply
         if (isset($result->brokenRules)) {
             foreach ($result->brokenRules as $error) {
-                $reply['errors'][] = (string)$error->errorDescription; // Cast the simpleXML object to a string
+                $reply['errors'][] = (string) $error->errorDescription; // Cast the simpleXML object to a string
             }
+
             return $reply;
         }
 
         // Read the XML response, moving barcode info into reply array
         foreach ($result->consignment->pieceLabelData as $labelData) {
-            $reply['barcode'][] = (string)$labelData->barcode; // Cast the simpleXML object to a string
+            $reply['barcode'][] = (string) $labelData->barcode; // Cast the simpleXML object to a string
         }
 
         // Pass the label data back to use when generating the TNT labels
@@ -254,7 +254,7 @@ class TNT
         $deliveryNode->addChild('CONTACTEMAIL', $this->shipment['recipient_email']);
         $detailsNode->addChild('CUSTOMERREF', $this->shipment['shipment_reference']);
         $detailsNode->addChild('CONTYPE', $this->getConType());
-        $detailsNode->addChild('PAYMENTIND', substr(strtoupper($this->shipment ['bill_shipping']), 0, 1));
+        $detailsNode->addChild('PAYMENTIND', substr(strtoupper($this->shipment['bill_shipping']), 0, 1));
         $detailsNode->addChild('ITEMS', $this->shipment['pieces']);
         $detailsNode->addChild('TOTALWEIGHT', $this->shipment['weight']);
         $detailsNode->addChild('TOTALVOLUME', $this->getTotalVolume());
@@ -278,10 +278,9 @@ class TNT
          * Package detail.
          */
         foreach ($this->shipment['packages'] as $package) {
-
             $packageNode = $detailsNode->addChild('PACKAGE');
             $packageNode->addChild('ITEMS', $this->getPackageItemCount($package['index']));
-            $packageNode->addChild('DESCRIPTION', 'Package ' . $package['index']);
+            $packageNode->addChild('DESCRIPTION', 'Package '.$package['index']);
             $packageNode->addChild('LENGTH', $package['length'] / 100);
             $packageNode->addChild('HEIGHT', $package['height'] / 100);
             $packageNode->addChild('WIDTH', $package['width'] / 100);
@@ -290,8 +289,7 @@ class TNT
             /*
              * Package contents (only for international shipments).
              */
-            if (!isUkDomestic($this->shipment['recipient_country_code']) && !empty($this->shipment['contents'])) {
-
+            if (! isUkDomestic($this->shipment['recipient_country_code']) && ! empty($this->shipment['contents'])) {
                 foreach ($this->shipment['contents'] as $content) {
                     $articleNode = $packageNode->addChild('ARTICLE');
                     $articleNode->addChild('ITEMS', $content['quantity']);
@@ -349,6 +347,7 @@ class TNT
         if ($this->shipment['ship_reason'] == 'documents') {
             return 'D';
         }
+
         return 'N';
     }
 
@@ -384,7 +383,7 @@ class TNT
             return $this->shipment['goods_description'];
         }
 
-        if (!empty($this->shipment['contents'])) {
+        if (! empty($this->shipment['contents'])) {
             foreach ($this->shipment['contents'] as $content) {
                 return $content['description'];
             }
@@ -412,6 +411,7 @@ class TNT
         if ($items <= 0) {
             return 1;
         }
+
         return $items;
     }
 
@@ -428,7 +428,7 @@ class TNT
             'type' => $type,
             'carrier' => 'tnt',
             'direction' => $direction,
-            'msg' => $msg
+            'msg' => $msg,
         ]);
     }
 
@@ -440,16 +440,16 @@ class TNT
      */
     private function postExpressConnect($string)
     {
-        $string = "xml_in=" . $string; // Append "xml_in=" to beginning of string
+        $string = 'xml_in='.$string; // Append "xml_in=" to beginning of string
 
-        $header = array(
-            "POST ShipperGate2.asp HTTP/1.0",
-            "Accept: */*",
-            "User-Agent: ShipperGate_socket/1.0",
-            "Content-type: application/x-www-form-urlencoded",
-            "Content-length: " . strlen($string),
-            ""
-        );
+        $header = [
+            'POST ShipperGate2.asp HTTP/1.0',
+            'Accept: */*',
+            'User-Agent: ShipperGate_socket/1.0',
+            'Content-type: application/x-www-form-urlencoded',
+            'Content-length: '.strlen($string),
+            '',
+        ];
 
         $ch = curl_init(); // initialize curl handle
         curl_setopt($ch, CURLOPT_URL, $this->express_connect_url);                // set url to post to
@@ -476,7 +476,7 @@ class TNT
      * Get the access key from the TNT Express Connect response.
      *
      * @param type $result
-     * @return boolean
+     * @return bool
      */
     private function getAccessKey($result)
     {
@@ -498,14 +498,15 @@ class TNT
      * Get the result from the TNT Express Connect response.
      *
      * @param type $response
-     * @return boolean|string
+     * @return bool|string
      */
     private function getXmlResult($response)
     {
         $start = stripos($response, '<document>');
         if ($start > 0) {
-            return "<?xml version='1.0' standalone='yes'?>" . substr($response, $start);
+            return "<?xml version='1.0' standalone='yes'?>".substr($response, $start);
         }
+
         return false;
     }
 
@@ -523,7 +524,7 @@ class TNT
         $consignmentIdentityNode = $consignmentNode->addChild('consignmentIdentity');
         $consignmentIdentityNode->addChild('consignmentNumber', $consignmentNumber);
         $consignmentIdentityNode->addChild('customerReference', $this->shipment['shipment_reference']);
-        $consignmentNode->addChild('collectionDateTime', date('Y-m-d', strtotime($this->shipment['collection_date'])) . 'T09:00:00');
+        $consignmentNode->addChild('collectionDateTime', date('Y-m-d', strtotime($this->shipment['collection_date'])).'T09:00:00');
         $senderNode = $consignmentNode->addChild('sender');
         $senderNode->addChild('name', $this->shipment['sender_name']);
         $senderNode->addChild('addressLine1', $this->shipment['sender_address1']);
@@ -582,13 +583,11 @@ class TNT
             /*
              * Package contents.
              */
-            if (!isUkDomestic($this->shipment['recipient_country_code']) && !empty($this->shipment['contents'])) {
+            if (! isUkDomestic($this->shipment['recipient_country_code']) && ! empty($this->shipment['contents'])) {
                 foreach ($this->shipment['contents'] as $content) {
-
                     $piecesNode = $pieceLineNode->addChild('pieces');
                     $piecesNode->addChild('sequenceNumbers', $package['index']);
                     $piecesNode->addChild('pieceReference', $content['description']);
-
                 }
             } else {
                 $piecesNode = $pieceLineNode->addChild('pieces');
@@ -610,6 +609,7 @@ class TNT
         if (strtoupper($this->shipment['recipient_country_code']) == 'GB') {
             return 1;
         }
+
         return 2;
     }
 
@@ -621,22 +621,22 @@ class TNT
     private function getProductId()
     {
         switch ($this->shipment['service']) {
-            case '1' :
-            case '15D' :
-            case '15N' :
+            case '1':
+            case '15D':
+            case '15N':
                 return 'EX';
                 break;
-            case 'AM' :
+            case 'AM':
                 return 'EX12';
                 break;
-            case '15F' :
+            case '15F':
                 return 'XF';
                 break;
-            case '48N' :
+            case '48N':
                 return 'EC';
                 break;
             default:
-                return null;
+                return;
                 break;
         }
     }
@@ -653,13 +653,13 @@ class TNT
         curl_setopt($ch, CURLOPT_URL, $this->express_label_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-        if ((trim($this->username) != "") && (trim($this->password) != "")) {
-            curl_setopt($ch, CURLOPT_USERPWD, $this->username . ":" . $this->password);
+        if ((trim($this->username) != '') && (trim($this->password) != '')) {
+            curl_setopt($ch, CURLOPT_USERPWD, $this->username.':'.$this->password);
         }
 
         curl_setopt($ch, CURLOPT_POSTFIELDS, $string);
 
-        $is_secure = strpos($this->express_label_url, "https://");
+        $is_secure = strpos($this->express_label_url, 'https://');
         if ($is_secure === 0) {
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
@@ -687,8 +687,8 @@ class TNT
         }
 
         foreach ($result->pieceLabelData as $label) {
-            $barcode[] = (string)$label->barcode;
-            $weight[] = (string)$label->weightDisplay;
+            $barcode[] = (string) $label->barcode;
+            $weight[] = (string) $label->weightDisplay;
         }
 
         $hazardous = '';
@@ -698,24 +698,23 @@ class TNT
         }
 
         return [
-            'consignment_number' => (string)$result->consignmentLabelData->consignmentNumber,
-            'transport_display' => $transport . (string)$result->consignmentLabelData->transportDisplay,
+            'consignment_number' => (string) $result->consignmentLabelData->consignmentNumber,
+            'transport_display' => $transport.(string) $result->consignmentLabelData->transportDisplay,
             'hazardous' => $hazardous,
-            'xray_display' => (string)$result->consignmentLabelData->xrayDisplay,
-            'free_circulation_display' => (string)$result->consignmentLabelData->freeCirculationDisplay,
-            'sort_split_text' => (string)$result->consignmentLabelData->sortSplitText,
+            'xray_display' => (string) $result->consignmentLabelData->xrayDisplay,
+            'free_circulation_display' => (string) $result->consignmentLabelData->freeCirculationDisplay,
+            'sort_split_text' => (string) $result->consignmentLabelData->sortSplitText,
             'weight' => $weight,
-            'account_number' => (string)$result->consignmentLabelData->account->accountNumber,
-            'cluster_code' => (string)$result->consignmentLabelData->clusterCode,
-            'product' => (string)$result->consignmentLabelData->product,
-            'option' => (string)$result->consignmentLabelData->option,
-            'depot_code' => (string)$result->consignmentLabelData->originDepot->depotCode,
-            'collection_date' => (string)$result->consignmentLabelData->collectionDate,
+            'account_number' => (string) $result->consignmentLabelData->account->accountNumber,
+            'cluster_code' => (string) $result->consignmentLabelData->clusterCode,
+            'product' => (string) $result->consignmentLabelData->product,
+            'option' => (string) $result->consignmentLabelData->option,
+            'depot_code' => (string) $result->consignmentLabelData->originDepot->depotCode,
+            'collection_date' => (string) $result->consignmentLabelData->collectionDate,
             'transit_depot' => $result->consignmentLabelData->transitDepots->transitDepot,
-            'destination_depot_code' => (string)$result->consignmentLabelData->destinationDepot->depotCode,
-            'due_day' => (string)$result->consignmentLabelData->destinationDepot->dueDayOfMonth,
-            'barcode' => $barcode
+            'destination_depot_code' => (string) $result->consignmentLabelData->destinationDepot->depotCode,
+            'due_day' => (string) $result->consignmentLabelData->destinationDepot->dueDayOfMonth,
+            'barcode' => $barcode,
         ];
     }
-
 }

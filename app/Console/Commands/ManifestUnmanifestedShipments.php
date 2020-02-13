@@ -2,13 +2,12 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Manifest;
 use App\ManifestProfile;
+use Illuminate\Console\Command;
 
 class ManifestUnmanifestedShipments extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -45,29 +44,28 @@ class ManifestUnmanifestedShipments extends Command
 
         foreach ($manifestProfiles as $profile) :
 
-            $this->line("loading shipments for " . $profile->name);
+            $this->line('loading shipments for '.$profile->name);
 
-            // Get unmanifested shipments
-            $shipments = $profile->getShipments();
+        // Get unmanifested shipments
+        $shipments = $profile->getShipments();
 
-            foreach ($shipments as $shipment):
+        foreach ($shipments as $shipment):
 
-                $this->info($shipment->consignment_number . " " . $shipment->ship_date);
+                $this->info($shipment->consignment_number.' '.$shipment->ship_date);
 
-                $manifest = Manifest::whereManifestProfileId($profile->id)->where('created_at', '>', $shipment->ship_date)->first();
+        $manifest = Manifest::whereManifestProfileId($profile->id)->where('created_at', '>', $shipment->ship_date)->first();
 
-                if ($manifest) {
-                    $this->info("Adding " . $shipment->consignment_number . " (" . $shipment->ship_date . ") to manifest " . $manifest->number . "(" . $manifest->created_at . ")");
+        if ($manifest) {
+            $this->info('Adding '.$shipment->consignment_number.' ('.$shipment->ship_date.') to manifest '.$manifest->number.'('.$manifest->created_at.')');
 
-                    $shipment->manifest_id = $manifest->id;
-                    $shipment->save();
-                } else {
-                    $this->error("Could not find a manifest for " . $shipment->ship_date);                    
-                }
+            $shipment->manifest_id = $manifest->id;
+            $shipment->save();
+        } else {
+            $this->error('Could not find a manifest for '.$shipment->ship_date);
+        }
 
-            endforeach;
+        endforeach;
 
         endforeach;
     }
-
 }

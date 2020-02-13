@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\ImportConfig;
-use Illuminate\Http\Request;
-use Faker\Generator as Faker;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Requests\ImportConfigRequest;
+use App\ImportConfig;
+use Faker\Generator as Faker;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ImportConfigsController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -53,8 +52,8 @@ class ImportConfigsController extends Controller
      */
     public function create()
     {
-        $fields = dropDown("importConfigFields", "Please select");
-        
+        $fields = dropDown('importConfigFields', 'Please select');
+
         $importConfig = \App\ImportConfig::whereCompanyName('*TEMPLATE*')->first();
 
         return view('import_configs.create', compact('importConfig', 'fields'));
@@ -83,7 +82,7 @@ class ImportConfigsController extends Controller
      */
     public function edit(ImportConfig $importConfig)
     {
-        $fields = dropDown("importConfigFields", "Please select");
+        $fields = dropDown('importConfigFields', 'Please select');
 
         return view('import_configs.edit', compact('importConfig', 'fields'));
     }
@@ -117,13 +116,12 @@ class ImportConfigsController extends Controller
     }
 
     /**
-     * Download a sample CSV file
+     * Download a sample CSV file.
      *
      * @param ImportConfig $importConfig
      */
     public function downloadExample(ImportConfig $importConfig, Faker $faker)
     {
-        return Excel::download(new \App\Exports\ShipmentImportExampleExport($importConfig, $faker), strtolower(snake_case($importConfig->company_name)) . '.csv');
+        return Excel::download(new \App\Exports\ShipmentImportExampleExport($importConfig, $faker), strtolower(snake_case($importConfig->company_name)).'.csv');
     }
-
 }

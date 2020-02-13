@@ -37,7 +37,7 @@ return [
     ],
     'fxrs' => [
         'url' => env('FEDEX_HOST'),
-        'port' => '2000'
+        'port' => '2000',
     ],
     'rfserver' => [
         'name' => env('RFSERVER'),

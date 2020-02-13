@@ -2,15 +2,15 @@
 
 namespace App;
 
+use App\Country;
 use App\Legacy\FukShipment;
 use App\Mail\GenericError;
 use App\Mail\TransportJobReinstated;
 use App\Pricing\Pricing;
-use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
-use \Spatie\PdfToImage\Pdf;
-use App\Country;
+use Spatie\PdfToImage\Pdf;
 
 class Shipment extends Model
 {
@@ -126,7 +126,7 @@ class Shipment extends Model
         'collection_date',
         'ship_date',
         'delivery_date',
-        'created_at'
+        'created_at',
     ];
 
     /**
@@ -187,7 +187,7 @@ class Shipment extends Model
             }
 
             if ($startTime > 0) {
-                if (!$this->delivery_date && in_array($this->status_id, [3, 4, 5, 8])) {
+                if (! $this->delivery_date && in_array($this->status_id, [3, 4, 5, 8])) {
                     $finishTime = time();
                 } else {
                     $finishTime = strtotime($this->delivery_date);
@@ -226,7 +226,7 @@ class Shipment extends Model
     }
 
     /**
-     * Get the sender's country
+     * Get the sender's country.
      *
      * @return string
      */
@@ -236,7 +236,7 @@ class Shipment extends Model
     }
 
     /**
-     * Get the recipient's country
+     * Get the recipient's country.
      *
      * @return string
      */
@@ -246,7 +246,7 @@ class Shipment extends Model
     }
 
     /**
-     * Get the recipient's country
+     * Get the recipient's country.
      *
      * @return string
      */
@@ -258,7 +258,7 @@ class Shipment extends Model
     }
 
     /**
-     * Get the recipient's country
+     * Get the recipient's country.
      *
      * @return string
      */
@@ -270,7 +270,7 @@ class Shipment extends Model
     }
 
     /**
-     * Get the chargeable weight
+     * Get the chargeable weight.
      *
      * @return string
      */
@@ -371,7 +371,7 @@ class Shipment extends Model
      */
     public function getPrintUrlAttribute()
     {
-        if (!$this->legacy) {
+        if (! $this->legacy) {
             return url('/label', $this->token);
         }
 
@@ -379,13 +379,13 @@ class Shipment extends Model
             $FukShipment = FukShipment::select('id')->where('docketno', $this->carrier_consignment_number)->where('compID', $this->company_id)->first();
 
             if ($FukShipment) {
-                return "https://www.ifsgl.com/CourierUK/reprint.php?id=" . $FukShipment->id . "&format=A4";
+                return 'https://www.ifsgl.com/CourierUK/reprint.php?id='.$FukShipment->id.'&format=A4';
             } else {
-                return null;
+                return;
             }
         }
 
-        return "https://www.ifsgl.com/Courier/print.php?id=" . $this->carrier_consignment_number;
+        return 'https://www.ifsgl.com/Courier/print.php?id='.$this->carrier_consignment_number;
     }
 
     /**
@@ -393,13 +393,14 @@ class Shipment extends Model
      *
      * @param type $senderCountryCode
      * @param type $recipientCountryCode
-     * @return boolean
+     * @return bool
      */
     public function isUkDomestic()
     {
         if (in_array($this->sender_country_code, getUkDomesticCountries()) && in_array($this->recipient_country_code, getUkDomesticCountries())) {
             return true;
         }
+
         return false;
     }
 
@@ -442,7 +443,8 @@ class Shipment extends Model
     {
         if ($this->shipping_charge > 0) {
             $margin = ($this->shipping_charge - $this->shipping_cost) / $this->shipping_charge * 100;
-            return number_format($margin, 2) . '%';
+
+            return number_format($margin, 2).'%';
         }
 
         return 'n/a';
@@ -467,7 +469,7 @@ class Shipment extends Model
     }
 
     /**
-     * Return the difference
+     * Return the difference.
      *
      * @return type
      */
@@ -477,23 +479,23 @@ class Shipment extends Model
     }
 
     /**
-     * Return the difference
+     * Return the difference.
      *
      * @return type
      */
     public function getProfitFormattedAttribute()
     {
         if ($this->shipping_cost > $this->shipping_charge) {
-            return '-' . number_format($this->profit, 2);
+            return '-'.number_format($this->profit, 2);
         } elseif ($this->shipping_charge > $this->shipping_cost) {
-            return '+' . number_format($this->profit, 2);
+            return '+'.number_format($this->profit, 2);
         } else {
             return number_format($this->profit, 2);
         }
     }
 
     /**
-     * A shipment has many packages
+     * A shipment has many packages.
      *
      * @return
      */
@@ -503,7 +505,7 @@ class Shipment extends Model
     }
 
     /**
-     * A shipment has many contents
+     * A shipment has many contents.
      *
      * @return
      */
@@ -513,7 +515,7 @@ class Shipment extends Model
     }
 
     /**
-     * A shipment has one service
+     * A shipment has one service.
      *
      * @return
      */
@@ -543,7 +545,7 @@ class Shipment extends Model
     }
 
     /**
-     * A shipment has one carrier
+     * A shipment has one carrier.
      *
      * @return
      */
@@ -573,7 +575,7 @@ class Shipment extends Model
     }
 
     /**
-     * A shipment hasone manifest
+     * A shipment hasone manifest.
      *
      * @return
      */
@@ -583,7 +585,7 @@ class Shipment extends Model
     }
 
     /**
-     * A shipment has many pricing manifests
+     * A shipment has many pricing manifests.
      *
      * @return
      */
@@ -593,7 +595,7 @@ class Shipment extends Model
     }
 
     /**
-     * A shipment has one label
+     * A shipment has one label.
      *
      * @return
      */
@@ -603,7 +605,7 @@ class Shipment extends Model
     }
 
     /**
-     * A shipment belongs to a mode of transport (courier, air, etc.)
+     * A shipment belongs to a mode of transport (courier, air, etc.).
      *
      * @return
      */
@@ -613,7 +615,7 @@ class Shipment extends Model
     }
 
     /**
-     * A shipment belongs to a mode
+     * A shipment belongs to a mode.
      *
      * @return
      */
@@ -623,7 +625,7 @@ class Shipment extends Model
     }
 
     /**
-     * A shipment has one status
+     * A shipment has one status.
      *
      * @return
      */
@@ -633,7 +635,7 @@ class Shipment extends Model
     }
 
     /**
-     * A shipment has many alerts
+     * A shipment has many alerts.
      *
      * @return
      */
@@ -643,9 +645,9 @@ class Shipment extends Model
     }
 
     /**
-     * A shipment is cancellable
+     * A shipment is cancellable.
      *
-     * @return boolean
+     * @return bool
      */
     public function isCancellable()
     {
@@ -654,16 +656,17 @@ class Shipment extends Model
             return false;
         }
 
-        if ($this->isActive() && !$this->received || $this->status->code == 'saved') {
+        if ($this->isActive() && ! $this->received || $this->status->code == 'saved') {
             return true;
         }
+
         return false;
     }
 
     /**
-     * Shipment active - i.e. not cancelled or delivered
+     * Shipment active - i.e. not cancelled or delivered.
      *
-     * @return boolean
+     * @return bool
      */
     public function isActive()
     {
@@ -677,20 +680,21 @@ class Shipment extends Model
     /**
      * Determines if a shipment is classified as domestic.
      *
-     * @return boolean
+     * @return bool
      */
     public function isDomestic()
     {
         if ($this->sender_country_code == $this->recipient_country_code) {
             return true;
         }
+
         return false;
     }
 
     /**
      * Returns a shipments EU status.
      *
-     * @return boolean
+     * @return bool
      */
     public function isWithinEu()
     {
@@ -700,13 +704,14 @@ class Shipment extends Model
         if ($sender && $recipient) {
             return true;
         }
+
         return false;
     }
 
     /**
      * Shipment has a commercial invoice.
      *
-     * @return boolean
+     * @return bool
      */
     public function hasCommercialInvoice()
     {
@@ -719,6 +724,7 @@ class Shipment extends Model
         if ((in_array($this->department->code, $viableDepartments) || in_array($this->recipient_country_code, ['GG', 'JE'])) && $this->status->code != 'cancelled') {
             return true;
         }
+
         return false;
     }
 
@@ -731,7 +737,7 @@ class Shipment extends Model
     public function getDeliveryDate($format = 'd-m-Y H:i', $timezone = false)
     {
         if ($this->delivery_date) {
-            if (!$timezone) {
+            if (! $timezone) {
                 $timezone = $this->destination_timezone;
             }
 
@@ -746,12 +752,11 @@ class Shipment extends Model
     }
 
     /**
-     *
      * @param type $format
      */
     public function getEstimatedDeliveryDate($format = 'd-m-Y', $timezone = false)
     {
-        if (!$timezone) {
+        if (! $timezone) {
             $timezone = $this->destination_timezone;
         }
 
@@ -791,7 +796,7 @@ class Shipment extends Model
     public function setDelivered($deliveryDate = null, $podSignature = 'Unknown', $userId = 0, $withTrackingEvent = false, $podImage = null)
     {
         // If the shipment has not been received, mark as received.
-        if (!$this->received) {
+        if (! $this->received) {
             $this->setReceived($this->ship_date, $userId);
         }
 
@@ -810,7 +815,7 @@ class Shipment extends Model
     }
 
     /**
-     * Sets the shipment to received - updates associated packages and inserts a tracking event for each package
+     * Sets the shipment to received - updates associated packages and inserts a tracking event for each package.
      *
      * @return null
      */
@@ -859,8 +864,8 @@ class Shipment extends Model
      * the status has changed.
      *
      * @param string $statusCode Status that the shipment will be changed to
-     * @param integer $userId User changing the shipment status
-     * @param boolean $withTrackingEvent
+     * @param int $userId User changing the shipment status
+     * @param bool $withTrackingEvent
      *
      * @return null
      */
@@ -871,7 +876,7 @@ class Shipment extends Model
 
         // Only update if we have been given a valid status and the shipment is not currently set to this status
         // Also, dont update the status if currently RTS or Delivered - GMcNicholl 25-09-2018 17:54
-        if ($status && $this->status_id != $status->id && !in_array($this->status_id, ['6', '9'])) {
+        if ($status && $this->status_id != $status->id && ! in_array($this->status_id, ['6', '9'])) {
 
             // Change the status on the shipment record
             $this->status_id = $status->id;
@@ -899,7 +904,7 @@ class Shipment extends Model
      * message is retreived from the statuses table.
      *
      * @param string $status Status that the shipment will be changed to
-     * @param integer $userId User adding the tracking event
+     * @param int $userId User adding the tracking event
      * @param string $message Tracking message
      * @param string $datetime Date/time of the event
      * @param string $location Location to apply to the tracking event (depot, shipper or destination)
@@ -912,7 +917,7 @@ class Shipment extends Model
         $status = Status::whereCode($statusCode)->first();
 
         if ($status) {
-            if (!$message) {
+            if (! $message) {
                 $message = $status->description;
             }
 
@@ -928,7 +933,7 @@ class Shipment extends Model
             return Tracking::firstOrCreate(['message' => $message, 'status' => $statusCode, 'datetime' => $datetime, 'shipment_id' => $this->id])->update([
                 'local_datetime' => $datetime,
                 'carrier' => $this->carrier->name,
-                'tracker_id' => 'trk_' . str_random(26),
+                'tracker_id' => 'trk_'.str_random(26),
                 'city' => $location['city'],
                 'state' => $location['state'],
                 'country_code' => $location['country_code'],
@@ -949,13 +954,13 @@ class Shipment extends Model
      */
     private function getTrackingEventLocation($location)
     {
-        if (!$this->company || !$this->depot) {
+        if (! $this->company || ! $this->depot) {
             return [
                 'city' => 'Antrim',
                 'state' => 'County Antrim',
                 'country_code' => 'GB',
                 'postcode' => 'BT41 2NQ',
-                'timezone' => 'Europe/London'
+                'timezone' => 'Europe/London',
             ];
         }
 
@@ -966,7 +971,7 @@ class Shipment extends Model
                     'state' => $this->company->state,
                     'country_code' => $this->company->country_code,
                     'postcode' => $this->company->postcode,
-                    'timezone' => $this->company->localisation->time_zone
+                    'timezone' => $this->company->localisation->time_zone,
                 ];
 
             case 'destination':
@@ -975,7 +980,7 @@ class Shipment extends Model
                     'state' => $this->recipient_state,
                     'country_code' => $this->recipient_country_code,
                     'postcode' => $this->recipient_postcode,
-                    'timezone' => getTimezone($this->recipient_country_code, $this->recipient_state, $this->recipient_city)
+                    'timezone' => getTimezone($this->recipient_country_code, $this->recipient_state, $this->recipient_city),
                 ];
 
             default:
@@ -984,7 +989,7 @@ class Shipment extends Model
                     'state' => $this->depot->state,
                     'country_code' => $this->depot->country_code,
                     'postcode' => $this->depot->postcode,
-                    'timezone' => $this->depot->localisation->time_zone
+                    'timezone' => $this->depot->localisation->time_zone,
                 ];
         }
     }
@@ -994,7 +999,7 @@ class Shipment extends Model
      *
      * @param type $datetime
      * @param type $userId
-     * @return boolean
+     * @return bool
      */
     public function closeCollectionRequest($datetime, $userId = 2)
     {
@@ -1011,7 +1016,7 @@ class Shipment extends Model
     public function createDeliveryRequest()
     {
         // Don't create a delivery request if these conditions are met
-        if ($this->carrier_id != 1 || $this->depot_id != 1 || !$this->isActive() || $this->service->code == 'air' || $this->transportJobs->where('type', 'd')->count() > 0) {
+        if ($this->carrier_id != 1 || $this->depot_id != 1 || ! $this->isActive() || $this->service->code == 'air' || $this->transportJobs->where('type', 'd')->count() > 0) {
             return false;
         }
 
@@ -1031,11 +1036,11 @@ class Shipment extends Model
             'weight' => $this->weight,
             'goods_description' => $this->goods_description,
             'volumetric_weight' => $this->volumetric_weight,
-            'instructions' => 'Deliver to: ' . $this->recipient_name . ', ' . $this->recipient_address1 . ', ' . $this->recipient_city . ' ' . $this->recipient_postcode . ' ' . $this->instructions,
+            'instructions' => 'Deliver to: '.$this->recipient_name.', '.$this->recipient_address1.', '.$this->recipient_city.' '.$this->recipient_postcode.' '.$this->instructions,
             'scs_job_number' => $this->scs_job_number,
             'scs_company_code' => ($this->company->group_account) ? $this->company->group_account : $this->company->scs_code,
             'cash_on_delivery' => 0,
-            'final_destination' => $this->recipient_city . ',' . $this->recipient_country,
+            'final_destination' => $this->recipient_city.','.$this->recipient_country,
             'type' => 'd',
             'from_type' => 'c',
             'from_company_name' => $this->company->company_name,
@@ -1063,7 +1068,7 @@ class Shipment extends Model
             'department_id' => $this->department_id,
             'depot_id' => $this->depot_id,
             'visible' => true,
-            'date_requested' => $dateRequested
+            'date_requested' => $dateRequested,
         ]);
 
         $transportJob->setTransendRoute();
@@ -1083,11 +1088,10 @@ class Shipment extends Model
     /**
      * Reverse out setDelivered actions. We should only ever have to reverse out manual POD against
      * IFS shipments, hence the restriction on the carrier ID.
-     *
      */
     public function undoSetDelivered()
     {
-        if (!$this->delivered && $this->carrier_id != 1) {
+        if (! $this->delivered && $this->carrier_id != 1) {
             return false;
         }
 
@@ -1102,7 +1106,7 @@ class Shipment extends Model
     }
 
     /**
-     * A shipment has many tracking events
+     * A shipment has many tracking events.
      *
      * @return
      */
@@ -1114,15 +1118,15 @@ class Shipment extends Model
     /**
      * Cancel a shipment. Makes API call, sets status and cancels collection request.
      *
-     * @param integer $userId
+     * @param int $userId
      */
     public function setCancelled($userId = 0)
     {
         $this->setStatus('cancelled', $userId);
 
         // If sender postcode not "BT", mainland pickup may need cancelled
-        if (!$this->originatesFromBtPostcode() && strtoupper($this->sender_country_code != 'US')) {
-            Mail::to('courier@antrim.ifsgroup.com')->cc('courieruk@antrim.ifsgroup.com')->queue(new GenericError('Shipment Cancelled (' . $this->company->company_name . '/' . $this->consignment_number . ')', 'Carrier pickup may need to be cancelled.'));
+        if (! $this->originatesFromBtPostcode() && strtoupper($this->sender_country_code != 'US')) {
+            Mail::to('courier@antrim.ifsgroup.com')->cc('courieruk@antrim.ifsgroup.com')->queue(new GenericError('Shipment Cancelled ('.$this->company->company_name.'/'.$this->consignment_number.')', 'Carrier pickup may need to be cancelled.'));
         }
 
         /*
@@ -1138,7 +1142,7 @@ class Shipment extends Model
     /**
      * Determine if shipment originates from BT postcode.
      *
-     * @return boolean
+     * @return bool
      */
     public function originatesFromBtPostcode()
     {
@@ -1172,7 +1176,7 @@ class Shipment extends Model
         }
 
         // No tracking found, check if received and use this status
-        if (!$this->tracking && $this->received) {
+        if (! $this->tracking && $this->received) {
             $status = 'received';
         }
 
@@ -1182,7 +1186,7 @@ class Shipment extends Model
 
             if ($collection) {
                 // Not received, so reinstate collection request
-                if (!$this->received) {
+                if (! $this->received) {
                     $collection->unmanifest();
                 } else {
                     $collection->setStatus('completed');
@@ -1191,7 +1195,6 @@ class Shipment extends Model
 
             // Notify transport
             Mail::to('transport@antrim.ifsgroup.com')->cc('it@antrim.ifsgroup.com')->queue(new TransportJobReinstated($collection));
-
 
             // Reinstate delivery request if exists
             $delivery = $this->transportJobs->where('type', 'd')->first();
@@ -1209,7 +1212,7 @@ class Shipment extends Model
     }
 
     /**
-     * Returns the number of packages scanned i.e "1 of 2"
+     * Returns the number of packages scanned i.e "1 of 2".
      *
      * @return string
      */
@@ -1222,7 +1225,7 @@ class Shipment extends Model
             }
         }
 
-        return $count . ' of ' . $this->pieces;
+        return $count.' of '.$this->pieces;
     }
 
     /**
@@ -1231,7 +1234,7 @@ class Shipment extends Model
     public function createCollectionRequest()
     {
         // Don't create a collection request if these conditions are met
-        if ($this->depot_id != 1 || !$this->isActive() || (!stristr($this->sender_postcode, 'BT') && strtoupper($this->sender_country_code) == 'GB') || $this->transportJobs->where('type', 'c')->count() > 0 || $this->company->testing == 1) {
+        if ($this->depot_id != 1 || ! $this->isActive() || (! stristr($this->sender_postcode, 'BT') && strtoupper($this->sender_country_code) == 'GB') || $this->transportJobs->where('type', 'c')->count() > 0 || $this->company->testing == 1) {
             return false;
         }
 
@@ -1242,11 +1245,11 @@ class Shipment extends Model
             'weight' => $this->weight,
             'goods_description' => $this->goods_description,
             'volumetric_weight' => $this->volumetric_weight,
-            'instructions' => 'Collect from customer premises and bring back to ' . $this->depot->name,
+            'instructions' => 'Collect from customer premises and bring back to '.$this->depot->name,
             'scs_job_number' => $this->scs_job_number,
             'scs_company_code' => ($this->company->group_account) ? $this->company->group_account : $this->company->scs_code,
             'cash_on_delivery' => 0,
-            'final_destination' => $this->recipient_city . ',' . $this->recipient_country,
+            'final_destination' => $this->recipient_city.','.$this->recipient_country,
             'type' => 'c',
             'from_type' => $this->sender_type,
             'from_name' => $this->sender_name,
@@ -1274,7 +1277,7 @@ class Shipment extends Model
             'department_id' => $this->department_id,
             'depot_id' => $this->depot_id,
             'visible' => '1',
-            'date_requested' => ($this->collection_date) ? $this->collection_date : $this->ship_date
+            'date_requested' => ($this->collection_date) ? $this->collection_date : $this->ship_date,
         ]);
 
         $transportJob->setTransendRoute();
@@ -1283,7 +1286,7 @@ class Shipment extends Model
 
     /**
      * Price shipment and if successful,
-     * optionally update the Shipment record
+     * optionally update the Shipment record.
      *
      * @param type $toBeSaved
      * @return array Pricing breakdown offor costs and sales
@@ -1326,13 +1329,14 @@ class Shipment extends Model
      * pre-transit, ANT shipments that do not have a BT postcode. Can be extended for any
      * other requirements in the future.
      *
-     * @return boolean
+     * @return bool
      */
     public function isHighlighted()
     {
-        if ($this->isActive() && $this->status->code == 'pre_transit' && $this->depot->code == 'ANT' && !$this->originatesFromBtPostcode()) {
+        if ($this->isActive() && $this->status->code == 'pre_transit' && $this->depot->code == 'ANT' && ! $this->originatesFromBtPostcode()) {
             return true;
         }
+
         return false;
     }
 
@@ -1341,18 +1345,19 @@ class Shipment extends Model
      * non MIA shipments that do not have a BT postcode. Can be extended for any other requirements
      * in the future.
      *
-     * @return boolean
+     * @return bool
      */
     public function formViewAvailable()
     {
-        if (!$this->legacy && $this->status->code != 'saved' && $this->form_values) {
+        if (! $this->legacy && $this->status->code != 'saved' && $this->form_values) {
             return true;
         }
+
         return false;
     }
 
     /**
-     * Calculate customs value in GBP
+     * Calculate customs value in GBP.
      *
      * @return type
      */
@@ -1372,7 +1377,7 @@ class Shipment extends Model
      *
      * @param string $carrierConsignmentNumber
      * @param carbon $dateTimeBooked
-     * @param integer $userId
+     * @param int $userId
      */
     public function bookedWithAirline($carrierConsignmentNumber, $dateTimeBooked = false, $userId = 0)
     {
@@ -1395,7 +1400,7 @@ class Shipment extends Model
     /**
      * Add shipment to last manifest closed out.
      *
-     * @return boolean
+     * @return bool
      */
     public function addToLastManifest()
     {
@@ -1428,7 +1433,7 @@ class Shipment extends Model
      * Determine if a shipment has an uploaded document.
      *
      * @param type $documentType
-     * @return boolean
+     * @return bool
      */
     public function hasUploadedDocument($documentType)
     {
@@ -1442,7 +1447,7 @@ class Shipment extends Model
     }
 
     /**
-     * A shipment has many documents
+     * A shipment has many documents.
      *
      * @return
      */
@@ -1450,7 +1455,6 @@ class Shipment extends Model
     {
         return $this->belongsToMany(Document::class)->orderBy('id', 'DESC');
     }
-
 
     /**
      * Returns shipment PDF label document as separate base64 encode PNG files.
@@ -1464,7 +1468,7 @@ class Shipment extends Model
         if ($this->label) {
 
             // Save the base64 string as PDF document in the temp directory
-            $pdfPath = storage_path('app/temp/' . $this->token . str_random(6) . '.pdf');
+            $pdfPath = storage_path('app/temp/'.$this->token.str_random(6).'.pdf');
             $decodedFile = base64_decode($this->label->base64);
             file_put_contents($pdfPath, $decodedFile);
 
@@ -1474,7 +1478,7 @@ class Shipment extends Model
 
             foreach (range(1, $numberOfPages) as $pageNumber) {
                 $key = ($numberOfPages > $this->pieces && $pageNumber == 1) ? 'master' : 'package';
-                $pngPath = storage_path('app/temp/' . str_random(3) . time() . '.png');
+                $pngPath = storage_path('app/temp/'.str_random(3).time().'.png');
                 $pdf->setPage($pageNumber)->setCompressionQuality(100)->setResolution(300)->setOutputFormat('png')->saveImage($pngPath);
 
                 if (file_exists($pngPath)) {
@@ -1494,7 +1498,7 @@ class Shipment extends Model
      */
     public function updateTracking()
     {
-        $className = "\App\Tracking\\" . $this->carrier->name;
+        $className = "\App\Tracking\\".$this->carrier->name;
 
         $tracking = new $className($this);
 

@@ -2,13 +2,13 @@
 
 namespace App\CarrierAPI\ExpressFreightNI;
 
-use TCPDI;
+use App\CarrierAPI\ExpressFreightNI\ExpressFreightNILabel;
 use App\TransactionLog;
 use Illuminate\Support\Facades\Validator;
-use App\CarrierAPI\ExpressFreightNI\ExpressFreightNILabel;
+use TCPDI;
 
 /**
- * Description of IFSWebAPI
+ * Description of IFSWebAPI.
  *
  * @author gmcbroom
  */
@@ -22,7 +22,6 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
 
     public function preProcess($shipment)
     {
-
     }
 
     public function createShipment($shipment)
@@ -46,7 +45,8 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
             if (isset($reply['errors']) && $reply['errors'] > '') {
 
                 // Request unsuccessful - return errors
-                $errorMsg = 'Carrier Error : ' . ((string)$reply['errors']);
+                $errorMsg = 'Carrier Error : '.((string) $reply['errors']);
+
                 return $this->generateErrorResponse($response, $errorMsg);
             } else {
 
@@ -69,9 +69,8 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
         return $this->applyRules($rules, $shipment);
     }
 
-    function initCarrier()
+    public function initCarrier()
     {
-
     }
 
     public function buildCarrierShipment($shipment)
@@ -108,7 +107,6 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
      */
     public function addAdditionalInfo($shipment)
     {
-
         $data['consignment_number'] = nextAvailable('CONSIGNMENT');                     // Generate an IFS Consignment Number
         $data['pieces'] = $shipment['pieces'];
 
@@ -124,14 +122,14 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
         $currentConsignmentNumber = nextAvailable('EXPNICONSIGNMENT');
         $currentConsignmentNumber = str_pad($currentConsignmentNumber, 3, 0, STR_PAD_LEFT);
 
-        $consignmentNumber = 'I012' . date('dmy', time()) . $currentConsignmentNumber;
+        $consignmentNumber = 'I012'.date('dmy', time()).$currentConsignmentNumber;
 
         // Set the carrier consignment and tracking numbers
         $data['carrier_consignment_number'] = $consignmentNumber;
         $data['carrier_tracking_number'] = $consignmentNumber;
 
         for ($i = 0; $i < $data['pieces']; $i++) {
-            $trackingNumber = $consignmentNumber . str_pad($i + 1, 3, 0, STR_PAD_LEFT); // Append the package number
+            $trackingNumber = $consignmentNumber.str_pad($i + 1, 3, 0, STR_PAD_LEFT); // Append the package number
             $data['packages'][$i]['carrier_tracking_number'] = $trackingNumber;         // Store tracking no for package
             $data['packages'][$i]['barcode'] = $trackingNumber;                         // Store tracking no for package
         }
@@ -159,7 +157,7 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
         $response['volumetric_divisor'] = getVolumetricDivisor('IFS', $serviceCode);       // From Helper functions
 
         $response['pieces'] = $reply['pieces'];
-        for ($i = 0; $i < $response['pieces']; ++$i) {
+        for ($i = 0; $i < $response['pieces']; $i++) {
             $response['packages'][$i]['sequence_number'] = $i + 1;
             $response['packages'][$i]['carrier_tracking_code'] = $reply['packages'][$i]['carrier_tracking_number'];
             $response['packages'][$i]['barcode'] = $reply['packages'][$i]['carrier_tracking_number'];
@@ -176,15 +174,12 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     *
      * @param type $reply
      */
     private function generatePdf($shipment, $serviceCode, $labelData)
     {
         $label = new ExpressFreightNILabel($shipment, $serviceCode, $labelData);
+
         return $label->create();
     }
-
 }
-
-?>

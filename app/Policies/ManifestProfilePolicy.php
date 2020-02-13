@@ -2,31 +2,30 @@
 
 namespace App\Policies;
 
-use App\User;
 use App\ManifestProfile;
+use App\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ManifestProfilePolicy
 {
-
     use HandlesAuthorization;
 
     /**
      * Intercept all checks - ensure IFS user.
      *
-     * @return boolean
+     * @return bool
      */
     public function before(User $user)
     {
-        if (!$user->hasIfsRole()) {
+        if (! $user->hasIfsRole()) {
             return false;
         }
     }
 
     /**
      * Index policy.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function view(User $user)
     {
@@ -38,7 +37,7 @@ class ManifestProfilePolicy
     /**
      * Update policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function update(User $user)
     {
@@ -48,9 +47,9 @@ class ManifestProfilePolicy
     }
 
     /**
-     * Run manifest. 
+     * Run manifest.
      *
-     * @return boolean
+     * @return bool
      */
     public function runManifest(User $user, ManifestProfile $manifestProfile)
     {
@@ -60,9 +59,9 @@ class ManifestProfilePolicy
     }
 
     /**
-     * Bulk hold. 
+     * Bulk hold.
      *
-     * @return boolean
+     * @return bool
      */
     public function bulkHold(User $user, ManifestProfile $manifestProfile)
     {
@@ -70,5 +69,4 @@ class ManifestProfilePolicy
             return true;
         }
     }
-
 }

@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Shipment;
 use App\InvoiceRun;
+use App\Shipment;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class InvoiceRunController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -22,7 +21,7 @@ class InvoiceRunController extends Controller
     }
 
     /**
-     * List the invoice runs and paginate the results
+     * List the invoice runs and paginate the results.
      *
      * @param Request $request
      * @return type
@@ -37,7 +36,7 @@ class InvoiceRunController extends Controller
     }
 
     /**
-     * Display the invoice run
+     * Display the invoice run.
      *
      * @param $id
      * @return type
@@ -52,7 +51,7 @@ class InvoiceRunController extends Controller
     }
 
     /**
-     * Display all shipments available for invoicing
+     * Display all shipments available for invoicing.
      *
      * @return type
      */
@@ -100,5 +99,4 @@ class InvoiceRunController extends Controller
 
         return redirect('invoice-runs');
     }
-
 }

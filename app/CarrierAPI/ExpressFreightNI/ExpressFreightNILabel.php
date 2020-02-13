@@ -8,9 +8,9 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
 {
     /**
      * Accepts Shipment and Carrier Response data
-     * and stores these to use to generate labels
+     * and stores these to use to generate labels.
      */
-    function __construct($shipment = null, $serviceCode = null, $data = null)
+    public function __construct($shipment = null, $serviceCode = null, $data = null)
     {
         parent::__construct($shipment, $serviceCode, $data);
     }
@@ -18,7 +18,7 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
     /**
      * Takes stored Shipment and Carrier Response data
      * and uses it to create a PDF containing all the
-     * necessary labels in the following format :-
+     * necessary labels in the following format :-.
      *
      * No Master label, each Label is a package label
      */
@@ -26,7 +26,6 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
     {
         $pkg = 0;
         foreach ($this->shipment['packages'] as $package) {
-
             $this->addPage();
 
             // Outer Box
@@ -59,7 +58,6 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->SetLineWidth(0.3);
             $this->pdf->Cell(22, 22, '', 1);
 
-
             $bay = $this->getBayNumber($this->shipment['recipient_postcode']);
 
             if (strlen($bay) > 2) {
@@ -86,7 +84,6 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->Text(6, $y, 'Delivery');
             $this->pdf->Text(40, $y, $this->data['packages'][$pkg]['barcode']);
 
-
             // Box for delivery address
             $this->pdf->SetXY(5, 90);
             $this->pdf->SetLineWidth(0.3);
@@ -97,37 +94,39 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
             $y = 92;
 
             $this->pdf->SetFont($this->font, 'B', 8);
-            if (isset($this->shipment['recipient_name']) && ($this->shipment['recipient_name'] > ""))
+            if (isset($this->shipment['recipient_name']) && ($this->shipment['recipient_name'] > '')) {
                 $this->pdf->Text($x, $y, strtoupper($this->shipment['recipient_name'] ? $this->shipment['recipient_name'] : ''));
+            }
 
-            if (isset($this->shipment['recipient_company_name']) && ($this->shipment['recipient_company_name'] > ""))
+            if (isset($this->shipment['recipient_company_name']) && ($this->shipment['recipient_company_name'] > '')) {
                 $this->pdf->Text($x, $y += 4.1, strtoupper($this->shipment['recipient_company_name'] ? $this->shipment['recipient_company_name'] : ''));
+            }
 
-            if (isset($this->shipment['recipient_address1']) && ($this->shipment['recipient_address1'] > ""))
+            if (isset($this->shipment['recipient_address1']) && ($this->shipment['recipient_address1'] > '')) {
                 $this->pdf->Text($x, $y += 4.1, strtoupper($this->shipment['recipient_address1']));
+            }
 
-            if (isset($this->shipment['recipient_address2']) && ($this->shipment['recipient_address2'] > ""))
+            if (isset($this->shipment['recipient_address2']) && ($this->shipment['recipient_address2'] > '')) {
                 $this->pdf->Text($x, $y += 4.1, strtoupper($this->shipment['recipient_address2']));
+            }
 
-            if (isset($this->shipment['recipient_city']) && ($this->shipment['recipient_city'] > ""))
+            if (isset($this->shipment['recipient_city']) && ($this->shipment['recipient_city'] > '')) {
                 $this->pdf->Text($x, $y += 4.1, strtoupper($this->shipment['recipient_city']));
+            }
 
-            if (isset($this->shipment['recipient_state']) && ($this->shipment['recipient_state'] > "")) {
-
-                if (isset($this->shipment['recipient_postcode']) && ($this->shipment['recipient_postcode'] > "")) {
-                    $this->pdf->Text($x, $y += 4.1, strtoupper($this->shipment['recipient_state'] . ', ' . $this->shipment['recipient_postcode']));
+            if (isset($this->shipment['recipient_state']) && ($this->shipment['recipient_state'] > '')) {
+                if (isset($this->shipment['recipient_postcode']) && ($this->shipment['recipient_postcode'] > '')) {
+                    $this->pdf->Text($x, $y += 4.1, strtoupper($this->shipment['recipient_state'].', '.$this->shipment['recipient_postcode']));
                 } else {
                     $this->pdf->Text($x, $y += 4.1, strtoupper($this->shipment['recipient_state']));
                 }
-
             } else {
-
-                if (isset($this->shipment['recipient_postcode']) && ($this->shipment['recipient_postcode'] > "")) {
+                if (isset($this->shipment['recipient_postcode']) && ($this->shipment['recipient_postcode'] > '')) {
                     $this->pdf->Text($x, $y += 4.1, strtoupper($this->shipment['recipient_postcode']));
                 }
             }
 
-            if (isset($this->shipment['recipient_country_code']) && ($this->shipment['recipient_country_code'] > "")) {
+            if (isset($this->shipment['recipient_country_code']) && ($this->shipment['recipient_country_code'] > '')) {
                 $this->pdf->Text($x, $y += 4.1, strtoupper(getCountry($this->shipment['recipient_country_code'])));
             }
 
@@ -146,7 +145,7 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->SetFont($this->font, 'U', 9);
             $this->pdf->Text($x, $y += 7, 'Item No.s');
             $this->pdf->SetFont($this->font, '', 9);
-            $this->pdf->Text($x, $y += 6, $package['index'] . ' of ' . $this->shipment['pieces']);
+            $this->pdf->Text($x, $y += 6, $package['index'].' of '.$this->shipment['pieces']);
             $this->pdf->SetLineWidth(0.3);
             $this->pdf->Line(65, $y + 5, 97, $y + 5); //horizontal
 
@@ -157,7 +156,7 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
 
             // Display sender
             $this->pdf->SetFont($this->font, 'B', 8);
-            $this->pdf->Text(6, 125, 'Sender: ' . $this->shipment['sender_company_name']);
+            $this->pdf->Text(6, 125, 'Sender: '.$this->shipment['sender_company_name']);
 
             $y = 131;
             $this->pdf->SetFont($this->font, 'B', 9);
@@ -167,16 +166,15 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
             $x = 7;
             $y = 141;
             $this->pdf->SetFont($this->font, 'B', 14);
-            $this->pdf->Text($x, $y, 'IFS CONSIGNMENT#: ' . $this->data['ifs_consignment_number']);
+            $this->pdf->Text($x, $y, 'IFS CONSIGNMENT#: '.$this->data['ifs_consignment_number']);
             $pkg++;
         }
 
         return $this->output();
     }
 
-
     /**
-     * Lookup the bay number from the EF gazetteer
+     * Lookup the bay number from the EF gazetteer.
      *
      * @param $postcode
      * @return int
@@ -190,8 +188,5 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
         if ($gaz) {
             return strtoupper($gaz->bay);
         }
-
-        return null;
     }
-
 }

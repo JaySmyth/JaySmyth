@@ -3,14 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\FuelSurcharge;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\FuelSurchargeRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class FuelSurchargesController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -22,10 +21,10 @@ class FuelSurchargesController extends Controller
     }
 
     /**
-     * List the fuel surcharges. 
+     * List the fuel surcharges.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function index(Request $request)
     {
@@ -39,8 +38,8 @@ class FuelSurchargesController extends Controller
     /**
      * Display create record form.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function create()
     {
@@ -52,8 +51,8 @@ class FuelSurchargesController extends Controller
     /**
      * Store a new record.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function store(FuelSurchargeRequest $request)
     {
@@ -69,8 +68,8 @@ class FuelSurchargesController extends Controller
     /**
      * Display edit screen.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function edit(FuelSurcharge $fuelSurcharge)
     {
@@ -82,8 +81,8 @@ class FuelSurchargesController extends Controller
     /**
      * Update changes.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function update(FuelSurcharge $fuelSurcharge, FuelSurchargeRequest $request)
     {
@@ -98,7 +97,7 @@ class FuelSurchargesController extends Controller
 
     /**
      * Upload CSV screen.
-     * 
+     *
      * @return type
      */
     public function upload()
@@ -110,7 +109,7 @@ class FuelSurchargesController extends Controller
 
     /**
      * Process CSV upload.
-     * 
+     *
      * @param Request $request
      * @return type
      */
@@ -122,11 +121,12 @@ class FuelSurchargesController extends Controller
         $this->validate($request, ['file' => 'required|mimes:csv,txt'], ['file.required' => 'Please select a file to upload.']);
 
         // Upload the file to the temp directory
-        $path = $request->file('file')->storeAs('temp', 'original_' . str_random(12) . '.csv');
+        $path = $request->file('file')->storeAs('temp', 'original_'.str_random(12).'.csv');
 
         // Check that the file was uploaded successfully
-        if (!Storage::disk('local')->exists($path)) {
+        if (! Storage::disk('local')->exists($path)) {
             flash()->error('Problem Uploading!', 'Unable to upload file. Please try again.');
+
             return back();
         }
 
@@ -140,7 +140,7 @@ class FuelSurchargesController extends Controller
 
     /**
      * Delete.
-     * 
+     *
      * @param Quotation $quotation
      * @return string
      */
@@ -155,10 +155,10 @@ class FuelSurchargesController extends Controller
 
     /*
      * Fuel surcharge search.
-     * 
+     *
      * @param   $request
      * @param   $paginate
-     * 
+     *
      * @return
      */
 
@@ -170,11 +170,10 @@ class FuelSurchargesController extends Controller
                 ->toDate($request->to_date)
                 ->hasCarrier($request->carrier);
 
-        if (!$paginate) {
+        if (! $paginate) {
             return $query->get();
         }
 
         return $query->paginate(50);
     }
-
 }
