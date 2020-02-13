@@ -2,7 +2,6 @@
 
 namespace App;
 
-use App\Service;
 use App\CarrierService;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,16 +9,6 @@ class Carrier extends Model
 {
 
     public $timestamps = false;
-
-    /**
-     * A carrier has many services.
-     *
-     * @return
-     */
-    public function services()
-    {
-        return $this->hasMany(Service::class)->orderBy('carrier_name');
-    }
 
     /**
      * A carrier has many purchase invoice charge codes.
@@ -39,6 +28,16 @@ class Carrier extends Model
     public function getServices($serviceCode)
     {
         return $this->services()->where('services.code', $serviceCode)->get();
+    }
+
+    /**
+     * A carrier has many services.
+     *
+     * @return
+     */
+    public function services()
+    {
+        return $this->hasMany(Service::class)->orderBy('carrier_name');
     }
 
     public function packagingTypes()
