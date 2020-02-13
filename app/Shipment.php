@@ -511,7 +511,7 @@ class Shipment extends Model
      */
     public function contents()
     {
-        return $this->hasMany('App\ShipmentContent')->orderBy('package_index');
+        return $this->hasMany(\App\ShipmentContent::class)->orderBy('package_index');
     }
 
     /**
@@ -521,7 +521,7 @@ class Shipment extends Model
      */
     public function service()
     {
-        return $this->belongsTo('App\Service');
+        return $this->belongsTo(\App\Service::class);
     }
 
     /**
@@ -541,7 +541,7 @@ class Shipment extends Model
      */
     public function user()
     {
-        return $this->belongsTo('App\User');
+        return $this->belongsTo(\App\User::class);
     }
 
     /**
@@ -551,7 +551,7 @@ class Shipment extends Model
      */
     public function carrier()
     {
-        return $this->belongsTo('App\Carrier');
+        return $this->belongsTo(\App\Carrier::class);
     }
 
     /**
@@ -561,7 +561,7 @@ class Shipment extends Model
      */
     public function route()
     {
-        return $this->belongsTo('App\Route');
+        return $this->belongsTo(\App\Route::class);
     }
 
     /**
@@ -571,7 +571,7 @@ class Shipment extends Model
      */
     public function depot()
     {
-        return $this->belongsTo('App\Depot');
+        return $this->belongsTo(\App\Depot::class);
     }
 
     /**
@@ -581,7 +581,7 @@ class Shipment extends Model
      */
     public function manifest()
     {
-        return $this->belongsTo('App\Manifest');
+        return $this->belongsTo(\App\Manifest::class);
     }
 
     /**
@@ -1112,7 +1112,7 @@ class Shipment extends Model
      */
     public function tracking()
     {
-        return $this->hasMany('App\Tracking')->orderBy('local_datetime', 'DESC')->orderBy('id', 'DESC');
+        return $this->hasMany(\App\Tracking::class)->orderBy('local_datetime', 'DESC')->orderBy('id', 'DESC');
     }
 
     /**
@@ -1498,7 +1498,7 @@ class Shipment extends Model
      */
     public function updateTracking()
     {
-        $className = "\App\Tracking\\".$this->carrier->name;
+        $className = \App\Tracking::class.$this->carrier->name;
 
         $tracking = new $className($this);
 

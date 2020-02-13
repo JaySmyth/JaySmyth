@@ -8,6 +8,6 @@ class CarrierPackagingType extends Model
 {
     public function packagingType()
     {
-        return $this->belongsToMany('App\PackagingType');
+        return $this->belongsToMany(\App\PackagingType::class);
     }
 }

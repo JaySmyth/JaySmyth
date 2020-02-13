@@ -46,6 +46,6 @@ class Carrier extends Model
      */
     public function packagingTypes()
     {
-        return $this->hasMany('App\CarrierPackagingType');
+        return $this->hasMany(\App\CarrierPackagingType::class);
     }
 }

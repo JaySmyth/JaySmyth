@@ -47,7 +47,7 @@ class DeleteOldLogEntries extends Command
 
         $this->info('Deleting transport job log entries before '.$cutOff->toDateTimeString());
 
-        \App\Log::where('logable_type', 'App\TransportJob')
+        \App\Log::where('logable_type', \App\TransportJob::class)
                 ->where('created_at', '<=', $cutOff)
                 ->delete();
 

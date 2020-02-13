@@ -15,7 +15,7 @@ use Carbon\Carbon;
  */
 function flash()
 {
-    return app('App\Http\Flash');
+    return app(\App\Http\Flash::class);
 }
 
 /**

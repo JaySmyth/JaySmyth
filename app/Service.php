@@ -16,7 +16,7 @@ class Service extends Model
      */
     public function mode()
     {
-        return $this->belongsTo('App\Mode');
+        return $this->belongsTo(\App\Mode::class);
     }
 
     /**
@@ -26,7 +26,7 @@ class Service extends Model
      */
     public function carrier()
     {
-        return $this->belongsTo('App\Carrier');
+        return $this->belongsTo(\App\Carrier::class);
     }
 
     /*
@@ -35,7 +35,7 @@ class Service extends Model
 
     public function companies()
     {
-        return $this->belongsToMany('App\Company')->withTimestamps();
+        return $this->belongsToMany(\App\Company::class)->withTimestamps();
     }
 
     /**
@@ -80,7 +80,7 @@ class Service extends Model
 
     public function surcharge()
     {
-        return $this->hasOne('App\Surcharge', 'id', 'surcharge_id');
+        return $this->hasOne(\App\Surcharge::class, 'id', 'surcharge_id');
     }
 
     public function getSurcharges($companyId = '0', $code = '', $shipDate = '')
