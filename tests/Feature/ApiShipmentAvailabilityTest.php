@@ -21,7 +21,7 @@ class ApiShipmentAvailabilityTest extends TestCase
      * Initial Setup to run Test as a named User
      * and initialise the Pricing Object.
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
