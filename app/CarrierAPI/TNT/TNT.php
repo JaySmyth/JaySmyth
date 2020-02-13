@@ -2,6 +2,7 @@
 
 namespace App\CarrierAPI\TNT;
 
+use Illuminate\Support\Str;
 use App\Service;
 use SimpleXMLElement;
 
@@ -20,7 +21,7 @@ class TNT
         $this->shipment = $shipment;
 
         // Random consignment identifier for TNT to use.
-        $this->conref = strtoupper(str_random(8));
+        $this->conref = strtoupper(Str::random(8));
 
         // Remove any unwanted characters before generating xml
         $this->removeUnwantedCharactersFromData();

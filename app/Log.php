@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
@@ -37,7 +38,7 @@ class Log extends Model
      */
     public function getParentUrlAttribute()
     {
-        return url(str_replace('_', '-', str_plural(strtolower(snake_case(substr($this->logable_type, 4))))), $this->logable_id);
+        return url(str_replace('_', '-', Str::plural(strtolower(Str::snake(substr($this->logable_type, 4))))), $this->logable_id);
     }
 
     /**

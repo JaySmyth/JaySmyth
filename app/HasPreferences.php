@@ -1,6 +1,7 @@
 <?php
 
 namespace App;
+use Illuminate\Support\Arr;
 
 trait HasPreferences
 {
@@ -31,7 +32,7 @@ trait HasPreferences
         }
 
         // Flatten the multi-dimensional array into 1D array using dot notation
-        $values = array_dot($values);
+        $values = Arr::dot($values);
 
         // Remove any existing default values first
         $this->resetPreferences($companyId, $modeId);

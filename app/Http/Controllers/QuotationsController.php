@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Arr;
 use App\CarrierAPI\Pdf;
 use App\Http\Requests\QuotationRequest;
 use App\Quotation;
@@ -71,7 +72,7 @@ class QuotationsController extends Controller
     {
         $this->authorize(new Quotation);
 
-        $quotation = Quotation::create(array_add($request->all(), 'user_id', Auth::user()->id));
+        $quotation = Quotation::create(Arr::add($request->all(), 'user_id', Auth::user()->id));
 
         $quotation->log();
 

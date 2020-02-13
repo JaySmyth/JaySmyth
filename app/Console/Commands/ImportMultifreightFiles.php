@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -133,7 +134,7 @@ class ImportMultifreightFiles extends Command
                 $this->fileType = $type;
 
                 // Instantiate corresponding model
-                $className = "\App\Multifreight\\".ucfirst(camel_case($this->fileType));
+                $className = "\App\Multifreight\\".ucfirst(Str::camel($this->fileType));
 
                 $this->table = new $className();
 

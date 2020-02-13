@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Arr;
 use App\ShipmentUpload;
 use Illuminate\Http\Request;
 
@@ -65,7 +66,7 @@ class ShipmentUploadsController extends Controller
             'import_config_id' => 'required',
         ]);
 
-        $shipmentUpload = ShipmentUpload::create(array_except($request->all(), ['create_sftp_account']));
+        $shipmentUpload = ShipmentUpload::create(Arr::except($request->all(), ['create_sftp_account']));
 
         $shipmentUpload->log();
 

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\PurchaseInvoices;
 
+use Illuminate\Support\Str;
 use App\PurchaseInvoice;
 use App\PurchaseInvoiceCharge;
 use App\PurchaseInvoiceLine;
@@ -204,8 +205,8 @@ class ImportUpsPurchaseInvoices extends Command
                     // Only read details that apply to this invoice number / acct number
                     if ($details['Inv No'] == $summary['Inv No'] && $details['Acct No'] == $summary['Acct No']) {
                         $purchaseInvoiceLine = PurchaseInvoiceLine::firstOrcreate([
-                            'carrier_consignment_number' => ($details['Tracking number']) ? $details['Tracking number'] : strtoupper(str_random(18)),
-                            'carrier_tracking_number' => ($details['Tracking number']) ? $details['Tracking number'] : strtoupper(str_random(18)),
+                            'carrier_consignment_number' => ($details['Tracking number']) ? $details['Tracking number'] : strtoupper(Str::random(18)),
+                            'carrier_tracking_number' => ($details['Tracking number']) ? $details['Tracking number'] : strtoupper(Str::random(18)),
                             'purchase_invoice_id' => $this->purchaseInvoice->id,
                         ]);
 

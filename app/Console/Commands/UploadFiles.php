@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
@@ -154,7 +155,7 @@ class UploadFiles extends Command
                 array_unshift($data, $headings);
             }
 
-            return writeCsv(storage_path().'/app/temp/'.time().str_random(3).'.csv', $data, 'w', $fileUpload->fileUploadHost->csv_delimiter);
+            return writeCsv(storage_path().'/app/temp/'.time().Str::random(3).'.csv', $data, 'w', $fileUpload->fileUploadHost->csv_delimiter);
         }
 
         $this->log('No data to transfer', 'error');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Str;
 use App\Http\Requests\UserRequest;
 use App\Role;
 use App\User;
@@ -96,11 +97,11 @@ class UsersController extends Controller
         $this->authorize(new User);
 
         // random password
-        $password = str_random(8);
+        $password = Str::random(8);
 
         $user = new User($request->all());
         $user->password = bcrypt($password);
-        $user->api_token = strtolower(str_random(40));
+        $user->api_token = strtolower(Str::random(40));
         $user->show_search_bar = 1;
 
         // Not an IFS user, default users role to "cust"

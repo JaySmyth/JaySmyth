@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Arr;
 use App\Company;
 use App\Country;
 use App\Postcode;
@@ -54,7 +55,7 @@ function inc(&$var, $value)
 function array_undot($array)
 {
     foreach ($array as $key => $value) {
-        array_set($array, $key, $value);
+        Arr::set($array, $key, $value);
     }
 
     foreach ($array as $key => $value) {
@@ -346,7 +347,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
         case 'statuses':
             $result = App\Status::select('name', 'id')->where('id', '>', 1)
                 ->where('id', '<', 13)->pluck('name', 'id')->toArray();
-            $result = array_add($result, 'S', 'Shipped (All except cancelled)');
+            $result = Arr::add($result, 'S', 'Shipped (All except cancelled)');
             break;
         case 'uoms':
             $result = App\Uom::select('name', 'code')->orderBy('name')->pluck('name', 'code');
@@ -376,7 +377,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             break;
         case 'seaFreightStatuses':
             $result = App\SeaFreightStatus::select('name', 'id')->orderBy('id')->pluck('name', 'id');
-            $result = array_add($result, 'active', 'Active (all except delivered/cancelled)');
+            $result = Arr::add($result, 'active', 'Active (all except delivered/cancelled)');
             break;
         case 'serviceCodes':
             $result = App\Service::orderBy('code')->pluck('code', 'code');

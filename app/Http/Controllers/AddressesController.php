@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Str;
 use App\Address;
 use App\Http\Requests;
 use App\Http\Requests\AddressRequest;
@@ -124,7 +125,7 @@ class AddressesController extends Controller
         ]);
 
         // Upload the file
-        $path = $request->file('file')->storeAs('temp', time().str_random(3).'.csv');
+        $path = $request->file('file')->storeAs('temp', time().Str::random(3).'.csv');
 
         // Check that the file was uploaded successfully
         if (! Storage::disk('local')->exists($path)) {

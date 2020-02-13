@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Str;
 use App\Carrier;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TrackingRequest;
@@ -140,7 +141,7 @@ class TrackingController extends Controller
             'state' => $request->state,
             'country_code' => $request->country_code,
             'postcode' => $request->postcode,
-            'tracker_id' => str_random(12),
+            'tracker_id' => Str::random(12),
             'source' => 'ifs',
             'estimated_delivery_date' => $estimatedDeliveryDate,
             'local_estimated_delivery_date' => $localEstimatedDeliveryDate,

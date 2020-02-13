@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Arr;
 use App\Company;
 use App\CustomsEntry;
 use App\Document;
@@ -81,7 +82,7 @@ class CustomsEntriesController extends Controller
     {
         $this->authorize(new CustomsEntry);
 
-        $customsEntry = CustomsEntry::create(array_add($request->all(), 'user_id', Auth::user()->id));
+        $customsEntry = CustomsEntry::create(Arr::add($request->all(), 'user_id', Auth::user()->id));
 
         flash()->success('Entry Created!', 'Customs entry created successfully.');
 

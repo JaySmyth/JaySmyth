@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use Illuminate\Support\Str;
 use App\PurchaseInvoice;
 use App\User;
 use Illuminate\Bus\Queueable;
@@ -118,10 +119,10 @@ class ExportPurchaseInvoices implements ShouldQueue
     private function getFilename($invoiceNumber = false, $carrier = false)
     {
         if ($carrier) {
-            return $carrier.'Bulk_'.date('dmy').'_'.strtoupper(str_random(3)).'.xml';
+            return $carrier.'Bulk_'.date('dmy').'_'.strtoupper(Str::random(3)).'.xml';
         }
 
-        return $invoiceNumber.'_'.date('dmy').'_'.strtoupper(str_random(3)).'.xml';
+        return $invoiceNumber.'_'.date('dmy').'_'.strtoupper(Str::random(3)).'.xml';
     }
 
     /**

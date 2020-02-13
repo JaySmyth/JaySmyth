@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Str;
 use App\Http\Requests\ImportConfigRequest;
 use App\ImportConfig;
 use Faker\Generator as Faker;
@@ -122,6 +123,6 @@ class ImportConfigsController extends Controller
      */
     public function downloadExample(ImportConfig $importConfig, Faker $faker)
     {
-        return Excel::download(new \App\Exports\ShipmentImportExampleExport($importConfig, $faker), strtolower(snake_case($importConfig->company_name)).'.csv');
+        return Excel::download(new \App\Exports\ShipmentImportExampleExport($importConfig, $faker), strtolower(Str::snake($importConfig->company_name)).'.csv');
     }
 }

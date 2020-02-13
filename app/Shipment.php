@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Support\Str;
 use App\Country;
 use App\Legacy\FukShipment;
 use App\Mail\GenericError;
@@ -933,7 +934,7 @@ class Shipment extends Model
             return Tracking::firstOrCreate(['message' => $message, 'status' => $statusCode, 'datetime' => $datetime, 'shipment_id' => $this->id])->update([
                 'local_datetime' => $datetime,
                 'carrier' => $this->carrier->name,
-                'tracker_id' => 'trk_'.str_random(26),
+                'tracker_id' => 'trk_'.Str::random(26),
                 'city' => $location['city'],
                 'state' => $location['state'],
                 'country_code' => $location['country_code'],
@@ -1468,7 +1469,7 @@ class Shipment extends Model
         if ($this->label) {
 
             // Save the base64 string as PDF document in the temp directory
-            $pdfPath = storage_path('app/temp/'.$this->token.str_random(6).'.pdf');
+            $pdfPath = storage_path('app/temp/'.$this->token.Str::random(6).'.pdf');
             $decodedFile = base64_decode($this->label->base64);
             file_put_contents($pdfPath, $decodedFile);
 
@@ -1478,7 +1479,7 @@ class Shipment extends Model
 
             foreach (range(1, $numberOfPages) as $pageNumber) {
                 $key = ($numberOfPages > $this->pieces && $pageNumber == 1) ? 'master' : 'package';
-                $pngPath = storage_path('app/temp/'.str_random(3).time().'.png');
+                $pngPath = storage_path('app/temp/'.Str::random(3).time().'.png');
                 $pdf->setPage($pageNumber)->setCompressionQuality(100)->setResolution(300)->setOutputFormat('png')->saveImage($pngPath);
 
                 if (file_exists($pngPath)) {

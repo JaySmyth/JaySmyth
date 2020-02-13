@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Str;
 use App\CustomsEntry;
 use App\Document;
 use App\Http\Controllers\Controller;
@@ -73,7 +74,7 @@ class DocumentsController extends Controller
         $this->authorize('view', $parentModel);
 
         // Generate a file path for the document
-        $filePath = 'documents/'.$request->parent.'/'.$parentModel->id.'/'.time().str_random(8).'.pdf';
+        $filePath = 'documents/'.$request->parent.'/'.$parentModel->id.'/'.time().Str::random(8).'.pdf';
 
         // Uploaded file
         $file = $request->file('file');

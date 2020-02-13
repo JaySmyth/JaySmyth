@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Illuminate\Support\Str;
 use App\ShipmentUpload;
 use Illuminate\Console\Command;
 
@@ -58,7 +59,7 @@ class ProcessShipmentUploads extends Command
 
                     $this->info("Found $originalFile");
 
-                    $tempFile = storage_path('app/temp/original_'.str_random(12).'.csv');
+                    $tempFile = storage_path('app/temp/original_'.Str::random(12).'.csv');
 
                     // Move the uploaded file to "storage/app/temp" for processing
                     if (copy($originalFile, $tempFile)) {

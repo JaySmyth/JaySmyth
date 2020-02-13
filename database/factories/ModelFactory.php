@@ -1,12 +1,13 @@
 <?php
 
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 $factory->define(App\Shipment::class, function (Faker\Generator $faker) {
     return [
         'consignment_number' => $faker->numberBetween(10000000000, 20000000000),
-        'carrier_consignment_number' => strtoupper(str_random(12)),
-        'carrier_tracking_number' => strtoupper(str_random(20)),
+        'carrier_consignment_number' => strtoupper(Str::random(12)),
+        'carrier_tracking_number' => strtoupper(Str::random(20)),
         'user_id' => $faker->numberBetween(1, 20),
         'company_id' => $faker->numberBetween(1, 20),
         'status_id' => $faker->numberBetween(1, 4),
@@ -18,7 +19,7 @@ $factory->define(App\Shipment::class, function (Faker\Generator $faker) {
         'depot_id' => $faker->numberBetween(1, 3),
         'manifest_id' => null,
         'invoice_run_id' => null,
-        'token' => str_random(15),
+        'token' => Str::random(15),
         'sender_type' => $faker->randomElement(['r', 'c']),
         'sender_name' => $faker->name,
         'sender_company_name' => $faker->company,
@@ -31,7 +32,7 @@ $factory->define(App\Shipment::class, function (Faker\Generator $faker) {
         'sender_country_code' => $faker->countryCode,
         'sender_telephone' => $faker->phoneNumber,
         'sender_email' => $faker->email,
-        'shipment_reference' => $faker->randomElement([str_random(5), str_random(12), $faker->company, str_random(9), $faker->word, $faker->name]),
+        'shipment_reference' => $faker->randomElement([Str::random(5), Str::random(12), $faker->company, Str::random(9), $faker->word, $faker->name]),
         'recipient_type' => $faker->randomElement(['r', 'c']),
         'recipient_name' => $faker->name,
         'recipient_company_name' => $faker->company,
@@ -116,7 +117,7 @@ $factory->define(App\Commodity::class, function (Faker\Generator $faker) {
     return [
         'company_id' => $faker->numberBetween(1, 10),
         'description' => $faker->word,
-        'product_code' => str_random(10),
+        'product_code' => Str::random(10),
         'country_of_manufacture' => $faker->countryCode,
         'manufacturer' => $faker->company,
         'unit_value' => $faker->numberBetween(1, 30),
@@ -124,8 +125,8 @@ $factory->define(App\Commodity::class, function (Faker\Generator $faker) {
         'unit_weight' => $faker->numberBetween(1, 5),
         'weight_uom' => 'kg',
         'uom' => 'ea',
-        'commodity_code' => str_random(10),
-        'harmonized_code' => str_random(10),
+        'commodity_code' => Str::random(10),
+        'harmonized_code' => Str::random(10),
         'shipping_cost' => $faker->numberBetween(1, 30),
     ];
 });
@@ -138,9 +139,9 @@ $factory->define(App\Package::class, function (Faker\Generator $faker) {
         'width' => $faker->numberBetween(10, 90),
         'height' => $faker->numberBetween(10, 90),
         'dry_ice_weight' => $faker->numberBetween(0, 3),
-        'packaging_code' => str_random(3),
-        'carrier_packaging_code' => str_random(3),
-        'carrier_tracking_number' => str_random(12),
+        'packaging_code' => Str::random(3),
+        'carrier_packaging_code' => Str::random(3),
+        'carrier_tracking_number' => Str::random(12),
         'barcode' => $faker->ean13(),
         'received' => $faker->boolean(),
         'date_received' => $faker->dateTimeThisMonth,
@@ -154,9 +155,9 @@ $factory->define(App\ShipmentContent::class, function (Faker\Generator $faker) {
         'package_index' => $faker->numberBetween(1, 3),
         'description' => $faker->word,
         'manufacturer' => $faker->company,
-        'product_code' => str_random(10),
-        'commodity_code' => str_random(10),
-        'harmonized_code' => str_random(10),
+        'product_code' => Str::random(10),
+        'commodity_code' => Str::random(10),
+        'harmonized_code' => Str::random(10),
         'country_of_manufacture' => $faker->countryCode,
         'quantity' => $faker->numberBetween(1, 50),
         'uom' => $faker->randomElement(['ea', 'ml', 'mg', 'l']),
@@ -170,7 +171,7 @@ $factory->define(App\ShipmentContent::class, function (Faker\Generator $faker) {
 
 $factory->define(App\Service::class, function (Faker\Generator $faker) {
     return [
-        'code' => strtoupper(str_random(2)),
+        'code' => strtoupper(Str::random(2)),
         'name' => strtoupper($faker->word),
     ];
 });
@@ -186,7 +187,7 @@ $factory->define(App\Tracking::class, function (Faker\Generator $faker) {
         'country_code' => $faker->countryCode,
         'postcode' => $faker->postcode,
         'source' => $faker->randomElement(['easypost', 'ifs']),
-        'tracker_id' => strtoupper(str_random(12)),
+        'tracker_id' => strtoupper(Str::random(12)),
         'user_id' => 0,
         'shipment_id' => $faker->numberBetween(1, 50),
     ];

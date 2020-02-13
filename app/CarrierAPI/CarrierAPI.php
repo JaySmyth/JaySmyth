@@ -9,6 +9,8 @@
 
 namespace App\CarrierAPI;
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use App;
 use App\CarrierAPI\APIShipment;
 use App\CarrierAPI\CWide\CWideAPI;
@@ -526,7 +528,7 @@ class CarrierAPI
             parse_str($data['form_values'], $values);
 
             // Flatten the multi-dimensional array into 1D array using dot notation
-            $values = array_dot($values);
+            $values = Arr::dot($values);
 
             $data['form_values'] = json_encode($values);
         }
@@ -734,7 +736,7 @@ class CarrierAPI
         $getNewToken = true;
 
         while ($getNewToken) {
-            $token = str_random(12);
+            $token = Str::random(12);
             $shipment = Shipment::where('token', $token)->first();
 
             if (! isset($shipment)) {

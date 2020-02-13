@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 trait HasRoles
@@ -39,7 +40,7 @@ trait HasRoles
     public function syncRoles($roles, $role_id = null)
     {
         if (is_array($roles) && $role_id) {
-            return $this->roles()->sync(array_prepend($roles, $role_id));
+            return $this->roles()->sync(Arr::prepend($roles, $role_id));
         }
 
         if (is_array($roles) && ! $role_id) {

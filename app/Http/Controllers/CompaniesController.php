@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use App\Company;
 use App\CompanyRates;
 use App\Http\Controllers\Controller;
@@ -83,7 +85,7 @@ class CompaniesController extends Controller
         $this->authorize(new Company);
 
         // Add a company code to the request array (not captured on form)
-        $array = array_add($request->all(), 'company_code', str_random(6));
+        $array = Arr::add($request->all(), 'company_code', Str::random(6));
 
         $company = Company::create($array);
 

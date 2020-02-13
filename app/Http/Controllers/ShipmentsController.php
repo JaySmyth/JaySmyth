@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use App\CarrierAPI\Facades\CarrierAPI;
 use App\CarrierAPI\Pdf;
 use App\Company;
@@ -268,7 +270,7 @@ class ShipmentsController extends Controller
             parse_str($request->values, $values);
 
             // Flatten the multi-dimensional array into 1D array using dot notation
-            $values = array_dot($values);
+            $values = Arr::dot($values);
 
             $shipment->recipient_name = $request->recipient_name;
             $shipment->recipient_company_name = $request->recipient_company_name;
@@ -616,7 +618,7 @@ class ShipmentsController extends Controller
         $this->validate($request, ['import_config_id' => 'required|numeric', 'file' => 'required'], ['import_config_id.required' => 'Please select an upload profile.', 'file.mimes' => 'Not a valid CSV file - please check for unsupported characters', 'file.required' => 'Please select a file to upload.']);
 
         // Upload the file to the temp directory
-        $path = $request->file('file')->storeAs('temp', 'original_'.str_random(12).'.csv');
+        $path = $request->file('file')->storeAs('temp', 'original_'.Str::random(12).'.csv');
 
         // Check that the file was uploaded successfully
         if (! Storage::disk('local')->exists($path)) {

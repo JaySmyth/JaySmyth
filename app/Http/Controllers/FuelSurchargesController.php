@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Str;
 use App\FuelSurcharge;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FuelSurchargeRequest;
@@ -121,7 +122,7 @@ class FuelSurchargesController extends Controller
         $this->validate($request, ['file' => 'required|mimes:csv,txt'], ['file.required' => 'Please select a file to upload.']);
 
         // Upload the file to the temp directory
-        $path = $request->file('file')->storeAs('temp', 'original_'.str_random(12).'.csv');
+        $path = $request->file('file')->storeAs('temp', 'original_'.Str::random(12).'.csv');
 
         // Check that the file was uploaded successfully
         if (! Storage::disk('local')->exists($path)) {

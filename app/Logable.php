@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
 
 trait Logable
@@ -22,7 +23,7 @@ trait Logable
     public function log($information = 'Record created', $comments = null, $data = null)
     {
         if (is_array($data)) {
-            $data = array_except($data, ['_token']);
+            $data = Arr::except($data, ['_token']);
         }
 
         $attributes = [

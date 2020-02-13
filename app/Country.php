@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
 
 class Country extends Model
@@ -51,7 +52,7 @@ class Country extends Model
 
         if (count($result) > 0) {
             // Sort the array by simularity
-            $result = array_values(array_sort($result, function ($value) {
+            $result = array_values(Arr::sort($result, function ($value) {
                 return $value['simularity'];
             }));
 
