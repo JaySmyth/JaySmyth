@@ -26,18 +26,6 @@ class ReportPolicy
      *
      * @return bool
      */
-    public function index(User $user)
-    {
-        if ($user->hasPermission('view_reports')) {
-            return true;
-        }
-    }
-
-    /**
-     * Index policy.
-     *
-     * @return bool
-     */
     public function viewAny(User $user)
     {
         if ($user->hasPermission('view_reports')) {

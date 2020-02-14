@@ -26,7 +26,7 @@ class SurchargePolicy
      *
      * @return bool
      */
-    public function index(User $user)
+    public function viewAny(User $user)
     {
         if ($user->hasPermission('create_rate_surcharge')) {
             return true;

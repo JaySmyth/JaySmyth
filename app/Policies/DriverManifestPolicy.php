@@ -26,7 +26,7 @@ class DriverManifestPolicy
      *
      * @return bool
      */
-    public function index(User $user)
+    public function viewAny(User $user)
     {
         if ($user->hasPermission('view_driver_manifest')) {
             return true;

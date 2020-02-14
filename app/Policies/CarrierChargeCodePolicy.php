@@ -26,7 +26,7 @@ class CarrierChargeCodePolicy
      *
      * @return bool
      */
-    public function index(User $user)
+    public function viewAny(User $user)
     {
         if ($user->hasIfsRole() && $user->hasPermission('view_carrier_charge_codes')) {
             return true;

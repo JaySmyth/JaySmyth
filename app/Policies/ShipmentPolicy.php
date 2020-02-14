@@ -15,18 +15,6 @@ class ShipmentPolicy
      *
      * @return bool
      */
-    public function index(User $user)
-    {
-        if ($user->hasPermission('create_shipment')) {
-            return true;
-        }
-    }
-
-    /**
-     * Index policy.
-     *
-     * @return bool
-     */
     public function viewAny(User $user)
     {
         if ($user->hasPermission('create_shipment')) {

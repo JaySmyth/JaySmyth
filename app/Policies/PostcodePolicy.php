@@ -26,7 +26,7 @@ class PostcodePolicy
      *
      * @return bool
      */
-    public function index(User $user)
+    public function viewAny(User $user)
     {
         if ($user->hasIfsRole() && $user->hasPermission('create_postcode')) {
             return true;

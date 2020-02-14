@@ -26,7 +26,7 @@ class CurrencyPolicy
      *
      * @return bool
      */
-    public function index(User $user)
+    public function viewAny(User $user)
     {
         if ($user->hasIfsRole() && $user->hasPermission('currency_admin')) {
             return true;
