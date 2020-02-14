@@ -2,32 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use App\Rate;
-use App\Company;
-use App\Service;
 use App\Carrier;
+use App\Company;
 use App\CompanyRates;
-use App\RateDiscount;
 use App\DomesticRate;
-use App\RateDetail;
 use App\DomesticRateDiscount;
-use App\RateChangeLogs;
-use Illuminate\Support\Facades\Auth;
-use App\Legacy\OldCompany;
-use App\Legacy\FukRate;
 use App\Legacy\Fuk_RateH;
-use App\Legacy\FxRateH;
 use App\Legacy\FukCustService;
-use Illuminate\Support\Facades\Storage;
+use App\Legacy\FukRate;
+use App\Legacy\FxRateH;
+use App\Legacy\OldCompany;
+use App\Rate;
+use App\RateChangeLogs;
+use App\RateDetail;
+use App\RateDiscount;
+use App\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class RateController extends Controller
 {
     public function index()
     {
-        $rates = Rate::orderBy("rate_type")->orderBy("model")->orderBy("description")->get();
-        return view('rates.index', compact("rates"));
+        $rates = Rate::orderBy('rate_type')->orderBy('model')->orderBy('description')->get();
+
+        return view('rates.index', compact('rates'));
     }
 
     public function showRate(Rate $rate, $rateDate = '')
@@ -46,16 +47,16 @@ class RateController extends Controller
             $companyRates = new CompanyRates();
             $table = $companyRates->formatRateTable($rate, 0, $rateTable);
             $tableFormat = $rate->model;
-            if ($tableFormat == "domestic") {
+            if ($tableFormat == 'domestic') {
                 $domesticRate = new DomesticRate();
                 $zones = $domesticRate->getZones($rate, $rateDate);
 
-                return view('rates.show_' . $tableFormat, compact("tableFormat", "rate", "table", "zones", "charges"));
+                return view('rates.show_'.$tableFormat, compact('tableFormat', 'rate', 'table', 'zones', 'charges'));
             } else {
                 $intlRate = new RateDetail();
                 $zones = $intlRate->getZones($rate, $rateDate);
 
-                return view('rates.show_intl', compact("tableFormat", "rate", "table", "zones", "charges"));
+                return view('rates.show_intl', compact('tableFormat', 'rate', 'table', 'zones', 'charges'));
             }
         } else {
             return view('errors.404');
@@ -81,29 +82,27 @@ class RateController extends Controller
                 }
             }
         }
-
-        return null;
     }
 
     /**
      * Get a list of all Live companies and
      * Migrate all legacy rates to the new
-     * system
+     * system.
      */
     public function migrateAllCompanyRates()
     {
 
         // $requiredCompanies = ["55","59","65","78","84","87","90","92","94","99","109","110","130","133","145","150","158","160","162","187","190","231","243","259","272","277","304","313","314","324","326","358","371","396","399","416","424","425","429","436","453","470","472","474","482","484","492","498","503","512","518","529","538","550","554","558","580","582","585","591","595","610","620","668","675","685","689","703","706","707","721","740","741","744","750","758","760","761","768","775","777","779","784","785","789","794","801","806","810","815","818","819","820","832","836","837","838","850","854"];
-        $requiredCompanies = ["296", "302", "305", "308", "309", "312", "318", "320", "327", "332", "333", "354", "357", "364", "366", "382", "383", "391", "395", "397", "405", "408", "410", "411", "413", "417", "418", "422", "430", "434", "435", "443", "446", "451", "463", "467", "475", "493", "497", "501", "509", "510", "522", "525", "526", "556", "564", "569", "570", "578", "589", "598", "600", "603", "604", "623", "671", "683", "687", "690", "696", "697", "698", "700", "715", "723", "724", "730", "733", "735", "736", "742", "746", "748", "754", "755", "756", "757", "763", "764", "772", "778", "782", "790", "791", "792", "795", "812", "814", "816", "817", "822", "826", "829", "833", "834", "839", "840", "844", "846", "848", "851", "853", "856", "857"];
+        $requiredCompanies = ['296', '302', '305', '308', '309', '312', '318', '320', '327', '332', '333', '354', '357', '364', '366', '382', '383', '391', '395', '397', '405', '408', '410', '411', '413', '417', '418', '422', '430', '434', '435', '443', '446', '451', '463', '467', '475', '493', '497', '501', '509', '510', '522', '525', '526', '556', '564', '569', '570', '578', '589', '598', '600', '603', '604', '623', '671', '683', '687', '690', '696', '697', '698', '700', '715', '723', '724', '730', '733', '735', '736', '742', '746', '748', '754', '755', '756', '757', '763', '764', '772', '778', '782', '790', '791', '792', '795', '812', '814', '816', '817', '822', '826', '829', '833', '834', '839', '840', '844', '846', '848', '851', '853', '856', '857'];
 
         $companies = new Company();
         $companyList = $companies::whereIn('id', $requiredCompanies)->where('legacy', '1')->get();
 
         //$companyList = $companies::where('legacy', '1')->orderBy('id')->get();
         foreach ($companyList as $company) {
-            echo "********************************<br>";
-            echo "* Migrating Company : " . $company->id . "<br>";
-            echo "********************************<br>";
+            echo '********************************<br>';
+            echo '* Migrating Company : '.$company->id.'<br>';
+            echo '********************************<br>';
             $this->migrateAllRates($company);
         }
     }
@@ -113,7 +112,7 @@ class RateController extends Controller
      * Gets all rates defined on the old system for
      * a company and Migrates them to the new system
      * as a table of discounts on a standard rate.
-     * **********************************************
+     * **********************************************.
      *
      * @param type $Company
      */
@@ -130,7 +129,7 @@ class RateController extends Controller
                 // Get Services defined for the Company
                 $services = new FukCustService();
                 $customerServices = $services->getCompanyServices($oldCompany);
-                if (!$customerServices->isEmpty()) {
+                if (! $customerServices->isEmpty()) {
 
                     // Delete any existing Company Services
                     // $company->syncServices([], true);
@@ -150,7 +149,7 @@ class RateController extends Controller
     /**
      * Given the service, create the appropriate objects
      * to allow migration of the legacy rate to the
-     * new system and then initiate the migration
+     * new system and then initiate the migration.
      *
      * @param type $company
      * @param type $service
@@ -185,19 +184,19 @@ class RateController extends Controller
     /**
      * Get all information necessary to start the
      * migration. Migrate the rate, and enable the
-     * service for the Company
+     * service for the Company.
      *
      * @param type $company
      * @param type $legacyService
      * @param type $rate
-     * @return boolean
+     * @return bool
      */
     public function migrateRate($company, $legacyService, $rate)
     {
         $carrierId = $legacyService->getCarrierId();
         $currentRate = $rate->readLegacyRate($company, $legacyService);
 
-        if (!$currentRate->isEmpty()) {
+        if (! $currentRate->isEmpty()) {
 
             // Get Carrier and Service objects for this service code
             $carrier = Carrier::find($carrierId);                                           // Get Carrier
@@ -226,6 +225,7 @@ class RateController extends Controller
                     }
                 } else {
                     $this->displayStatus('Failed', $company, $legacyService);
+
                     return false;
                 }
             }
@@ -235,7 +235,7 @@ class RateController extends Controller
     }
 
     /**
-     * Display Status, Carrier & Service for the given company
+     * Display Status, Carrier & Service for the given company.
      *
      * @param type $status
      * @param type $company
@@ -243,16 +243,16 @@ class RateController extends Controller
      */
     public function displayStatus($status, $company, $legacyService)
     {
-        echo "Company : " . $company->company
-        . ' Service : ' . $legacyService->service
-        . ' Carrier : ' . $legacyService->gateway
-        . " - " . $status
-        . "<br>";
+        echo 'Company : '.$company->company
+        .' Service : '.$legacyService->service
+        .' Carrier : '.$legacyService->gateway
+        .' - '.$status
+        .'<br>';
     }
 
     /**
      * Given Legacy tableName and Service identify
-     * the correct base table to use on the new system
+     * the correct base table to use on the new system.
      *
      * @param type $tableName
      * @param type $rateType
@@ -291,6 +291,7 @@ class RateController extends Controller
                 case 'uk48r':
                     $rate = new Fuk_RateH();
                     $rateId = $rate->getRateTable($company->company, 'courierUK', $legacyService->service, $company->UPSTable, date('Y-m-d'));
+
                     return strtoupper($rateId);
                     break;
 
@@ -326,7 +327,7 @@ class RateController extends Controller
         $from_date = date('d-m-Y');
         $to_date = date('d-m-Y', strtotime('Dec 31'));
 
-        return view('rates.upload', compact("company_id", "service_id", "from_date", "to_date"));
+        return view('rates.upload', compact('company_id', 'service_id', 'from_date', 'to_date'));
     }
 
     /**
@@ -344,18 +345,19 @@ class RateController extends Controller
         // Upload the file to the rate_uploads directory
         $uploadDirectory = 'rate_uploads';
 
-        $fileName = $companyId . '_' . time() . '.' . pathinfo($request->file('file')->getClientOriginalName(), PATHINFO_EXTENSION);
+        $fileName = $companyId.'_'.time().'.'.pathinfo($request->file('file')->getClientOriginalName(), PATHINFO_EXTENSION);
         $path = $request->file('file')->storeAs($uploadDirectory, $fileName);
 
         // Check that the file was uploaded successfully
-        if (!Storage::disk('local')->exists($path)) {
+        if (! Storage::disk('local')->exists($path)) {
             flash()->error('Problem Uploading!', 'Unable to upload file. Please try again.');
+
             return back();
         }
 
         // Import csv file
         if ($request->hasFile('file')) {
-            $array = array_map('str_getcsv', file(storage_path('app/' . $path)));
+            $array = array_map('str_getcsv', file(storage_path('app/'.$path)));
             $keys = $array[0];
             unset($array[0]);
             $uploadedRate = [];
@@ -378,9 +380,10 @@ class RateController extends Controller
 
             // Notify user and redirect
             flash()->error('File Failed!', $errors);
+
             return back();
         } else {
-            if ($rate->model == "domestic") {
+            if ($rate->model == 'domestic') {
 
                 // Identify all domestic rates
                 $domesticRates = Rate::where('model', 'domestic')->pluck('id')->toArray();
@@ -401,12 +404,12 @@ class RateController extends Controller
                 CompanyRates::updateOrCreate(
                     [
                     'company_id' => $companyId,
-                    'service_id' => $serviceId
+                    'service_id' => $serviceId,
                         ],
                     [
                     'rate_id' => $request->rate_id,
                     'discount' => 0,
-                    'special_discount' => 1
+                    'special_discount' => 1,
                 ]
                 );
             }
@@ -416,7 +419,8 @@ class RateController extends Controller
 
             // Notify user and redirect
             flash()->info('File Uploaded!', 'Rate Successfully loaded', true);
-            return redirect('companies/' . $companyId);
+
+            return redirect('companies/'.$companyId);
         }
     }
 
@@ -460,17 +464,17 @@ class RateController extends Controller
         if (Carbon::parse($request->effectiveDate)->gt(Carbon::parse($request->revertToDate))) {
             $company = Company::find($request->company_id);
             if ($company) {
-                $effectiveDate = Carbon::parse($request->effectiveDate)->format("Y-m-d");
-                $revertToDate = Carbon::parse($request->revertToDate)->format("Y-m-d");
+                $effectiveDate = Carbon::parse($request->effectiveDate)->format('Y-m-d');
+                $revertToDate = Carbon::parse($request->revertToDate)->format('Y-m-d');
                 $discount = $request->discount;
 
                 // Cycle through each of the companies services reverting rates
                 foreach ($company->services as $service) {
                     $errors = $this->revertRate($company, $service, $effectiveDate, $revertToDate, $discount);
                     if ($errors != []) {
-                        echo "Errors in processing upload<br>";
+                        echo 'Errors in processing upload<br>';
                         echo "Company : $company->id Service : $service->code Description : $service->carrier_name<br>";
-                        echo "Upload incomplete<br>";
+                        echo 'Upload incomplete<br>';
                         dd($errors);
                     }
                 }
@@ -511,7 +515,7 @@ class RateController extends Controller
         switch ($dateType) {
             case 'revert_to_date':
                 // Return one month previous
-                return date("Y-m-d H:i:s", strtotime("-1 month"));
+                return date('Y-m-d H:i:s', strtotime('-1 month'));
                 break;
 
             default:

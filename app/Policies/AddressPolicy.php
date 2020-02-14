@@ -2,19 +2,18 @@
 
 namespace App\Policies;
 
-use App\User;
 use App\Address;
+use App\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class AddressPolicy
 {
-
     use HandlesAuthorization;
 
     /**
      * Show policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function view(User $user, Address $address)
     {
@@ -26,7 +25,7 @@ class AddressPolicy
     /**
      * Update policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function update(User $user, Address $address)
     {
@@ -38,7 +37,7 @@ class AddressPolicy
     /**
      * Delete policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function delete(User $user, Address $address)
     {
@@ -46,5 +45,4 @@ class AddressPolicy
             return true;
         }
     }
-
 }

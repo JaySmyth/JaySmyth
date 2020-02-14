@@ -7,17 +7,16 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 
 class InvoiceRunPolicy
 {
-
     use HandlesAuthorization;
 
     /**
      * Intercept all checks - ensure IFS user.
      *
-     * @return boolean
+     * @return bool
      */
     public function before(User $user)
     {
-        if (!$user->hasIfsRole() && !$user->hasPermission('view_invoice_run')) {
+        if (! $user->hasIfsRole() && ! $user->hasPermission('view_invoice_run')) {
             return false;
         }
     }
@@ -25,7 +24,7 @@ class InvoiceRunPolicy
     /**
      * Index policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function index(User $user)
     {
@@ -37,7 +36,7 @@ class InvoiceRunPolicy
     /**
      * Show policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function view(User $user)
     {
@@ -49,7 +48,7 @@ class InvoiceRunPolicy
     /**
      * Create policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function create(User $user)
     {
@@ -57,5 +56,4 @@ class InvoiceRunPolicy
             return true;
         }
     }
-
 }

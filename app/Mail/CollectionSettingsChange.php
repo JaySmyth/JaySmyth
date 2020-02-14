@@ -8,7 +8,6 @@ use Illuminate\Queue\SerializesModels;
 
 class CollectionSettingsChange extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -33,11 +32,10 @@ class CollectionSettingsChange extends Mailable
      */
     public function build()
     {
-        $subject = 'Collection/Delivery settings changed for ' . $this->company->company_name;
+        $subject = 'Collection/Delivery settings changed for '.$this->company->company_name;
 
         return $this->view('emails.companies.collection_settings')
                         ->subject($subject)
                         ->with(['company' => $this->company, 'user' => $this->user]);
     }
-
 }

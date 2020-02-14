@@ -4,13 +4,12 @@ namespace App\Jobs;
 
 use App\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class UpdateScsJobNumbersOnPurchaseInvoiceLines implements ShouldQueue
 {
-
     use InteractsWithQueue,
         Queueable,
         SerializesModels;
@@ -39,18 +38,16 @@ class UpdateScsJobNumbersOnPurchaseInvoiceLines implements ShouldQueue
     public function handle()
     {
         foreach ($this->purchaseInvoice->lines as $line) {
+            if (! $line->scs_job_number && $line->carrier_tracking_number) {
 
-            if (!$line->scs_job_number && $line->carrier_tracking_number) {
-
-                // If linked to a shipment record, check it for SCS job number first             
+                // If linked to a shipment record, check it for SCS job number first
                 if ($line->shipment && $line->shipment->scs_job_number) {
-
                     $line->scs_job_number = $line->shipment->scs_job_number;
                     $line->save();
                 } else {
 
                     // Check job header for SCS job number
-                    $withHypen = substr($line->carrier_tracking_number, 0, 3) . '-' . substr($line->carrier_tracking_number, 3);
+                    $withHypen = substr($line->carrier_tracking_number, 0, 3).'-'.substr($line->carrier_tracking_number, 3);
 
                     $jobHdr = \App\Multifreight\JobHdr::select('job_disp')
                             ->orWhere('hawb_char', $line->carrier_tracking_number)
@@ -70,5 +67,4 @@ class UpdateScsJobNumbersOnPurchaseInvoiceLines implements ShouldQueue
         // Check every line of the invoice and set to passed if there are no overcharges.
         $this->purchaseInvoice->autoPass();
     }
-
 }

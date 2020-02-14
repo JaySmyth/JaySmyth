@@ -4,7 +4,6 @@ use Illuminate\Database\Seeder;
 
 class DomesticPurchaseInvoicesSeeder extends Seeder
 {
-
     /**
      * Run the database seeds.
      *
@@ -26,10 +25,9 @@ class DomesticPurchaseInvoicesSeeder extends Seeder
 
         // Loop through each of the results
         foreach ($invoices as $invoice) {
-
             $checkExists = App\PurchaseInvoice::where('invoice_number', $invoice->inv_no)->where('carrier_id', 2)->first();
 
-            if (!$checkExists) {
+            if (! $checkExists) {
 
                 // Build the array to create the invoice record
                 $array = [
@@ -53,18 +51,17 @@ class DomesticPurchaseInvoicesSeeder extends Seeder
                     'status' => $invoice->status,
                     'carrier_id' => 2,
                     'date' => strtotime($invoice->inv_date),
-                    'date_received' => strtotime($invoice->inv_date)
+                    'date_received' => strtotime($invoice->inv_date),
                 ];
 
                 // Save the  record
                 $invoice = App\PurchaseInvoice::create($array);
 
-                // Create the invoice lines            
+                // Create the invoice lines
                 $lines = DB::connection('legacy')->select('SELECT * FROM FUKSuppInvD WHERE inv_no= :inv_no', ['inv_no' => $invoice->invoice_number]);
 
                 foreach ($lines as $line) {
-
-                    $carrierConsignmentNumber = '489' . $line->docketno;
+                    $carrierConsignmentNumber = '489'.$line->docketno;
 
                     $shipment = App\Shipment::whereCarrierConsignmentNumber($carrierConsignmentNumber)->whereCarrierId(2)->first();
 
@@ -115,17 +112,16 @@ class DomesticPurchaseInvoicesSeeder extends Seeder
                         'purchase_invoice_id' => $invoice->id,
                         'ship_date' => strtotime($line->ship_date),
                         'delivery_date' => ($shipment) ? $shipment->delivery_date : null,
-                        'shipment_id' => ($shipment) ? $shipment->id : null
+                        'shipment_id' => ($shipment) ? $shipment->id : null,
                     ];
 
                     // Save the  record
                     $line = App\PurchaseInvoiceLine::create($array);
 
-                    // Create the invoice charges            
+                    // Create the invoice charges
                     $charges = DB::connection('legacy')->select('SELECT * FROM FUKSuppInvC WHERE inv_no = :inv_no AND docketno = :docketno', ['inv_no' => $invoice->invoice_number, 'docketno' => substr($line->carrier_consignment_number, 3)]);
 
                     foreach ($charges as $charge) {
-
                         $array = [
                             'code' => $this->getChargeCode($charge->chg_type),
                             'description' => $charge->surchDesc,
@@ -136,7 +132,7 @@ class DomesticPurchaseInvoicesSeeder extends Seeder
                             'billed_amount_currency_code' => $charge->billed_curr,
                             'purchase_invoice_id' => $invoice->id,
                             'purchase_invoice_line_id' => $line->id,
-                            'carrier_charge_code_id' => $this->getChargeId($charge->chg_type)
+                            'carrier_charge_code_id' => $this->getChargeId($charge->chg_type),
                         ];
 
                         // Save the  record
@@ -168,5 +164,4 @@ class DomesticPurchaseInvoicesSeeder extends Seeder
                 return 43;
         }
     }
-
 }

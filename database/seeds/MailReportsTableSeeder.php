@@ -4,7 +4,6 @@ use Illuminate\Database\Seeder;
 
 class MailReportsTableSeeder extends Seeder
 {
-
     /**
      * Run the database seeds.
      *
@@ -12,10 +11,9 @@ class MailReportsTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('mail_reports')->insert(array(
-            array('name' => 'Delivery Exception', 'enabled' => 1),
-            array('name' => 'POD', 'enabled' => 1)
-        ));
+        DB::table('mail_reports')->insert([
+            ['name' => 'Delivery Exception', 'enabled' => 1],
+            ['name' => 'POD', 'enabled' => 1],
+        ]);
     }
-
 }

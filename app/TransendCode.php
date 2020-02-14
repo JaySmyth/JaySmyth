@@ -14,9 +14,8 @@ class TransendCode extends Model
 
     /*
      * Black list of NON mass assignable - all others are mass assignable.
-     * 
+     *
      * @var array
      */
     protected $guarded = ['id'];
-
 }

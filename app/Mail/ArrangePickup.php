@@ -8,7 +8,6 @@ use Illuminate\Queue\SerializesModels;
 
 class ArrangePickup extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -37,8 +36,7 @@ class ArrangePickup extends Mailable
     public function build()
     {
         return $this->view('emails.shipments.pickup')
-                        ->subject('Arrange Pickup - ' . $this->shipment->company->site_name . ' (' . $this->shipment->carrier_consignment_number . ')')
+                        ->subject('Arrange Pickup - '.$this->shipment->company->site_name.' ('.$this->shipment->carrier_consignment_number.')')
                         ->with(['shipment' => $this->shipment]);
     }
-
 }

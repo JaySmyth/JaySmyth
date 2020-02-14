@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Auth;
 use App\SeaFreightTracking;
+use Auth;
 use Illuminate\Http\Request;
 
 class SeaFreightTrackingController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -43,15 +42,14 @@ class SeaFreightTrackingController extends Controller
         $this->authorize($seaFreightTracking);
 
         $attributes = [
-            'datetime' => gmtToCarbonUtc($request->date . ' ' . $request->time),
-            'message' => $request->message
+            'datetime' => gmtToCarbonUtc($request->date.' '.$request->time),
+            'message' => $request->message,
         ];
 
         $seaFreightTracking->update($attributes);
 
         flash()->success('Updated!', 'Tracking updated successfully.');
 
-        return redirect('sea-freight/' . $seaFreightTracking->seaFreightShipment->id);
+        return redirect('sea-freight/'.$seaFreightTracking->seaFreightShipment->id);
     }
-
 }

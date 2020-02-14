@@ -3,13 +3,13 @@
 namespace app\CarrierAPI\Fedex;
 
 use App\Carrier;
-use App\Company;
-use App\CarrierPackagingType;
-use App\TransactionLog;
 use App\CarrierAPI\Fedex\FedexLabel;
-use App\Sequence;
-use Carbon\Carbon;
 use App\CarrierAPI\Fedex\FedexSettings;
+use App\CarrierPackagingType;
+use App\Company;
+use App\Sequence;
+use App\TransactionLog;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 
 /**
@@ -41,24 +41,24 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
 
         switch (strtoupper($this->mode)) {
             case 'TEST':
-                $this->accounts['meterNumbers'] = array(
+                $this->accounts['meterNumbers'] = [
                     205691588 => 978666,
                     327423851 => 526564,
                     631510906 => 526938,
                     342638775 => 180565,
-                );
+                ];
 
                 break;
 
             default:
-                $this->accounts['meterNumbers'] = array(
+                $this->accounts['meterNumbers'] = [
                     205691588 => 482731, // IFS
                     327423851 => 482746, // TEREX
                     631510906 => 482768, // CMASS
                     342638775 => 482764, // ALMAC
                     811732648 => 564790, // DOMESTIC
-                    811250724 => 564800  // Glen Dimplex
-                );
+                    811250724 => 564800,  // Glen Dimplex
+                ];
                 break;
         }
 
@@ -72,7 +72,6 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
         811732648 => 418725, // DOMESTIC
         811250724 => 418727  // Glen Dimplex
         */
-
 
         /*
          * *****************************************
@@ -100,7 +99,6 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     *
      * @param array $data containing company_id, user_id, shipment_token
      *
      * @return type
@@ -129,7 +127,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
     {
 
         // Encode the Message
-        $msg = '0,"023"1,"cancel shipment"29,"' . $shipment->carrier_consignment_number . '"99,""';
+        $msg = '0,"023"1,"cancel shipment"29,"'.$shipment->carrier_consignment_number.'"99,""';
 
         return $msg;
     }
@@ -150,10 +148,9 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
         $seconds = 5;
         $milliseconds = 0;
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        socket_set_option($socket, SOL_SOCKET, SO_SNDTIMEO, array('sec' => $seconds, 'usec' => $milliseconds));
+        socket_set_option($socket, SOL_SOCKET, SO_SNDTIMEO, ['sec' => $seconds, 'usec' => $milliseconds]);
 
         $connected = socket_connect($socket, $this->connection['url'], $this->connection['port']);
-
 
         if ($connected) {
             socket_write($socket, $msg, strlen($msg));
@@ -179,7 +176,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
 
             $string = '';
             $i = 0;
-            while (!preg_match('/"99,""/', $string)) {
+            while (! preg_match('/"99,""/', $string)) {
                 $char = socket_read($socket, 1);
                 $string .= $char;
             }
@@ -193,9 +190,9 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
             $to = 'it@antrim.ifsgroup.com';
             $subject = 'Courier Intl FXRS Server Error';
             $message = 'Web Client unable to communicate with the FXRS Server';
-            $headers = 'From: noreply@antrim.ifsgroup.com' . "\r\n" .
-                'Reply-To: it@antrim.ifsgroup.com' . "\r\n" .
-                'X-Mailer: PHP/' . phpversion();
+            $headers = 'From: noreply@antrim.ifsgroup.com'."\r\n".
+                'Reply-To: it@antrim.ifsgroup.com'."\r\n".
+                'X-Mailer: PHP/'.phpversion();
 
             mail($to, $subject, $message, $headers);
         }
@@ -233,7 +230,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
 
                 // If Valid Field no - PreProcess Data
                 if ($fieldNoAbs > 0) {
-                    if (!isset($reply[$fieldNoAbs])) {
+                    if (! isset($reply[$fieldNoAbs])) {
                         $reply[$fieldNoAbs] = '';
                     }
                     $fieldData = $this->multiplier($fieldNoAbs, $fieldData, 'decode');
@@ -266,9 +263,9 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
 
     public function multiplier($key, $value, $mode)
     {
-        #######################################################################
-        #          Fields Requiring PreProcessing of Data
-        #######################################################################
+        //######################################################################
+        //          Fields Requiring PreProcessing of Data
+        //######################################################################
         $mult = 0;
 
         $key = $this->getFldNo($key);
@@ -303,7 +300,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
         return $value;
     }
 
-    private function addValue($existing = '', $fieldNoAbs, $fieldData)
+    private function addValue($existing, $fieldNoAbs, $fieldData)
     {
 
         /*
@@ -388,10 +385,10 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
     {
 
         // Find Senders Fedex Account
-        $service = Company::find($shipment['company_id'])->services()->where("code", $shipment['service_code'])->where("carrier_id", "2")->first();
+        $service = Company::find($shipment['company_id'])->services()->where('code', $shipment['service_code'])->where('carrier_id', '2')->first();
 
-        if (!empty($service)) {
-            if ($service->pivot->account > "") {
+        if (! empty($service)) {
+            if ($service->pivot->account > '') {
                 $shipment['sender_account'] = $service->pivot->account;
             } else {
                 $shipment['sender_account'] = $service->account;
@@ -399,7 +396,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
         }
 
         // Catch instance where above code not setting account - needs looked at
-        if (!isset($shipment['sender_account'])) {
+        if (! isset($shipment['sender_account'])) {
             if (strtoupper($shipment['service_code']) == 'UK48') {
                 $shipment['sender_account'] = 811732648;
             } else {
@@ -408,7 +405,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
         }
 
         // If bill to recipient set Recipient Fedex Account
-        if (strtoupper($shipment['bill_shipping']) == "RECIPIENT") {
+        if (strtoupper($shipment['bill_shipping']) == 'RECIPIENT') {
             $shipment['recipient_account'] = $shipment['bill_shipping_account'];
         }
 
@@ -418,7 +415,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
         }
 
         // Fudge to set correct routing for Fedex UK shipments
-        if (strtoupper($shipment['sender_country_code']) == "GB" && strtoupper($shipment['recipient_country_code']) == "GB") {
+        if (strtoupper($shipment['sender_country_code']) == 'GB' && strtoupper($shipment['recipient_country_code']) == 'GB') {
             $shipment['sender_postcode'] = 'XY35';
         }
 
@@ -430,7 +427,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     * Perform Carrier Specific Validation
+     * Perform Carrier Specific Validation.
      *
      * @param array Shipment details
      * @return array Array of Errors or empty string if none
@@ -468,7 +465,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     * Check Packaging codes are correct for carrier
+     * Check Packaging codes are correct for carrier.
      * @param array $errors
      * @param array $packages
      *
@@ -480,7 +477,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
         // Check each Package is valid for this Carrier
         $cnt = 1;
         foreach ($packages as $package) {
-            if (!isset($this->fedex->packageTypes[$package['packaging_code']])) {
+            if (! isset($this->fedex->packageTypes[$package['packaging_code']])) {
                 $errors[] = "packages.$cnt.packaging_code is invalid for carrier.";
             }
             $cnt++;
@@ -524,8 +521,8 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
     private function validateCargoOption($errors, $shipment)
     {
         $hazardCode = $this->getData($shipment, 'hazardous');
-        if (!($hazardCode == 'E' || ((intval($hazardCode) >= 1) && (intval($hazardCode) <= 9)))) {
-            $errors[] = "CARGO option for DG Shipments only";
+        if (! ($hazardCode == 'E' || ((intval($hazardCode) >= 1) && (intval($hazardCode) <= 9)))) {
+            $errors[] = 'CARGO option for DG Shipments only';
         }
 
         return $errors;
@@ -576,7 +573,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
         $msgData = $this->buildGroup($data, $msgGroups);
 
         // Encode the result
-        $msg = '0,"020"' . $this->encode($msgData) . '99,""';
+        $msg = '0,"020"'.$this->encode($msgData).'99,""';
 
         return $msg;
     }
@@ -623,7 +620,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
                                 $msgData[$this->fedex->fldno['documents_description']] = '0';
                             }
 
-                            if (!isset($msgData['79-1']) || $msgData['79-1'] == '') {
+                            if (! isset($msgData['79-1']) || $msgData['79-1'] == '') {
                                 $msgData['79-1'] = 'Documentation/ No Commercial Value';
                             }
                             break;
@@ -657,18 +654,18 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
                                 $numberOfPackages = count($packages);
 
                                 for ($i = 1; $i <= $numberOfPackages; $i++) {
-                                    $msgData[$this->fedex->fldno['lithium_batteries'] . '-' . $i] = $value;
+                                    $msgData[$this->fedex->fldno['lithium_batteries'].'-'.$i] = $value;
                                 }
                             }
 
                             break;
 
                         case 'volumetric_weight':
-                            $msgData [$this->fedex->fldno[$key]] = $this->fedex->multiplier($uom, $key, $value);
+                            $msgData[$this->fedex->fldno[$key]] = $this->fedex->multiplier($uom, $key, $value);
                             break;
 
                         case 'weight':
-                            $msgData [$this->fedex->fldno[$key]] = $this->fedex->multiplier($uom, $key, $value);
+                            $msgData[$this->fedex->fldno[$key]] = $this->fedex->multiplier($uom, $key, $value);
                             break;
 
                         case 'recipient_type':
@@ -755,7 +752,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
 
                         case 'insurance_value':
                             if (is_numeric($value) && $value > 0) {
-                                $msgData [$this->fedex->fldno[$key]] = $this->fedex->multiplier($uom, $key, $value);
+                                $msgData[$this->fedex->fldno[$key]] = $this->fedex->multiplier($uom, $key, $value);
                             }
                             break;
 
@@ -771,16 +768,16 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
                             $packages = $this->getData($data, 'packages');
                             if ($packages > '') {
                                 foreach ($packages as $package) {
-                                    $msgData[$this->fedex->fldno['packages.*.sequence_number'] . '-' . $cnt] = $cnt;
-                                    $msgData[$this->fedex->fldno['packages.*.packaging_code'] . '-' . $cnt] = $this->fedex->packageTypes[$packages[$cnt - 1]['packaging_code']];
-                                    $msgData[$this->fedex->fldno['packages.*.weight'] . '-' . $cnt] = $this->fedex->multiplier($uom, 'packages.*.weight', $packages[$cnt - 1]['weight']);
-                                    $msgData[$this->fedex->fldno['packages.*.length'] . '-' . $cnt] = $packages[$cnt - 1]['length'];
-                                    $msgData[$this->fedex->fldno['packages.*.width'] . '-' . $cnt] = $packages[$cnt - 1]['width'];
-                                    $msgData[$this->fedex->fldno['packages.*.height'] . '-' . $cnt] = $packages[$cnt - 1]['height'];
+                                    $msgData[$this->fedex->fldno['packages.*.sequence_number'].'-'.$cnt] = $cnt;
+                                    $msgData[$this->fedex->fldno['packages.*.packaging_code'].'-'.$cnt] = $this->fedex->packageTypes[$packages[$cnt - 1]['packaging_code']];
+                                    $msgData[$this->fedex->fldno['packages.*.weight'].'-'.$cnt] = $this->fedex->multiplier($uom, 'packages.*.weight', $packages[$cnt - 1]['weight']);
+                                    $msgData[$this->fedex->fldno['packages.*.length'].'-'.$cnt] = $packages[$cnt - 1]['length'];
+                                    $msgData[$this->fedex->fldno['packages.*.width'].'-'.$cnt] = $packages[$cnt - 1]['width'];
+                                    $msgData[$this->fedex->fldno['packages.*.height'].'-'.$cnt] = $packages[$cnt - 1]['height'];
 
                                     if (isset($packages[$cnt - 1]['dry_ice_weight']) && $packages[$cnt - 1]['dry_ice_weight'] > 0) {
                                         // Dry Ice Shipment
-                                        $msgData[$this->fedex->fldno['packages.*.dry_ice_weight'] . '-' . $cnt] = $this->fedex->multiplier($uom, 'packages.*.dry_ice_weight', $packages[$cnt - 1]['dry_ice_weight']);
+                                        $msgData[$this->fedex->fldno['packages.*.dry_ice_weight'].'-'.$cnt] = $this->fedex->multiplier($uom, 'packages.*.dry_ice_weight', $packages[$cnt - 1]['dry_ice_weight']);
                                         $msgData[$this->fedex->fldno['dry_ice_flag']] = 'Y';
                                     }
 
@@ -798,7 +795,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
 
                             $comments = $this->getData($data, 'commercial_invoice_comments');
                             if ($comments > '') {
-                                $msgData[$this->fedex->fldno ['commercial_invoice_comments']] = $comments;
+                                $msgData[$this->fedex->fldno['commercial_invoice_comments']] = $comments;
                             }
 
                             $cnt = 1;
@@ -807,19 +804,19 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
                                 foreach ($contents as $content) {
                                     $uom = $this->getData($content, 'weight_uom');
                                     // Add multiplier if unit weight is in KG (Commodity level)
-                                    $msgData[$this->fedex->fldno['contents.*.description'] . '-' . $cnt] = $this->getElement($content, 'description');
-                                    $msgData[$this->fedex->fldno['contents.*.quantity'] . '-' . $cnt] = $this->getElement($content, 'quantity');
-                                    $msgData[$this->fedex->fldno['contents.*.uom'] . '-' . $cnt] = $this->getElement($content, 'uom');
-                                    $msgData[$this->fedex->fldno['contents.*.unit_value'] . '-' . $cnt] = $this->getElement($content, 'unit_value');
-                                    $msgData[$this->fedex->fldno['contents.*.country_of_manufacture'] . '-' . $cnt] = $this->getElement($content, 'country_of_manufacture');
-                                    $msgData[$this->fedex->fldno['contents.*.unit_weight'] . '-' . $cnt] = $this->fedex->multiplier($uom, 'contents.*.unit_weight', $this->getElement($content, 'unit_weight'));
+                                    $msgData[$this->fedex->fldno['contents.*.description'].'-'.$cnt] = $this->getElement($content, 'description');
+                                    $msgData[$this->fedex->fldno['contents.*.quantity'].'-'.$cnt] = $this->getElement($content, 'quantity');
+                                    $msgData[$this->fedex->fldno['contents.*.uom'].'-'.$cnt] = $this->getElement($content, 'uom');
+                                    $msgData[$this->fedex->fldno['contents.*.unit_value'].'-'.$cnt] = $this->getElement($content, 'unit_value');
+                                    $msgData[$this->fedex->fldno['contents.*.country_of_manufacture'].'-'.$cnt] = $this->getElement($content, 'country_of_manufacture');
+                                    $msgData[$this->fedex->fldno['contents.*.unit_weight'].'-'.$cnt] = $this->fedex->multiplier($uom, 'contents.*.unit_weight', $this->getElement($content, 'unit_weight'));
                                     // $msgData[$this->fldno['contents.*.weight_uom'] . '-' . $cnt] = $this->getData($data, 'weight_uom');
-                                    $msgData[$this->fedex->fldno['contents.*.total_value'] . '-' . $cnt] = $this->getElement($content, 'quantity') * $this->getElement($content, 'unit_value');
-                                    $msgData[$this->fedex->fldno['contents.*.harmonized_code'] . '-' . $cnt] = $this->getElement($content, 'harmonized_code');
-                                    $msgData[$this->fedex->fldno['contents.*.part_number'] . '-' . $cnt] = $this->getElement($content, 'part_number');
-                                    $msgData[$this->fedex->fldno['contents.*.export_license'] . '-' . $cnt] = $this->getElement($content, 'export_license');
+                                    $msgData[$this->fedex->fldno['contents.*.total_value'].'-'.$cnt] = $this->getElement($content, 'quantity') * $this->getElement($content, 'unit_value');
+                                    $msgData[$this->fedex->fldno['contents.*.harmonized_code'].'-'.$cnt] = $this->getElement($content, 'harmonized_code');
+                                    $msgData[$this->fedex->fldno['contents.*.part_number'].'-'.$cnt] = $this->getElement($content, 'part_number');
+                                    $msgData[$this->fedex->fldno['contents.*.export_license'].'-'.$cnt] = $this->getElement($content, 'export_license');
                                     if ($this->getElement($content, 'export_license_date') > '') {
-                                        $msgData[$this->fedex->fldno['contents.*.export_license_date'] . '-' . $cnt] = date('Ymd', strtotime($this->getElement($content, 'export_license_date')));
+                                        $msgData[$this->fedex->fldno['contents.*.export_license_date'].'-'.$cnt] = date('Ymd', strtotime($this->getElement($content, 'export_license_date')));
                                     }
                                     $cnt++;
                                 }
@@ -827,7 +824,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
                             break;
 
                         default:
-                            $msgData [$this->fedex->fldno[$key]] = $this->fedex->multiplier($uom, $key, $value);
+                            $msgData[$this->fedex->fldno[$key]] = $this->fedex->multiplier($uom, $key, $value);
                     }
                 }
             }
@@ -869,23 +866,23 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
         foreach ($options as $option) {
             switch (strtoupper($option)) {
                 case 'HOLD':
-                    $msgData [1200] = 'Y';
+                    $msgData[1200] = 'Y';
                     break;
 
                 case 'DROPOFF':
-                    $msgData [1333] = 'Y';
+                    $msgData[1333] = 'Y';
                     break;
 
                 case 'BOOK':
-                    $msgData [1272] = 'Y';
+                    $msgData[1272] = 'Y';
                     break;
 
                 case 'SATDELIV':
-                    $msgData [1266] = 'Y';
+                    $msgData[1266] = 'Y';
                     break;
 
                 case 'CARGO':
-                    $msgData [488] = 'Y';
+                    $msgData[488] = 'Y';
                     break;
 
                 default:
@@ -905,7 +902,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
             if ($arrValue != '' && $arrValue != '!') {
                 $fldNoAbs = $this->getFldNo($arrKey);
                 $value = $this->multiplier($fldNoAbs, $arrValue, 'encode');
-                $msg = $msg . $arrKey . ',"' . $value . '"';
+                $msg = $msg.$arrKey.',"'.$value.'"';
             }
         }
 
@@ -916,8 +913,9 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
     {
         $response = $this->generateSuccess();
 
-        if (!isset($reply['664'])) {
+        if (! isset($reply['664'])) {
             $response['errors'][] = 'Failed to generate barcode: please verify recipient address and postcode';
+
             return $response;
         }
 
@@ -932,7 +930,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
             // Multiple Pieces
             $cnt = count($reply['664']);
             $response['pieces'] = $cnt;
-            for ($i = 0; $i < $cnt; ++$i) {
+            for ($i = 0; $i < $cnt; $i++) {
                 $response['packages'][$i]['sequence_number'] = $i + 1;
                 $response['packages'][$i]['carrier_tracking_code'] = $reply['29'][$i];
                 $response['packages'][$i]['barcode'] = $reply['664'][$i];
@@ -956,14 +954,15 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
         return $response;
     }
 
-    private function generatePdf($data, $serviceCode = '', $route_id, $splitServiceBox = false)
+    private function generatePdf($data, $serviceCode, $route_id, $splitServiceBox = false)
     {
         $label = new FedexLabel($data, $serviceCode, $this->connection['url'], $route_id, $splitServiceBox);
+
         return $label->create();
     }
 
     /**
-     * Function to generate rules for Max Package weight
+     * Function to generate rules for Max Package weight.
      *
      * @param array Rules
      * @param string Service_code

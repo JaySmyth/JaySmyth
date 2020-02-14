@@ -6,7 +6,6 @@ use App\Http\Requests\Request;
 
 class DriverRequest extends Request
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -32,5 +31,4 @@ class DriverRequest extends Request
             'enabled' => 'required|boolean',
         ];
     }
-
 }

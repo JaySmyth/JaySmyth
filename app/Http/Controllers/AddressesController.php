@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Address;
-use App\Http\Requests\AddressRequest;
 use App\Http\Requests;
+use App\Http\Requests\AddressRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Response;
 
 class AddressesController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -97,7 +97,7 @@ class AddressesController extends Controller
 
         flash()->success('Created!', 'Address created successfully.');
 
-        return redirect('addresses?definition=' . $address->definition);
+        return redirect('addresses?definition='.$address->definition);
     }
 
     /**
@@ -125,11 +125,12 @@ class AddressesController extends Controller
         ]);
 
         // Upload the file
-        $path = $request->file('file')->storeAs('temp', time() . str_random(3) . '.csv');
+        $path = $request->file('file')->storeAs('temp', time().Str::random(3).'.csv');
 
         // Check that the file was uploaded successfully
-        if (!Storage::disk('local')->exists($path)) {
+        if (! Storage::disk('local')->exists($path)) {
             flash()->error('Problem Uploading!', 'Unable to upload file. Please try again.');
+
             return back();
         }
 
@@ -138,6 +139,7 @@ class AddressesController extends Controller
 
         // Notify user and redirect
         flash()->success('File Uploaded!', 'Please check your email for import results.', true);
+
         return redirect('addresses?definition=recipient');
     }
 
@@ -177,7 +179,7 @@ class AddressesController extends Controller
 
         flash()->success('Updated!', 'Address updated successfully.');
 
-        return redirect('addresses?definition=' . $address->definition);
+        return redirect('addresses?definition='.$address->definition);
     }
 
     /**
@@ -189,8 +191,7 @@ class AddressesController extends Controller
     public function autocomplete(Request $request)
     {
         if ($request->ajax()) {
-
-            $results = array();
+            $results = [];
 
             $addresses = Address::select('id', 'name', 'company_name')
                     ->filter($request->term)
@@ -213,7 +214,7 @@ class AddressesController extends Controller
 
     /**
      * Delete an address.
-     * 
+     *
      * @param Address $address
      * @return string
      */
@@ -246,5 +247,4 @@ class AddressesController extends Controller
                         ->with('company')
                         ->paginate(50);
     }
-
 }

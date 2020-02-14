@@ -3,12 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Vehicle;
 use App\Http\Requests\VehicleRequest;
+use App\Vehicle;
 
 class VehiclesController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -97,5 +96,4 @@ class VehiclesController extends Controller
 
         return redirect('vehicles');
     }
-
 }

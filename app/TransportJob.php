@@ -2,13 +2,12 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
 
 class TransportJob extends Model
 {
-
     use Logable;
 
     protected $fillable = [
@@ -61,7 +60,7 @@ class TransportJob extends Model
         'date_sent',
         'date_requested',
         'date_manifested',
-        'date_completed'
+        'date_completed',
     ];
 
     /**
@@ -82,7 +81,7 @@ class TransportJob extends Model
     }
 
     /**
-     * A transport job is owned by a driver's manifest
+     * A transport job is owned by a driver's manifest.
      *
      * @return
      */
@@ -92,7 +91,7 @@ class TransportJob extends Model
     }
 
     /**
-     * A transport job has one shipment
+     * A transport job has one shipment.
      *
      * @return
      */
@@ -102,7 +101,7 @@ class TransportJob extends Model
     }
 
     /**
-     * A transport job has one status
+     * A transport job has one status.
      *
      * @return
      */
@@ -112,7 +111,7 @@ class TransportJob extends Model
     }
 
     /**
-     * A transport job belongs to a department
+     * A transport job belongs to a department.
      *
      * @return
      */
@@ -122,7 +121,7 @@ class TransportJob extends Model
     }
 
     /**
-     * Get the sender's country
+     * Get the sender's country.
      *
      * @return string
      */
@@ -132,7 +131,7 @@ class TransportJob extends Model
     }
 
     /**
-     * Get the recipient's country
+     * Get the recipient's country.
      *
      * @return string
      */
@@ -191,12 +190,11 @@ class TransportJob extends Model
     public function scopeFilter($query, $filter)
     {
         if ($filter) {
-
             $filter = trim($filter);
 
-            return $query->where('number', 'LIKE', '%' . $filter . '%')
-                ->orWhere('reference', 'LIKE', '%' . $filter . '%')
-                ->orWhere('scs_job_number', 'LIKE', '%' . $filter . '%');
+            return $query->where('number', 'LIKE', '%'.$filter.'%')
+                ->orWhere('reference', 'LIKE', '%'.$filter.'%')
+                ->orWhere('scs_job_number', 'LIKE', '%'.$filter.'%');
         }
     }
 
@@ -212,7 +210,6 @@ class TransportJob extends Model
         }
 
         if ($status) {
-
             $query->select('transport_jobs.*')->join('statuses', 'transport_jobs.status_id', '=', 'statuses.id');
 
             if (is_array($status)) {
@@ -260,28 +257,30 @@ class TransportJob extends Model
     }
 
     /**
-     * A job is cancellable
+     * A job is cancellable.
      *
-     * @return boolean
+     * @return bool
      */
     public function isCancellable()
     {
-        if ($this->isActive() && !$this->shipment) {
+        if ($this->isActive() && ! $this->shipment) {
             return true;
         }
+
         return false;
     }
 
     /**
-     * Job active - i.e. not cancelled or completed
+     * Job active - i.e. not cancelled or completed.
      *
-     * @return boolean
+     * @return bool
      */
     public function isActive()
     {
         if ($this->status->code == 'cancelled' || $this->completed) {
             return false;
         }
+
         return true;
     }
 
@@ -325,7 +324,7 @@ class TransportJob extends Model
             $status = \App\Status::whereCode($status)->first();
         }
 
-        if (!$status) {
+        if (! $status) {
             $status = \App\Status::whereCode('unknown')->first();
         }
 
@@ -347,7 +346,7 @@ class TransportJob extends Model
         // Set the status of this job to completed
         $this->setStatus('completed');
 
-        if (!$this->completed) {
+        if (! $this->completed) {
             $this->completed = true;
             $this->pod_signature = $podSignature;
             $this->pod_image = $podImage;
@@ -411,14 +410,14 @@ class TransportJob extends Model
      */
     public function groupByLocation($transportJobs)
     {
-        $jobsByLocation = array();
+        $jobsByLocation = [];
 
         foreach ($transportJobs as $job) {
             if ($job->type == 'c') {
-                $key = $job->from_address1 . $job->from_postcode;
+                $key = $job->from_address1.$job->from_postcode;
                 inc($jobsByLocation[$key]['collections'], 1);
             } else {
-                $key = $job->to_address1 . $job->to_postcode;
+                $key = $job->to_address1.$job->to_postcode;
                 inc($jobsByLocation[$key]['deliveries'], 1);
             }
 
@@ -453,9 +452,8 @@ class TransportJob extends Model
         $this->save();
     }
 
-
     /**
-     * Get routing info (collection/delivery route and time)
+     * Get routing info (collection/delivery route and time).
      *
      * @return array
      */
@@ -526,7 +524,7 @@ class TransportJob extends Model
             return ($this->department) ? $this->department->transend_code : 'ADHOC';
         }
 
-        return (!empty($this->routing['collection_route'])) ? $this->routing['collection_route'] : 'ADHOC';
+        return (! empty($this->routing['collection_route'])) ? $this->routing['collection_route'] : 'ADHOC';
     }
 
     /**
@@ -538,16 +536,15 @@ class TransportJob extends Model
     {
         // Deliveries, use company name and postcode
         if ($this->type == 'd') {
-            return strtoupper(substr($this->to_company_name, 0, 3) . '00' . preg_replace('/\s+/', '', $this->to_postcode) . '-001');
+            return strtoupper(substr($this->to_company_name, 0, 3).'00'.preg_replace('/\s+/', '', $this->to_postcode).'-001');
         }
 
         // Collections with known SCS code
         if ($this->scs_company_code) {
-            return $this->scs_company_code . '-002';
+            return $this->scs_company_code.'-002';
         }
 
         // Collections where SCS code isn't known, use company name and postcode
-        return strtoupper(substr($this->from_company_name, 0, 3) . '00' . preg_replace('/\s+/', '', $this->from_postcode) . '-002');
+        return strtoupper(substr($this->from_company_name, 0, 3).'00'.preg_replace('/\s+/', '', $this->from_postcode).'-002');
     }
-
 }

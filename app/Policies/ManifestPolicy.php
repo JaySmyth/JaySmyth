@@ -7,25 +7,24 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ManifestPolicy
 {
-
     use HandlesAuthorization;
 
     /**
      * Intercept all checks - ensure IFS user.
      *
-     * @return boolean
+     * @return bool
      */
     public function before(User $user)
     {
-        if (!$user->hasIfsRole()) {
+        if (! $user->hasIfsRole()) {
             return false;
         }
     }
 
     /**
      * View policy.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function view(User $user)
     {
@@ -36,8 +35,8 @@ class ManifestPolicy
 
     /**
      * Add shipment to manifest policy.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function addShipment(User $user)
     {
@@ -45,5 +44,4 @@ class ManifestPolicy
             return true;
         }
     }
-
 }

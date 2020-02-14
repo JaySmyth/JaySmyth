@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Http\Requests\CustomsEntryRequest;
-use App\Http\Requests\CustomsEntryCommodityRequest;
-use Illuminate\Support\Facades\Storage;
-use App\CustomsEntry;
 use App\Company;
+use App\CustomsEntry;
 use App\Document;
+use App\Http\Requests\CustomsEntryCommodityRequest;
+use App\Http\Requests\CustomsEntryRequest;
 use Auth;
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
 class CustomsEntriesController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -82,7 +82,7 @@ class CustomsEntriesController extends Controller
     {
         $this->authorize(new CustomsEntry);
 
-        $customsEntry = CustomsEntry::create(array_add($request->all(), 'user_id', Auth::user()->id));
+        $customsEntry = CustomsEntry::create(Arr::add($request->all(), 'user_id', Auth::user()->id));
 
         flash()->success('Entry Created!', 'Customs entry created successfully.');
 
@@ -224,7 +224,7 @@ class CustomsEntriesController extends Controller
                 ->hasCpc($request->cpc)
                 ->restrictCompany($request->user()->getAllowedCompanyIds());
 
-        if (!$paginate) {
+        if (! $paginate) {
             return $query->get();
         }
 
@@ -266,30 +266,30 @@ class CustomsEntriesController extends Controller
     }
 
     /**
-    * Returns full_dutyandvat flag to ajax call
-    * on customs entry screen_resolution
-    *
-    * @param  Request
-    * @return Boolean
-    */
+     * Returns full_dutyandvat flag to ajax call
+     * on customs entry screen_resolution.
+     *
+     * @param  Request
+     * @return bool
+     */
     public function companyType(Company $company)
     {
         return $company->full_dutyandvat;
     }
 
     /**
-    * Returns true if any of the users companies ezmlm_has
-    * Access to full Duty and Vat reporting
-    *
-    * @param  Company
-    * @return Boolean
-    */
+     * Returns true if any of the users companies ezmlm_has
+     * Access to full Duty and Vat reporting.
+     *
+     * @param  Company
+     * @return bool
+     */
     public function getDutyVatType($request)
     {
         $companyIds = $request->user()->getAllowedCompanyIds();
-        $fullDutyAndVat=false;
+        $fullDutyAndVat = false;
         foreach ($companyIds as $companyId) {
-            if (Company::find($companyId)->full_dutyandvat == "1") {
+            if (Company::find($companyId)->full_dutyandvat == '1') {
                 $fullDutyAndVat = true;
                 break;
             }

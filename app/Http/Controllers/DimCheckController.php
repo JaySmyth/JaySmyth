@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Storage;
 
 class DimCheckController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -19,7 +18,6 @@ class DimCheckController extends Controller
         $this->middleware('auth');
     }
 
-
     /**
      * Process uploaded shipment file.
      *
@@ -28,38 +26,36 @@ class DimCheckController extends Controller
      */
     public function processUpload(Request $request)
     {
-        if (!$request->user()->hasIfsRole()) {
-            return null;
+        if (! $request->user()->hasIfsRole()) {
+            return;
         }
 
         // Validate the request
         $this->validate($request, ['file' => 'required'], ['file.mimes' => 'Not a valid CSV file - please check for unsupported characters', 'file.required' => 'Please select a file to upload.']);
 
         // Upload the file to the temp directory
-        $path = $request->file('file')->storeAs('temp', 'dimcheck' . time() . '.csv');
+        $path = $request->file('file')->storeAs('temp', 'dimcheck'.time().'.csv');
 
         // Check that the file was uploaded successfully
-        if (!Storage::disk('local')->exists($path)) {
+        if (! Storage::disk('local')->exists($path)) {
             flash()->error('Problem Uploading!', 'Unable to upload file. Please try again.');
+
             return back();
         }
 
         $results = [];
         $rowNumber = 1;
-        $filepath = storage_path('app/' . $path);
+        $filepath = storage_path('app/'.$path);
 
         if (($handle = fopen($filepath, 'r')) !== false) {
             while (($data = fgetcsv($handle, 1000)) !== false) {
-
                 if ($rowNumber >= 2) {
-
-                    $dhlActualWeight = (!empty($data[30]) && is_numeric($data[30])) ? $data[30] : 0;
-                    $dhlVolWeight = (!empty($data[31]) && is_numeric($data[31])) ? $data[31] : 0;
+                    $dhlActualWeight = (! empty($data[30]) && is_numeric($data[30])) ? $data[30] : 0;
+                    $dhlVolWeight = (! empty($data[31]) && is_numeric($data[31])) ? $data[31] : 0;
 
                     $shipment = Shipment::where('carrier_consignment_number', $data[2])->where('carrier_id', 5)->first();
 
                     if ($shipment) {
-
                         $results[$rowNumber] = [
                             'shipment_id' => $shipment->id,
                             'ship_date' => $shipment->ship_date->format('d-M-y'),
@@ -76,9 +72,8 @@ class DimCheckController extends Controller
                             'difference' => round(abs(max($dhlActualWeight, $dhlVolWeight) - max($shipment->weight, $shipment->volumetric_weight)), 2),
                             'costs_zone' => (isset($shipment->quoted_array['costs_zone'])) ? $shipment->quoted_array['costs_zone'] : '',
                             'sales_zone' => (isset($shipment->quoted_array['sales_zone'])) ? $shipment->quoted_array['sales_zone'] : '',
-                            'flag' => (max($dhlActualWeight, $dhlVolWeight) >= max($shipment->weight, $shipment->volumetric_weight)) ? true : false
+                            'flag' => (max($dhlActualWeight, $dhlVolWeight) >= max($shipment->weight, $shipment->volumetric_weight)) ? true : false,
                         ];
-
                     } else {
                         $results[$rowNumber] = ['consignment_number' => false, 'carrier_consignment_number' => $data[2]];
                     }
@@ -93,6 +88,4 @@ class DimCheckController extends Controller
 
         return view('dim_check.results', ['results' => $results]);
     }
-
-
 }

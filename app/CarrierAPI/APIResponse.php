@@ -15,8 +15,8 @@ use Illuminate\Support\Facades\Response;
  *
  * @author gmcbroom
  */
-class APIResponse {
-
+class APIResponse
+{
     public $statusCode = '200';
     public $transactionHeader = 'IFS API Transaction';
     public $version = '2';
@@ -70,7 +70,7 @@ class APIResponse {
 
     public function getValue(&$item, $default = '')
     {
-        return (!empty($item)) ? $item : $default;
+        return (! empty($item)) ? $item : $default;
     }
 
     public function getHeaders()
@@ -82,12 +82,10 @@ class APIResponse {
         ];
     }
 
-    public function respondCreatedShipment($reply = '', $version)
+    public function respondCreatedShipment($reply, $version)
     {
-
         $this->version = $version;
         if ($reply['errors'] == []) {
-
             return $this->setStatusCode(201)->respond([
                         'meta' => $this->getHeaders(),
                         'data' => $reply,
@@ -99,7 +97,6 @@ class APIResponse {
 
     public function respondDeletedShipment($reply = '', $version = '')
     {
-
         $this->version = $version;
         if ($reply['errors'] == []) {
             return $this->setStatusCode(200)->respond([
@@ -113,10 +110,8 @@ class APIResponse {
 
     public function respondPricedShipment($reply = [], $version = '')
     {
-
         $this->version = $version;
         if (isset($reply['errors']) && $reply['errors'] == []) {
-
             $response['errors'] = [];
             $response['pricing']['charges'] = $reply['sales'];
             $response['pricing']['vat_code'] = $reply['sales_vat_code'];
@@ -124,12 +119,12 @@ class APIResponse {
             $response['pricing']['total_cost'] = $reply['shipping_charge'];
 
             $this->setStatusCode(201);
+
             return $this->respond([
                         'meta' => $this->getHeaders(),
                         'data' => $response,
             ]);
         } else {
-
             return $this->setStatusCode(400)->respondWithError($reply);
         }
     }
@@ -157,5 +152,4 @@ class APIResponse {
     {
         return response()->json($data, $this->getStatusCode(), $headers);
     }
-
 }

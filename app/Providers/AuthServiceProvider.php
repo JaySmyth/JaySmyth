@@ -3,13 +3,12 @@
 namespace App\Providers;
 
 use App\Permission;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 
 class AuthServiceProvider extends ServiceProvider
 {
-
     /**
      * The policy mappings for the application.
      *
@@ -56,21 +55,20 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-
         $this->registerPolicies();
 
         // Dynamically register permissions with Laravel's Gate.
         foreach ($this->getPermissions() as $permission) {
-
             Gate::define($permission->name, function ($user) use ($permission) {
                 return $user->hasPermission($permission);
             });
         }
 
         // Grant all abilities to IFS Admin user
-        Gate::before(function($user) {
-            if ($user->hasRole('ifsa'))
+        Gate::before(function ($user) {
+            if ($user->hasRole('ifsa')) {
                 return true;
+            }
         });
     }
 
@@ -83,5 +81,4 @@ class AuthServiceProvider extends ServiceProvider
     {
         return Permission::with('roles')->get();
     }
-
 }

@@ -8,7 +8,6 @@ use Illuminate\Console\Command;
 
 class TntTotalVolume extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -52,13 +51,11 @@ class TntTotalVolume extends Command
         foreach ($shipments as $shipment) {
             $totalVolume = $this->getTotalVolume($shipment);
             $volumetricWeight = $totalVolume * 250;
-            $this->info($shipment->consignment_number . ',' . $shipment->carrier_consignment_number . ',' . $totalVolume . ',' . $volumetricWeight);
+            $this->info($shipment->consignment_number.','.$shipment->carrier_consignment_number.','.$totalVolume.','.$volumetricWeight);
         }
 
         $this->info('Finished');
-
     }
-
 
     /**
      * Get shipment volume.
@@ -75,5 +72,4 @@ class TntTotalVolume extends Command
 
         return $totalVolume;
     }
-
 }

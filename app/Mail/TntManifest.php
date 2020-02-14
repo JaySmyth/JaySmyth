@@ -8,7 +8,6 @@ use Illuminate\Queue\SerializesModels;
 
 class TntManifest extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -39,5 +38,4 @@ class TntManifest extends Mailable
             ->subject('TNT Summary Manifest')
             ->view('emails.manifests.tnt');
     }
-
 }

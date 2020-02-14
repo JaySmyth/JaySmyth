@@ -6,11 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class ImportConfig extends Model
 {
-
     /**
      * Number of columns that can be configured.
-     * 
-     * @var type 
+     *
+     * @var type
      */
     public $numberOfColumns = 52;
 
@@ -52,7 +51,6 @@ class ImportConfig extends Model
     }
 
     /**
-     *
      * @param type $value
      * @return type
      */
@@ -66,7 +64,6 @@ class ImportConfig extends Model
     }
 
     /**
-     *
      * @param type $value
      * @return type
      */
@@ -82,7 +79,7 @@ class ImportConfig extends Model
     /**
      * Get the field names of the import columns with excel columns names
      * as the array key.
-     * 
+     *
      * @return array
      */
     public function getColumns()
@@ -91,19 +88,18 @@ class ImportConfig extends Model
         $prefix = null;
 
         for ($i = 0; $i <= $this->numberOfColumns; $i++) {
-
             if ($i == 26) {
                 $prefix = 'A';
             }
 
-            $key = strtoupper($prefix . chr($i % 26 + 0x41));
+            $key = strtoupper($prefix.chr($i % 26 + 0x41));
 
             $field = "column$i";
             if ($this->$field) {
                 $columns[$key] = $this->$field;
             }
         }
+
         return $columns;
     }
-
 }

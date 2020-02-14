@@ -2,12 +2,11 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 class Quotation extends Model
 {
-
     use Logable;
 
     /**
@@ -46,7 +45,7 @@ class Quotation extends Model
 
     /**
      * Set valid to.
-     * 
+     *
      * @param type $value
      */
     public function setValidToAttribute($value)
@@ -56,12 +55,12 @@ class Quotation extends Model
 
     /**
      * Reference number.
-     * 
+     *
      * @return string
      */
     public function getReferenceAttribute()
     {
-        return $this->department->code . str_pad($this->id, 8, 0, STR_PAD_LEFT);
+        return $this->department->code.str_pad($this->id, 8, 0, STR_PAD_LEFT);
     }
 
     /**
@@ -86,8 +85,8 @@ class Quotation extends Model
     {
         if ($filter) {
             return $query->where('id', preg_replace('/[^0-9]/', '', $filter))
-                            ->orWhere('company_name', 'LIKE', '%' . $filter . '%')
-                            ->orWhere('contact', 'LIKE', '%' . $filter . '%');
+                            ->orWhere('company_name', 'LIKE', '%'.$filter.'%')
+                            ->orWhere('contact', 'LIKE', '%'.$filter.'%');
         }
     }
 
@@ -122,11 +121,11 @@ class Quotation extends Model
      */
     public function scopeDateBetween($query, $dateFrom, $dateTo)
     {
-        if (!$dateFrom && $dateTo) {
+        if (! $dateFrom && $dateTo) {
             return $query->where('created_at', '<', Carbon::parse($dateTo)->endOfDay());
         }
 
-        if ($dateFrom && !$dateTo) {
+        if ($dateFrom && ! $dateTo) {
             return $query->where('created_at', '>', Carbon::parse($dateFrom)->startOfDay());
         }
 
@@ -134,5 +133,4 @@ class Quotation extends Model
             return $query->whereBetween('created_at', [Carbon::parse($dateFrom)->startOfDay(), Carbon::parse($dateTo)->endOfDay()]);
         }
     }
-
 }

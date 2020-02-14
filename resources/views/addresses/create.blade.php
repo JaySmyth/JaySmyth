@@ -2,7 +2,7 @@
 
 @section('content')
 
-<h2>Create {{ucwords(Input::get('definition'))}} Address</h2>
+<h2>Create {{ucwords(Request::get('definition'))}} Address</h2>
 
 <hr class="mt-1">
 

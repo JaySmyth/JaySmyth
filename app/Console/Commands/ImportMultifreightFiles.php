@@ -5,10 +5,10 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class ImportMultifreightFiles extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -93,7 +93,7 @@ class ImportMultifreightFiles extends Command
 
         // Expects month e.g. 05 for May
         if (strlen($month) == 2) {
-            $this->line('Moving files for the month ' . $month . ' for reprocessing');
+            $this->line('Moving files for the month '.$month.' for reprocessing');
             $this->moveFilesForReprocessing($month);
         }
 
@@ -101,17 +101,13 @@ class ImportMultifreightFiles extends Command
         $this->checkDirectory();
 
         if ($handle = opendir($this->directory)) {
-
             while (false !== ($file = readdir($handle))) {
-
-                if (!is_dir($file) && stristr($file, '.dat') && !stristr($file, 'filepart')) {
-
-                    if (file_exists($this->directory . $file)) {
-
+                if (! is_dir($file) && stristr($file, '.dat') && ! stristr($file, 'filepart')) {
+                    if (file_exists($this->directory.$file)) {
                         $this->processFile($file);
                         $this->archiveFile($file);
                     } else {
-                        Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Import Multifreight Files: File not found', false, false, $this->directory . $file));
+                        Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Import Multifreight Files: File not found', false, false, $this->directory.$file));
                     }
                 }
             }
@@ -129,19 +125,16 @@ class ImportMultifreightFiles extends Command
      * Sets the file type and table.
      *
      * @param type $filename
-     * @return boolean
+     * @return bool
      */
     protected function setFileType($filename)
     {
-
         foreach ($this->fileTypes as $type) {
-
             if (stristr($filename, $type)) {
-
                 $this->fileType = $type;
 
                 // Instantiate corresponding model
-                $className = "\App\Multifreight\\" . ucfirst(camel_case($this->fileType));
+                $className = "\App\Multifreight\\".ucfirst(Str::camel($this->fileType));
 
                 $this->table = new $className();
 
@@ -158,6 +151,7 @@ class ImportMultifreightFiles extends Command
         }
 
         $this->error("Ignoring $filename");
+
         return false;
     }
 
@@ -180,7 +174,7 @@ class ImportMultifreightFiles extends Command
             }
 
             // Parse date string
-            if (!empty($row[$field]) && stristr($field, 'date')) {
+            if (! empty($row[$field]) && stristr($field, 'date')) {
                 $row[$field] = date_create_from_format('d/m/y', $row[$field]);
             }
 
@@ -199,12 +193,10 @@ class ImportMultifreightFiles extends Command
     {
         $this->info("Processing file $file");
 
-        if ($this->setFileType($file) && ($handle = fopen($this->directory . $file, 'r')) !== false) {
-
+        if ($this->setFileType($file) && ($handle = fopen($this->directory.$file, 'r')) !== false) {
             $count = 0;
 
             while (($data = fgetcsv($handle, 2000, ' ', '"')) !== false) {
-
                 $row = $this->assignFieldNames($data);
 
                 $this->line("Processing row $count");
@@ -213,7 +205,7 @@ class ImportMultifreightFiles extends Command
 
                     case 1:
                         $this->table::firstOrCreate([
-                            $this->keyFields[$this->fileType][0] => $row[$this->keyFields[$this->fileType][0]]
+                            $this->keyFields[$this->fileType][0] => $row[$this->keyFields[$this->fileType][0]],
                         ])->update($row);
 
                         break;
@@ -221,7 +213,7 @@ class ImportMultifreightFiles extends Command
                     case 2:
                         $this->table::firstOrCreate([
                             $this->keyFields[$this->fileType][0] => $row[$this->keyFields[$this->fileType][0]],
-                            $this->keyFields[$this->fileType][1] => $row[$this->keyFields[$this->fileType][1]]
+                            $this->keyFields[$this->fileType][1] => $row[$this->keyFields[$this->fileType][1]],
                         ])->update($row);
 
                         break;
@@ -231,7 +223,7 @@ class ImportMultifreightFiles extends Command
                         $this->table::firstOrCreate([
                             $this->keyFields[$this->fileType][0] => $row[$this->keyFields[$this->fileType][0]],
                             $this->keyFields[$this->fileType][1] => $row[$this->keyFields[$this->fileType][1]],
-                            $this->keyFields[$this->fileType][2] => $row[$this->keyFields[$this->fileType][2]]
+                            $this->keyFields[$this->fileType][2] => $row[$this->keyFields[$this->fileType][2]],
                         ])->update($row);
 
                         break;
@@ -250,7 +242,7 @@ class ImportMultifreightFiles extends Command
      * @param string $file
      * @return void
      */
-    function archiveFile($file)
+    public function archiveFile($file)
     {
         $this->info("Archiving file $file");
 
@@ -258,20 +250,21 @@ class ImportMultifreightFiles extends Command
         $pos2 = strpos($file, '-', strpos($file, '-') + strlen('-'));
         $month = substr($file, $pos2 + 5, 2);
 
-        $directory = $this->directory . $this->archiveDirectory . '/' . $month;
+        $directory = $this->directory.$this->archiveDirectory.'/'.$month;
 
         // Make an archive directory for today's date if it doesn't exist
-        if (!is_dir($directory)) {
+        if (! is_dir($directory)) {
             mkdir($directory, 0777, true);
         }
 
-        $originalFile = $this->directory . $file;
-        $archiveFile = $directory . '/' . $file;
+        $originalFile = $this->directory.$file;
+        $archiveFile = $directory.'/'.$file;
 
         $this->info("Moving $originalFile to archive");
 
-        if (!file_exists($originalFile)) {
+        if (! file_exists($originalFile)) {
             $this->error("Problem archiving $originalFile  - file not found");
+
             return false;
         }
 
@@ -282,7 +275,7 @@ class ImportMultifreightFiles extends Command
 
         if (copy($originalFile, $archiveFile)) {
             unlink($originalFile);
-            $this->info("File archived successfully");
+            $this->info('File archived successfully');
         }
     }
 
@@ -293,11 +286,12 @@ class ImportMultifreightFiles extends Command
      */
     protected function moveFilesForReprocessing($month)
     {
-        $archive = $this->directory . $this->archiveDirectory . '/' . $month;
+        $archive = $this->directory.$this->archiveDirectory.'/'.$month;
 
         // Check that the directory exists.
-        if (!is_dir($archive)) {
+        if (! is_dir($archive)) {
             $this->error("Archive directory $month not found");
+
             return false;
         }
 
@@ -307,7 +301,7 @@ class ImportMultifreightFiles extends Command
         // Loop through the array of filenames and rename the .dat files to top level directory
         foreach ($files as $fname) {
             if (stristr($fname, '.dat')) {
-                rename($archive . '/' . $fname, $this->directory . $fname);
+                rename($archive.'/'.$fname, $this->directory.$fname);
                 $this->line("Moved $fname successfully");
             }
         }
@@ -319,18 +313,17 @@ class ImportMultifreightFiles extends Command
     protected function deleteArchives()
     {
         // Get monthly archive directories
-        $directories = array_filter(glob($this->directory . $this->archiveDirectory . '/*'), 'is_dir');
+        $directories = array_filter(glob($this->directory.$this->archiveDirectory.'/*'), 'is_dir');
 
         // Delete the oldest directory
         if (count($directories) > 3) {
-
-            $files = glob($directories[0] . '/*');
+            $files = glob($directories[0].'/*');
             foreach ($files as $file) {
                 is_dir($file) ? removeDirectory($file) : unlink($file);
             }
             rmdir($directories[0]);
 
-            $this->info("Removed archive directory " . $directories[0]);
+            $this->info('Removed archive directory '.$directories[0]);
         }
     }
 
@@ -339,21 +332,18 @@ class ImportMultifreightFiles extends Command
      */
     protected function checkDirectory()
     {
-        $files = glob($this->directory . '*.dat');
+        $files = glob($this->directory.'*.dat');
 
         $filecount = 0;
 
         if ($files !== false) {
-
             $filecount = count($files);
 
             if ($filecount > 250) {
-
                 $this->error('Sending warning: large number of files to process');
 
-                Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Import Multifreight Files: WARNING', $filecount . ' files detected for processing'));
+                Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Import Multifreight Files: WARNING', $filecount.' files detected for processing'));
             }
         }
     }
-
 }

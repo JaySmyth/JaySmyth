@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Mail;
 
 class NotifyTransportDepartmentPodRequired extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -41,7 +40,6 @@ class NotifyTransportDepartmentPodRequired extends Command
      */
     public function handle()
     {
-
         $localPod = Shipment::where('carrier_id', 1)
             ->where('recipient_country_code', 'IE')
             ->where('ship_date', '<', Carbon::yesterday()->endOfDay())
@@ -53,5 +51,4 @@ class NotifyTransportDepartmentPodRequired extends Command
             Mail::to(['lclose@antrim.ifsgroup.com', 'cgordon@antrim.ifsgroup.com'])->cc(['gmcnicholl@antrim.ifsgroup.com'])->send(new \App\Mail\PodShipments($localPod));
         }
     }
-
 }

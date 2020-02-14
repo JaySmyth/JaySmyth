@@ -8,7 +8,6 @@ use Illuminate\Queue\SerializesModels;
 
 class ShipmentWarning extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -33,52 +32,49 @@ class ShipmentWarning extends Mailable
      */
     public function build()
     {
-
         $subject = '';
-        $valueClass = "";
-        $countryClass = "";
+        $valueClass = '';
+        $countryClass = '';
         switch ($this->warningSubject) {
-            case "value":
-                $subject = "High customs value detected (over £25,000)";
-                $valueClass = "error";
+            case 'value':
+                $subject = 'High customs value detected (over £25,000)';
+                $valueClass = 'error';
                 break;
 
-            case "country":
-                $subject = "Problem country detected";
-                $countryClass = "error";
+            case 'country':
+                $subject = 'Problem country detected';
+                $countryClass = 'error';
                 break;
 
-            case "hazardous":
-                $subject = "Hazardous/Dry Ice Shipment/Lithium Batteries detected";
+            case 'hazardous':
+                $subject = 'Hazardous/Dry Ice Shipment/Lithium Batteries detected';
                 break;
 
-            case "insurance":
-                $subject = "Insured shipment requested";
-                break;
-            
-            case "loss":
-                $subject = "Loss Making Shipment";
+            case 'insurance':
+                $subject = 'Insured shipment requested';
                 break;
 
-            case "ship_reason":
-                $subject = "Non standard ship reason detected (" . $this->shipment->ship_reason . ")";
+            case 'loss':
+                $subject = 'Loss Making Shipment';
                 break;
 
+            case 'ship_reason':
+                $subject = 'Non standard ship reason detected ('.$this->shipment->ship_reason.')';
+                break;
 
             default:
-                $subject = "High customs value (over £25,000) and problem country detected";
-                $valueClass = "error";
-                $countryClass = "error";
+                $subject = 'High customs value (over £25,000) and problem country detected';
+                $valueClass = 'error';
+                $countryClass = 'error';
                 break;
         }
 
         return $this->view('emails.shipments.warning')
-                        ->subject($subject . ' - ' . $this->shipment->consignment_number)
+                        ->subject($subject.' - '.$this->shipment->consignment_number)
                         ->with(['shipment' => $this->shipment,
                             'subject' => $subject,
                             'valueClass' => $valueClass,
                             'countryClass' => $countryClass,
         ]);
     }
-
 }

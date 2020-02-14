@@ -6,12 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Localisation extends Model
 {
-
     public $timestamps = false;
 
     /**
      * Get PHP date format.
-     * 
+     *
      * @return string
      */
     public function getPhpDateFormatAttribute()
@@ -32,7 +31,6 @@ class Localisation extends Model
     }
 
     /**
-     * 
      * @return string
      */
     public function getVerbosePhpDateFormatAttribute()
@@ -46,5 +44,4 @@ class Localisation extends Model
                 return 'jS M - Y';
         }
     }
-
 }

@@ -2,13 +2,12 @@
 
 namespace App\Console\Commands;
 
-use Validator;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
+use Validator;
 
 class UpdatePrimaryFreightShipments extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -42,7 +41,7 @@ class UpdatePrimaryFreightShipments extends Command
      *
      * @var array
      */
-    protected $fields = array('TransactionNumber', 'CustomerName', 'ReferenceNumber', 'PurchaseOrderNumber', 'ShipCarrier', 'ShipService', 'ShipBilling', 'ShipAccount', 'EarliestShipDate', 'CancelDate', 'Notes', 'ShipToName', 'ShipToCompany', 'ShipToAddress1', 'ShipToAddress2', 'ShipToCity', 'ShipToState', 'ShipToZip', 'ShipToCountry', 'ShipToPhone', 'ShipToFax', 'ShipToEmail', 'ShipToCustomerName', 'ShipToDeptNumber', 'ShipToVendorID', 'TotalCartons', 'TotalPallets', 'TotalWeight', 'TotalVolume', 'BOLNum', 'TrackingNum', 'TrailerNum', 'SealNum', 'ShipDate', 'ItemNumber', 'ItemQuantityOrdered', 'ItemQuantityShipped', 'ItemLength', 'ItemWidth', 'ItemHeight', 'ItemWeight', 'FreightPP', 'WarehouseID', 'LotNumber', 'SerialNumber', 'ExpirationDate', 'Supplier', 'Cost', 'FulfillInvShippingAndHandling', 'FulfillInvTax', 'FulfillInvDiscountCode', 'FulfillInvDiscountAmount', 'FulfillInvGiftMessage', 'SoldToName', 'SoldToCompany', 'SoldToAddress1', 'SoldToAddress2', 'SoldToCity', 'SoldToState', 'SoldToZip', 'SoldToCountry', 'SoldToPhone', 'SoldToFax', 'SoldToEmail', 'SoldToCustomerID', 'SoldToDeptNumber', 'FulfillInvSalePrice', 'FulfillInvDiscountPct', 'FulfillInvDiscountAmt');
+    protected $fields = ['TransactionNumber', 'CustomerName', 'ReferenceNumber', 'PurchaseOrderNumber', 'ShipCarrier', 'ShipService', 'ShipBilling', 'ShipAccount', 'EarliestShipDate', 'CancelDate', 'Notes', 'ShipToName', 'ShipToCompany', 'ShipToAddress1', 'ShipToAddress2', 'ShipToCity', 'ShipToState', 'ShipToZip', 'ShipToCountry', 'ShipToPhone', 'ShipToFax', 'ShipToEmail', 'ShipToCustomerName', 'ShipToDeptNumber', 'ShipToVendorID', 'TotalCartons', 'TotalPallets', 'TotalWeight', 'TotalVolume', 'BOLNum', 'TrackingNum', 'TrailerNum', 'SealNum', 'ShipDate', 'ItemNumber', 'ItemQuantityOrdered', 'ItemQuantityShipped', 'ItemLength', 'ItemWidth', 'ItemHeight', 'ItemWeight', 'FreightPP', 'WarehouseID', 'LotNumber', 'SerialNumber', 'ExpirationDate', 'Supplier', 'Cost', 'FulfillInvShippingAndHandling', 'FulfillInvTax', 'FulfillInvDiscountCode', 'FulfillInvDiscountAmount', 'FulfillInvGiftMessage', 'SoldToName', 'SoldToCompany', 'SoldToAddress1', 'SoldToAddress2', 'SoldToCity', 'SoldToState', 'SoldToZip', 'SoldToCountry', 'SoldToPhone', 'SoldToFax', 'SoldToEmail', 'SoldToCustomerID', 'SoldToDeptNumber', 'FulfillInvSalePrice', 'FulfillInvDiscountPct', 'FulfillInvDiscountAmt'];
 
     /**
      * Results array.
@@ -67,7 +66,7 @@ class UpdatePrimaryFreightShipments extends Command
     {
         parent::__construct();
 
-        $this->tempFile = storage_path('app/temp/tracking_' . time() . '.csv');
+        $this->tempFile = storage_path('app/temp/tracking_'.time().'.csv');
     }
 
     /**
@@ -77,20 +76,16 @@ class UpdatePrimaryFreightShipments extends Command
      */
     public function handle()
     {
-
-        $this->info('Checking ' . $this->directory . ' for files to process');
+        $this->info('Checking '.$this->directory.' for files to process');
 
         if ($handle = opendir($this->directory)) {
-
             while (false !== ($file = readdir($handle))) {
-
-                if (!is_dir($file) && $file != $this->archiveDirectory) {
-
+                if (! is_dir($file) && $file != $this->archiveDirectory) {
                     $this->processFile($file);
                     $this->archiveFile($file);
 
-                    $this->results['subject'] = 'Update Primary Freight Shipments - ' . count($this->results['success']) . ' updated / ' . count($this->results['failed']) . ' failed';
-                    $this->results['file'] = $this->directory . $this->archiveDirectory . '/' . $file;
+                    $this->results['subject'] = 'Update Primary Freight Shipments - '.count($this->results['success']).' updated / '.count($this->results['failed']).' failed';
+                    $this->results['file'] = $this->directory.$this->archiveDirectory.'/'.$file;
 
                     Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\UpdateThirdPartyShipments($this->results));
 
@@ -118,7 +113,7 @@ class UpdatePrimaryFreightShipments extends Command
         $rowNumber = 1;
         $data = null;
 
-        if (($handle = fopen($this->directory . $file, 'r')) !== false) {
+        if (($handle = fopen($this->directory.$file, 'r')) !== false) {
             while (($data = fgetcsv($handle, 1000, chr(9))) !== false) {
                 if ($rowNumber >= 2) {
                     $this->processRow($rowNumber, $data);
@@ -163,16 +158,15 @@ class UpdatePrimaryFreightShipments extends Command
             $shipment = \App\Shipment::where('consignment_number', $consignmentNumber)->first();
 
             // Shipment not found
-            if (!$shipment) {
-                $this->setRowFailed($rowNumber, $row, 'Consignment ' . $consignmentNumber . ' not recognised');
+            if (! $shipment) {
+                $this->setRowFailed($rowNumber, $row, 'Consignment '.$consignmentNumber.' not recognised');
                 $proceed = false;
             }
 
             $carrierConsignmentNumber = preg_replace('/\s+/', '', $row['TrackingNum']);
 
             if ($proceed) {
-
-                $this->info("Found shipment $shipment->consignment_number. Updating with carrier consignment number: " . $carrierConsignmentNumber);
+                $this->info("Found shipment $shipment->consignment_number. Updating with carrier consignment number: ".$carrierConsignmentNumber);
 
                 // Update the shipment with details from 3rd party
                 $shipment->carrier_consignment_number = $carrierConsignmentNumber;
@@ -183,7 +177,7 @@ class UpdatePrimaryFreightShipments extends Command
                 // Set the shipment to received
                 $shipment->setReceived(null, 0, false, false);
 
-                // Create an easypost tracker               
+                // Create an easypost tracker
                 dispatch(new \App\Jobs\CreateEasypostTracker($shipment->carrier_consignment_number, $this->identifyCarrier($shipment->carrier_consignment_number)));
 
                 $this->setRowSucceeded($rowNumber, $row);
@@ -194,20 +188,20 @@ class UpdatePrimaryFreightShipments extends Command
     }
 
     /**
-     * Build a CSV file to send to babocush
+     * Build a CSV file to send to babocush.
      *
      * @param type $shipment
      */
     protected function addToTrackingFile($shipment)
     {
-        $handle = fopen($this->tempFile, "a");
+        $handle = fopen($this->tempFile, 'a');
 
         $line = [
             $shipment->shipment_reference,
             1,
             $shipment->pieces,
             $shipment->carrier_consignment_number,
-            $this->identifyCarrier($shipment->carrier_consignment_number)
+            $this->identifyCarrier($shipment->carrier_consignment_number),
         ];
 
         fputcsv($handle, $line);
@@ -223,7 +217,7 @@ class UpdatePrimaryFreightShipments extends Command
      */
     protected function assignFieldNames($data)
     {
-        $row = array();
+        $row = [];
 
         $i = 0;
         foreach ($this->fields as $field) {
@@ -240,13 +234,14 @@ class UpdatePrimaryFreightShipments extends Command
      * @param type $rowNumber
      * @param type $data
      * @param type $row
-     * @return boolean
+     * @return bool
      */
     protected function validateRow($rowNumber, $data, $row)
     {
         // First check for correct number of fields
         if (count($data) != count($this->fields)) {
-            $this->setRowFailed($rowNumber, $row, "Invalid number of fields detected. Detected " . count($data) . " fields. " . count($this->fields) . " required");
+            $this->setRowFailed($rowNumber, $row, 'Invalid number of fields detected. Detected '.count($data).' fields. '.count($this->fields).' required');
+
             return false;
         }
 
@@ -261,6 +256,7 @@ class UpdatePrimaryFreightShipments extends Command
         if ($validator->fails()) {
             $errors = $validator->errors();
             $this->setRowFailed($rowNumber, $row, $errors->all());
+
             return false;
         }
 
@@ -274,9 +270,9 @@ class UpdatePrimaryFreightShipments extends Command
      */
     protected function setResultsArray()
     {
-        $this->results['success'] = array();
-        $this->results['failed'] = array();
-        $this->results['rows'] = array();
+        $this->results['success'] = [];
+        $this->results['failed'] = [];
+        $this->results['rows'] = [];
     }
 
     /**
@@ -318,24 +314,24 @@ class UpdatePrimaryFreightShipments extends Command
      * Move file to archive directory.
      *
      * @param string $file
-     * @return boolean
+     * @return bool
      */
     protected function archiveFile($file)
     {
         $this->info("Archiving file $file");
 
-        $originalFile = $this->directory . $file;
-        $archiveFile = $this->directory . $this->archiveDirectory . '/' . $file;
+        $originalFile = $this->directory.$file;
+        $archiveFile = $this->directory.$this->archiveDirectory.'/'.$file;
 
         $this->info("Moving $originalFile to archive");
 
-        if (!file_exists($originalFile)) {
+        if (! file_exists($originalFile)) {
             $this->error("Problem archiving $file  - file not found");
         }
 
         if (copy($originalFile, $archiveFile)) {
             unlink($originalFile);
-            $this->info("File archived successfully");
+            $this->info('File archived successfully');
         }
     }
 
@@ -357,5 +353,4 @@ class UpdatePrimaryFreightShipments extends Command
 
         return 'USPS';
     }
-
 }

@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\SeaFreightShipment;
 use App\Company;
-use App\Http\Requests\SeaFreightShipmentRequest;
-use App\Http\Requests\ProcessSeaFreightShipmentRequest;
 use App\Http\Requests\ContainerRequest;
-use Illuminate\Http\Request;
+use App\Http\Requests\ProcessSeaFreightShipmentRequest;
+use App\Http\Requests\SeaFreightShipmentRequest;
+use App\SeaFreightShipment;
 use Auth;
+use Illuminate\Http\Request;
 
 class SeaFreightShipmentController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -25,7 +24,7 @@ class SeaFreightShipmentController extends Controller
 
     /**
      * List customs entries.
-     * 
+     *
      * @param Request $request
      * @return type
      */
@@ -40,7 +39,7 @@ class SeaFreightShipmentController extends Controller
 
     /**
      * Display a customs entry.
-     * 
+     *
      * @param type $id
      * @return type
      */
@@ -56,8 +55,8 @@ class SeaFreightShipmentController extends Controller
     /**
      * Displays new entry form.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function create()
     {
@@ -69,8 +68,8 @@ class SeaFreightShipmentController extends Controller
     /**
      * Save the customs entry.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function store(SeaFreightShipmentRequest $request)
     {
@@ -94,8 +93,8 @@ class SeaFreightShipmentController extends Controller
     /**
      * Displays edit entry form.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function edit($id)
     {
@@ -109,8 +108,8 @@ class SeaFreightShipmentController extends Controller
     /**
      * Updates an existing entry.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function update(SeaFreightShipmentRequest $request, $id)
     {
@@ -129,8 +128,8 @@ class SeaFreightShipmentController extends Controller
     /**
      * Displays edit entry form.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function process($id)
     {
@@ -139,7 +138,7 @@ class SeaFreightShipmentController extends Controller
         $this->authorize($shipment);
 
         if ($shipment->processed && $shipment->containers->count() < $shipment->number_of_containers) {
-            return redirect('sea-freight/' . $shipment->id . '/add-container');
+            return redirect('sea-freight/'.$shipment->id.'/add-container');
         }
 
         return view('sea_freight_shipments.process', compact('shipment'));
@@ -148,8 +147,8 @@ class SeaFreightShipmentController extends Controller
     /**
      * Updates an existing entry.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function storeProcess(ProcessSeaFreightShipmentRequest $request, $id)
     {
@@ -164,14 +163,14 @@ class SeaFreightShipmentController extends Controller
 
         flash()->success('Processed!', 'Shipment processed successfully.');
 
-        return redirect('sea-freight/' . $shipment->id . '/add-container');
+        return redirect('sea-freight/'.$shipment->id.'/add-container');
     }
 
     /**
-     * Displays add commodity form.     
-     * 
+     * Displays add commodity form.
+     *
      * @param int $id
-     * @return 
+     * @return
      */
     public function addContainer($id)
     {
@@ -181,6 +180,7 @@ class SeaFreightShipmentController extends Controller
 
         if ($shipment->containers->count() >= $shipment->number_of_containers) {
             flash()->error('Already completed!', 'Containers have already been added to this shipment.');
+
             return back();
         }
 
@@ -189,9 +189,9 @@ class SeaFreightShipmentController extends Controller
 
     /**
      * Saves the commodity line.
-     * 
+     *
      * @param Request $request
-     * @param int $id   
+     * @param int $id
      * @return void
      */
     public function storeContainer(ContainerRequest $request, $id)
@@ -204,6 +204,7 @@ class SeaFreightShipmentController extends Controller
 
         if ($shipment->containers->count() >= $shipment->number_of_containers) {
             flash()->success('Processing Finished!', 'Container added to shipment.');
+
             return redirect('sea-freight');
         }
 
@@ -215,8 +216,8 @@ class SeaFreightShipmentController extends Controller
     /**
      * Displays edit commodity form.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function editContainer($id, $containerId)
     {
@@ -232,8 +233,8 @@ class SeaFreightShipmentController extends Controller
     /**
      * Updates an existing user.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function updateContainer(ContainerRequest $request, $id, $containerId)
     {
@@ -248,14 +249,14 @@ class SeaFreightShipmentController extends Controller
 
         flash()->success('Updated!', 'Container updated successfully.');
 
-        return redirect('sea-freight/' . $shipment->id);
+        return redirect('sea-freight/'.$shipment->id);
     }
 
     /**
      * Displays edit seal number form.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function editSeal($id, $containerId)
     {
@@ -265,6 +266,7 @@ class SeaFreightShipmentController extends Controller
 
         if ($container->seal_number) {
             flash()->error('Already completed!', 'Seal number has already been set.');
+
             return back();
         }
 
@@ -274,8 +276,8 @@ class SeaFreightShipmentController extends Controller
     /**
      * Updates seal number.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function updateSeal(Request $request, $id, $containerId)
     {
@@ -292,14 +294,14 @@ class SeaFreightShipmentController extends Controller
 
         flash()->success('Updated!', 'Seal number updated successfully.');
 
-        return redirect('sea-freight/' . $shipment->id);
+        return redirect('sea-freight/'.$shipment->id);
     }
 
     /**
      * Displays edit entry form.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function status($id)
     {
@@ -320,8 +322,8 @@ class SeaFreightShipmentController extends Controller
     /**
      * Updates an existing entry.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function updateStatus(Request $request, $id)
     {
@@ -329,11 +331,11 @@ class SeaFreightShipmentController extends Controller
 
         $this->authorize('status', $shipment);
 
-        $shipment->setStatus($request->sea_freight_status_id, $request->user()->id, gmtToCarbonUtc($request->date . ' ' . $request->time), $request->message);
+        $shipment->setStatus($request->sea_freight_status_id, $request->user()->id, gmtToCarbonUtc($request->date.' '.$request->time), $request->message);
 
         flash()->success('Status updated!', 'Shipment status updated.');
 
-        return redirect('sea-freight/' . $shipment->id);
+        return redirect('sea-freight/'.$shipment->id);
     }
 
     /**
@@ -345,7 +347,6 @@ class SeaFreightShipmentController extends Controller
     public function cancel(Request $request, $id)
     {
         if ($request->ajax()) {
-
             $shipment = SeaFreightShipment::findOrFail($id);
 
             $this->authorize($shipment);
@@ -356,10 +357,10 @@ class SeaFreightShipmentController extends Controller
 
     /*
      * Customs entry search.
-     * 
+     *
      * @param   $request
      * @param   $paginate
-     * 
+     *
      * @return
      */
 
@@ -372,11 +373,10 @@ class SeaFreightShipmentController extends Controller
                 ->hasStatus($request->status)
                 ->restrictCompany($request->user()->getAllowedCompanyIds());
 
-        if (!$paginate) {
+        if (! $paginate) {
             return $query->get();
         }
 
         return $query->paginate(50);
     }
-
 }

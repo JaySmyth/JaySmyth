@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Driver;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\DriverRequest;
 
 class DriversController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -61,7 +60,7 @@ class DriversController extends Controller
                     'enabled' => $request->enabled,
                     'telephone' => $request->telephone,
                     'vehicle_id' => ($request->vehicle_id) ? $request->vehicle_id : null,
-                    'depot_id' => $request->depot_id
+                    'depot_id' => $request->depot_id,
         ]);
 
         flash()->success('Created!', 'Driver created successfully.');
@@ -101,12 +100,11 @@ class DriversController extends Controller
             'enabled' => $request->enabled,
             'telephone' => $request->telephone,
             'vehicle_id' => ($request->vehicle_id) ? $request->vehicle_id : null,
-            'depot_id' => $request->depot_id
+            'depot_id' => $request->depot_id,
         ]);
 
         flash()->success('Updated!', 'Driver updated successfully.');
 
         return redirect('drivers');
     }
-
 }

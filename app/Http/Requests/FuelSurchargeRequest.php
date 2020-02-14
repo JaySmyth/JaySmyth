@@ -6,7 +6,6 @@ use App\Http\Requests\Request;
 
 class FuelSurchargeRequest extends Request
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -32,5 +31,4 @@ class FuelSurchargeRequest extends Request
             'date_to' => 'required',
         ];
     }
-
 }

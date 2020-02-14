@@ -7,17 +7,16 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 
 class FuelSurchargePolicy
 {
-
     use HandlesAuthorization;
 
     /**
      * Intercept all checks - ensure IFS user.
      *
-     * @return boolean
+     * @return bool
      */
     public function before(User $user)
     {
-        if (!$user->hasIfsRole()) {
+        if (! $user->hasIfsRole()) {
             return false;
         }
     }
@@ -25,7 +24,7 @@ class FuelSurchargePolicy
     /**
      * Index policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function index(User $user)
     {
@@ -37,7 +36,7 @@ class FuelSurchargePolicy
     /**
      * Show policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function view(User $user)
     {
@@ -49,7 +48,7 @@ class FuelSurchargePolicy
     /**
      * Create policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function create(User $user)
     {
@@ -61,7 +60,7 @@ class FuelSurchargePolicy
     /**
      * Update policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function update(User $user)
     {
@@ -73,7 +72,7 @@ class FuelSurchargePolicy
     /**
      * Update policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function upload(User $user)
     {
@@ -85,7 +84,7 @@ class FuelSurchargePolicy
     /**
      * Delete policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function delete(User $user)
     {
@@ -93,5 +92,4 @@ class FuelSurchargePolicy
             return true;
         }
     }
-
 }

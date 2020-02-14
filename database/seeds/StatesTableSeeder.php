@@ -4,7 +4,6 @@ use Illuminate\Database\Seeder;
 
 class StatesTableSeeder extends Seeder
 {
-
     /**
      * Run the database seeds.
      *
@@ -81,5 +80,4 @@ class StatesTableSeeder extends Seeder
             ['code' => 'PR', 'alpha_code' => 'PUERTORICO', 'name' => 'Puerto Rico', 'country_code' => 'PR'],
         ]);
     }
-
 }

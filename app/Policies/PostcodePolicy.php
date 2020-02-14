@@ -7,17 +7,16 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PostcodePolicy
 {
-
     use HandlesAuthorization;
 
     /**
      * Intercept all checks - ensure IFS user.
      *
-     * @return boolean
+     * @return bool
      */
     public function before(User $user)
     {
-        if (!$user->hasIfsRole() || !$user->hasPermission('create_postcode')) {
+        if (! $user->hasIfsRole() || ! $user->hasPermission('create_postcode')) {
             return false;
         }
     }
@@ -25,7 +24,7 @@ class PostcodePolicy
     /**
      * Index policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function index(User $user)
     {
@@ -33,5 +32,4 @@ class PostcodePolicy
             return true;
         }
     }
-
 }

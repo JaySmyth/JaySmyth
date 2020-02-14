@@ -3,8 +3,8 @@
 namespace App;
 
 use App\Rate;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class CompanyRates extends Model
 {
@@ -15,18 +15,17 @@ class CompanyRates extends Model
     public $tableFormat;
 
     /**
-    * Retrieve Rate Table.
-    *
-    * Note: Rates are service agnostic but discounts are not
-    *      (although using an international table for domestic
-    *      shipments will not work due to zone incompatibilities)
-    *
-    * @param type $companyId
-    * @param type Rate
-    * @param type $shipDate
-    * @param type Service
-    *
-    */
+     * Retrieve Rate Table.
+     *
+     * Note: Rates are service agnostic but discounts are not
+     *      (although using an international table for domestic
+     *      shipments will not work due to zone incompatibilities)
+     *
+     * @param type $companyId
+     * @param type Rate
+     * @param type $shipDate
+     * @param type Service
+     */
     public function getRateTable($companyId, $rate, $service = '', $shipDate = '')
     {
         if ($service == '') {
@@ -55,13 +54,13 @@ class CompanyRates extends Model
     }
 
     /**
-    * Format table appropriately for output
-    *
-    * @param type $rate
-    * @param type $discount
-    * @param type $rateTable
-    * @return type
-    */
+     * Format table appropriately for output.
+     *
+     * @param type $rate
+     * @param type $discount
+     * @param type $rateTable
+     * @return type
+     */
     public function formatRateTable($rate, $discount, $rateTable)
     {
         switch ($rate->model) {
@@ -78,20 +77,20 @@ class CompanyRates extends Model
     }
 
     /**
-    * Format Domestic table applying any discounts
-    * from the company_rates table
-    *
-    * @param type $rateTable
-    * @param type $discount
-    * @return type
-    */
+     * Format Domestic table applying any discounts
+     * from the company_rates table.
+     *
+     * @param type $rateTable
+     * @param type $discount
+     * @return type
+     */
     public function formatDomesticTable($rateTable, $discount = 0)
     {
         $table = [];
         $row = [];
 
         foreach ($rateTable as $item) {
-            if ($discount <> 0) {
+            if ($discount != 0) {
                 $item->first = number_format($item->first - (($item->first * $discount) / 100), 2, '.', '');
                 $item->others = number_format($item->others - (($item->others * $discount) / 100), 2, '.', '');
                 $item->notional = number_format($item->notional - (($item->notional * $discount) / 100), 2, '.', '');
@@ -108,13 +107,13 @@ class CompanyRates extends Model
     }
 
     /**
-    * Format Intl table applying any discounts
-    * from the company_rates table
-    *
-    * @param type $rateTable
-    * @param type $discount
-    * @return type
-    */
+     * Format Intl table applying any discounts
+     * from the company_rates table.
+     *
+     * @param type $rateTable
+     * @param type $discount
+     * @return type
+     */
     public function formatIntlTable($rateTable, $discount)
     {
         $rate = [];
@@ -122,13 +121,13 @@ class CompanyRates extends Model
         foreach ($rateTable as $item) {
 
             // Test For Weight Rate
-            if ($item->consignment_rate == 0 && $item->weight_rate <> 0 && $item->package_rate == 0) {
-                $suffix = '/' . $item->weight_units;
+            if ($item->consignment_rate == 0 && $item->weight_rate != 0 && $item->package_rate == 0) {
+                $suffix = '/'.$item->weight_units;
                 $rate['value'] = number_format(($item->weight_rate - ($item->weight_rate * $discount) / 100), 2, '.', '');
             } else {
 
                 // Test For Package Rate
-                if ($item->consignment_rate == 0 && $item->weight_rate == 0 && $item->package_rate <> 0) {
+                if ($item->consignment_rate == 0 && $item->weight_rate == 0 && $item->package_rate != 0) {
                     $suffix = '/each';
                     $rate['value'] = number_format($item->package_rate - (($item->package_rate * $discount) / 100), 2, '.', '');
                 } else {
@@ -147,7 +146,7 @@ class CompanyRates extends Model
             $rate['from_date'] = $item->from_date;
             $rate['to_date'] = $item->to_date;
 
-            $table[$item->residential][$item->piece_limit][$item->package_type][$item->break_point . $suffix][$item->zone] = $rate;
+            $table[$item->residential][$item->piece_limit][$item->package_type][$item->break_point.$suffix][$item->zone] = $rate;
         }
 
         return $table;
@@ -158,7 +157,7 @@ class CompanyRates extends Model
         $serviceCode = '';
 
         // If ServiceId defined then get Service code for the required service
-        if ($serviceId > "") {
+        if ($serviceId > '') {
             $service = Service::find($serviceId);
             if ($service) {
                 $serviceCode = $service->code;
@@ -174,17 +173,17 @@ class CompanyRates extends Model
     }
 
     /**
-    * Calc the max and min discount %'s applied to the
-    * to a custom rate
-    *
-    * @param type $companyId
-    * @param type $rateId
-    * @param type $serviceCode
-    * @param type $effectiveDate
-    * @param type $queryType
-    * @return type
-    */
-    public function getMinMaxDiscount($companyId, $rateId, $serviceId = '', $effectiveDate = '', $queryType)
+     * Calc the max and min discount %'s applied to the
+     * to a custom rate.
+     *
+     * @param type $companyId
+     * @param type $rateId
+     * @param type $serviceCode
+     * @param type $effectiveDate
+     * @param type $queryType
+     * @return type
+     */
+    public function getMinMaxDiscount($companyId, $rateId, $serviceId, $effectiveDate, $queryType)
     {
         $serviceCode = $this->getServiceCode($serviceId);
 
@@ -254,12 +253,12 @@ class CompanyRates extends Model
     }
 
     /**
-    * Checks Domestic & Non domestic and deletes matching rates
-    *
-    * @param type $companyId
-    * @param type $rateId
-    * @param type $effectiveDate
-    */
+     * Checks Domestic & Non domestic and deletes matching rates.
+     *
+     * @param type $companyId
+     * @param type $rateId
+     * @param type $effectiveDate
+     */
     public function clearExistingRate($companyId, $rateId, $serviceId, $effectiveDate = '')
     {
 
@@ -283,7 +282,7 @@ class CompanyRates extends Model
     public function setDiscount($discount = 0, $effectiveDate = '')
     {
         // If necessary add discounts
-        if ($discount <> 0) {
+        if ($discount != 0) {
             // Get correct empty RateDetail object
             $this->getRateDetailObject($this->rate_id);
 
@@ -303,7 +302,7 @@ class CompanyRates extends Model
                         'rate_id' => $this->rate_id,
                         'special_discount' => $special,
                         'discount' => 0,
-                        'fuel_cap' => $this->fuel_cap
+                        'fuel_cap' => $this->fuel_cap,
                     ]
                 );
             }
@@ -315,13 +314,11 @@ class CompanyRates extends Model
         $rate = Rate::find($rateId);
         if ($rate) {
             if (strtolower($rate->model) == 'domestic') {
-                return CompanyRates::where('company_id', $companyId)->where('rate_id', $rateId)->get();
+                return self::where('company_id', $companyId)->where('rate_id', $rateId)->get();
             } else {
-                return CompanyRates::where('company_id', $companyId)->where('service_id', $serviceId)->get();
+                return self::where('company_id', $companyId)->where('service_id', $serviceId)->get();
             }
         }
-
-        return null;
     }
 
     public function closeRateDiscounts($companyId, $rateId = '', $serviceId = '', $effectiveDate = '')
@@ -336,12 +333,12 @@ class CompanyRates extends Model
     }
 
     /**
-    * Checks Domestic & Non domestic and deletes matching discounts
-    *
-    * @param type $companyId
-    * @param type $rateId
-    * @param type $effectiveDate
-    */
+     * Checks Domestic & Non domestic and deletes matching discounts.
+     *
+     * @param type $companyId
+     * @param type $rateId
+     * @param type $effectiveDate
+     */
     public function deleteDiscount($companyId, $rateId = '', $serviceId = '', $effectiveDate = '')
     {
 

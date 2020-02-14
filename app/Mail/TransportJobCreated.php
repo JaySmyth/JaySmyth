@@ -3,13 +3,12 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class TransportJobCreated extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -32,16 +31,14 @@ class TransportJobCreated extends Mailable
      */
     public function build()
     {
-
         if ($this->transportJob->type == 'c') {
-            $subject = 'Collection Request - ' . $this->transportJob->from_company_name . ', ' . $this->transportJob->from_city;
+            $subject = 'Collection Request - '.$this->transportJob->from_company_name.', '.$this->transportJob->from_city;
         } else {
-            $subject = 'Delivery Request - ' . $this->transportJob->to_company_name . ', ' . $this->transportJob->to_city;
+            $subject = 'Delivery Request - '.$this->transportJob->to_company_name.', '.$this->transportJob->to_city;
         }
 
         return $this->view('emails.transport_jobs.created')
                         ->subject($subject)
                         ->with(['transportJob' => $this->transportJob]);
     }
-
 }

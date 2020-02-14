@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Depot extends Model
 {
-
     /**
      * A depot has one localisation.
      *
@@ -16,5 +15,4 @@ class Depot extends Model
     {
         return $this->belongsTo(Localisation::class);
     }
-
 }

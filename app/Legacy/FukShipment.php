@@ -4,8 +4,8 @@ namespace App\Legacy;
 
 use Illuminate\Database\Eloquent\Model;
 
-class FukShipment extends Model {
-
+class FukShipment extends Model
+{
     /**
      * The connection name for the model.
      *

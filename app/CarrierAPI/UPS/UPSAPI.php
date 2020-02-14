@@ -3,14 +3,14 @@
 namespace App\CarrierAPI\UPS;
 
 use App\Carrier;
-use App\Service;
-use App\PackagingType;
-use App\TransactionLog;
 use App\CarrierAPI\UPS\UPSLabel;
+use App\PackagingType;
+use App\Service;
+use App\TransactionLog;
 use Ups\Entity\Shipment;
 
 /**
- * Description of UPSAPI
+ * Description of UPSAPI.
  *
  * @author gmcbroom
  */
@@ -23,9 +23,8 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
     private $account;
     public $mode;
 
-    function initCarrier()
+    public function initCarrier()
     {
-
         $this->account = [
             'TEST' => [
                 // ID to use to connect to UPS
@@ -33,7 +32,7 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
                 // Password to use to connect to UPS
                 'pass' => 'tLniwtbP7',
                 // Access Key to use to connect to UPS
-                'key' => '4D132F25A427F478'
+                'key' => '4D132F25A427F478',
             ],
             'PRODUCTION' => [
                 // ID to use to connect to UPS
@@ -41,11 +40,10 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
                 // Password to use to connect to UPS
                 'pass' => 'tLniwtbP7',
                 // Access Key to use to connect to UPS
-                'key' => '4D132F25A427F478'
+                'key' => '4D132F25A427F478',
                 // Shipper, Billing and Duty Account numbers
-            ]
+            ],
         ];
-
 
         // Billing
         $this->billTo = ['sender' => 'prepaid', 'recipient' => 'consigneeBilled', 'other' => 'billThirdParty'];
@@ -73,14 +71,13 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
 
     /**
      * Accepts the Shipment detail array and calcs
-     * The correct Global Product code to return
+     * The correct Global Product code to return.
      *
      * @param array $shipment
      * @return string Global Product Code
      */
     public function getGPC($shipment)
     {
-
         $service_code = $this->getServiceCode($shipment);
         if (isset($this->svc['service'][$service_code])) {
             $service_details = $this->svc['service'][$service_code];
@@ -91,14 +88,13 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
 
     /**
      * Accepts the Shipment detail array and calcs
-     * The correct Local Product code to return
+     * The correct Local Product code to return.
      *
      * @param array $shipment
      * @return string Local Product Code
      */
     public function getLPC($shipment)
     {
-
         $service_code = $this->getServiceCode($shipment);
         if (isset($this->svc['service'][$service_code])) {
             $service_details = $this->svc['service'][$service_code];
@@ -149,7 +145,6 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
         $shipFrom->setPhoneNumber($shipment['sender_telephone']);
         $upsShipment->setShipFrom($shipFrom);
 
-
         // To address
         $address = new \Ups\Entity\Address();
         $address->setAddressLine1($shipment['recipient_address1']);
@@ -178,7 +173,7 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
         $upsShipment->setService($upsService);
 
         // Set description
-        if (isset($shipment['goods_description']) && $shipment['goods_description'] > "") {
+        if (isset($shipment['goods_description']) && $shipment['goods_description'] > '') {
             $upsShipment->setDescription(substr($shipment['goods_description'], 0, 50));
         } else {
             $upsShipment->setDescription($shipment['documents_description']);
@@ -221,7 +216,7 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
 
         // Set payment information
         $upsShipment->setPaymentInformation(new \Ups\Entity\PaymentInformation(
-            $this->billTo[$shipment['bill_shipping']], (object)array('AccountNumber' => $shipment['bill_shipping_account'])
+            $this->billTo[$shipment['bill_shipping']], (object) ['AccountNumber' => $shipment['bill_shipping_account']]
         ));
 
         /*
@@ -266,7 +261,6 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
 
     public function validateShipment($shipment)
     {
-
         $errors = [];
 
         // $rules['bill_shipping'] = 'required|in:sender';
@@ -287,7 +281,6 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
 
     private function sendMessageToCarrier($upsShipment, $labelSpecification)
     {
-
         $labelSpecification = new \Ups\Entity\ShipmentRequestLabelSpecification('GIF');
         $labelSpecification->setStockSizeHeight(6);
         $labelSpecification->setStockSizeWidth(4);
@@ -315,10 +308,9 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
                 $response = $api->accept($confirm->ShipmentDigest);
                 $json = json_encode($response);
                 TransactionLog::create(['carrier' => 'ups', 'type' => 'JSON', 'direction' => 'I', 'msg' => $json, 'mode' => $this->mode]);
-                $response = json_decode($json, TRUE);
+                $response = json_decode($json, true);
             }
         } catch (\Exception $e) {
-
             $response['errors'][] = $e->getMessage();
         }
 
@@ -351,23 +343,23 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
 
                 //                      Prepare Response
                 $response = $this->createShipmentResponse($reply, $shipment['service_code'], $route_id);
+
                 return $response;
             }
         } else {
-
             return $this->generateErrorResponse($response, $errors);
         }
     }
 
     private function calc_routing($shipment)
     {
-
         return 1;
     }
 
     private function generatePdf($data, $serviceCode = '')
     {
         $label = new UPSLabel(null, $serviceCode, $data);
+
         return $label->create();
     }
 
@@ -412,7 +404,4 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
 
         return $response;
     }
-
 }
-
-?>

@@ -10,8 +10,10 @@ namespace App\Pricing\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
-class Pricing extends Facade {
-    protected static function getFacadeAccessor() {
+class Pricing extends Facade
+{
+    protected static function getFacadeAccessor()
+    {
         return 'Pricing';
     }
 }

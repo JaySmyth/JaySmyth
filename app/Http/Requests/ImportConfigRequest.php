@@ -6,7 +6,6 @@ use App\Http\Requests\Request;
 
 class ImportConfigRequest extends Request
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -44,5 +43,4 @@ class ImportConfigRequest extends Request
             'ship_ref_sep' => 'size:1',
         ];
     }
-
 }

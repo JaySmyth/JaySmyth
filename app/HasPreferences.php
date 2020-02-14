@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Illuminate\Support\Arr;
+
 trait HasPreferences
 {
     /*
@@ -16,39 +18,38 @@ trait HasPreferences
      */
     public function preferences()
     {
-        return $this->hasMany('App\Preference');
+        return $this->hasMany(\App\Preference::class);
     }
 
     /**
-     * 
      * @param type $companyId
      * @param type $modeId
      * @param type $values
      */
     public function setPreferences($companyId, $modeId, $values)
     {
-        if (!is_array($values)) {
+        if (! is_array($values)) {
             parse_str($values, $values);
         }
 
         // Flatten the multi-dimensional array into 1D array using dot notation
-        $values = array_dot($values);
+        $values = Arr::dot($values);
 
         // Remove any existing default values first
         $this->resetPreferences($companyId, $modeId);
 
         // Construct an array for bulk insert
-        $preferences = array();
+        $preferences = [];
 
         foreach ($values as $field => $value) {
-            if (strlen($value) > 0 && !in_array($field, $this->exclude)) {
-                $preferences[] = array(
+            if (strlen($value) > 0 && ! in_array($field, $this->exclude)) {
+                $preferences[] = [
                     'field' => $field,
                     'value' => $value,
                     'company_id' => $companyId,
                     'mode_id' => $modeId,
                     'user_id' => $this->id,
-                );
+                ];
             }
         }
 
@@ -56,14 +57,13 @@ trait HasPreferences
     }
 
     /**
-     * 
      * @param type $companyId
      * @param type $modeId
      * @return type
      */
     public function getPreferences($companyId, $modeId, $asArray = false)
     {
-        $values = array();
+        $values = [];
 
         $preferences = $this->preferences()
                 ->where('company_id', $companyId)
@@ -77,7 +77,6 @@ trait HasPreferences
 
         // User has no preferences defined, so prepopulate with system defaults
         if ($preferences->count() <= 0) {
-
             $company = Company::findOrFail($companyId);
 
             $values = [
@@ -95,7 +94,7 @@ trait HasPreferences
                 'sender_email' => $this->email,
                 'terms_of_sale' => 'DAP',
                 'bill_tax_duty' => 'recipient',
-                'eori' => $company->eori
+                'eori' => $company->eori,
             ];
         }
 
@@ -107,7 +106,6 @@ trait HasPreferences
     }
 
     /**
-     * 
      * @param type $companyId
      * @param type $modeId
      */
@@ -118,5 +116,4 @@ trait HasPreferences
                 ->where('mode_id', $modeId)
                 ->delete();
     }
-
 }

@@ -4,7 +4,6 @@ use Illuminate\Database\Seeder;
 
 class ManifestProfilesTableSeeder extends Seeder
 {
-
     /**
      * Run the database seeds.
      *
@@ -28,5 +27,4 @@ class ManifestProfilesTableSeeder extends Seeder
             ['name' => 'Air Freight', 'prefix' => 'AF', 'mode_id' => 2, 'carrier_id' => 1, 'route_id' => null, 'depot_id' => 1, 'auto' => 1, 'time' => '18:30', 'upload_required' => 0, 'last_run' => null],
         ]);
     }
-
 }

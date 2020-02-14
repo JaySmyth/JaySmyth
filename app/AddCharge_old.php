@@ -4,11 +4,11 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class AddCharge extends Model
+class AddCharge_old extends Model
 {
     /*
      * Black list of NON mass assignable - all others are mass assignable.
-     * 
+     *
      * @var array
      */
 
@@ -22,7 +22,7 @@ class AddCharge extends Model
     protected $dates = ['created_at', 'updated_at'];
 
     /**
-     * A surcharge has many surcharge details
+     * A surcharge has many surcharge details.
      *
      * @return
      */
@@ -33,22 +33,21 @@ class AddCharge extends Model
 
     /**
      * A surcharge has many surcharge details
-     * But only some are valid for given date
+     * But only some are valid for given date.
      *
      * @return
      */
     public function charges($effectiveDate)
     {
-
         if ($effectiveDate == '') {
             $effectiveDate = date('Y-m-d');
         }
-        
+
         return $this->addChargeDetails()->where('from_date', '<=', $effectiveDate)->where('to_date', '>=', $effectiveDate);
     }
 
     /**
-     * Get the type (verbose)
+     * Get the type (verbose).
      *
      * @return string
      */
@@ -56,5 +55,4 @@ class AddCharge extends Model
     {
         return ($this->type == 'c') ? 'Cost' : 'Sale';
     }
-
 }

@@ -33,5 +33,4 @@ class ProblemEvent extends Model
     {
         return strtoupper($value);
     }
-
 }

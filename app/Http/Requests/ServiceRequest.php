@@ -6,7 +6,6 @@ use App\Http\Requests\Request;
 
 class ServiceRequest extends Request
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -22,10 +21,9 @@ class ServiceRequest extends Request
      *
      * @return array
      */
-    
     public function rules()
     {
-        return array();
+        return [];
         /*
         return [
             'company_id' => 'required',
@@ -43,6 +41,4 @@ class ServiceRequest extends Request
         ];
         */
     }
-
-
 }

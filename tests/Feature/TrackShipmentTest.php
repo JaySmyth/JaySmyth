@@ -2,13 +2,12 @@
 
 namespace Tests\Unit;
 
-use App\User;
 use App\Shipment;
+use App\User;
 use Tests\TestCase;
 
 class TrackShipmentTest extends TestCase
 {
-
     /**
      * Check tracking (guest).
      *
@@ -20,9 +19,7 @@ class TrackShipmentTest extends TestCase
             ->assertOk()
             ->assertSeeText('Delivered')
             ->assertSeeText('484340955945');
-
     }
-
 
     /**
      * Check tracking (authenticated user).
@@ -38,14 +35,11 @@ class TrackShipmentTest extends TestCase
         $shipment = Shipment::where('status_id', 6)->where('carrier_id', 2)->orderBy('id', 'desc')->first();
 
         $response = $this->actingAs($user)->post('/track', ['tracking_number' => $shipment->consignment_number])
-            ->assertRedirect('shipments/' . $shipment->id);
+            ->assertRedirect('shipments/'.$shipment->id);
 
         $this->followRedirects($response)
             ->assertOk()
             ->assertSeeText('Delivered')
             ->assertSeeText($shipment->carrier_consignment_number);
-
     }
-
-
 }

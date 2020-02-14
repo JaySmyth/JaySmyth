@@ -17,7 +17,7 @@ class IfsAdmin
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if (Auth::guard($guard)->guest() || !Auth::user()->hasRole('ifsa')) {
+        if (Auth::guard($guard)->guest() || ! Auth::user()->hasRole('ifsa')) {
             if ($request->ajax() || $request->wantsJson()) {
                 return response('Unauthorized.', 401);
             } else {

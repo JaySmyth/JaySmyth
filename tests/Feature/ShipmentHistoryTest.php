@@ -21,8 +21,5 @@ class ShipmentHistoryTest extends TestCase
             ->assertOk()
             ->assertSeeText('shipment history')
             ->assertSeeText($user->name);
-
     }
-
-
 }

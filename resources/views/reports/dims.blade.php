@@ -10,37 +10,37 @@
 
         <div class="form-group">
             <label for="month">Date From</label>
-            <input type="text" name="date_from" value="@if(!Input::get('date_from') && !Input::get('date_to')){{date(Auth::user()->date_format)}}@else{{Input::get('date_from')}}@endif" class="form-control datepicker" placeholder="Date from">
+            <input type="text" name="date_from" value="@if(!Request::get('date_from') && !Request::get('date_to')){{date(Auth::user()->date_format)}}@else{{Request::get('date_from')}}@endif" class="form-control datepicker" placeholder="Date from">
         </div>
 
         <div class="form-group">
             <label for="month">Date To</label>
-            <input type="text" name="date_to" value="@if(!Input::get('date_from') && !Input::get('date_to')){{date(Auth::user()->date_format)}}@else{{Input::get('date_to')}}@endif" class="form-control datepicker" placeholder="Date To">
+            <input type="text" name="date_to" value="@if(!Request::get('date_from') && !Request::get('date_to')){{date(Auth::user()->date_format)}}@else{{Request::get('date_to')}}@endif" class="form-control datepicker" placeholder="Date To">
         </div>
 
         <div class="form-group">
             <label for="status">Status</label>
-            {!! Form::select('status', dropDown('statuses', 'All Statuses'), Input::get('status'), array('class' => 'form-control')) !!}
+            {!! Form::select('status', dropDown('statuses', 'All Statuses'), Request::get('status'), array('class' => 'form-control')) !!}
         </div>
 
         <div class="form-group">
             <label for="month">Traffic</label>
-            {!! Form::select('traffic', dropDown('traffic', 'All Traffic'), Input::get('traffic'), array('class' => 'form-control')) !!}
+            {!! Form::select('traffic', dropDown('traffic', 'All Traffic'), Request::get('traffic'), array('class' => 'form-control')) !!}
         </div>
 
         <div class="form-group">
             <label for="month">Carrier</label>
-            {!! Form::select('carrier', dropDown('carriers', 'All Carriers'), Input::get('carrier'), array('class' => 'form-control')) !!}
+            {!! Form::select('carrier', dropDown('carriers', 'All Carriers'), Request::get('carrier'), array('class' => 'form-control')) !!}
         </div>
 
         <div class="form-group">
             <label for="month">Service</label>
-            {!! Form::select('service', dropDown('services', 'All Services'), Input::get('service'), array('class' => 'form-control')) !!}   
+            {!! Form::select('service', dropDown('services', 'All Services'), Request::get('service'), array('class' => 'form-control')) !!}   
         </div>
 
         <div class="form-group">
             <label for="month">Shipper</label>
-            {!! Form::select('company', dropDown('enabledSites', 'All Shippers'), Input::get('company'), array('class' => 'form-control')) !!}  
+            {!! Form::select('company', dropDown('enabledSites', 'All Shippers'), Request::get('company'), array('class' => 'form-control')) !!}  
         </div>
 
         <button type="submit" class="btn btn-primary mt-3">Update Report</button>
@@ -51,7 +51,7 @@
 
     <main class="col-sm-10 ml-sm-auto" role="main">
 
-        @if(Input::get('date_from'))
+        @if(Request::get('date_from'))
         @section('toolbar')   
         <a href="{{ url('/shipments/download-dims?' . Request::getQueryString()) }}" title="Download Results"><span class="fas fa-cloud-download-alt fa-lg" aria-hidden="true"></span></a>
         @endsection

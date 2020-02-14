@@ -8,10 +8,10 @@
 
 namespace App\Pricing;
 
-use App\Company;
 use App\CarrierPackagingType;
-use App\DomesticZone;
+use App\Company;
 use App\DomesticRate;
+use App\DomesticZone;
 use App\FedexEas;
 
 class PricingModel1 extends PricingModel
@@ -78,8 +78,8 @@ class PricingModel1 extends PricingModel
 
             default:
                 $this->zone = 0;
-                $requireCosts = "Y";
-                $this->response['errors'][] = "Unknown Service";
+                $requireCosts = 'Y';
+                $this->response['errors'][] = 'Unknown Service';
         }
     }
 
@@ -102,14 +102,14 @@ class PricingModel1 extends PricingModel
             $this->rateDetail = $rateDetail;
         } else {
             // Create error response
-            $this->response['errors'][] = "No " . $this->priceType . " rate/ current rate found";
-            $this->response['errors'][] = "Rate Id : " . $this->rate['id']
-                    . " Company Id : " . $this->shipment['company_id']
-                    . " Service Code : " . $this->shipment['service_code']
-                    . " Packaging : " . $packageType
-                    . " Zone : " . $this->zone
-                    . " Pieces : " . $this->shipment['pieces']
-                    . " Weight : " . $this->chargeableWeight;
+            $this->response['errors'][] = 'No '.$this->priceType.' rate/ current rate found';
+            $this->response['errors'][] = 'Rate Id : '.$this->rate['id']
+                    .' Company Id : '.$this->shipment['company_id']
+                    .' Service Code : '.$this->shipment['service_code']
+                    .' Packaging : '.$packageType
+                    .' Zone : '.$this->zone
+                    .' Pieces : '.$this->shipment['pieces']
+                    .' Weight : '.$this->chargeableWeight;
         }
     }
 
@@ -118,7 +118,7 @@ class PricingModel1 extends PricingModel
         $okToPrice = true;
         $shipmentSummary = $this->buildPackageSummary();
 
-        $this->log("*** Domestic Shipment ***");
+        $this->log('*** Domestic Shipment ***');
         // Calc charge for each piece as they may be of different types
         foreach ($shipmentSummary as $packageCode => $packageSummary) {
             $pieces = $packageSummary['pieces'];
@@ -126,10 +126,10 @@ class PricingModel1 extends PricingModel
 
             $this->setPackageType($packageCode);
 
-            $this->log($pieces . " x " .$this->packagingType . ' ' . $chargeableWeight . " kgs Charged");
+            $this->log($pieces.' x '.$this->packagingType.' '.$chargeableWeight.' kgs Charged');
 
             $charge['code'] = 'FRT';
-            $charge['description'] = "$pieces $this->packagingType(s) to Area " . strtoupper($this->zone);
+            $charge['description'] = "$pieces $this->packagingType(s) to Area ".strtoupper($this->zone);
             $charge['value'] = 0;
 
             // Get Rate for this package
@@ -140,13 +140,13 @@ class PricingModel1 extends PricingModel
                 // Calc Charge for 1st piece
                 if ($this->rateDetail->first > 0) {
                     $charge['value'] = round($this->rateDetail->first, 2);
-                    $this->log("First Piece: " . round($this->rateDetail->first, 2));
+                    $this->log('First Piece: '.round($this->rateDetail->first, 2));
                 }
 
                 // Calc charge for any additional pieces
                 if ($pieces > 1) {
                     $charge['value'] += round(($pieces - 1) * round($this->rateDetail->others, 2), 2);
-                    $this->log("Subs Pieces: " . round(($pieces - 1) * round($this->rateDetail->others, 2), 2));
+                    $this->log('Subs Pieces: '.round(($pieces - 1) * round($this->rateDetail->others, 2), 2));
                 }
 
                 // Rate has notional package charge so check to see if it applies
@@ -159,7 +159,7 @@ class PricingModel1 extends PricingModel
 
                             // Price notional packages
                             $charge['value'] += round($notionalPackages * round($this->rateDetail->notional, 2), 2);
-                            $this->log("Notional: " . round($notionalPackages * round($this->rateDetail->notional, 2), 2));
+                            $this->log('Notional: '.round($notionalPackages * round($this->rateDetail->notional, 2), 2));
                         } // else {
 
                             // Notional rate missing, so error out unless company_id == 550
@@ -220,7 +220,7 @@ class PricingModel1 extends PricingModel
 
             // Add package to summary
             if (isset($summary[$package['packaging_code']])) {
-                $summary[$package['packaging_code']]['pieces'] ++;
+                $summary[$package['packaging_code']]['pieces']++;
                 $summary[$package['packaging_code']]['weight'] += $chargeableWeight;
             } else {
                 $summary[$package['packaging_code']]['pieces'] = 1;
@@ -233,7 +233,7 @@ class PricingModel1 extends PricingModel
 
     /**
      * Tries to work out what packaging type to use
-     * for the rate tables
+     * for the rate tables.
      *
      * @param type $packageCode
      */
@@ -310,31 +310,30 @@ class PricingModel1 extends PricingModel
          * *************************************
          */
 
-        if (!in_array($this->shipment['service_code'], ['ni24', 'ni48', 'ie24', 'ie48', 'uk48'])) {
+        if (! in_array($this->shipment['service_code'], ['ni24', 'ni48', 'ie24', 'ie48', 'uk48'])) {
             if ($this->shipment['recipient_type'] == 'r') {
                 return true;
             }
         }
-
 
         return false;
     }
 
     public function isLPS()
     {
-        $serviceCodes = ["uk48", "uk48r"];
-        if (in_array(strtolower($this->shipment["service_code"]), $serviceCodes)) {
+        $serviceCodes = ['uk48', 'uk48r'];
+        if (in_array(strtolower($this->shipment['service_code']), $serviceCodes)) {
             return false;
         }
     }
 
     /**
-     * Returns true if any piece in the shipment has any dim greater than 120cm
+     * Returns true if any piece in the shipment has any dim greater than 120cm.
      */
     public function isOSP()
     {
-        $serviceCodes = ["uk48", "uk48r"];
-        if (in_array(strtolower($this->shipment["service_code"]), $serviceCodes)) {
+        $serviceCodes = ['uk48', 'uk48r'];
+        if (in_array(strtolower($this->shipment['service_code']), $serviceCodes)) {
             return false;
         }
 
@@ -349,12 +348,12 @@ class PricingModel1 extends PricingModel
     }
 
     /**
-     * Returns true if any piece in the shipment has a weight in excess of 69.5 kg
+     * Returns true if any piece in the shipment has a weight in excess of 69.5 kg.
      */
     public function isOWP()
     {
-        $serviceCodes = ["uk48", "uk48r"];
-        if (in_array(strtolower($this->shipment["service_code"]), $serviceCodes)) {
+        $serviceCodes = ['uk48', 'uk48r'];
+        if (in_array(strtolower($this->shipment['service_code']), $serviceCodes)) {
             return false;
         }
 
@@ -370,7 +369,7 @@ class PricingModel1 extends PricingModel
     }
 
     /**
-     * Returns true if shipment attracts a collection charge
+     * Returns true if shipment attracts a collection charge.
      */
     public function isCOL()
     {
@@ -386,7 +385,7 @@ class PricingModel1 extends PricingModel
     public function isEAS()
     {
         $surcharge = new \App\FedexEas();
-        if (strtoupper($surcharge->getSurcharge($this->shipment['recipient_postcode'])) == "EAS") {
+        if (strtoupper($surcharge->getSurcharge($this->shipment['recipient_postcode'])) == 'EAS') {
             return true;
         }
 
@@ -396,7 +395,7 @@ class PricingModel1 extends PricingModel
     public function isRAS()
     {
         $surcharge = new \App\FedexEas();
-        if (strtoupper($surcharge->getSurcharge($this->shipment['recipient_postcode'])) == "RAS") {
+        if (strtoupper($surcharge->getSurcharge($this->shipment['recipient_postcode'])) == 'RAS') {
             return true;
         }
 
@@ -406,7 +405,7 @@ class PricingModel1 extends PricingModel
     public function isOOA()
     {
         $surcharge = new \App\FedexEas();
-        if (strtoupper($surcharge->getSurcharge($this->shipment['recipient_postcode'])) == "OOA") {
+        if (strtoupper($surcharge->getSurcharge($this->shipment['recipient_postcode'])) == 'OOA') {
             return true;
         }
 

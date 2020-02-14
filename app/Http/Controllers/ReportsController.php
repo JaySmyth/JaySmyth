@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Report;
-use App\Shipment;
 use App\Company;
 use App\Manifest;
+use App\Report;
 use App\Service;
+use App\Shipment;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ReportsController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -68,15 +67,15 @@ class ReportsController extends Controller
         // Load for manifests drop down
         $manifests = Manifest::whereIn('manifest_profile_id', [1, 2])->whereDepotId($report->depot_id)->whereCarrierId($criteria['carrier_id'])->orderBy('id', 'DESC')->limit(250)->get();
 
-        $dropdown = array();
+        $dropdown = [];
 
         foreach ($manifests as $m) {
-            $dropdown[$m->id] = $m->number . ' (' . $m->created_at->timezone($request->user()->time_zone)->format($request->user()->date_format) . ')';
+            $dropdown[$m->id] = $m->number.' ('.$m->created_at->timezone($request->user()->time_zone)->format($request->user()->date_format).')';
         }
 
         $parisShipments = $this->getCustomsReportShipments($report, $request, 'fedexRouteParis');
         $memphisShipments = $this->getCustomsReportShipments($report, $request, 'fedexRouteMemphis');
-        $range = number_format($criteria['customs_value_low'], 2) . 'GBP - ' . number_format($criteria['customs_value_high'], 2) . 'GBP';
+        $range = number_format($criteria['customs_value_low'], 2).'GBP - '.number_format($criteria['customs_value_high'], 2).'GBP';
 
         return view('reports.customs', compact('manifest', 'dropdown', 'report', 'parisShipments', 'memphisShipments', 'range'));
     }
@@ -203,7 +202,6 @@ class ReportsController extends Controller
     }
 
     /**
-     *
      * @param Request $request
      * @param type $id
      * @return type
@@ -214,7 +212,7 @@ class ReportsController extends Controller
 
         $this->authorize(new Report);
 
-        if (!$request->date) {
+        if (! $request->date) {
             $date = Carbon::today();
         } else {
             $date = new Carbon($request->date);
@@ -289,7 +287,6 @@ class ReportsController extends Controller
         $dateFrom = new Carbon($request->date_from);
         $dateTo = new Carbon($request->date_to);
 
-
         $shipments = Shipment::select('shipments.*')
             ->orderBy('created_at', 'DESC')
             ->orderBy('shipments.id', 'DESC')
@@ -302,7 +299,6 @@ class ReportsController extends Controller
             ->shipDateBetween($dateFrom, $dateTo)
             ->whereNotIn('status_id', [1])
             ->paginate(500);
-
 
         return view('reports.dims', compact('report', 'shipments'));
     }
@@ -324,7 +320,7 @@ class ReportsController extends Controller
 
         $services = Service::whereIn('id', $shipments->pluck('service_id')->unique())->pluck('name', 'id')->toArray();
 
-        $shipmentsByService = array();
+        $shipmentsByService = [];
 
         // Loop through the shipments, group them by service and total
         foreach ($shipments as $shipment) {
@@ -442,7 +438,7 @@ class ReportsController extends Controller
 
         $date->startOfMonth();
 
-        $results = array();
+        $results = [];
         $results['total_weight'] = 0;
         $results['total_volumetric_weight'] = 0;
         $results['total_pieces'] = 0;
@@ -661,7 +657,7 @@ class ReportsController extends Controller
         $this->authorize(new Report);
 
         // Default results to "today"
-        if (!$request->date_from && !$request->date_to) {
+        if (! $request->date_from && ! $request->date_to) {
             $request->date_from = Carbon::today()->startOfDay();
             $request->date_to = Carbon::today()->endOfDay();
         }

@@ -9,7 +9,7 @@
         Manifest number:
     </label>
     <div class="col-sm-7">
-        <input type="text" name="filter" id="filter" value="{{Input::get('filter')}}" class="form-control">
+        <input type="text" name="filter" id="filter" value="{{Request::get('filter')}}" class="form-control">
     </div>                        
 </div>
 
@@ -18,7 +18,7 @@
         Date:
     </label>
     <div class="col-sm-7">
-        <input type="text" name="date" value="@if(!Input::get('date')){{date(Auth::user()->date_format)}}@else{{Input::get('date')}}@endif" class="form-control datepicker">
+        <input type="text" name="date" value="@if(!Request::get('date')){{date(Auth::user()->date_format)}}@else{{Request::get('date')}}@endif" class="form-control datepicker">
     </div>                        
 </div>
 
@@ -27,7 +27,7 @@
         Driver:
     </label>
     <div class="col-sm-7">
-        {!! Form::select('driver_id',  dropDown('drivers', 'All Drivers'), Input::get('driver_id'), array('class' => 'form-control')) !!}
+        {!! Form::select('driver_id',  dropDown('drivers', 'All Drivers'), Request::get('driver_id'), array('class' => 'form-control')) !!}
     </div>                        
 </div>
 
@@ -36,7 +36,7 @@
         Vehicle:
     </label>
     <div class="col-sm-7">
-        {!! Form::select('vehicle_id',  dropDown('vehicles', 'All Vehicles'), Input::get('vehicle_id'), array('class' => 'form-control')) !!}
+        {!! Form::select('vehicle_id',  dropDown('vehicles', 'All Vehicles'), Request::get('vehicle_id'), array('class' => 'form-control')) !!}
     </div>                        
 </div>
 
@@ -45,7 +45,7 @@
         Depot:
     </label>
     <div class="col-sm-7">
-        {!! Form::select('depot_id', dropDown('associatedDepots', 'All Depots'), Input::get('depot_id'), array('class' => 'form-control')) !!}
+        {!! Form::select('depot_id', dropDown('associatedDepots', 'All Depots'), Request::get('depot_id'), array('class' => 'form-control')) !!}
     </div>                        
 </div>
 

@@ -3,13 +3,12 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class CompanyStatusChange extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -23,7 +22,7 @@ class CompanyStatusChange extends Mailable
      */
     public function __construct($company, $user)
     {
-        $this->company = $company;        
+        $this->company = $company;
         $this->user = $user;
     }
 
@@ -35,10 +34,9 @@ class CompanyStatusChange extends Mailable
     public function build()
     {
         $subject = ($this->company->enabled) ? 'Company Enabled: ' : 'Company Account Disabled: ';
-        
+
         return $this->view('emails.companies.status')
-                        ->subject($subject . $this->company->company_name)
+                        ->subject($subject.$this->company->company_name)
                         ->with(['company' => $this->company, 'user' => $this->user]);
     }
-
 }

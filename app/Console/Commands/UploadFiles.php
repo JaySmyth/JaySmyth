@@ -4,13 +4,13 @@ namespace App\Console\Commands;
 
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use League\Flysystem\Filesystem;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use League\Flysystem\Filesystem;
 use League\Flysystem\Sftp\SftpAdapter;
 
 class UploadFiles extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -56,7 +56,7 @@ class UploadFiles extends Command
      */
     public function handle()
     {
-        $queue = array();
+        $queue = [];
 
         $fileUploads = \App\FileUpload::whereEnabled(1)->get();
 
@@ -77,42 +77,42 @@ class UploadFiles extends Command
         foreach ($queue as $fileUpload) :
 
             // Clear the log
-            $this->log = array();
+            $this->log = [];
 
-            // Clear the IDs
-            $this->idsSent = array();
+        // Clear the IDs
+        $this->idsSent = [];
 
-            // Write the data to be uploaded to a temp file
-            if (!$tempFile = $this->writeFile($fileUpload)) {
+        // Write the data to be uploaded to a temp file
+        if (! $tempFile = $this->writeFile($fileUpload)) {
 
                 // If no data then skip gracefully to next upload
-                if (is_null($tempFile)) {
-                    $fileUpload->setNextUpload();
-                    continue;
-                }
-
-                // Update logs, timestamps and send error email if required
-                $this->finishJob($fileUpload);
+            if (is_null($tempFile)) {
+                $fileUpload->setNextUpload();
                 continue;
             }
 
-            $this->log("Created temp file: " . $tempFile);
+            // Update logs, timestamps and send error email if required
+            $this->finishJob($fileUpload);
+            continue;
+        }
 
-            // Connect to the remote host
-            if (!$connection = $this->connect($fileUpload->fileUploadHost)) {
-                $this->log("Failed to connect", 'error');
-                $this->finishJob($fileUpload);
-                continue;
-            }
+        $this->log('Created temp file: '.$tempFile);
 
-            // Generate a filename for the file to be uploaded
-            $filename = $this->getFilename($fileUpload);
+        // Connect to the remote host
+        if (! $connection = $this->connect($fileUpload->fileUploadHost)) {
+            $this->log('Failed to connect', 'error');
+            $this->finishJob($fileUpload);
+            continue;
+        }
 
-            // Upload the file to the remote host
-            $result = $this->upload($filename, $tempFile, $connection);
+        // Generate a filename for the file to be uploaded
+        $filename = $this->getFilename($fileUpload);
 
-            // Log the results to database and set next upload time
-            $this->finishJob($fileUpload, $result, $tempFile);
+        // Upload the file to the remote host
+        $result = $this->upload($filename, $tempFile, $connection);
+
+        // Log the results to database and set next upload time
+        $this->finishJob($fileUpload, $result, $tempFile);
 
         endforeach;
     }
@@ -126,18 +126,18 @@ class UploadFiles extends Command
     protected function writeFile($fileUpload)
     {
         $data = false;
-        $method = 'get' . ucfirst($fileUpload->type) . 'Shipments';
+        $method = 'get'.ucfirst($fileUpload->type).'Shipments';
 
-        if (!method_exists($this, $method)) {
-            $this->log('Invalid type - ' . $fileUpload->type, 'error');
+        if (! method_exists($this, $method)) {
+            $this->log('Invalid type - '.$fileUpload->type, 'error');
+
             return false;
         }
 
         // Retreive the shipment records
         $shipments = $this->$method($fileUpload->company_id);
 
-
-        if (!$shipments->isEmpty()) {
+        if (! $shipments->isEmpty()) {
 
             // Build a list of ids we are going to send
             $this->idsSent = $shipments->pluck('id')->toArray();
@@ -147,7 +147,7 @@ class UploadFiles extends Command
         }
 
         if (is_array($data) && count($data) > 0) {
-            $this->log(count($data) . " records to upload");
+            $this->log(count($data).' records to upload');
 
             // Add a heading row if required
             if ($fileUpload->fileUploadHost->heading_row) {
@@ -155,12 +155,10 @@ class UploadFiles extends Command
                 array_unshift($data, $headings);
             }
 
-            return writeCsv(storage_path() . '/app/temp/' . time() . str_random(3) . '.csv', $data, 'w', $fileUpload->fileUploadHost->csv_delimiter);
+            return writeCsv(storage_path().'/app/temp/'.time().Str::random(3).'.csv', $data, 'w', $fileUpload->fileUploadHost->csv_delimiter);
         }
 
-        $this->log("No data to transfer", 'error');
-
-        return null;
+        $this->log('No data to transfer', 'error');
     }
 
     /**
@@ -183,18 +181,17 @@ class UploadFiles extends Command
      */
     protected function getShipmentExportArray($shipments, $timezone = 'Europe/London', $verbose = true)
     {
-        $data = array();
+        $data = [];
 
         foreach ($shipments as $shipment) :
 
             if ($verbose) {
-
                 $data[] = [
                     'Consignment Number' => $shipment->consignment_number,
                     'Carrier Consignment Number' => $shipment->carrier_consignment_number,
                     'Shipment Reference' => $shipment->shipment_reference,
                     'Pieces' => $shipment->pieces,
-                    'Weight' => $shipment->weight . strtoupper($shipment->weight_uom),
+                    'Weight' => $shipment->weight.strtoupper($shipment->weight_uom),
                     'Volume' => $shipment->volumetric_weight,
                     'Sender Name' => $shipment->sender_name,
                     'Sender Company Name' => $shipment->sender_company_name,
@@ -225,16 +222,15 @@ class UploadFiles extends Command
                     'Status' => $shipment->status->name,
                     'POD Signature' => $shipment->pod_signature,
                     'Delivery Date' => $shipment->getDeliveryDate('d-m-Y H:i'),
-                    'Tracking' => url('/tracking/' . $shipment->token),
+                    'Tracking' => url('/tracking/'.$shipment->token),
                 ];
             } else {
-
                 $data[] = [
                     'Consignment Number' => $shipment->consignment_number,
                     'Carrier Consignment Number' => $shipment->carrier_consignment_number,
                     'Shipment Reference' => $shipment->shipment_reference,
                     'Pieces' => $shipment->pieces,
-                    'Weight' => $shipment->weight . strtoupper($shipment->weight_uom),
+                    'Weight' => $shipment->weight.strtoupper($shipment->weight_uom),
                     'Volume' => $shipment->volumetric_weight,
                     'Date Created' => $shipment->created_at->timezone($timezone)->format('d-m-Y'),
                     'Ship Date' => $shipment->ship_date->timezone($timezone)->format('d-m-Y'),
@@ -243,7 +239,7 @@ class UploadFiles extends Command
                     'Status' => $shipment->status->name,
                     'POD Signature' => $shipment->pod_signature,
                     'Delivery Date' => $shipment->getDeliveryDate('d-m-Y H:i'),
-                    'Tracking' => url('/tracking/' . $shipment->token),
+                    'Tracking' => url('/tracking/'.$shipment->token),
                 ];
             }
 
@@ -262,16 +258,16 @@ class UploadFiles extends Command
         $fileUpload->last_status = $uploaded;
         $fileUpload->update();
 
-        if (!$uploaded) {
+        if (! $uploaded) {
             $fileUpload->retry(10);
-            $this->log("*** Upload will be attempted again in 10 minutes ***");
+            $this->log('*** Upload will be attempted again in 10 minutes ***');
             Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('File Upload Failed', $this->log, $tempFile));
         }
 
         $log = \App\FileUploadLog::create([
-            'output' => implode("<br>", $this->log),
+            'output' => implode('<br>', $this->log),
             'uploaded' => $uploaded,
-            'file_upload_id' => $fileUpload->id
+            'file_upload_id' => $fileUpload->id,
         ]);
 
         if ($uploaded) {
@@ -279,7 +275,7 @@ class UploadFiles extends Command
             $fileUpload->setNextUpload();
 
             // Update "sent" flag on records after successful transfer
-            \App\Shipment::whereIn('id', $this->idsSent)->update([$fileUpload->type . '_sent' => 1]);
+            \App\Shipment::whereIn('id', $this->idsSent)->update([$fileUpload->type.'_sent' => 1]);
         }
     }
 
@@ -292,7 +288,7 @@ class UploadFiles extends Command
      */
     protected function connect($host)
     {
-        $this->log("Connecting to remote host: " . $host->host . ":" . $host->port);
+        $this->log('Connecting to remote host: '.$host->host.':'.$host->port);
 
         switch ($host->sftp) {
 
@@ -305,13 +301,14 @@ class UploadFiles extends Command
                     'privateKey' => $host->private_key,
                     'root' => $host->directory,
                     'timeout' => $host->timeout,
-                    'directoryPerm' => $host->direcory_permissions
+                    'directoryPerm' => $host->direcory_permissions,
                 ]);
 
                 try {
                     $filesystem = new Filesystem($adapter);
                 } catch (\Exception $exc) {
                     $this->log($exc->getMessage(), 'error');
+
                     return false;
                 }
 
@@ -328,8 +325,9 @@ class UploadFiles extends Command
                 }
 
                 // Check connection was made
-                if ((!$connection) || (!$loginResult)) {
-                    $this->log("Unable to connect to FTP host -> " . $host->host, 'error');
+                if ((! $connection) || (! $loginResult)) {
+                    $this->log('Unable to connect to FTP host -> '.$host->host, 'error');
+
                     return false;
                 }
 
@@ -345,11 +343,12 @@ class UploadFiles extends Command
      */
     protected function getFilename($fileUpload)
     {
-        $fileName = $fileUpload->type . '_' . date('d_m_y', time()) . '_' . time() . $fileUpload->id . '.csv';
+        $fileName = $fileUpload->type.'_'.date('d_m_y', time()).'_'.time().$fileUpload->id.'.csv';
 
         if ($fileUpload->upload_directory) {
-            $fileName = $fileUpload->upload_directory . '/' . $fileName;
+            $fileName = $fileUpload->upload_directory.'/'.$fileName;
         }
+
         return $fileName;
     }
 
@@ -365,12 +364,12 @@ class UploadFiles extends Command
         $this->log("Attempting to upload $filename");
 
         if ($connection instanceof \League\Flysystem\Filesystem) {
-
             try {
                 $result = $connection->write($filename, fopen($tempFile, 'r'));
                 $this->log("UPLOAD SUCCESS: $filename");
             } catch (\Exception $exc) {
                 $this->log($exc->getMessage(), 'error');
+
                 return false;
             }
 
@@ -420,5 +419,4 @@ class UploadFiles extends Command
     {
         return \App\Shipment::whereNotIn('status_id', [1, 7])->whereCreatedSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
     }
-
 }

@@ -8,26 +8,26 @@
 
 namespace App\ScsXml;
 
-use App\ScsXml\JobHdr;
-use App\ScsXml\JobLine;
+use App\ScsXml\Diary;
+use App\ScsXml\DocAdds;
 use App\ScsXml\JobCol;
 use App\ScsXml\JobDel;
-use App\ScsXml\RecCont;
 use App\ScsXml\JobDims;
-use App\ScsXml\DocAdds;
+use App\ScsXml\JobHdr;
+use App\ScsXml\JobLine;
 use App\ScsXml\RecChg;
+use App\ScsXml\RecCont;
 use App\ScsXml\RecCost;
-use App\ScsXml\RecRefs;
 use App\ScsXml\RecDate;
-use App\ScsXml\Diary;
+use App\ScsXml\RecRefs;
 
 /**
- * Description of Job
+ * Description of Job.
  *
  * @author gmcbroom
  */
-class Job {
-
+class Job
+{
     public $jobHdr;
     public $jobLine;
     public $jobCol;
@@ -42,8 +42,8 @@ class Job {
     private $recDate;
     private $diary;
 
-    public function __construct() {
-
+    public function __construct()
+    {
         $this->jobHdr = new JobHdr();
         $this->jobLine = new JobLine();
         $this->jobCol = new JobCol();
@@ -59,9 +59,9 @@ class Job {
         $this->diary = [];
     }
 
-    public function toXML() {
-
-        $xml = "<Job>";
+    public function toXML()
+    {
+        $xml = '<Job>';
         $xml .= $this->buildXML('jobHdr');
         $xml .= $this->buildXML('jobLine');
         $xml .= $this->buildXML('jobCol');
@@ -75,143 +75,142 @@ class Job {
         $xml .= $this->buildXML('recRefs');
         $xml .= $this->buildXML('recDate');
         $xml .= $this->buildXML('diary');
-        $xml .= "</Job>";
+        $xml .= '</Job>';
 
         return $xml;
     }
 
     /**
-     * Add Address to object
-     * 
+     * Add Address to object.
+     *
      * @param type $docAdds
      */
-    public function setJobHdr($jobHdr) {
-
+    public function setJobHdr($jobHdr)
+    {
         $this->jobHdr = $jobHdr;
     }
 
     /**
-     * Add Address to object
-     * 
+     * Add Address to object.
+     *
      * @param type $docAdds
      */
-    public function setJobLine($jobLine) {
-
+    public function setJobLine($jobLine)
+    {
         $this->jobLine = $jobLine;
     }
 
     /**
-     * Add Address to object
-     * 
+     * Add Address to object.
+     *
      * @param type $docAdds
      */
-    public function setJobCol($jobCol) {
-
+    public function setJobCol($jobCol)
+    {
         $this->jobCol = $jobCol;
     }
 
     /**
-     * Add Address to object
-     * 
+     * Add Address to object.
+     *
      * @param type $docAdds
      */
-    public function setJobDel($jobDel) {
-
+    public function setJobDel($jobDel)
+    {
         $this->jobDel = $jobDel;
     }
 
     /**
-     * Add Address to object
-     * 
+     * Add Address to object.
+     *
      * @param type $docAdds
      */
-    public function setRecJny($recJny) {
-
+    public function setRecJny($recJny)
+    {
         $this->recJny = $recJny;
     }
 
     /**
-     * Add Address to object
-     * 
+     * Add Address to object.
+     *
      * @param type $docAdds
      */
-    public function addAddress($docAdds) {
-
+    public function addAddress($docAdds)
+    {
         $this->docAdds[] = $docAdds;
     }
 
     /**
-     * Add Address to object
-     * 
+     * Add Address to object.
+     *
      * @param type $docAdds
      */
-    public function addCharge($recChg) {
-
+    public function addCharge($recChg)
+    {
         $this->recChg[] = $recChg;
     }
 
     /**
-     * Add Address to object
-     * 
+     * Add Address to object.
+     *
      * @param type $docAdds
      */
-    public function addCost($recCost) {
-
+    public function addCost($recCost)
+    {
         $this->recCost[] = $recCost;
     }
 
     /**
-     * Add Address to object
-     * 
+     * Add Address to object.
+     *
      * @param type $docAdds
      */
-    public function addRef($recRefs) {
-
+    public function addRef($recRefs)
+    {
         $this->recRefs[] = $recRefs;
     }
 
     /**
-     * Add Address to object
-     * 
+     * Add Address to object.
+     *
      * @param type $docAdds
      */
-    public function addDiary($diary) {
-
+    public function addDiary($diary)
+    {
         $this->diary[] = $diary;
     }
 
     /**
-     * Add Address to object
-     * 
+     * Add Address to object.
+     *
      * @param type $docAdds
      */
-    public function addContainer($recCont) {
-
+    public function addContainer($recCont)
+    {
         $this->recCont[] = $recCont;
     }
 
     /**
-     * Add Address to object
-     * 
+     * Add Address to object.
+     *
      * @param type $docAdds
      */
-    public function addDims($jobDims) {
-
+    public function addDims($jobDims)
+    {
         $this->jobDims[] = $jobDims;
     }
 
     /**
-     * Returns XML for an object or array of objects
-     * 
+     * Returns XML for an object or array of objects.
+     *
      * @param type $tableName
      * @return type
      */
-    public function buildXML($tableName) {
-
+    public function buildXML($tableName)
+    {
         $xml = '';
 
         if (isset($this->$tableName) && $this->$tableName) {
-            
             switch ($tableName) {
                 case 'recCont':
                 case 'jobDims':
@@ -238,14 +237,14 @@ class Job {
 
     /**
      * Create Objects for the following tables :-
-     * jobHdr, jobLine, jobCol, jobDel, recCont, jobDims, 
-     * docAdds, recChg, recCost,recRefs, recDate, diary
-     * 
+     * jobHdr, jobLine, jobCol, jobDel, recCont, jobDims,
+     * docAdds, recChg, recCost,recRefs, recDate, diary.
+     *
      * @param type string tableName
      * @return table object
      */
-    public function create($tableName) {
-
+    public function create($tableName)
+    {
         switch (strtolower($tableName)) {
 
             case 'jobhdr':
@@ -300,5 +299,4 @@ class Job {
                 break;
         }
     }
-
 }

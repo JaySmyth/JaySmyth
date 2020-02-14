@@ -4,8 +4,8 @@ namespace App\Legacy;
 
 use Illuminate\Database\Eloquent\Model;
 
-class FukCustService extends Model {
-
+class FukCustService extends Model
+{
     /**
      * The connection name for the model.
      *
@@ -31,14 +31,13 @@ class FukCustService extends Model {
     public $timestamps = false;
 
     /**
-     * Return Services for this customer
-     * 
+     * Return Services for this customer.
+     *
      * @param type $company
      * @return type
      */
     public function getCompanyServices($company)
     {
-
         $services = $this->where('company', $company->company)
                 ->where('app', 'courierUK')
                 ->where('IFSDepot', $company->IFSDepot)
@@ -62,13 +61,12 @@ class FukCustService extends Model {
                     ->where('IFSDepot', $company->IFSDepot)
                     ->get();
         }
-        
+
         return $services->merge($intlServices);
     }
 
     public function getCarrierId()
     {
-
         switch (strtoupper($this->gateway)) {
 
             case 'UPS':
@@ -103,9 +101,8 @@ class FukCustService extends Model {
                 break;
 
             default:
-                return null;
+                return;
                 break;
         }
     }
-
 }

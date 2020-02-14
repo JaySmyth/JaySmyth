@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Storage;
 
 class EmptyTempStorage extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -48,7 +47,6 @@ class EmptyTempStorage extends Command
         }
 
         foreach ($files as $key => $file) {
-
             $time = Carbon::createFromTimestamp(Storage::lastModified($file));
 
             // younger than 24 hours - ignore
@@ -62,5 +60,4 @@ class EmptyTempStorage extends Command
 
         Storage::delete($files);
     }
-
 }

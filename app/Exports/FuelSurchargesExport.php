@@ -3,19 +3,17 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class FuelSurchargeExport implements FromCollection, WithHeadings, ShouldAutoSize
+class FuelSurchargesExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
-
     public function __construct($shipments)
     {
         $this->shipments = $shipments;
     }
 
     /**
-     * 
      * @return array
      */
     public function headings(): array
@@ -35,11 +33,10 @@ class FuelSurchargeExport implements FromCollection, WithHeadings, ShouldAutoSiz
 
             ]);
 
-            $collection->push($row);
+        $collection->push($row);
 
         endforeach;
 
         return $collection;
     }
-
 }

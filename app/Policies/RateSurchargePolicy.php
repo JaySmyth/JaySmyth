@@ -5,19 +5,18 @@ namespace App\Policies;
 use App\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class RateSurchargePolicy {
-
+class RateSurchargePolicy
+{
     use HandlesAuthorization;
 
     /**
      * Intercept all checks - ensure IFS user.
      *
-     * @return boolean
+     * @return bool
      */
     public function before(User $user)
     {
-
-        if (!$user->hasIfsRole()) {
+        if (! $user->hasIfsRole()) {
             return false;
         }
     }
@@ -25,7 +24,7 @@ class RateSurchargePolicy {
     /**
      * Index policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function index(User $user)
     {
@@ -37,7 +36,7 @@ class RateSurchargePolicy {
     /**
      * Show policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function view(User $user)
     {
@@ -47,7 +46,7 @@ class RateSurchargePolicy {
     /**
      * Create policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function create(User $user)
     {
@@ -59,7 +58,7 @@ class RateSurchargePolicy {
     /**
      * Update policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function update(User $user)
     {
@@ -71,7 +70,7 @@ class RateSurchargePolicy {
     /**
      * Delete policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function delete(User $user)
     {
@@ -79,5 +78,4 @@ class RateSurchargePolicy {
             return true;
         }
     }
-
 }

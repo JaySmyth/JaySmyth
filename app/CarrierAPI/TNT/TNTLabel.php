@@ -4,8 +4,7 @@ namespace App\CarrierAPI\TNT;
 
 class TNTLabel extends \App\CarrierAPI\CarrierLabel
 {
-
-    function __construct($shipment = null, $serviceCode = null, $data = null)
+    public function __construct($shipment = null, $serviceCode = null, $data = null)
     {
         parent::__construct($shipment, $serviceCode, $data);
     }
@@ -13,7 +12,6 @@ class TNTLabel extends \App\CarrierAPI\CarrierLabel
     public function create()
     {
         for ($piece = 1; $piece <= $this->shipment['pieces']; $piece++) {
-
             $this->addPage();
 
             // Set the y coordinate
@@ -39,7 +37,7 @@ class TNTLabel extends \App\CarrierAPI\CarrierLabel
             if (strlen($this->data['free_circulation_display']) > 0) {
                 // Draw a black cell
                 $this->pdf->SetXY($x + 72, $y + 1);
-                $this->pdf->Cell(14, 5, '', 0, 2, 'L', 1); //width,height,string 
+                $this->pdf->Cell(14, 5, '', 0, 2, 'L', 1); //width,height,string
                 $this->pdf->SetXY(0, 0);
                 $this->pdf->SetTextColor(255, 255, 255); // White font
                 $this->pdf->Text($x + 72, $y, $this->data['free_circulation_display']);
@@ -50,7 +48,7 @@ class TNTLabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->SetLineWidth(0.5);
             $this->pdf->Line($x + 27, $y + 1, $x + 27, $y + 17); //vertical
             $this->pdf->Line($x + 49, $y + 17, $x + 49, $y + 107); //vertical
-            // Consignment Number            
+            // Consignment Number
             $y = 17;
             $this->pdf->SetLineWidth(0.5);
             $this->pdf->Line(0, $y, 107, $y); //horizontal
@@ -63,7 +61,7 @@ class TNTLabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->Text($x, $y += 8, 'Piece');
             $this->pdf->Text($x + 25, $y, 'Weight');
             $this->pdf->SetFont($this->font, 'B', 15);
-            $this->pdf->Text($x, $y += 3, "$piece of " . $this->shipment['pieces']);
+            $this->pdf->Text($x, $y += 3, "$piece of ".$this->shipment['pieces']);
             $this->pdf->Text($x + 25, $y, $this->data['weight'][$piece - 1]);
 
             // Customer Reference
@@ -75,7 +73,7 @@ class TNTLabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->SetFont($this->font, 'B', 9);
             $this->pdf->Text($x, $y += 4, strtoupper($this->shipment['shipment_reference']));
             $this->pdf->SetFont($this->font, '', 9);
-            $this->pdf->Text($x, $y += 4, 'S/R Account No ' . $this->data['account_number']);
+            $this->pdf->Text($x, $y += 4, 'S/R Account No '.$this->data['account_number']);
 
             // Sender Address
             $y = 50;
@@ -85,10 +83,10 @@ class TNTLabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->Text($x, $y, 'Sender Address');
             $this->pdf->SetFont($this->font, '', 8);
             $this->pdf->Text($x + 5, $y += 3, strtoupper($this->shipment['sender_name']));
-            $this->pdf->Text($x + 5, $y += 3, strtoupper($this->shipment['sender_company_name'] ? : $this->shipment['sender_name']));
+            $this->pdf->Text($x + 5, $y += 3, strtoupper($this->shipment['sender_company_name'] ?: $this->shipment['sender_name']));
             $this->pdf->Text($x + 5, $y += 3, strtoupper($this->shipment['sender_address1']));
             $this->pdf->Text($x + 5, $y += 3, strtoupper($this->shipment['sender_address2']));
-            $this->pdf->Text($x + 5, $y += 3, strtoupper($this->shipment['sender_city'] . ' ' . $this->shipment['sender_postcode']));
+            $this->pdf->Text($x + 5, $y += 3, strtoupper($this->shipment['sender_city'].' '.$this->shipment['sender_postcode']));
             $this->pdf->Text($x + 5, $y += 3, strtoupper($this->shipment['sender_country_code']));
 
             // Delivery Address
@@ -99,17 +97,17 @@ class TNTLabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->Text($x, $y, 'Delivery Address');
             $this->pdf->SetFont($this->font, '', 8);
             $this->pdf->Text($x + 5, $y += 3, strtoupper($this->shipment['recipient_name']));
-            $this->pdf->Text($x + 5, $y += 3, strtoupper($this->shipment['recipient_company_name'] ? : $this->shipment['recipient_name']));
+            $this->pdf->Text($x + 5, $y += 3, strtoupper($this->shipment['recipient_company_name'] ?: $this->shipment['recipient_name']));
             $this->pdf->Text($x + 5, $y += 3, strtoupper($this->shipment['recipient_address1']));
             $this->pdf->Text($x + 5, $y += 3, strtoupper($this->shipment['recipient_address2']));
-            $this->pdf->Text($x + 5, $y += 3, strtoupper($this->shipment['recipient_city'] . ' ' . $this->shipment['recipient_postcode']));
+            $this->pdf->Text($x + 5, $y += 3, strtoupper($this->shipment['recipient_city'].' '.$this->shipment['recipient_postcode']));
             $this->pdf->Text($x + 5, $y += 3, strtoupper($this->shipment['recipient_country_code']));
 
-            // Cluster Code                
+            // Cluster Code
             $y = 95;
             // Draw a black cell
             $this->pdf->SetXY($x + 20, $y);
-            $this->pdf->Cell(29, 12, '', 0, 2, 'L', 1); //width,height,string  
+            $this->pdf->Cell(29, 12, '', 0, 2, 'L', 1); //width,height,string
 
             $this->pdf->Line(0, $y, 52, $y); //horizontal
 
@@ -120,7 +118,7 @@ class TNTLabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->SetTextColor(255, 255, 255); // White font
             $this->pdf->Text($x + 21, $y - 3, strtoupper($this->data['cluster_code']));
             $this->pdf->SetTextColor(0, 0, 0);  // Switch back to black font
-            // Service                
+            // Service
             $x = 53;
             $y = 17;
 
@@ -138,7 +136,7 @@ class TNTLabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->SetFont($this->font, 'B', 15);
             $this->pdf->Text($x, $y += 3, $this->data['option']);
             $this->pdf->SetTextColor(0, 0, 0);  // Switch back to black font
-            // Origin                
+            // Origin
             $y = 38;
 
             $this->pdf->Line(52, $y, 107, $y); //horizontal
@@ -150,7 +148,7 @@ class TNTLabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->Text($x + 22, $y = $y, 'Pickup Date');
             $this->pdf->Text($x + 22, $y += 4, $this->data['collection_date']);
 
-            // Routing                
+            // Routing
             $y = 47;
 
             $this->pdf->Line(52, $y, 107, $y); //horizontal
@@ -165,7 +163,7 @@ class TNTLabel extends \App\CarrierAPI\CarrierLabel
                 $y += 7;
             }
 
-            // Sort                
+            // Sort
             $y = 84;
             $this->pdf->Line(52, $y, 107, $y); //horizontal
             $this->pdf->SetFont($this->font, '', 9);
@@ -173,14 +171,14 @@ class TNTLabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->SetFont($this->font, 'B', 24);
             $this->pdf->Text($x + 11, $y, '');
 
-            // Destination Depot                
+            // Destination Depot
             $y = 95;
             $this->pdf->Line(52, $y, 107, $y); //horizontal
             $this->pdf->SetFont($this->font, '', 9);
             $this->pdf->Text($x, $y += 2, 'Dest');
             $this->pdf->Text($x, $y + 3, 'Depot');
             $this->pdf->SetFont($this->font, 'B', 24);
-            $this->pdf->Text($x + 11, $y - 1, $this->data['destination_depot_code'] . '-' . $this->data['due_day']);
+            $this->pdf->Text($x + 11, $y - 1, $this->data['destination_depot_code'].'-'.$this->data['due_day']);
 
             $x = 3;
 
@@ -191,5 +189,4 @@ class TNTLabel extends \App\CarrierAPI\CarrierLabel
 
         return $this->output();
     }
-
 }

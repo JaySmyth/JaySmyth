@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
-use App\Role;
-use Illuminate\Http\Request;
 use App\Http\Requests\UserRequest;
+use App\Role;
+use App\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class UsersController extends Controller
 {
@@ -96,15 +97,15 @@ class UsersController extends Controller
         $this->authorize(new User);
 
         // random password
-        $password = str_random(8);
+        $password = Str::random(8);
 
         $user = new User($request->all());
         $user->password = bcrypt($password);
-        $user->api_token = strtolower(str_random(40));
+        $user->api_token = strtolower(Str::random(40));
         $user->show_search_bar = 1;
 
         // Not an IFS user, default users role to "cust"
-        if (!$request->user()->hasIfsRole()) {
+        if (! $request->user()->hasIfsRole()) {
             $request->role_id = 1;
             $request->roles = [10];
         }
@@ -124,7 +125,7 @@ class UsersController extends Controller
 
         flash()->success('Created!', 'User created successfully.');
 
-        return redirect('users/' . $user->id);
+        return redirect('users/'.$user->id);
     }
 
     /**
@@ -158,7 +159,7 @@ class UsersController extends Controller
         $this->authorize($user);
 
         // Not an IFS user, default users role to "cust"
-        if (!$request->user()->hasIfsRole()) {
+        if (! $request->user()->hasIfsRole()) {
             $request->role_id = 1;
             $request->roles = [10];
         }
@@ -171,7 +172,7 @@ class UsersController extends Controller
 
         flash()->success('Updated!', 'User updated successfully.');
 
-        return redirect('users/' . $id);
+        return redirect('users/'.$id);
     }
 
     /**
@@ -205,7 +206,7 @@ class UsersController extends Controller
 
         flash()->success('Company Added!', 'Company added successfully.');
 
-        return redirect('users/' . $user->id);
+        return redirect('users/'.$user->id);
     }
 
     /**
@@ -223,6 +224,7 @@ class UsersController extends Controller
         if ($user->companies()->count() > 1) {
             $user->companies()->detach($companyId);
             flash()->success('Company Removed!', 'Company removed successfully.');
+
             return back();
         }
 
@@ -248,10 +250,10 @@ class UsersController extends Controller
 
     /*
      * User search.
-     * 
+     *
      * @param   $request
      * @param   $paginate
-     * 
+     *
      * @return
      */
 
@@ -281,5 +283,4 @@ class UsersController extends Controller
 
         return redirect('users');
     }
-
 }

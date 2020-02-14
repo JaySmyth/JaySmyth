@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class CarrierAccounts extends Model
 {
-
     protected $fillable = [
         'carrier_id',
         'account',
@@ -19,6 +18,6 @@ class CarrierAccounts extends Model
         'postcode',
         'country_code',
         'telephone',
-        'vatno'
+        'vatno',
     ];
 }

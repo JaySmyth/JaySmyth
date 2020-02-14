@@ -3,15 +3,15 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 
 class TntPostcode extends Model
 {
-
     /**
-     * Lookup a TNT postcode for a given town / country code
-     * 
+     * Lookup a TNT postcode for a given town / country code.
+     *
      * @param type string $town
-     * 
+     *
      * @return string
      */
     public function getPostcode($countryCode, $town)
@@ -45,17 +45,14 @@ class TntPostcode extends Model
 
         if (count($result) > 0) {
             // Sort the array by simularity
-            $result = array_values(array_sort($result, function ($value) {
-                        return $value['simularity'];
-                    }));
+            $result = array_values(Arr::sort($result, function ($value) {
+                return $value['simularity'];
+            }));
 
             // Get the result with the highest simularity
             $result = last($result);
 
             return $result['postcode_from'];
         }
-
-        return null;
     }
-
 }

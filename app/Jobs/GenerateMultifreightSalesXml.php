@@ -2,20 +2,19 @@
 
 namespace App\Jobs;
 
-use App\User;
-use App\Shipment;
 use App\InvoiceRun;
 use App\ScsXml\ISLEDI;
+use App\Shipment;
+use App\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class GenerateMultifreightSalesXml implements ShouldQueue
 {
-
     use InteractsWithQueue,
         Queueable,
         SerializesModels;
@@ -33,7 +32,7 @@ class GenerateMultifreightSalesXml implements ShouldQueue
     public function __construct($shipments, $department_id, User $user)
     {
         $this->shipments = $shipments;
-        $this->department_id = (!$department_id) ? 'All' : $department_id;
+        $this->department_id = (! $department_id) ? 'All' : $department_id;
         $this->user = $user;
         $this->createInvoiceRun();
     }
@@ -46,7 +45,7 @@ class GenerateMultifreightSalesXml implements ShouldQueue
         $this->invoiceRun = InvoiceRun::create([
             'department_id' => $this->department_id,
             'user_id' => $this->user->id,
-            'status' => 'Processing'
+            'status' => 'Processing',
         ]);
     }
 
@@ -70,19 +69,19 @@ class GenerateMultifreightSalesXml implements ShouldQueue
             // Write XML file to directory for transfer to and processing by SCS
             $filename = date('ymdHis');
 
-            if (Storage::disk('salesinvoices')->put($filename . ".tmp", $xml)) {
+            if (Storage::disk('salesinvoices')->put($filename.'.tmp', $xml)) {
 
                 // Rename the temp file
-                Storage::disk('salesinvoices')->move($filename . '.tmp', $filename . '.xml');
+                Storage::disk('salesinvoices')->move($filename.'.tmp', $filename.'.xml');
 
                 // Update the invoicing status of the shipments after the XML has been created successfully
                 Shipment::whereIn('id', $this->shipments)->update([
                     'invoicing_status' => 1,
-                    'invoice_run_id' => $this->invoiceRun->id
+                    'invoice_run_id' => $this->invoiceRun->id,
                 ]);
 
                 // Change status of this Invoice run to "Success"
-                $this->invoiceRun->status = "Success";
+                $this->invoiceRun->status = 'Success';
                 $this->invoiceRun->save();
             }
         }
@@ -97,11 +96,10 @@ class GenerateMultifreightSalesXml implements ShouldQueue
     public function failed($exception)
     {
         // Firstly send an email to raise the alarm
-        Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed("Generate MultiFreight Sales XML", $exception));
+        Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Generate MultiFreight Sales XML', $exception));
 
         // Now try to set status of Invoice run to Failed
-        $this->invoiceRun->status = "Failed";
+        $this->invoiceRun->status = 'Failed';
         $this->invoiceRun->save();
     }
-
 }

@@ -9,7 +9,7 @@
         Name or Email Address:
     </label>
     <div class="col-sm-8">
-        <input type="text" name="filter" id="filter" value="{{Input::get('filter')}}" class="form-control">
+        <input type="text" name="filter" id="filter" value="{{Request::get('filter')}}" class="form-control">
     </div>   
 </div>
 
@@ -18,7 +18,7 @@
         Company:
     </label>
     <div class="col-sm-8">
-        {!! Form::select('company', dropDown('sites', 'All Companies'), Input::get('company'), array('class' => 'form-control')) !!}
+        {!! Form::select('company', dropDown('sites', 'All Companies'), Request::get('company'), array('class' => 'form-control')) !!}
     </div>   
 </div>
 
@@ -27,7 +27,7 @@
         Role:
     </label>
     <div class="col-sm-8">
-        {!! Form::select('role', dropDown('roles', 'All Roles'), Input::get('role'), array('class' => 'form-control')) !!}
+        {!! Form::select('role', dropDown('roles', 'All Roles'), Request::get('role'), array('class' => 'form-control')) !!}
     </div>   
 </div>
 
@@ -36,7 +36,7 @@
         Status:
     </label>
     <div class="col-sm-8">
-        {!! Form::select('enabled', ['' => 'All Statuses', '1' => 'Enabled', '0' => 'Disabled' ], Input::get('enabled'), array('class' => 'form-control')) !!}
+        {!! Form::select('enabled', ['' => 'All Statuses', '1' => 'Enabled', '0' => 'Disabled' ], Request::get('enabled'), array('class' => 'form-control')) !!}
     </div>   
 </div>    
 

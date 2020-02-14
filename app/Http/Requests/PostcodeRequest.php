@@ -6,7 +6,6 @@ use App\Http\Requests\Request;
 
 class PostcodeRequest extends Request
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -32,5 +31,4 @@ class PostcodeRequest extends Request
             'delivery_route' => 'required|alpha|min:3',
         ];
     }
-
 }

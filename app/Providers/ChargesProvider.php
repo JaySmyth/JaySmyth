@@ -4,14 +4,15 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-class ChargesProvider extends ServiceProvider {
-
+class ChargesProvider extends ServiceProvider
+{
     /**
      * Bootstrap any application services.
      *
      * @return void
      */
-    public function boot() {
+    public function boot()
+    {
         //
     }
 
@@ -20,10 +21,10 @@ class ChargesProvider extends ServiceProvider {
      *
      * @return void
      */
-    public function register() {
-        $this->app->bind('Pricing', function() {
+    public function register()
+    {
+        $this->app->bind('Pricing', function () {
             return new \App\Pricing\Pricing;
         });
     }
-
 }

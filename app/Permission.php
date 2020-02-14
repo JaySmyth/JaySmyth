@@ -6,9 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Permission extends Model
 {
-
     public $timestamps = false;
-    
+
     /**
      * A permission can be applied to roles.
      *
@@ -18,5 +17,4 @@ class Permission extends Model
     {
         return $this->belongsToMany(Role::class);
     }
-
 }

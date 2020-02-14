@@ -9,27 +9,26 @@
 namespace App\ScsXml;
 
 /**
- * Description of DocAdds
+ * Description of DocAdds.
  *
  * @author gmcbroom
  */
-class Diary extends SCSTable {
-
-    public function __construct() {
-
-        $this->tableName = "diary";
+class Diary extends SCSTable
+{
+    public function __construct()
+    {
+        $this->tableName = 'diary';
 
         $this->attributes = [
-            "rec-id" => "",
-            "event-code" => "",
-            "on-date" => "",
-            "at-time" => "",
-            "event-date" => "",
-            "event-time" => "",
-            "event-text" => "",
-            "tracking" => "",
-            "tracking-desc" => ""
+            'rec-id' => '',
+            'event-code' => '',
+            'on-date' => '',
+            'at-time' => '',
+            'event-date' => '',
+            'event-time' => '',
+            'event-text' => '',
+            'tracking' => '',
+            'tracking-desc' => '',
         ];
     }
-
 }

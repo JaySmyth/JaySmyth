@@ -7,17 +7,16 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 
 class RolePolicy
 {
-
     use HandlesAuthorization;
 
     /**
      * Intercept all checks - ensure IFS user.
      *
-     * @return boolean
+     * @return bool
      */
     public function before(User $user)
     {
-        if (!$user->hasIfsRole()) {
+        if (! $user->hasIfsRole()) {
             return false;
         }
     }
@@ -25,7 +24,7 @@ class RolePolicy
     /**
      * Index policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function index(User $user)
     {
@@ -37,7 +36,7 @@ class RolePolicy
     /**
      * Show policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function permissions(User $user)
     {
@@ -49,7 +48,7 @@ class RolePolicy
     /**
      * Set permissions policy. Only allowed to IFSA users.
      *
-     * @return boolean
+     * @return bool
      */
     public function setPermissions(User $user)
     {
@@ -61,7 +60,7 @@ class RolePolicy
     /**
      * Get roles policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function getRoles(User $user)
     {
@@ -69,5 +68,4 @@ class RolePolicy
             return true;
         }
     }
-
 }

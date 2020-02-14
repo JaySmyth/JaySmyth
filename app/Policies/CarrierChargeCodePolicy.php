@@ -7,17 +7,16 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CarrierChargeCodePolicy
 {
-
     use HandlesAuthorization;
 
     /**
      * Intercept all checks - ensure IFS user.
      *
-     * @return boolean
+     * @return bool
      */
     public function before(User $user)
     {
-        if (!$user->hasIfsRole() || !$user->hasPermission('view_carrier_charge_codes')) {
+        if (! $user->hasIfsRole() || ! $user->hasPermission('view_carrier_charge_codes')) {
             return false;
         }
     }
@@ -25,7 +24,7 @@ class CarrierChargeCodePolicy
     /**
      * Index policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function index(User $user)
     {
@@ -33,5 +32,4 @@ class CarrierChargeCodePolicy
             return true;
         }
     }
-
 }

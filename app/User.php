@@ -2,12 +2,11 @@
 
 namespace App;
 
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-
     use HasRoles,
         HasPreferences,
         Notifiable;
@@ -64,7 +63,7 @@ class User extends Authenticatable
 
     /**
      * User belongs to many companies.
-     * 
+     *
      * @return type
      */
     public function companies()
@@ -104,23 +103,23 @@ class User extends Authenticatable
     }
 
     /**
-     * Scope
-     * 
+     * Scope.
+     *
      * @return
      */
     public function scopeFilter($query, $filter)
     {
         if ($filter) {
-            return $query->where('name', 'LIKE', '%' . $filter . '%')
-                            ->orWhere('email', 'LIKE', '%' . $filter . '%');
+            return $query->where('name', 'LIKE', '%'.$filter.'%')
+                            ->orWhere('email', 'LIKE', '%'.$filter.'%');
         }
     }
 
     /*
      * Scope restrict results by company.
-     *      
+     *
      * @param   array   $allowedCompanyIds  An array of company IDs that the user is enabled for.
-     * 
+     *
      */
 
     public function scopeRestrictByCompany($query, $allowedCompanyIds)
@@ -131,7 +130,7 @@ class User extends Authenticatable
 
     /**
      * Scope enabled.
-     * 
+     *
      * @return
      */
     public function scopeHasEnabled($query, $enabled)
@@ -143,7 +142,7 @@ class User extends Authenticatable
 
     /**
      * Scope role.
-     * 
+     *
      * @return
      */
     public function scopeHasRole($query, $role)
@@ -155,9 +154,9 @@ class User extends Authenticatable
     }
 
     /**
-     * If the user only has one company association, returns the company id
-     * 
-     * @return integer or null
+     * If the user only has one company association, returns the company id.
+     *
+     * @return int or null
      */
     public function getCompanyIdAttribute()
     {
@@ -165,9 +164,9 @@ class User extends Authenticatable
     }
 
     /**
-     * If a user has only 1 import config enabled, return it's id
-     * 
-     * @return integer or null
+     * If a user has only 1 import config enabled, return it's id.
+     *
+     * @return int or null
      */
     public function getImportConfigIdAttribute()
     {
@@ -176,14 +175,12 @@ class User extends Authenticatable
         if ($importConfigs->count() == 1) {
             return $importConfigs->first()->id;
         }
-
-        return null;
     }
 
     /**
-     * Get the user's main role id
-     * 
-     * @return integer or null
+     * Get the user's main role id.
+     *
+     * @return int or null
      */
     public function getPrimaryRoleAttribute()
     {
@@ -195,9 +192,9 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the user's main role id
-     * 
-     * @return integer or null
+     * Get the user's main role id.
+     *
+     * @return int or null
      */
     public function getPrimaryRoleLabelAttribute()
     {
@@ -210,7 +207,7 @@ class User extends Authenticatable
 
     /**
      * Get the user's time zone.
-     * 
+     *
      * @return string
      */
     public function getTimeZoneAttribute()
@@ -220,7 +217,7 @@ class User extends Authenticatable
 
     /**
      * Returns PHP date format depending on user's localisation setting.
-     * 
+     *
      * @return string
      */
     public function getDateFormatAttribute()
@@ -230,7 +227,7 @@ class User extends Authenticatable
 
     /**
      * Returns PHP date format depending on user's localisation setting.
-     * 
+     *
      * @return string
      */
     public function getVerboseDateFormatAttribute()
@@ -240,7 +237,7 @@ class User extends Authenticatable
 
     /**
      * Get's a user's last login or returns an "inactive" message.
-     * 
+     *
      * @param type $timeZone
      * @param type $format
      * @return string
@@ -250,12 +247,13 @@ class User extends Authenticatable
         if ($this->last_login) {
             return $this->last_login->timezone($timeZone)->format($format);
         }
+
         return 'Inactive';
     }
 
     /**
      * Get viable notification messages for the user.
-     * 
+     *
      * @return type
      */
     public function getMessages()
@@ -266,15 +264,14 @@ class User extends Authenticatable
                     $query->whereIn('depot_id', $this->getDepotIds());
                 })
                 ->whereDoesntHave('companies', function ($query) {
-            $query->whereIn('company_id', $this->getAllowedCompanyIds());
-        });
+                    $query->whereIn('company_id', $this->getAllowedCompanyIds());
+                });
 
         // Not an IFS user, dont return any IFS only messages
-        if (!$this->hasIfsRole()) {
+        if (! $this->hasIfsRole()) {
             $messages->whereIfsOnly(0);
         }
 
         return $messages->get();
     }
-
 }

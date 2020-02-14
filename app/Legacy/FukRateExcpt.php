@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class FukRateExcpt extends Model
 {
-
     /**
      * The connection name for the model.
      *
@@ -40,34 +39,30 @@ class FukRateExcpt extends Model
 
             // Seems to be properly formatted, so lets try it.
             $myPostTown = $tmp[0];
-            $exception = FukRateExcpt::where('postcode', $myPostTown)->first();
+            $exception = self::where('postcode', $myPostTown)->first();
 
             if ($exception) {
                 return $exception->std;
             }
         }
-
-        return null;
     }
 
-    public function calcSalesOOA($companyId, $currency = 'GBP', $postcode)
+    public function calcSalesOOA($companyId, $currency, $postcode)
     {
-
-        $surcharge = NULL;
+        $surcharge = null;
         $exception = $this->calcCostOoa($postcode);
 
         if ($exception) {
-            
             switch ($currency) {
                 case 'GBP':
 
                     switch ($companyId) {
-                        case '201' :
+                        case '201':
                             // Morrigan Ltd - GHeaney 2010-11-26
                             $surcharge = '14.00';
                             break;
 
-                        case '256' :
+                        case '256':
                             // Asset Management - GHeaney 2011-12-19
                             $surcharge = '16.00';
                             break;
@@ -90,5 +85,4 @@ class FukRateExcpt extends Model
 
         return $surcharge;
     }
-
 }

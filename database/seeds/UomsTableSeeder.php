@@ -4,14 +4,13 @@ use Illuminate\Database\Seeder;
 
 class UomsTableSeeder extends Seeder
 {
-
     /**
      * Run the database seeds.
      *
      * @return void
      */
     public function run()
-    {      
+    {
         //insert some dummy records
         DB::table('uoms')->insert([
             ['code' => 'BBL', 'name' => 'Barrel'],
@@ -34,8 +33,7 @@ class UomsTableSeeder extends Seeder
             ['code' => 'TOZ', 'name' => 'Troy Ounce'],
             ['code' => 'YD', 'name' => 'Yard'],
             ['code' => 'YN', 'name' => 'Yam'],
-            
+
         ]);
     }
-
 }

@@ -4,8 +4,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 
-class StartRfserver extends Command {
-
+class StartRfserver extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -22,21 +22,21 @@ class StartRfserver extends Command {
 
     /*
      * Path to nodejs - loaded from .env
-     * 
+     *
      * @var string
      */
     protected $pathToNode;
 
     /*
      * Server javacript filename - loaded from .env
-     * 
+     *
      * @var string
      */
     protected $serverName;
 
     /*
      * Hostname of the server - calculated from app url
-     * 
+     *
      * @var string
      */
     protected $host;
@@ -71,20 +71,20 @@ class StartRfserver extends Command {
     /**
      * Check if the rf server is running.
      *
-     * @return boolean
+     * @return bool
      */
     private function serverIsRunning()
     {
-        exec('ps aux | grep "' . $this->serverName . '"', $output);
+        exec('ps aux | grep "'.$this->serverName.'"', $output);
 
         foreach ($output as $value) {
-            if (stristr($value, $this->pathToNode . ' ' . $this->serverName)) {
-                $this->info("RF Server running");
+            if (stristr($value, $this->pathToNode.' '.$this->serverName)) {
+                $this->info('RF Server running');
+
                 return true;
             }
         }
 
         return false;
     }
-
 }

@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Quotation extends Model
 {
-
     /**
      * The connection name for the model.
      *
@@ -20,6 +19,4 @@ class Quotation extends Model
      * @var string
      */
     protected $table = 'Quotations';
-
-
 }

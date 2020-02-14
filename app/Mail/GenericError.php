@@ -8,7 +8,6 @@ use Illuminate\Queue\SerializesModels;
 
 class GenericError extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -47,5 +46,4 @@ class GenericError extends Mailable
                         ->subject($this->subject)
                         ->with(['msg' => $this->msg, 'path' => $this->path, 'warning' => $this->warning, 'detail' => $this->detail]);
     }
-
 }

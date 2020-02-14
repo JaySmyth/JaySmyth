@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class SeaFreightTracking extends Model
 {
-
     protected $table = 'sea_freight_tracking';
 
     /*
@@ -39,8 +38,8 @@ class SeaFreightTracking extends Model
     }
 
     /**
-     * Returns a user's name if the tracking event has been created manually
-     * 
+     * Returns a user's name if the tracking event has been created manually.
+     *
      * @return string or null
      */
     public function getUserNameAttribute()
@@ -50,8 +49,5 @@ class SeaFreightTracking extends Model
         if ($user) {
             return $user->name;
         }
-
-        return null;
     }
-
 }

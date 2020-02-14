@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\User;
 use App\Commodity;
+use App\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CommodityPolicy
@@ -13,7 +13,7 @@ class CommodityPolicy
     /**
      * Show policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function view(User $user, Commodity $commodity)
     {
@@ -25,7 +25,7 @@ class CommodityPolicy
     /**
      * Update policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function update(User $user, Commodity $commodity)
     {
@@ -37,7 +37,7 @@ class CommodityPolicy
     /**
      * Delete policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function delete(User $user, Commodity $commodity)
     {

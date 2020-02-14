@@ -10,33 +10,33 @@
 
         <div class="form-group">
             <label for="filter">Consignment ?? Reference</label>
-            <input type="text" name="filter" id="filter" value="{{Input::get('filter')}}" class="form-control" placeholder="">
+            <input type="text" name="filter" id="filter" value="{{Request::get('filter')}}" class="form-control" placeholder="">
         </div>
 
         <div class="form-group">
             <label for="month">Carrier</label>
-            {!! Form::select('carrier', dropDown('carriers', 'All Carriers'), Input::get('carrier'), array('class' => 'form-control')) !!}
+            {!! Form::select('carrier', dropDown('carriers', 'All Carriers'), Request::get('carrier'), array('class' => 'form-control')) !!}
         </div>
         <br>
 
         <div class="form-group">
             <label for="invoice_date_from">Invoice Date From</label>
-            <input type="text" name="invoice_date_from" value="@if(Input::get('invoice_date_from')){{Input::get('invoice_date_from')}}@endif" class="form-control datepicker" placeholder="Date from">
+            <input type="text" name="invoice_date_from" value="@if(Request::get('invoice_date_from')){{Request::get('invoice_date_from')}}@endif" class="form-control datepicker" placeholder="Date from">
         </div>
 
         <div class="form-group">
             <label for="invoice_date_to">Invoice Date To</label>
-            <input type="text" name="invoice_date_to" value="@if(Input::get('invoice_date_to')){{Input::get('invoice_date_to')}}@endif" class="form-control datepicker" placeholder="Date To">
+            <input type="text" name="invoice_date_to" value="@if(Request::get('invoice_date_to')){{Request::get('invoice_date_to')}}@endif" class="form-control datepicker" placeholder="Date To">
         </div>
 
         <br>
         <div class="form-group">
             <label for="date_from">Ship Date From</label>
-            <input type="text" name="date_from" value="@if(Input::get('date_from')){{Input::get('date_from')}}@endif" class="form-control datepicker" placeholder="Date from">
+            <input type="text" name="date_from" value="@if(Request::get('date_from')){{Request::get('date_from')}}@endif" class="form-control datepicker" placeholder="Date from">
         </div>
         <div class="form-group">
             <label for="date_to">Ship Date To</label>
-            <input type="text" name="date_to" value="@if(Input::get('date_to')){{Input::get('date_to')}}@endif" class="form-control datepicker" placeholder="Date To">
+            <input type="text" name="date_to" value="@if(Request::get('date_to')){{Request::get('date_to')}}@endif" class="form-control datepicker" placeholder="Date To">
         </div>
 
         <button type="submit" class="btn btn-primary mt-3">Update Report</button>

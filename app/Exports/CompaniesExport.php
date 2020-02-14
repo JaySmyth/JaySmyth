@@ -3,19 +3,17 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class CompaniesExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
-
     public function __construct($companies)
     {
         $this->companies = $companies;
     }
 
     /**
-     * 
      * @return array
      */
     public function headings(): array
@@ -46,7 +44,7 @@ class CompaniesExport implements FromCollection, WithHeadings, ShouldAutoSize
             'Master Label',
             'Commercial Invoice',
             'Localisation',
-            'Date Created'
+            'Date Created',
         ];
     }
 
@@ -60,7 +58,7 @@ class CompaniesExport implements FromCollection, WithHeadings, ShouldAutoSize
                 continue;
             }
 
-            $row = collect([
+        $row = collect([
                 'ID' => $company->id,
                 'Company Name' => $company->company_name,
                 'Address 1' => $company->address1,
@@ -86,14 +84,13 @@ class CompaniesExport implements FromCollection, WithHeadings, ShouldAutoSize
                 'Master Label' => $company->master_label,
                 'Commercial Invoice' => $company->commercial_invoice,
                 'Localisation' => $company->localisation->time_zone,
-                'Date Created' => $company->created_at
+                'Date Created' => $company->created_at,
             ]);
 
-            $collection->push($row);
+        $collection->push($row);
 
         endforeach;
 
         return $collection;
     }
-
 }

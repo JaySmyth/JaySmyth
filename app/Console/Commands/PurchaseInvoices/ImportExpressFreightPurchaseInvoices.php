@@ -3,13 +3,12 @@
 namespace App\Console\Commands\PurchaseInvoices;
 
 use App\PurchaseInvoice;
-use App\PurchaseInvoiceLine;
 use App\PurchaseInvoiceCharge;
+use App\PurchaseInvoiceLine;
 use Illuminate\Console\Command;
 
 class ImportExpressFreightPurchaseInvoices extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -53,7 +52,6 @@ class ImportExpressFreightPurchaseInvoices extends Command
     protected $purchaseInvoiceLine;
 
     /**
-     *
      * @var type
      */
     protected $row;
@@ -69,7 +67,7 @@ class ImportExpressFreightPurchaseInvoices extends Command
 
         $this->sftpDirectory = '/home/expressfreight/invoices/';
         $this->archiveDirectory = 'archive';
-        $this->fields = array('Consignment Number', 'Return', 'Dispatch Date', 'City', 'Type', 'No.', 'Description', 'Quantity', 'Consignee', 'Unit of Measure Code', 'Fuel Surcharge Amount', 'Line Amount Excl. VAT', 'Deferral Code', 'Consignment2', 'Post Code');
+        $this->fields = ['Consignment Number', 'Return', 'Dispatch Date', 'City', 'Type', 'No.', 'Description', 'Quantity', 'Consignee', 'Unit of Measure Code', 'Fuel Surcharge Amount', 'Line Amount Excl. VAT', 'Deferral Code', 'Consignment2', 'Post Code'];
     }
 
     /**
@@ -79,11 +77,11 @@ class ImportExpressFreightPurchaseInvoices extends Command
      */
     public function handle()
     {
-        $this->info('Checking ' . $this->sftpDirectory . ' for files to process');
+        $this->info('Checking '.$this->sftpDirectory.' for files to process');
 
         if ($handle = opendir($this->sftpDirectory)) {
             while (false !== ($file = readdir($handle))) {
-                if (!is_dir($file) && $file != $this->archiveDirectory) {
+                if (! is_dir($file) && $file != $this->archiveDirectory) {
                     $this->processFile($file);
                     $this->archiveFile($file);
                 }
@@ -109,12 +107,9 @@ class ImportExpressFreightPurchaseInvoices extends Command
         $rowNumber = 1;
         $totalTaxable = 0;
 
-        if (($handle = fopen($this->sftpDirectory . $file, 'r')) !== false) {
-
+        if (($handle = fopen($this->sftpDirectory.$file, 'r')) !== false) {
             while (($data = fgetcsv($handle, 2000, ',')) !== false) {
-
                 if ($rowNumber >= 2) {
-
                     $row = $this->assignFieldNames($data);
 
                     // Lookup shipment
@@ -159,7 +154,6 @@ class ImportExpressFreightPurchaseInvoices extends Command
                     $this->applyCharge($row['Fuel Surcharge Amount'], 'FSC', 'FUEL SURCHARGE', $purchaseInvoiceLine->id);
 
                     $totalTaxable += $purchaseInvoiceLine->charges->sum('billed_amount');
-
                 }
 
                 $rowNumber++;
@@ -170,7 +164,6 @@ class ImportExpressFreightPurchaseInvoices extends Command
             /**
              * Update additional information after the invoice has been imported.
              */
-
             $vat = ($totalTaxable / 100) * 20;
             $purchaseInvoice = PurchaseInvoice::find($this->purchaseInvoice->id);
             $purchaseInvoice->setAdditionalValues();
@@ -195,6 +188,7 @@ class ImportExpressFreightPurchaseInvoices extends Command
 
         if ($this->purchaseInvoice) {
             $this->error("Invoice $invoiceNumber skipped (already exists)");
+
             return false;
         }
 
@@ -208,7 +202,7 @@ class ImportExpressFreightPurchaseInvoices extends Command
             'currency_code' => 'GBP',
             'type' => 'F',
             'carrier_id' => 14,
-            'date' => time()
+            'date' => time(),
         ]);
 
         $this->invoices[] = $invoiceNumber;
@@ -230,6 +224,7 @@ class ImportExpressFreightPurchaseInvoices extends Command
             $row[$field] = (isset($data[$i])) ? trim($data[$i]) : null;
             $i++;
         }
+
         return $row;
     }
 
@@ -256,7 +251,7 @@ class ImportExpressFreightPurchaseInvoices extends Command
                 'vat' => 0,
                 'vat_rate' => 20,
                 'purchase_invoice_id' => $this->purchaseInvoice->id,
-                'purchase_invoice_line_id' => $purchaseInvoiceLineId
+                'purchase_invoice_line_id' => $purchaseInvoiceLineId,
             ]);
 
             $purchaseInvoiceCharge->setCarrierChargeId();
@@ -267,25 +262,24 @@ class ImportExpressFreightPurchaseInvoices extends Command
      * Move file to archive directory.
      *
      * @param string $file
-     * @return boolean
+     * @return bool
      */
-    function archiveFile($file)
+    public function archiveFile($file)
     {
         $this->info("Archiving file $file");
 
-        $originalFile = $this->sftpDirectory . $file;
-        $archiveFile = $this->sftpDirectory . $this->archiveDirectory . '/' . $file;
+        $originalFile = $this->sftpDirectory.$file;
+        $archiveFile = $this->sftpDirectory.$this->archiveDirectory.'/'.$file;
 
         $this->info("Moving $originalFile to archive");
 
-        if (!file_exists($originalFile)) {
+        if (! file_exists($originalFile)) {
             $this->error("Problem archiving $file  - file not found");
         }
 
         if (copy($originalFile, $archiveFile)) {
             unlink($originalFile);
-            $this->info("File archived successfully");
+            $this->info('File archived successfully');
         }
     }
-
 }

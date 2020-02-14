@@ -2,14 +2,13 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Shipment;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
 class CheckForDuplicateShipments extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -45,12 +44,10 @@ class CheckForDuplicateShipments extends Command
 
         $shipments = Shipment::where('ship_date', '>=', $cutOff)->groupBy('consignment_number')->havingRaw('count(*) > 1')->get();
 
-
         if ($shipments->count() > 0) {
             Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Duplicate consignment number detected', 'Please check shipments table for duplicate consignment numbers'));
         }
 
-        $this->info("** " . $shipments->count() . " duplicate(s) found **");
+        $this->info('** '.$shipments->count().' duplicate(s) found **');
     }
-
 }

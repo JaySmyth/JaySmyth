@@ -8,7 +8,6 @@ use Illuminate\Queue\SerializesModels;
 
 class JobFailed extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -40,8 +39,7 @@ class JobFailed extends Mailable
         }
 
         return $this->view('emails.errors.job_failed')
-                        ->subject('JOB FAILED: ' . $this->name)
+                        ->subject('JOB FAILED: '.$this->name)
                         ->with(['exception' => $this->exception, 'name' => $this->name, 'path' => $this->path]);
     }
-
 }

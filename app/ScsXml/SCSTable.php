@@ -2,7 +2,7 @@
 
 /*
  * ****************************************
- * Class 
+ * Class
  *  To get and set ISLEDI attributes
  *  To output IFS objects as XML
  *  Read SCS table dump and decode
@@ -12,15 +12,15 @@
 namespace App\ScsXml;
 
 /**
- * Description of DocAdds
+ * Description of DocAdds.
  *
  * @author gmcbroom
  */
-class SCSTable {
-
+class SCSTable
+{
     public $attributes;
     public $table = [];
-    public $tableName = "";
+    public $tableName = '';
     public $fieldCount = 0;
     public $cr;
     public $lf;
@@ -33,7 +33,6 @@ class SCSTable {
 
     public function cleanAttribute($value)
     {
-
         $value = str_replace('<', '&lt;', $value);                              // Optional
         $value = str_replace('>', '&gt;', $value);                              // Optional
         $value = str_replace('&', '&amp;', $value);                             // Mandatory
@@ -42,18 +41,16 @@ class SCSTable {
         return $value;
     }
 
-    public function setAttribute($attribute, $value = "")
+    public function setAttribute($attribute, $value = '')
     {
-
         if (array_key_exists($attribute, $this->attributes)) {
-
-            if ($value > "") {
+            if ($value > '') {
 
                 // Remove any characters not allowed
                 $value = $this->cleanAttribute($value);
 
                 // Only output attribute if it has a value
-                if ($this->attributes[$attribute] == "") {
+                if ($this->attributes[$attribute] == '') {
 
                     // No Validation necessary
                     $this->table[$attribute] = $value;
@@ -64,46 +61,38 @@ class SCSTable {
                 }
             }
         } else {
-
-            dd("Table : " . $this->tableName . " Field $attribute not found");
+            dd('Table : '.$this->tableName." Field $attribute not found");
         }
     }
 
     public function getAttribute($attribute)
     {
-
         if (in_array($attribute, $this->attributes)) {
-
             if (isset($this->table[$attribute])) {
-
                 return $this->table[$attribute];
             } else {
-
-                return null;
+                return;
             }
         }
     }
 
     public function toXML()
     {
-
         $xml = null;
 
         if ($this->table) {
-
             $term = "\n";
-            $xml .= "<" . $this->tableName . ">$term";
-            $blank = "<" . $this->tableName . ">" . "</" . $this->tableName . ">$term";
+            $xml .= '<'.$this->tableName.">$term";
+            $blank = '<'.$this->tableName.'>'.'</'.$this->tableName.">$term";
 
             foreach ($this->attributes as $attribute => $value) {
-
-                if (isset($this->table[$attribute]) && $this->table[$attribute] != "") {
+                if (isset($this->table[$attribute]) && $this->table[$attribute] != '') {
 
                     // Only set if it contains a value
-                    $xml .= "<$attribute>" . $this->table[$attribute] . "</$attribute>$term";
+                    $xml .= "<$attribute>".$this->table[$attribute]."</$attribute>$term";
                 }
             }
-            $xml .= "</" . $this->tableName . ">$term";
+            $xml .= '</'.$this->tableName.">$term";
         }
 
         return $xml;
@@ -123,7 +112,6 @@ class SCSTable {
         $records = explode(chr(10), $table);
 
         foreach ($records as $record) {
-
             $data = array_map('trimMe', str_getcsv($record, ' ', '"'));
         }
     }
@@ -135,7 +123,6 @@ class SCSTable {
 
     public function cleanString($table)
     {
-
         $table = removeCrFromFields($table);
 
         // Replace comma with .
@@ -154,9 +141,8 @@ class SCSTable {
         return $table;
     }
 
-    function removeCrFromFields($table)
+    public function removeCrFromFields($table)
     {
-
         $cnt = strlen($table) - 1;  // string index from 0 not 1
         $finished = false;
         $startFrom = 0;
@@ -164,7 +150,7 @@ class SCSTable {
         $newString = '';
 
         // Loop until we run out of quotes
-        while (!$finished) {
+        while (! $finished) {
 
             // Find opening quote
             $pos1 = strpos($table, '"', $startFrom);
@@ -184,7 +170,7 @@ class SCSTable {
 
                 /*
                  * *************************************
-                 * Opening quote found, 
+                 * Opening quote found,
                  * so now find closing Quote
                  * *************************************
                  */
@@ -194,14 +180,14 @@ class SCSTable {
 
                     /*
                      * **************************************
-                     * No Closing Quote found 
+                     * No Closing Quote found
                      * Invalid format - raise an error
                      * **************************************
                      */
-                    mail('it@antrim.ifsgroup.com', 'import_job_line.php - Pos1 ' . $pos1 . ' CNT ', $cnt);
+                    mail('it@antrim.ifsgroup.com', 'import_job_line.php - Pos1 '.$pos1.' CNT ', $cnt);
                     dd("Invalid File Format Pos : $pos1");
                 } else {
-                    
+
                     /*
                      * **************************************
                      * Process process everthing in between
@@ -227,5 +213,4 @@ class SCSTable {
             }
         }
     }
-
 }

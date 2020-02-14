@@ -8,7 +8,6 @@ use Illuminate\Queue\SerializesModels;
 
 class ShippingAlertProblem extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -34,8 +33,7 @@ class ShippingAlertProblem extends Mailable
     public function build()
     {
         return $this->view('emails.shipments.problem')
-                        ->subject('Important information regarding shipment ' . $this->shipment->consignment_number)
+                        ->subject('Important information regarding shipment '.$this->shipment->consignment_number)
                         ->with(['shipment' => $this->shipment, 'problem' => $this->problemEvent]);
     }
-
 }

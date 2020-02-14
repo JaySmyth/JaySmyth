@@ -6,7 +6,6 @@ use App\Http\Requests\Request;
 
 class TransportJobRequest extends Request
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -70,5 +69,4 @@ class TransportJobRequest extends Request
             //'time' => 'sometimes|required|date_format:H:i|time_before:' . getPickupTime('gb', $this->from_postcode),
         ];
     }
-
 }

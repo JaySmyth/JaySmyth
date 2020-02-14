@@ -3,24 +3,23 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 
 class State extends Model
 {
-
     public $timestamps = false;
 
     /**
      * Accepts a country code and State name
-     * and attempts to return the ansi state code
-     * 
+     * and attempts to return the ansi state code.
+     *
      * @param type string 2 Char Country Code
      * @param type string State name
-     * 
+     *
      * @return string Returns a 2 char state code or empty string
      */
-    static function getAnsiStateCode($countryCode, $name)
+    public static function getAnsiStateCode($countryCode, $name)
     {
-
         $state = self::where('country_code', $countryCode)->where('name', $name)->first();
 
         // State found, return the ansi code
@@ -50,17 +49,14 @@ class State extends Model
 
         if (count($result) > 0) {
             // Sort the array by simularity
-            $result = array_values(array_sort($result, function ($value) {
-                        return $value['simularity'];
-                    }));
+            $result = array_values(Arr::sort($result, function ($value) {
+                return $value['simularity'];
+            }));
 
             // Get the result with the highest simularity
             $result = last($result);
 
             return $result['code'];
         }
-
-        return null;
     }
-
 }

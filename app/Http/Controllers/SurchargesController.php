@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\SurchargeRequest;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\SurchargeRequest;
 use App\Surcharge;
+use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
 class SurchargesController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -45,7 +44,6 @@ class SurchargesController extends Controller
      */
     public function create()
     {
-
         $this->authorize('index', new Surcharge);
 
         return view('surcharges.create');
@@ -59,7 +57,6 @@ class SurchargesController extends Controller
      */
     public function store(SurchargeRequest $request)
     {
-
         $this->authorize('index', new Surcharge);
 
         // Check to see if record already exists
@@ -69,11 +66,13 @@ class SurchargesController extends Controller
                 ->first();
 
         if ($surcharge) {
-            flash()->error('Failed!', "Sorry, Surcharge already exists.", true);
+            flash()->error('Failed!', 'Sorry, Surcharge already exists.', true);
+
             return back();
         } else {
             Surcharge::create($request->all());
             flash()->success('Created!', 'Surcharge created successfully.');
+
             return redirect('surcharges');
         }
     }
@@ -86,7 +85,6 @@ class SurchargesController extends Controller
      */
     public function edit(Surcharge $surcharge)
     {
-
         $this->authorize('index', new Surcharge);
 
         return view('surcharges.edit', compact('surcharge'));
@@ -104,6 +102,7 @@ class SurchargesController extends Controller
 
         $surcharge->update($request->all());
         flash()->success('Updated!', 'Surcharge updated successfully.');
+
         return redirect('surcharges');
     }
 
@@ -153,11 +152,10 @@ class SurchargesController extends Controller
                 ->orderBy('name')
                 ->filter($request->filter);
 
-        if (!$paginate) {
+        if (! $paginate) {
             return $query->get();
         }
 
         return $query->paginate(50);
     }
-
 }

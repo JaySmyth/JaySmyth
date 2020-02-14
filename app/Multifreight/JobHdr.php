@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class JobHdr extends Model
 {
-
     /**
      * The connection name for the model.
      *
@@ -35,7 +34,7 @@ class JobHdr extends Model
 
     /**
      * A job has many lines.
-     * 
+     *
      * @return type
      */
     public function lines()
@@ -45,7 +44,7 @@ class JobHdr extends Model
 
     /**
      * A job has many collections.
-     * 
+     *
      * @return type
      */
     public function collections()
@@ -55,7 +54,7 @@ class JobHdr extends Model
 
     /**
      * A job has many collections.
-     * 
+     *
      * @return type
      */
     public function deliveries()
@@ -65,12 +64,11 @@ class JobHdr extends Model
 
     /**
      * A job has many costs.
-     * 
+     *
      * @return type
      */
     public function costs()
     {
         return $this->hasMany(RecCost::class, 'rec_id', 'job_id')->select('rec_id', 'cost_rate', 'description', 'charge_type');
     }
-
 }

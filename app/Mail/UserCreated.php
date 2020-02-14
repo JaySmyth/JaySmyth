@@ -3,13 +3,12 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class UserCreated extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -38,5 +37,4 @@ class UserCreated extends Mailable
                         ->subject('IFS Global Logistics - Account Details')
                         ->with(['user' => $this->user, 'password' => $this->password]);
     }
-
 }

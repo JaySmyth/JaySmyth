@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Postcode;
-use App\IfsNdPostcode;
-use Illuminate\Http\Request;
 use App\Http\Requests\PostcodeRequest;
+use App\IfsNdPostcode;
+use App\Postcode;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class PostcodesController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -22,8 +21,6 @@ class PostcodesController extends Controller
     }
 
     /**
-     *
-     *
      * @param
      * @return
      */
@@ -38,8 +35,6 @@ class PostcodesController extends Controller
     }
 
     /**
-     *
-     *
      * @param
      * @return
      */
@@ -51,8 +46,6 @@ class PostcodesController extends Controller
     }
 
     /**
-     *
-     *
      * @param
      * @return
      */
@@ -68,8 +61,6 @@ class PostcodesController extends Controller
     }
 
     /**
-     *
-     *
      * @param
      * @return
      */
@@ -83,8 +74,6 @@ class PostcodesController extends Controller
     }
 
     /**
-     *
-     *
      * @param
      * @return
      */
@@ -116,7 +105,6 @@ class PostcodesController extends Controller
         return view('postcodes.ifs_nd_postcodes', compact('postcodes'));
     }
 
-
     /**
      * Store ND postcode.
      *
@@ -144,7 +132,6 @@ class PostcodesController extends Controller
         return redirect('ifs-nd-postcodes');
     }
 
-
     /**
      * Delete.
      *
@@ -157,5 +144,4 @@ class PostcodesController extends Controller
 
         return response()->json(null, 204);
     }
-
 }

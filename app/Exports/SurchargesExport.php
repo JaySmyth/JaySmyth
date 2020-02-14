@@ -3,20 +3,19 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class SurchargesExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
-
     public function __construct($data)
     {
         $this->data = $data;
     }
 
     /**
-     * Headings 
-     * 
+     * Headings.
+     *
      * @return array
      */
     public function headings(): array
@@ -25,12 +24,10 @@ class SurchargesExport implements FromCollection, WithHeadings, ShouldAutoSize
     }
 
     /**
-     * 
      * @return type
      */
     public function collection()
     {
         return $this->data;
     }
-
 }

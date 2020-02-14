@@ -2,17 +2,16 @@
 
 namespace App\Console\Commands;
 
-use App\User;
-use App\Company;
-use App\CarrierAPI\CarrierAPI;
 use App\CarrierAPI\APIShipment;
+use App\CarrierAPI\CarrierAPI;
+use App\Company;
 use App\Http\Controllers\APIController;
 use App\TransactionLog;
+use App\User;
 use Illuminate\Console\Command;
 
 class CheckApi extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -93,7 +92,7 @@ class CheckApi extends Command
             'GDCDEV' => '16f01ed0cb61d6e472983683bdcf4c71bb8b9d41',
             'FAQSWB' => '46f01fd0cb61d6e072983683bdef4c710b8b9b41',
             'FPZ8EX' => 'zhuiugbh0yehqhmmfhlbbqxawefnakwr1zmysr3m',
-            'FTPIOD' => '0eysm9wasrtsvpoza5inxbgyjezccasjpscbdzve'
+            'FTPIOD' => '0eysm9wasrtsvpoza5inxbgyjezccasjpscbdzve',
         ];
 
         $this->time = time();
@@ -106,7 +105,6 @@ class CheckApi extends Command
      */
     public function handle()
     {
-
         $this->checkDate = $this->argument('checkDate');
         if (is_null($this->checkDate)) {
             $this->checkDate = date('Y-m-d');
@@ -114,15 +112,12 @@ class CheckApi extends Command
         $this->selectShipments();
 
         foreach ($this->shipments as $shipment) {
-
             $this->cnt++;
             $msg = $this->callApi($shipment);
             $data = json_decode($msg, true);
             if (isset($data['errors']) && $data['errors'] != []) {
-
                 foreach ($data['errors'] as $error) {
-
-                    $this->errorMessages[] = "Log Id : " . $shipment->id . ' - ' . $error['message'] . "\n";
+                    $this->errorMessages[] = 'Log Id : '.$shipment->id.' - '.$error['message']."\n";
                 }
             }
 
@@ -135,32 +130,24 @@ class CheckApi extends Command
 
     public function displayResult($msg)
     {
-
-        if ($msg == "legacy") {
-
+        if ($msg == 'legacy') {
             $this->legacy++;
         } else {
-
             $jsonData = json_decode($msg, true);
 
             if (isset($jsonData['data']['errors'])) {
-
                 if ($jsonData['data']['errors'] == []) {
-
                     $this->correct++;
                     echo '.';
                 } else {
-
                     $this->errors++;
                     echo 'x';
                 }
             } else {
-
                 $this->errors++;
                 echo 'e';
             }
         }
-
 
         if ($this->cnt % 50 === 0) {
 
@@ -174,17 +161,16 @@ class CheckApi extends Command
 
             $this->time = time();
 
-            echo " " . $this->cnt . "\n";
+            echo ' '.$this->cnt."\n";
         }
     }
 
     public function displaySummary()
     {
-
-        echo "\n" . $this->cnt . " Shipments Selected, "
-        . $this->legacy . " Legacy, "
-        . $this->correct . " Passed validation, "
-        . "$this->errors Failed validation\n\n";
+        echo "\n".$this->cnt.' Shipments Selected, '
+        .$this->legacy.' Legacy, '
+        .$this->correct.' Passed validation, '
+        ."$this->errors Failed validation\n\n";
 
         if ($this->errors > 0) {
             foreach ($this->errorMessages as $error) {
@@ -195,7 +181,6 @@ class CheckApi extends Command
 
     public function selectShipments()
     {
-
         echo "**************************************************\n";
         echo "*     Selecting shipments to pass to the API     *\n";
         echo "*                                                *\n";
@@ -207,23 +192,22 @@ class CheckApi extends Command
         echo "* Note: No shipment details will actually change *\n";
         echo "*              ... Please Wait ...               *\n";
         echo "**************************************************\n";
-        $this->shipments = TransactionLog::where('type', 'API')->where('created_at', '>', date('Y-m-d h:i:s', strtotime($this->checkDate . ' 00:00:00')))->get();
+        $this->shipments = TransactionLog::where('type', 'API')->where('created_at', '>', date('Y-m-d h:i:s', strtotime($this->checkDate.' 00:00:00')))->get();
 
         $cnt = count($this->shipments);
 
-        echo "\n             " . $cnt . " Shipments selected\n\n";
+        echo "\n             ".$cnt." Shipments selected\n\n";
         echo "           Commencing Shipment Pricing\n\n";
         echo "**************************************************\n";
     }
 
     public function callApi($shipment)
     {
-
-        $method = "POST";
+        $method = 'POST';
         $path = '/api/v2/shipments';
 
         // Retrieve JSON data and Decode it
-        $shipmentArray = json_decode($shipment->msg, TRUE);
+        $shipmentArray = json_decode($shipment->msg, true);
 
         $apiToken = $this->getUserToken($shipmentArray['company_code']);
 
@@ -237,27 +221,23 @@ class CheckApi extends Command
 
             return $this->sendMsg($data, $path, 'POST', $apiToken);
         } else {
-
-            return "legacy";
+            return 'legacy';
         }
     }
 
     public function getUserToken($companyCode)
     {
-
         $userIds = Company::where('company_code', $companyCode)->first()->users->pluck('id');
         $user = User::whereIn('id', $userIds)->orderBy('last_login', 'DESC')->first();
 
         if ($user) {
-
             return $user->api_token;
         } else {
-
-            return null;
+            return;
         }
     }
 
-    public function sendMsg($data, $path, $method = 'POST', $api_token)
+    public function sendMsg($data, $path, $method, $api_token)
     {
 
         /*
@@ -272,11 +252,11 @@ class CheckApi extends Command
         $ch = curl_init(); // initialize curl handle
 
         $headers = [
-            "Accept: application/vnd.api+json",
-            "Authorization: Bearer $api_token"
+            'Accept: application/vnd.api+json',
+            "Authorization: Bearer $api_token",
         ];
 
-        curl_setopt($ch, CURLOPT_URL, $url . $path); // set url to post to
+        curl_setopt($ch, CURLOPT_URL, $url.$path); // set url to post to
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
@@ -296,5 +276,4 @@ class CheckApi extends Command
 
         return $result;
     }
-
 }

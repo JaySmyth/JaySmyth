@@ -3,7 +3,7 @@
 /*
  * ******************************************
  * Default Generic Pricing
- * 
+ *
  * Allows overiding specific methods for carrier
  * ******************************************
  */
@@ -14,11 +14,11 @@ class PricingModel0 extends PricingModel
 {
     /*
      * *************************************
-     * Class contains Carrier specific 
+     * Class contains Carrier specific
      * extensions for the PricingModel class
-     * 
+     *
      * Available functions
-     * 
+     *
      *      price($shipment, $rate, $priceType)
      *      getZone()
      *      getPackagingType($pkgNo = 0)
@@ -35,13 +35,11 @@ class PricingModel0 extends PricingModel
 
     public function __construct()
     {
-
         parent::__construct();
     }
 
     public function calcSurcharge($code, $packages = 0)
     {
-
         if ($packages == 0) {
             $packages = $this->shipment['pieces'];
         }
@@ -80,7 +78,4 @@ class PricingModel0 extends PricingModel
             $this->surcharge = null;
         }
     }
-
 }
-
-?>

@@ -7,7 +7,6 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
-
     /**
      * The Artisan commands provided by your application.
      *
@@ -148,7 +147,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:notify-transport-department-pod-required')->weekdays()->dailyAt('09:20');
         $schedule->command('ifs:log-scanning-kpis')->weekdays()->dailyAt('09:00');
 
-        /**
+        /*
          * Express Freight
          */
         $schedule->command('ifs:reset-express-freight-consignment-number-sequence')->dailyAt('23:00');

@@ -2,12 +2,12 @@
 
 namespace App\Providers;
 
-use Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\ServiceProvider;
+use Validator;
 
-class AppServiceProvider extends ServiceProvider {
-
+class AppServiceProvider extends ServiceProvider
+{
     /**
      * Bootstrap any application services.
      *
@@ -20,7 +20,7 @@ class AppServiceProvider extends ServiceProvider {
         });
 
         Validator::extend('not_supported', function ($attribute, $value, $parameters, $validator) {
-            if (!$value || $value == 'N') {
+            if (! $value || $value == 'N') {
                 return true;
             }
         });
@@ -38,18 +38,18 @@ class AppServiceProvider extends ServiceProvider {
         });
 
         Validator::extend('greater_than_value', function ($attribute, $value, $parameters, $validator) {
-            return ($value > $parameters[0]);
+            return $value > $parameters[0];
         });
 
-        Validator::replacer('time_before', function($message, $attribute, $rule, $parameters) {
+        Validator::replacer('time_before', function ($message, $attribute, $rule, $parameters) {
             return str_replace(':value', $parameters[0], $message);
         });
 
-        Validator::replacer('time_after', function($message, $attribute, $rule, $parameters) {
+        Validator::replacer('time_after', function ($message, $attribute, $rule, $parameters) {
             return str_replace(':value', $parameters[0], $message);
         });
 
-        Validator::replacer('greater_than_value', function($message, $attribute, $rule, $parameters) {
+        Validator::replacer('greater_than_value', function ($message, $attribute, $rule, $parameters) {
             return str_replace(':value', $parameters[0], $message);
         });
     }
@@ -63,5 +63,4 @@ class AppServiceProvider extends ServiceProvider {
     {
         //
     }
-
 }

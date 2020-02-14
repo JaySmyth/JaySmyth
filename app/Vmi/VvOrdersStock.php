@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class VvOrdersStock extends Model
 {
-
     /**
      * The connection name for the model.
      *
@@ -40,5 +39,4 @@ class VvOrdersStock extends Model
     {
         return $this->belongsTo(VvStock::class, 'stock_id', 'id');
     }
-
 }

@@ -10,32 +10,32 @@
 
         <div class="form-group">
             <label for="month">Month</label>
-            {!! Form::select('month', dropDown('monthsPrevious'), Input::get('month'), array('class' => 'form-control')) !!}
+            {!! Form::select('month', dropDown('monthsPrevious'), Request::get('month'), array('class' => 'form-control')) !!}
         </div>
 
         <div class="form-group">
             <label for="month">Traffic</label>
-            {!! Form::select('traffic', dropDown('traffic', 'All Traffic'), Input::get('traffic'), array('class' => 'form-control')) !!}
+            {!! Form::select('traffic', dropDown('traffic', 'All Traffic'), Request::get('traffic'), array('class' => 'form-control')) !!}
         </div>
 
         <div class="form-group">
             <label for="month">Carrier</label>
-            {!! Form::select('carrier', dropDown('carriers', 'All Carriers'), Input::get('carrier'), array('class' => 'form-control')) !!}
+            {!! Form::select('carrier', dropDown('carriers', 'All Carriers'), Request::get('carrier'), array('class' => 'form-control')) !!}
         </div>
 
         <div class="form-group">
             <label for="month">Depot</label>
-            {!! Form::select('depot', dropDown('associatedDepots', 'All Depots'), Input::get('depot'), array('class' => 'form-control')) !!}
+            {!! Form::select('depot', dropDown('associatedDepots', 'All Depots'), Request::get('depot'), array('class' => 'form-control')) !!}
         </div>
 
         <div class="form-group">
             <label for="month">Service</label>
-            {!! Form::select('service', dropDown('services', 'All Services'), Input::get('service'), array('class' => 'form-control')) !!}
+            {!! Form::select('service', dropDown('services', 'All Services'), Request::get('service'), array('class' => 'form-control')) !!}
         </div>
 
         <div class="form-group">
             <label for="month">Shipper</label>
-            {!! Form::select('company', dropDown('enabledSites', 'All Shippers'), Input::get('company'), array('class' => 'form-control')) !!}
+            {!! Form::select('company', dropDown('enabledSites', 'All Shippers'), Request::get('company'), array('class' => 'form-control')) !!}
         </div>
 
         <button type="submit" class="btn btn-primary mt-3">Update Report</button>
@@ -47,8 +47,8 @@
     <main class="col-sm-10 ml-sm-auto" role="main">
 
         <h2>{{$report->name}} -
-            @if(Input::get('month'))
-            {{Input::get('month')}}
+            @if(Request::get('month'))
+            {{Request::get('month')}}
             @else
             {{ date("F Y", time())}}
             @endif

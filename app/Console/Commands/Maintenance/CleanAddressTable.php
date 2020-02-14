@@ -6,7 +6,6 @@ use Illuminate\Console\Command;
 
 class CleanAddressTable extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -42,43 +41,39 @@ class CleanAddressTable extends Command
 
         $addresses = \App\Address::whereNotNull('id')->groupBy('company_id', 'name', 'company_name', 'address1')->havingRaw('count(*) > 1')->get();
 
-        $this->info($addresses->count() . ' duplicate addresses found');
+        $this->info($addresses->count().' duplicate addresses found');
 
         foreach ($addresses as $duplicate) {
-
             $duplicateAddress = \App\Address::whereCompanyId($duplicate->company_id)->whereName($duplicate->name)->whereCompanyName($duplicate->company_name)->whereAddress1($duplicate->address1)->orderBy('id', 'ASC')->get();
 
-            $this->line($duplicateAddress->count() . ' duplicate addresses loaded');
+            $this->line($duplicateAddress->count().' duplicate addresses loaded');
 
             foreach ($duplicateAddress as $add) {
-
                 $count = \App\Address::whereCompanyId($duplicate->company_id)->whereName($duplicate->name)->whereCompanyName($duplicate->company_name)->whereAddress1($duplicate->address1)->count();
 
                 if ($count > 1) {
-                    $this->error('Deleting duplicate (' . $add->id . '): ' . $add->name . ' - ' . $add->address1);
+                    $this->error('Deleting duplicate ('.$add->id.'): '.$add->name.' - '.$add->address1);
                     $add->delete();
                     $total++;
                 } else {
-                    $this->info('No more duplicates found for: ' . $add->name . ' - ' . $add->address1);
+                    $this->info('No more duplicates found for: '.$add->name.' - '.$add->address1);
                 }
             }
         }
 
-        $this->line("Deleting records associated with redundant companies");
+        $this->line('Deleting records associated with redundant companies');
 
         $companies = \App\Company::whereDepotId(4)->get();
 
         foreach ($companies as $company) {
-
             $deleted = \App\Address::whereCompanyId($company->id)->delete();
 
             if ($deleted > 0) {
-                $this->error($company->company_name . ' (redundant): ' . $deleted . ' addresses deleted');
+                $this->error($company->company_name.' (redundant): '.$deleted.' addresses deleted');
                 $total += $deleted;
             }
         }
 
         $this->info("FINISHED: $total addresses deleted!");
     }
-
 }

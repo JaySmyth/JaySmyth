@@ -48,5 +48,4 @@ class Vehicle extends Model
     {
         $this->attributes['type'] = ucwords(strtolower($value));
     }
-
 }

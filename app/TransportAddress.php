@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class TransportAddress extends Model
 {
-
     protected $fillable = [
         'name',
         'company_name',
@@ -19,7 +18,7 @@ class TransportAddress extends Model
         'country_code',
         'telephone',
         'email',
-        'type'
+        'type',
     ];
 
     /**
@@ -29,7 +28,7 @@ class TransportAddress extends Model
      */
     public function getFullNameAttribute()
     {
-        return $this->name . " " . $this->company_name;
+        return $this->name.' '.$this->company_name;
     }
 
     /**
@@ -63,10 +62,10 @@ class TransportAddress extends Model
     public function scopeFilter($query, $filter)
     {
         if ($filter) {
-            return $query->where(function($query) use ($filter) {
-                        $query->where('name', 'LIKE', '%' . $filter . '%')
-                                ->orWhere('company_name', 'LIKE', '%' . $filter . '%');
-                    });
+            return $query->where(function ($query) use ($filter) {
+                $query->where('name', 'LIKE', '%'.$filter.'%')
+                                ->orWhere('company_name', 'LIKE', '%'.$filter.'%');
+            });
         }
     }
 
@@ -80,7 +79,7 @@ class TransportAddress extends Model
     public function scopeHasCity($query, $city)
     {
         if ($city) {
-            return $query->where('city', 'LIKE', '%' . $city . '%');
+            return $query->where('city', 'LIKE', '%'.$city.'%');
         }
     }
 
@@ -97,5 +96,4 @@ class TransportAddress extends Model
             return $query->where('country_code', $countryCode);
         }
     }
-
 }

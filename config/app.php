@@ -12,15 +12,15 @@ return [
       |
      */
     'env' => env('APP_ENV', 'production'),
-    
+
      /*
       |--------------------------------------------------------------------------
       | Host IP
       |--------------------------------------------------------------------------
       |
-     */   
+     */
     'host' => env('APP_HOST', '127.0.0.1'),
-    
+
      /*
       |--------------------------------------------------------------------------
       | Default mail address
@@ -144,7 +144,7 @@ return [
         App\Providers\PricingProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Jenssegers\Agent\AgentServiceProvider::class,
-        Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class
+        Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class,
     ],
     /*
       |--------------------------------------------------------------------------
@@ -158,6 +158,7 @@ return [
      */
     'aliases' => [
         'App' => Illuminate\Support\Facades\App::class,
+        'Arr' => Illuminate\Support\Arr::class,
         'Artisan' => Illuminate\Support\Facades\Artisan::class,
         'Auth' => Illuminate\Support\Facades\Auth::class,
         'Blade' => Illuminate\Support\Facades\Blade::class,
@@ -185,15 +186,15 @@ return [
         'Schema' => Illuminate\Support\Facades\Schema::class,
         'Session' => Illuminate\Support\Facades\Session::class,
         'Storage' => Illuminate\Support\Facades\Storage::class,
+        'Str' => Illuminate\Support\Str::class,
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-        'Input' => Illuminate\Support\Facades\Input::class,
         'Form' => Collective\Html\FormFacade::class,
         'Html' => Collective\Html\HtmlFacade::class,
         'CarrierAPI' => App\CarrierAPI\Facades\CarrierAPI::class,
         'APIResponse' => App\CarrierAPI\Facades\APIResponse::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
-        'Agent' => Jenssegers\Agent\Facades\Agent::class
+        'Agent' => Jenssegers\Agent\Facades\Agent::class,
     ],
 ];

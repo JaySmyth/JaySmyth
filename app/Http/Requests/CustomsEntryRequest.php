@@ -6,7 +6,6 @@ use App\Http\Requests\Request;
 
 class CustomsEntryRequest extends Request
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -26,8 +25,7 @@ class CustomsEntryRequest extends Request
     {
         return [
             'company_id' => 'required',
-            'reference' => 'required|min:3',            
+            'reference' => 'required|min:3',
         ];
     }
-
 }

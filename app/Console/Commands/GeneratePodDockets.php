@@ -6,7 +6,6 @@ use Illuminate\Console\Command;
 
 class GeneratePodDockets extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -40,5 +39,4 @@ class GeneratePodDockets extends Command
     {
         dispatch(new \App\Jobs\GeneratePodDockets());
     }
-
 }

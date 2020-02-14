@@ -2,15 +2,14 @@
 
 namespace App;
 
+use App\CarrierAPI\TNT\TNTManifest;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Database\Eloquent\Model;
-
 /*
  * Temporary code.
  */
 
-use App\CarrierAPI\TNT\TNTManifest;
+use Illuminate\Support\Facades\Mail;
 
 class ManifestProfile extends Model
 {
@@ -56,7 +55,7 @@ class ManifestProfile extends Model
     }
 
     /**
-     * A manifest profile belongs to a mode of transport (courier, air, etc.)
+     * A manifest profile belongs to a mode of transport (courier, air, etc.).
      *
      * @return
      */
@@ -86,7 +85,7 @@ class ManifestProfile extends Model
     }
 
     /**
-     * A manifest profile has one carrier
+     * A manifest profile has one carrier.
      *
      * @return
      */
@@ -191,10 +190,10 @@ class ManifestProfile extends Model
     }
 
     /**
-     * Determine if a shipment is viable for a profile
+     * Determine if a shipment is viable for a profile.
      *
      * @param type $shipmentId
-     * @return boolean
+     * @return bool
      */
     public function isShipmentViable($shipmentId)
     {
@@ -226,7 +225,7 @@ class ManifestProfile extends Model
 
     /*
      * Run the manifest profile (set shipments to manifested).
-     * 
+     *
      * @return boolean
      */
 
@@ -243,7 +242,7 @@ class ManifestProfile extends Model
             // append to manifest
             $manifest = Manifest::findOrFail($manifestId);
         } else {
-            // generate a manifest number 
+            // generate a manifest number
             $manifestNumber = $this->getManifestNumber();
 
             // create a new manifest
@@ -261,7 +260,7 @@ class ManifestProfile extends Model
 
         // update all the shipments with the manifest id
         Shipment::whereIn('id', $shipmentIds)->update([
-            'manifest_id' => $manifest->id
+            'manifest_id' => $manifest->id,
         ]);
 
         $this->last_run = Carbon::now();
@@ -307,7 +306,7 @@ class ManifestProfile extends Model
             $number = $sequence->getNextAvailable();
         }
 
-        return $prefix . str_pad($number, 7, '0', STR_PAD_LEFT);
+        return $prefix.str_pad($number, 7, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -320,8 +319,9 @@ class ManifestProfile extends Model
     public function getLastRunTime($timeZone = 'Europe/London', $format = 'd-m-Y')
     {
         if ($this->last_run) {
-            return $this->last_run->timezone($timeZone)->format($format . ' H:i');
+            return $this->last_run->timezone($timeZone)->format($format.' H:i');
         }
+
         return 'Never';
     }
 
@@ -338,7 +338,7 @@ class ManifestProfile extends Model
         if ($shipments->count() > 0) {
             // Set the source field on all shipments to that of the filename
             \App\Shipment::whereIn('id', $shipments->pluck('id'))->update([
-                'on_hold' => ($hold) ? 0 : 1
+                'on_hold' => ($hold) ? 0 : 1,
             ]);
 
             return true;
@@ -346,5 +346,4 @@ class ManifestProfile extends Model
 
         return false;
     }
-
 }

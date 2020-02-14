@@ -2,13 +2,13 @@
 
 namespace App\CarrierAPI;
 
-use TCPDI;
-use App\Shipment;
 use App\Company;
 use App\PrintFormat;
+use App\Shipment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use TCPDI;
 
 class Pdf
 {
@@ -35,13 +35,13 @@ class Pdf
     protected $pageDims;
     protected $customerLabelRequired = false;
     protected $user = false;
-    #
+    //
     protected $masterLabelRequired = false;
     protected $packageLabelRequired = false;
     protected $commercialInvoiceRequired = false;
 
     /**
-     * Set up default values
+     * Set up default values.
      *
      * @param string $this ->size    Size of the PDF document required (accepts code defined in print formats table).
      * @param string $output Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
@@ -78,7 +78,6 @@ class Pdf
      */
     public function createManifest($manifest)
     {
-
         $totalShipments = 0;
         $totalPieces = 0;
         $totalWeight = 0;
@@ -87,7 +86,7 @@ class Pdf
         $this->pdf->AddPage('P');
 
         $this->pdf->SetFont($this->font, '', 14);
-        $this->pdf->Text(9, 5, 'Manifest ' . $manifest->number);
+        $this->pdf->Text(9, 5, 'Manifest '.$manifest->number);
 
         $this->pdf->SetY(12);
         $this->pdf->SetFont($this->font, 'I', 7);
@@ -108,7 +107,7 @@ class Pdf
             $this->pdf->Cell(22, 6, $shipment->consignment_number, 1, 0, 'L', true);
             $this->pdf->Cell(27, 6, $shipment->carrier_consignment_number, 1, 0, 'L', true);
             $this->pdf->Cell(57, 6, $shipment->company->company_name, 1, 0, 'L', true);
-            $this->pdf->Cell(42, 6, $shipment->recipient_city . ', ' . $shipment->recipient_country_code, 1, 0, 'L', true);
+            $this->pdf->Cell(42, 6, $shipment->recipient_city.', '.$shipment->recipient_country_code, 1, 0, 'L', true);
             $this->pdf->Cell(15, 6, $shipment->ship_date->format('d-m-Y'), 1, 0, 'L', true);
             $this->pdf->Cell(9, 6, strtoupper($shipment->service->code), 1, 0, 'C', true);
             $this->pdf->Cell(9, 6, $shipment->pieces, 1, 0, 'R', true);
@@ -122,23 +121,22 @@ class Pdf
         // Add Totals
         $this->pdf->Ln();
 
-        $this->pdf->Cell(65, 6, "Total Shipments : " . $totalShipments, 1, 0, 'R', true);
-        $this->pdf->Cell(65, 6, "Total Pieces : " . $totalPieces, 1, 0, 'R', true);
-        $this->pdf->Cell(63, 6, "Total Weight : " . $totalWeight . " kgs", 1, 0, 'R', true);
+        $this->pdf->Cell(65, 6, 'Total Shipments : '.$totalShipments, 1, 0, 'R', true);
+        $this->pdf->Cell(65, 6, 'Total Pieces : '.$totalPieces, 1, 0, 'R', true);
+        $this->pdf->Cell(63, 6, 'Total Weight : '.$totalWeight.' kgs', 1, 0, 'R', true);
         $this->pdf->Ln();
         $this->pdf->Ln();
-        $this->pdf->Cell(65, 6, "Received in good condition by :", 0, 0, 'L', true);
+        $this->pdf->Cell(65, 6, 'Received in good condition by :', 0, 0, 'L', true);
         $this->pdf->Ln();
-        $this->pdf->Cell(65, 6, "Name : ", 1, 0, 'L', true);
-        $this->pdf->Cell(65, 6, "Signature : ", 1, 0, 'L', true);
-        $this->pdf->Cell(38, 6, "Date : ", 1, 0, 'L', true);
-        $this->pdf->Cell(25, 6, "Time : ", 1, 0, 'L', true);
+        $this->pdf->Cell(65, 6, 'Name : ', 1, 0, 'L', true);
+        $this->pdf->Cell(65, 6, 'Signature : ', 1, 0, 'L', true);
+        $this->pdf->Cell(38, 6, 'Date : ', 1, 0, 'L', true);
+        $this->pdf->Cell(25, 6, 'Time : ', 1, 0, 'L', true);
 
-        return $this->displayPdf($manifest->number . '.pdf', true);
+        return $this->displayPdf($manifest->number.'.pdf', true);
     }
 
     /**
-     *
      * @param type $filename
      * @param type $encoded
      * @param type $output
@@ -149,13 +147,11 @@ class Pdf
         if ($encoded) {
             return base64_encode($this->pdf->Output($filename, $this->output));
         } else {
-
             return $this->pdf->Output($filename, $this->output);
         }
     }
 
     /**
-     *
      * @param type $shipments
      * @return type
      */
@@ -168,7 +164,7 @@ class Pdf
 
         $date = date('d-m-Y H:i', time());
 
-        $this->pdf->Text(9, 5, "Collection Manifest");
+        $this->pdf->Text(9, 5, 'Collection Manifest');
 
         $this->pdf->SetFont($this->font, 'BI', 12);
         $this->pdf->Text(155, 7, "Printed $date");
@@ -195,9 +191,8 @@ class Pdf
         $i = 1;
 
         foreach ($shipments as $shipment) {
-
             $recipient = $shipment->recipient_company_name ?: $shipment->recipient_name;
-            $recipient .= ', ' . $shipment->recipient_city;
+            $recipient .= ', '.$shipment->recipient_city;
 
             $this->pdf->Cell(5, 5, $i, 1, 0, 'L', true);
             $this->pdf->Cell(23, 5, $shipment->consignment_number, 1, 0, 'L', true);
@@ -245,7 +240,7 @@ class Pdf
     }
 
     /**
-     * Possible choices - ALL, MASTER, INVOICE, CUSTOMS(INVOICE & MASTER)
+     * Possible choices - ALL, MASTER, INVOICE, CUSTOMS(INVOICE & MASTER).
      *
      * @param type $shipments
      * @param type $labelType Values -['ALL', 'MASTER', 'INVOICE', 'CUSTOMS' - (INVOICE & MASTER)]
@@ -256,7 +251,6 @@ class Pdf
 
         // Build PDF
         foreach ($shipments as $shipment) {
-
             if (strtoupper($labelType) == 'DESPATCH') {
                 $this->createDespatchNote($shipment->token, false);
                 continue;
@@ -267,13 +261,13 @@ class Pdf
 
                 // If unable to create label return error
                 $label = $this->createLabel($shipment, false, $labelType, false);
-                if ($label == "not found") {
-                    return "not found";
+                if ($label == 'not found') {
+                    return 'not found';
                 }
             }
 
             // If not a document shipment and a customs entry is required
-            if ($shipment->ship_reason != "documents" && customsEntryRequired($shipment->sender_country_code, $shipment->recipient_country_code)) {
+            if ($shipment->ship_reason != 'documents' && customsEntryRequired($shipment->sender_country_code, $shipment->recipient_country_code)) {
 
                 // Add Commercial Invoice unless request is for a master label only (A4 only)
                 if ((strtoupper($labelType) != 'MASTER') && $this->size == 'A4') {
@@ -285,8 +279,7 @@ class Pdf
                         $commercial_invoice_required = Company::find($shipment->company_id)->commercial_invoice;
                     }
 
-                    if ($commercial_invoice_required || $labelType == "INVOICE" || $labelType == "CUSTOMS") {
-
+                    if ($commercial_invoice_required || $labelType == 'INVOICE' || $labelType == 'CUSTOMS') {
                         if ($shipment->hasUploadedDocument('invoice')) {
                             $this->importUploadedDocuments($shipment, 'invoice', ($labelType == '') ? 4 : 1);
                         } else {
@@ -304,7 +297,7 @@ class Pdf
             }
         }
 
-        return $this->displayPdf('shipping_docs.pdf', TRUE);
+        return $this->displayPdf('shipping_docs.pdf', true);
     }
 
     /**
@@ -317,7 +310,7 @@ class Pdf
      */
     public function createDespatchNote($token, $output = true)
     {
-        if (!$shipment = Shipment::whereToken($token)->first()) {
+        if (! $shipment = Shipment::whereToken($token)->first()) {
             return false;
         }
 
@@ -336,7 +329,7 @@ class Pdf
         }
 
         $this->pdf->Text(10, $y = $y + 5, $shipment->company->city);
-        $this->pdf->Text(10, $y = $y + 5, $shipment->company->state . ' ' . $shipment->company->postcode);
+        $this->pdf->Text(10, $y = $y + 5, $shipment->company->state.' '.$shipment->company->postcode);
         $this->pdf->Text(10, $y = $y + 5, getCountry($shipment->company->country_code));
 
         $this->pdf->SetY(7);
@@ -384,7 +377,7 @@ class Pdf
             $this->pdf->Ln();
         }
         $this->pdf->SetX(105);
-        $this->pdf->Cell(20, 6, $shipment->customs_value_currency_code . ' ' . $shipment->customs_value, 1, 0, 'R', true);
+        $this->pdf->Cell(20, 6, $shipment->customs_value_currency_code.' '.$shipment->customs_value, 1, 0, 'R', true);
 
         $this->pdf->SetFont($this->font, 'B', 16);
         $this->pdf->Text(140, 38, 'Shipping Details');
@@ -405,12 +398,11 @@ class Pdf
         }
 
         $this->pdf->Text(140, $y += 4, ucwords($shipment->recipient_city));
-        $this->pdf->Text(140, $y += 4, ucwords($shipment->recipient_state . ' ' . $shipment->recipient_postcode));
+        $this->pdf->Text(140, $y += 4, ucwords($shipment->recipient_state.' '.$shipment->recipient_postcode));
         $this->pdf->Text(140, $y += 4, getCountry($shipment->recipient_country_code));
-        $this->pdf->Text(140, $y += 8, 'Tel: ' . $shipment->recipient_telephone);
+        $this->pdf->Text(140, $y += 8, 'Tel: '.$shipment->recipient_telephone);
 
         if ($shipment->company->despatchNote) {
-
             $this->pdf->SetLineWidth(0.3);
             $this->pdf->Line(5, 140, 200, 140); //horizontal
             $this->pdf->SetFont($this->font, 'B', 16);
@@ -421,7 +413,7 @@ class Pdf
         }
 
         if ($output) {
-            return $this->displayPdf('despatch_note' . '_' . $shipment->consignment_number . '.pdf', TRUE);
+            return $this->displayPdf('despatch_note'.'_'.$shipment->consignment_number.'.pdf', true);
         }
     }
 
@@ -433,18 +425,18 @@ class Pdf
      * @param type $encoded
      * @param type $labelType
      * @param type $output
-     * @return boolean|string
+     * @return bool|string
      */
     public function createLabel(Shipment $shipment, $encoded = true, $labelType = '', $output = true)
     {
 
         // get the original PDF generated by the carrier
-        if (!$originalPdf = $this->getOriginalPdf($shipment)) {
+        if (! $originalPdf = $this->getOriginalPdf($shipment)) {
             return 'not found';
         }
 
         // load the desired print format
-        if (!$printFormat = PrintFormat::whereCode($this->size)->first()) {
+        if (! $printFormat = PrintFormat::whereCode($this->size)->first()) {
             return false;
         }
 
@@ -477,7 +469,6 @@ class Pdf
 
                 // This is not a package label so don't Add
             } else {
-
                 if ($this->packageLabelRequired) {
 
                     // Add Package Label
@@ -486,8 +477,9 @@ class Pdf
             }
         }
 
-        if ($output)
-            return $this->displayPdf($shipment->consignment_number . '.pdf', $encoded);
+        if ($output) {
+            return $this->displayPdf($shipment->consignment_number.'.pdf', $encoded);
+        }
     }
 
     /*
@@ -510,7 +502,6 @@ class Pdf
 
         // if we have not been passed a loaded shipment model, load from token
         if (is_string($shipment)) {
-
             $shipment = Shipment::where('token', $shipment)->first();
         }
 
@@ -526,6 +517,7 @@ class Pdf
                 $pdf = Storage::disk('s3')->get($pathToFile);
             }
         }
+
         return $pdf;
     }
 
@@ -537,7 +529,7 @@ class Pdf
      *
      */
 
-    function decodeBase64($base64)
+    public function decodeBase64($base64)
     {
         $file = base64_decode($base64);
 
@@ -553,12 +545,11 @@ class Pdf
 
     protected function getS3LabelPath($createdAt, $consignmentNumber, $index = false)
     {
-        return 'labels/' . date('Y/m', strtotime($createdAt)) . '/' . $consignmentNumber . '.pdf';
+        return 'labels/'.date('Y/m', strtotime($createdAt)).'/'.$consignmentNumber.'.pdf';
     }
 
     public function setLabelRequirements($shipment, $labelType)
     {
-
         switch ($labelType) {
 
             case 'ALL':
@@ -599,12 +590,11 @@ class Pdf
     }
 
     /**
-     * Takes
+     * Takes.
      * @param type $shipment
      */
     public function addLabelToPdf($printFormat, $pageNo, $shipment, $labelType = '')
     {
-
         $this->tpl = $this->pdf->importPage($pageNo);
         $originalPdfSize = $this->pdf->getTemplateSize($this->tpl);
 
@@ -701,11 +691,11 @@ class Pdf
                         break;
 
                     case 'CUSTOMER':
-                        $this->pdf->Text(7, $y = $y + 5, $labelType . ' Copy - Retain for your own use');
+                        $this->pdf->Text(7, $y = $y + 5, $labelType.' Copy - Retain for your own use');
                         break;
 
                     default:
-                        $this->pdf->Text(7, $y = $y + 5, $labelType . 'Label - Insert into Package Pouch');
+                        $this->pdf->Text(7, $y = $y + 5, $labelType.'Label - Insert into Package Pouch');
                         $this->pdf->SetFont($this->font, 'B', 10);
                         $this->pdf->Text(7, $y = $y + 8, 'PRINTING GUIDELINES:');
                         $this->pdf->SetFont($this->font, 'B', 8);
@@ -736,47 +726,39 @@ class Pdf
                         $this->pdf->SetFillColor(0, 0, 0);
                         $this->pdf->SetTextColor(255, 255, 255);
                         $this->pdf->SetXY(0, 0);
-                        $this->pdf->Cell(102, 5, $labelType . ' Copy  - IFS Ref : ' . $shipment->consignment_number, 1, 0, 0, true);
+                        $this->pdf->Cell(102, 5, $labelType.' Copy  - IFS Ref : '.$shipment->consignment_number, 1, 0, 0, true);
                         break;
                 }
         }
     }
 
-    /**
-     *
-     */
     public function importUploadedDocuments($shipment, $documentType = 'invoice', $copies = 1)
     {
         $documents = $shipment->documents()->where('document_type', $documentType)->get();
 
         foreach ($documents as $document) {
-
-            $tempFile = 'temp/invoice' . $document->id . '.pdf';
+            $tempFile = 'temp/invoice'.$document->id.'.pdf';
 
             // If the temp file does not exist, download from S3
-            if (!file_exists(storage_path('app/' . $tempFile))) {
+            if (! file_exists(storage_path('app/'.$tempFile))) {
                 if (Storage::disk('s3')->exists($document->path)) {
                     $pdf = Storage::disk('s3')->get($document->path);
                     Storage::disk('local')->put($tempFile, $pdf);
                 }
             }
 
-            if (file_exists(storage_path('app/' . $tempFile))) {
-
+            if (file_exists(storage_path('app/'.$tempFile))) {
                 $pageCount = 0;
 
                 try {
-                    $pageCount = $this->pdf->setSourceFile(storage_path('app/' . $tempFile));
+                    $pageCount = $this->pdf->setSourceFile(storage_path('app/'.$tempFile));
                 } catch (\Exception $exc) {
-                    Mail::to(($this->user) ? $this->user->email : 'courier@antrim.ifsgroup.com')->queue(new \App\Mail\GenericError('Document Error - ' . $shipment->consignment_number, 'Warning, unable to include uploaded documents for shipment ' . $shipment->consignment_number));
+                    Mail::to(($this->user) ? $this->user->email : 'courier@antrim.ifsgroup.com')->queue(new \App\Mail\GenericError('Document Error - '.$shipment->consignment_number, 'Warning, unable to include uploaded documents for shipment '.$shipment->consignment_number));
                 }
 
                 if ($pageCount > 0) {
-
                     for ($i = 0; $i < $copies; $i++) {
-
                         for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-
                             $tpl = $this->pdf->importPage($pageNo);
 
                             // get the size of the imported page
@@ -784,15 +766,13 @@ class Pdf
 
                             // create a page (landscape or portrait depending on the imported page size)
                             if ($size['w'] > $size['h']) {
-                                $this->pdf->addPage('L', array($size['w'], $size['h']));
+                                $this->pdf->addPage('L', [$size['w'], $size['h']]);
                             } else {
-                                $this->pdf->addPage('P', array($size['w'], $size['h']));
+                                $this->pdf->addPage('P', [$size['w'], $size['h']]);
                             }
 
                             $this->pdf->useTemplate($tpl);
                         }
-
-
                     }
                 }
             }
@@ -809,7 +789,7 @@ class Pdf
      */
     public function createCommercialInvoice($token, $parameters = [], $output = true)
     {
-        if (!$shipment = Shipment::whereToken($token)->first()) {
+        if (! $shipment = Shipment::whereToken($token)->first()) {
             return false;
         }
 
@@ -829,7 +809,6 @@ class Pdf
         // If available get description of ship reason else use the code
         $shipReason = $shipment->ship_reason;
         if (isset($shipment->ship_reason)) {
-
             $reason = \App\ShipReason::where('code', $shipment->ship_reason)->first();
             if ($reason) {
                 $shipReason = $reason->description;
@@ -837,10 +816,10 @@ class Pdf
         }
 
         if ($type == 'p') {
-            $this->pdf->setSourceFile(storage_path('app/templates/proforma_invoice_' . $template . $this->size . '.pdf'));
+            $this->pdf->setSourceFile(storage_path('app/templates/proforma_invoice_'.$template.$this->size.'.pdf'));
             $filenamePrefix = 'PI';
         } else {
-            $this->pdf->setSourceFile(storage_path('app/templates/commercial_invoice_' . $template . $this->size . '.pdf'));
+            $this->pdf->setSourceFile(storage_path('app/templates/commercial_invoice_'.$template.$this->size.'.pdf'));
             $filenamePrefix = 'CI';
         }
 
@@ -854,26 +833,26 @@ class Pdf
         $this->pdf->Text(6, 25, $shipment->carrier_tracking_number);
         $this->pdf->SetFont($this->font, '', 10);
         $this->pdf->Text(6, 39, $shipment->ship_date->format('d-m-Y'));
-        $this->pdf->Text(103.5, 39, $shipment->consignment_number . '  /  ' . $shipment->shipment_reference);
+        $this->pdf->Text(103.5, 39, $shipment->consignment_number.'  /  '.$shipment->shipment_reference);
         $this->pdf->Text(6, 50, $shipment->sender_name);
         $this->pdf->Text(6, 54, $shipment->sender_company_name);
         $this->pdf->Text(6, 58, $shipment->sender_address1);
         $this->pdf->Text(6, 62, $shipment->sender_address2);
         $this->pdf->Text(6, 66, $shipment->sender_city);
-        $this->pdf->Text(6, 70, $shipment->sender_state . ' ' . $shipment->sender_postcode);
+        $this->pdf->Text(6, 70, $shipment->sender_state.' '.$shipment->sender_postcode);
         $this->pdf->Text(6, 76, getCountry($shipment->sender_country_code));
-        $this->pdf->Text(63, 50, 'Tel:' . $shipment->sender_telephone);
+        $this->pdf->Text(63, 50, 'Tel:'.$shipment->sender_telephone);
         $this->pdf->Text(103.5, 50, $shipment->recipient_name);
         $this->pdf->Text(103.5, 54, $shipment->recipient_company_name);
         $this->pdf->Text(103.5, 58, $shipment->recipient_address1);
         $this->pdf->Text(103.5, 62, $shipment->recipient_address2);
         $this->pdf->Text(103.5, 66, $shipment->recipient_city);
-        $this->pdf->Text(103.5, 70, $shipment->recipient_state . ' ' . $shipment->recipient_postcode);
+        $this->pdf->Text(103.5, 70, $shipment->recipient_state.' '.$shipment->recipient_postcode);
         $this->pdf->Text(103.5, 76, getCountry($shipment->recipient_country_code));
-        $this->pdf->Text(165, 50, 'Tel:' . $shipment->recipient_telephone);
+        $this->pdf->Text(165, 50, 'Tel:'.$shipment->recipient_telephone);
         $this->pdf->Text(6, 88, getCountry($shipment->sender_country_code));
 
-        if (!empty($shipment->eori) || !empty($shipment->company->eori)) {
+        if (! empty($shipment->eori) || ! empty($shipment->company->eori)) {
             $this->pdf->SetFont($this->font, 'B', 10);
             $this->pdf->Text(63, 84, 'EORI');
             $this->pdf->SetFont($this->font, '', 10);
@@ -949,20 +928,19 @@ class Pdf
         $this->pdf->Text(149, 223, $shipment->customs_value);
         $this->pdf->Text(184, 223, $shipment->customs_value_currency_code);
         $this->pdf->Text(149, 233, $shipment->pieces);
-        $this->pdf->Text(149, 243, $shipment->weight . ' ' . strtoupper($shipment->weight_uom));
+        $this->pdf->Text(149, 243, $shipment->weight.' '.strtoupper($shipment->weight_uom));
         $this->pdf->Text(149, 253, strtoupper($incoterm));
 
         $this->pdf->SetFont($this->font, '', 8);
         $this->pdf->Text(7, 237, $comments);
 
         if ($output) {
-            return $this->displayPdf($filenamePrefix . '_' . $shipment->consignment_number . '.pdf', TRUE);
+            return $this->displayPdf($filenamePrefix.'_'.$shipment->consignment_number.'.pdf', true);
         }
     }
 
     public function countLines($content)
     {
-
         $lines = 0;
         foreach ($content as $key => $item) {
 
@@ -994,11 +972,10 @@ class Pdf
     public function createBatchedCommercialInvoices($shipments)
     {
         foreach ($shipments as $shipment) {
-
             $this->createCommercialInvoice($shipment->token, [], false);
         }
 
-        return $this->displayPdf('commercial_invoices.pdf', TRUE);
+        return $this->displayPdf('commercial_invoices.pdf', true);
     }
 
     /**
@@ -1016,7 +993,7 @@ class Pdf
 
         $date = date('d-m-Y H:i', time());
 
-        $this->pdf->Text(9, 5, $driverManifest->driver->name . ' - ' . $driverManifest->date->format('l jS F, Y'));
+        $this->pdf->Text(9, 5, $driverManifest->driver->name.' - '.$driverManifest->date->format('l jS F, Y'));
 
         $this->pdf->SetFont($this->font, 'BI', 12);
         $this->pdf->Text(155, 6, "Printed $date");
@@ -1031,52 +1008,52 @@ class Pdf
 
             $locationCount++;
 
-            $this->pdf->SetFont($this->font, 'B', 9);
-            $this->pdf->Cell(50, 8, "Location $locationCount");
-            $this->pdf->Ln(7);
+        $this->pdf->SetFont($this->font, 'B', 9);
+        $this->pdf->Cell(50, 8, "Location $locationCount");
+        $this->pdf->Ln(7);
 
-            $this->pdf->SetFont($this->font, 'I', 6);
-            $this->pdf->SetFillColor(221, 221, 221);
-            $this->pdf->Cell(5, 5, '#', 1, 0, 'L', true);
-            $this->pdf->Cell(18, 5, 'REFERENCE', 1, 0, 'L', true);
-            $this->pdf->Cell(8, 5, 'TYPE', 1, 0, 'C', true);
-            $this->pdf->Cell(72, 5, 'FROM', 1, 0, 'L', true);
-            $this->pdf->Cell(72, 5, 'TO', 1, 0, 'L', true);
-            $this->pdf->Cell(10, 5, 'COD (£)', 1, 0, 'R', true);
-            $this->pdf->Cell(10, 5, 'PIECES', 1, 0, 'R', true);
+        $this->pdf->SetFont($this->font, 'I', 6);
+        $this->pdf->SetFillColor(221, 221, 221);
+        $this->pdf->Cell(5, 5, '#', 1, 0, 'L', true);
+        $this->pdf->Cell(18, 5, 'REFERENCE', 1, 0, 'L', true);
+        $this->pdf->Cell(8, 5, 'TYPE', 1, 0, 'C', true);
+        $this->pdf->Cell(72, 5, 'FROM', 1, 0, 'L', true);
+        $this->pdf->Cell(72, 5, 'TO', 1, 0, 'L', true);
+        $this->pdf->Cell(10, 5, 'COD (£)', 1, 0, 'R', true);
+        $this->pdf->Cell(10, 5, 'PIECES', 1, 0, 'R', true);
 
-            $this->pdf->Ln();
+        $this->pdf->Ln();
 
-            $this->pdf->SetFont($this->font, '', 6);
-            $this->pdf->SetFillColor(255, 255, 255);
+        $this->pdf->SetFont($this->font, '', 6);
+        $this->pdf->SetFillColor(255, 255, 255);
 
-            $i = 1;
+        $i = 1;
 
-            foreach ($location['jobs'] as $transportJob):
+        foreach ($location['jobs'] as $transportJob):
                 $this->pdf->Cell(5, 5, $i, 1, 0, 'L', true);
-                $this->pdf->Cell(18, 5, ($transportJob->reference) ? $transportJob->reference : $transportJob->scs_job_number, 1, 0, 'L', true);
-                $this->pdf->Cell(8, 5, strtoupper($transportJob->type), 1, 0, 'C', true);
-                $this->pdf->Cell(72, 5, $transportJob->from_company_name . ',' . $transportJob->from_city . ' ' . $transportJob->from_postcode, 1, 0, 'L', true);
-                $this->pdf->Cell(72, 5, $transportJob->to_company_name . ',' . $transportJob->to_city . ' ' . $transportJob->to_postcode, 1, 0, 'L', true);
-                $this->pdf->Cell(10, 5, $transportJob->cash_on_delivery, 1, 0, 'R', true);
-                $this->pdf->Cell(10, 5, $transportJob->pieces, 1, 0, 'R', true);
-                $this->pdf->Ln();
-                $i++;
-            endforeach;
+        $this->pdf->Cell(18, 5, ($transportJob->reference) ? $transportJob->reference : $transportJob->scs_job_number, 1, 0, 'L', true);
+        $this->pdf->Cell(8, 5, strtoupper($transportJob->type), 1, 0, 'C', true);
+        $this->pdf->Cell(72, 5, $transportJob->from_company_name.','.$transportJob->from_city.' '.$transportJob->from_postcode, 1, 0, 'L', true);
+        $this->pdf->Cell(72, 5, $transportJob->to_company_name.','.$transportJob->to_city.' '.$transportJob->to_postcode, 1, 0, 'L', true);
+        $this->pdf->Cell(10, 5, $transportJob->cash_on_delivery, 1, 0, 'R', true);
+        $this->pdf->Cell(10, 5, $transportJob->pieces, 1, 0, 'R', true);
+        $this->pdf->Ln();
+        $i++;
+        endforeach;
 
-            $this->pdf->SetFont($this->font, 'B', 7);
-            $this->pdf->Cell(5, 5, null, 1, 0, 'L', true);
-            $this->pdf->Cell(18, 5, null, 1, 0, 'L', true);
-            $this->pdf->Cell(8, 5, null, 1, 0, 'L', true);
-            $this->pdf->Cell(72, 5, null, 1, 0, 'L', true);
-            $this->pdf->Cell(72, 5, null, 1, 0, 'L', true);
-            $this->pdf->Cell(10, 5, number_format($location['cod'], 2), 1, 0, 'R', true);
-            $this->pdf->Cell(10, 5, $location['pieces'], 1, 0, 'R', true);
-            $this->pdf->Ln(9);
+        $this->pdf->SetFont($this->font, 'B', 7);
+        $this->pdf->Cell(5, 5, null, 1, 0, 'L', true);
+        $this->pdf->Cell(18, 5, null, 1, 0, 'L', true);
+        $this->pdf->Cell(8, 5, null, 1, 0, 'L', true);
+        $this->pdf->Cell(72, 5, null, 1, 0, 'L', true);
+        $this->pdf->Cell(72, 5, null, 1, 0, 'L', true);
+        $this->pdf->Cell(10, 5, number_format($location['cod'], 2), 1, 0, 'R', true);
+        $this->pdf->Cell(10, 5, $location['pieces'], 1, 0, 'R', true);
+        $this->pdf->Ln(9);
 
         endforeach;
 
-        return $this->displayPdf($driverManifest->number . '.pdf', true);
+        return $this->displayPdf($driverManifest->number.'.pdf', true);
     }
 
     /**
@@ -1095,21 +1072,21 @@ class Pdf
         $this->pdf->AddPage('P', [$size['w'], $size['h']]);
         $this->pdf->useTemplate($tpl);
         $this->pdf->SetFont($this->font, '', 12);
-        $this->pdf->Text(30, 61, $quotation->contact . ', ' . $quotation->company_name);
+        $this->pdf->Text(30, 61, $quotation->contact.', '.$quotation->company_name);
         $this->pdf->Text(30, 67.5, $quotation->email);
         $this->pdf->Text(30, 74, $quotation->user->name);
         $this->pdf->Text(30, 80.5, $quotation->created_at);
         $this->pdf->Text(163, 80.5, $quotation->reference);
         $this->pdf->SetFont($this->font, '', 10);
-        $this->pdf->Text(14, 107, $quotation->from_city . ', ' . getCountry($quotation->from_country_code));
-        $this->pdf->Text(103, 107, $quotation->to_city . ', ' . getCountry($quotation->to_country_code));
+        $this->pdf->Text(14, 107, $quotation->from_city.', '.getCountry($quotation->from_country_code));
+        $this->pdf->Text(103, 107, $quotation->to_city.', '.getCountry($quotation->to_country_code));
         $this->pdf->Text(14, 118, $quotation->pieces);
         $this->pdf->Text(103, 118, $quotation->dimensions);
-        $this->pdf->Text(14, 129.5, $quotation->weight . ' KG');
-        $this->pdf->Text(103, 129.5, $quotation->volumetric_weight . ' KG');
+        $this->pdf->Text(14, 129.5, $quotation->weight.' KG');
+        $this->pdf->Text(103, 129.5, $quotation->volumetric_weight.' KG');
         $this->pdf->Text(14, 141, $quotation->goods_description);
         $this->pdf->Text(103, 141, $quotation->rate_of_exchange);
-        $this->pdf->Text(14, 152, $quotation->quote . ' ' . $quotation->currency_code);
+        $this->pdf->Text(14, 152, $quotation->quote.' '.$quotation->currency_code);
         $this->pdf->Text(103, 152, $quotation->terms);
         $this->pdf->Text(14, 164, $quotation->special_requirements);
         $this->pdf->Text(103, 164, $quotation->valid_to->format('d-m-Y'));
@@ -1119,7 +1096,8 @@ class Pdf
         $this->pdf->Text(38, 226.5, $quotation->user->name);
         $this->pdf->Text(38, 233, '02894464211');
         $this->pdf->Text(38, 239, $quotation->user->email);
-        return $this->displayPdf($quotation->id . '.pdf', true);
+
+        return $this->displayPdf($quotation->id.'.pdf', true);
     }
 
     /**
@@ -1131,22 +1109,22 @@ class Pdf
     public function createDriverManifestDockets($driverManifest)
     {
         foreach ($driverManifest->transportJobs as $transportJob) {
-            if ($transportJob->type == 'd' || ($transportJob->type == 'c' && !is_numeric($transportJob->shipment_id)) && $transportJob->staus_id != 7) {
+            if ($transportJob->type == 'd' || ($transportJob->type == 'c' && ! is_numeric($transportJob->shipment_id)) && $transportJob->staus_id != 7) {
                 $this->createPodDocket($transportJob, $driverManifest, false);
             }
         }
-        return $this->displayPdf($driverManifest->number . '_dockets.pdf', TRUE);
+
+        return $this->displayPdf($driverManifest->number.'_dockets.pdf', true);
     }
 
     /**
-     *
      * @param type $transportJob
      */
     public function createPodDocket($transportJob, $driverManifest = false, $output = true)
     {
         $printFormat = PrintFormat::whereCode($this->size)->first();
 
-        $this->pdf->SetAutoPageBreak(TRUE, 0);
+        $this->pdf->SetAutoPageBreak(true, 0);
         // Add a blank page to the document
         $this->pdf->AddPage('P', [$printFormat->width, $printFormat->height]);
 
@@ -1160,7 +1138,7 @@ class Pdf
         }
 
         $this->pdf->SetFont($this->font, 'B', 22);
-        $this->pdf->Text($titleX, $y, 'PROOF OF ' . strtoupper(verboseCollectionDelivery($transportJob->type)));
+        $this->pdf->Text($titleX, $y, 'PROOF OF '.strtoupper(verboseCollectionDelivery($transportJob->type)));
         $this->pdf->SetLineWidth(0.5);
         $this->pdf->Line(0, $y += 11.5, 110, $y); //horizontal
 
@@ -1179,17 +1157,17 @@ class Pdf
             $this->pdf->Text($x, $y += 3, strtoupper($transportJob->from_company_name));
             $this->pdf->Text($x, $y += 3, strtoupper($transportJob->from_address1));
             $this->pdf->Text($x, $y += 3, strtoupper($transportJob->from_address2));
-            $this->pdf->Text($x, $y += 3, strtoupper($transportJob->from_city . ' ' . $transportJob->from_postcode));
+            $this->pdf->Text($x, $y += 3, strtoupper($transportJob->from_city.' '.$transportJob->from_postcode));
             $this->pdf->Text($x, $y += 3, strtoupper(getCountry($transportJob->from_country_code)));
-            $this->pdf->Text($x, $y += 3.5, 'Tel: ' . strtoupper($transportJob->from_telephone));
+            $this->pdf->Text($x, $y += 3.5, 'Tel: '.strtoupper($transportJob->from_telephone));
         } else {
             $this->pdf->Text($x, $y += 5, strtoupper($transportJob->to_name));
             $this->pdf->Text($x, $y += 3, strtoupper($transportJob->to_company_name));
             $this->pdf->Text($x, $y += 3, strtoupper($transportJob->to_address1));
             $this->pdf->Text($x, $y += 3, strtoupper($transportJob->to_address2));
-            $this->pdf->Text($x, $y += 3, strtoupper($transportJob->to_city . ' ' . $transportJob->to_postcode));
+            $this->pdf->Text($x, $y += 3, strtoupper($transportJob->to_city.' '.$transportJob->to_postcode));
             $this->pdf->Text($x, $y += 3, strtoupper(getCountry($transportJob->to_country_code)));
-            $this->pdf->Text($x, $y += 3.5, 'Tel: ' . strtoupper($transportJob->to_telephone));
+            $this->pdf->Text($x, $y += 3.5, 'Tel: '.strtoupper($transportJob->to_telephone));
         }
 
         $this->pdf->SetLineWidth(0.3);
@@ -1207,7 +1185,7 @@ class Pdf
         $this->pdf->Text($x + 28, $y, 'Weight:');
         $this->pdf->SetLineWidth(0.3);
         $this->pdf->Line($x + 59, $y - 1.5, $x + 59, $y + 11); //vertical
-        $this->pdf->Text($x + 61, $y, 'Cash On ' . ucfirst(verboseCollectionDelivery($transportJob->type)) . ':');
+        $this->pdf->Text($x + 61, $y, 'Cash On '.ucfirst(verboseCollectionDelivery($transportJob->type)).':');
         $this->pdf->SetFont($this->font, 'B', 15);
         $this->pdf->Text($x, $y += 4, $transportJob->pieces);
         $this->pdf->Text($x + 28, $y, $transportJob->weight);
@@ -1227,7 +1205,7 @@ class Pdf
         $this->pdf->SetFont($this->font, '', 9);
 
         if (is_numeric($transportJob->shipment_id)) {
-            $this->pdf->Text($x, $y += 1, $transportJob->shipment->company->company_name . ':');
+            $this->pdf->Text($x, $y += 1, $transportJob->shipment->company->company_name.':');
         } else {
             $this->pdf->Text($x, $y += 1, 'Reference:');
         }
@@ -1275,12 +1253,11 @@ class Pdf
             $this->pdf->SetFont($this->font, 'B', 7);
             $this->pdf->SetX(0);
             $this->pdf->SetY(147);
-            $this->pdf->Cell(84, 5, $driverManifest->driver->name . ' - ' . $driverManifest->number . ' - ' . $driverManifest->date->format('l jS F, Y'), 0, 0, 'C');
+            $this->pdf->Cell(84, 5, $driverManifest->driver->name.' - '.$driverManifest->number.' - '.$driverManifest->date->format('l jS F, Y'), 0, 0, 'C');
         }
 
         if ($output) {
-            return $this->displayPdf($transportJob->number . '.pdf', true);
+            return $this->displayPdf($transportJob->number.'.pdf', true);
         }
     }
-
 }

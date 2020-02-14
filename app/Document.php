@@ -31,8 +31,8 @@ class Document extends Model
     }
 
     /**
-     * Returns the user's name who uploaded the document
-     * 
+     * Returns the user's name who uploaded the document.
+     *
      * @return string or null
      */
     public function getUserNameAttribute()
@@ -42,8 +42,5 @@ class Document extends Model
         if ($user) {
             return $user->name;
         }
-
-        return null;
     }
-
 }

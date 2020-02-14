@@ -2,19 +2,18 @@
 
 namespace App\Jobs;
 
-use DB;
-use App\User;
-use Validator;
 use App\Carrier;
-use App\Service;
 use App\FuelSurcharge;
+use App\Service;
+use App\User;
+use DB;
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Mail;
+use Validator;
 
 class ImportFuelSurcharges implements ShouldQueue
 {
-
     use Queueable;
 
     protected $path;
@@ -32,14 +31,14 @@ class ImportFuelSurcharges implements ShouldQueue
      * Create a new job instance.
      *
      * @param string    $path
-     * @param integer   $importConfigId
+     * @param int   $importConfigId
      * @param User      $user
      *
      * @return void
      */
     public function __construct($path, User $user)
     {
-        $this->path = storage_path('app/' . $path);
+        $this->path = storage_path('app/'.$path);
         $this->user = $user;
         $this->source = substr($path, 14, 12);
     }
@@ -86,8 +85,9 @@ class ImportFuelSurcharges implements ShouldQueue
         $rowNumber = 1;
         if (($handle = fopen($this->path, 'r')) !== false) {
             while (($data = fgetcsv($handle, 1000, $this->delimiter)) !== false) {
-                if ($rowNumber >= $this->startRow)
+                if ($rowNumber >= $this->startRow) {
                     $this->processRow($rowNumber, $data);
+                }
                 $rowNumber++;
             }
             fclose($handle);
@@ -110,15 +110,17 @@ class ImportFuelSurcharges implements ShouldQueue
         $this->buildRow($data);
 
         // Ignore blank lines (or lines with no fuel %)
-        if ($this->row['fuel_percent'] == "")
+        if ($this->row['fuel_percent'] == '') {
             return;
+        }
 
         // Pass the data back to the results summary
         $this->results['rows'][$rowNumber]['data'] = $this->row;
 
         // Invalid number of fields, return false
         if (count($data) != count($this->fields)) {
-            $this->setRowFailed($rowNumber, [0 => "Invalid number of fields detected. Detected " . count($data) . " fields. " . count($this->fields) . " required"]);
+            $this->setRowFailed($rowNumber, [0 => 'Invalid number of fields detected. Detected '.count($data).' fields. '.count($this->fields).' required']);
+
             return false;
         }
 
@@ -126,22 +128,22 @@ class ImportFuelSurcharges implements ShouldQueue
         $this->completeEmptyFields();
 
         // Validate row
-        if ($this->validate($rowNumber) && $this->row['fuel_percent'] > "") {
+        if ($this->validate($rowNumber) && $this->row['fuel_percent'] > '') {
             $this->updateTables($rowNumber);
         }
     }
 
     /**
-     * Validate row
-     * 
+     * Validate row.
+     *
      * @param type $rowNumber
-     * @return boolean
+     * @return bool
      */
     private function validate($rowNumber)
     {
         $this->doGenericValidation();
 
-        if (!$this->errors) {
+        if (! $this->errors) {
             $this->doSpecialValidation();
         }
 
@@ -153,6 +155,7 @@ class ImportFuelSurcharges implements ShouldQueue
         if ($this->errors) {
             $this->setRowFailed($rowNumber, $this->errors);
             $this->errors = null;
+
             return false;
         }
 
@@ -160,18 +163,17 @@ class ImportFuelSurcharges implements ShouldQueue
     }
 
     /**
-     * Do some general validation on data format and values
+     * Do some general validation on data format and values.
      */
     private function doGenericValidation()
     {
-
         $maxDate = date('Y-m-d', strtotime('+2 weeks'));
 
         // Add general rules
         $rules = [
             'carrier_code' => 'required|exists:carriers,code',
             'fuel_percent' => 'required|min:0|max:30.00',
-            'from_date' => 'required|date|date_format:Y-m-d|after:yesterday|before:' . $maxDate
+            'from_date' => 'required|date|date_format:Y-m-d|after:yesterday|before:'.$maxDate,
         ];
 
         $validator = Validator::make($this->row, $rules);
@@ -185,7 +187,7 @@ class ImportFuelSurcharges implements ShouldQueue
     }
 
     /**
-     * Do additional validation against existing data in tables
+     * Do additional validation against existing data in tables.
      */
     private function doSpecialValidation()
     {
@@ -213,10 +215,9 @@ class ImportFuelSurcharges implements ShouldQueue
         $this->carrier = Carrier::where('code', $this->row['carrier_code'])->first();
 
         if ($this->carrier) {
-
             $service = Service::where('code', $this->row['service_code'])->where('carrier_id', $this->carrier->id)->first();
 
-            if (!$service) {
+            if (! $service) {
                 $this->errors[] = 'Service not valid for Carrier';
             }
         }
@@ -241,22 +242,22 @@ class ImportFuelSurcharges implements ShouldQueue
           if ($diff > 3 && $increase > 40)
           return true;
           }
-         * 
+         *
          */
 
         return false;
     }
 
     /**
-     * 
      * @param type $rowNumber
-     * @return boolean
+     * @return bool
      */
     private function updateTables($rowNumber)
     {
         // Found errors, return false and add to error array
         if ($this->errors) {
             $this->setRowFailed($rowNumber, $this->errors);
+
             return false;
         }
 
@@ -268,6 +269,7 @@ class ImportFuelSurcharges implements ShouldQueue
         // Found errors, return false and add to error array
         if (isset($result['errors']) && is_array($result['errors'])) {
             $this->setRowFailed($rowNumber, $result['errors']);
+
             return false;
         }
 
@@ -338,7 +340,7 @@ class ImportFuelSurcharges implements ShouldQueue
     /**
      * Check to see if a record exists for any period after my start date.
      *
-     * @return boolean
+     * @return bool
      */
     private function hasFutureRate()
     {
@@ -357,7 +359,7 @@ class ImportFuelSurcharges implements ShouldQueue
     /**
      * Check to see if a record is a duplicate.
      *
-     * @return boolean
+     * @return bool
      */
     private function isDuplicate()
     {
@@ -375,12 +377,8 @@ class ImportFuelSurcharges implements ShouldQueue
         return true;
     }
 
-    /**
-     * 
-     */
     private function closePreviousRates()
     {
-
         DB::enableQueryLog();
 
         // Check to see if an existing rate overlaps
@@ -390,10 +388,8 @@ class ImportFuelSurcharges implements ShouldQueue
                 ->where('to_date', '>=', $this->row['to_date'])
                 ->get();
 
-        if (!$fuelSurcharges->isEmpty()) {
-
+        if (! $fuelSurcharges->isEmpty()) {
             foreach ($fuelSurcharges as $fuelSurcharge) {
-
                 if ($fuelSurcharge->from_date->format('Y-m-d') == $this->row['from_date']) {
 
                     // Looks like we are trying to re-load an existing record so delete existing one first
@@ -402,7 +398,7 @@ class ImportFuelSurcharges implements ShouldQueue
 
                     // If Existing record starts prior, then close
                     $surcharge = \App\FuelSurcharge::where('id', $fuelSurcharge['id'])
-                            ->update(['to_date' => date('Y-m-d', strtotime($this->row['from_date'] . ' -1 day'))]);
+                            ->update(['to_date' => date('Y-m-d', strtotime($this->row['from_date'].' -1 day'))]);
                 }
             }
         }
@@ -417,10 +413,10 @@ class ImportFuelSurcharges implements ShouldQueue
     private function exportResultsToCsvFiles()
     {
         if (count($this->results['success']) > 0) {
-            $this->exportRowsToCsv($this->results['success'], 'success_' . $this->source);
+            $this->exportRowsToCsv($this->results['success'], 'success_'.$this->source);
         }
         if (count($this->results['failed']) > 0) {
-            $this->exportRowsToCsv($this->results['failed'], 'failed_' . $this->source);
+            $this->exportRowsToCsv($this->results['failed'], 'failed_'.$this->source);
         }
     }
 
@@ -436,7 +432,6 @@ class ImportFuelSurcharges implements ShouldQueue
     {
         // Build an array that will be written to csv
         foreach ($rows as $key => $row) {
-
             foreach ($this->fields as $field) {
                 $data[$key][$field] = (isset($row[$field])) ? $row[$field] : null;
             }
@@ -446,10 +441,10 @@ class ImportFuelSurcharges implements ShouldQueue
             }
         }
 
-        writeCsv(storage_path() . '/app/temp/' . $fileName . '.csv', $data);
+        writeCsv(storage_path().'/app/temp/'.$fileName.'.csv', $data);
 
         // Add the filename to the results array
-        $this->results['files'][] = storage_path() . '/app/temp/' . $fileName . '.csv';
+        $this->results['files'][] = storage_path().'/app/temp/'.$fileName.'.csv';
     }
 
     /**
@@ -459,12 +454,11 @@ class ImportFuelSurcharges implements ShouldQueue
      */
     private function setSubject()
     {
-        $this->results['subject'] = 'Fuel Surcharge Upload (' . count($this->results['success']) . ' processed / ' . count($this->results['failed']) . ' failed';
+        $this->results['subject'] = 'Fuel Surcharge Upload ('.count($this->results['success']).' processed / '.count($this->results['failed']).' failed';
     }
 
     /**
-     * Attempt to supply values for any information not provided
-     *
+     * Attempt to supply values for any information not provided.
      */
     private function completeEmptyFields()
     {
@@ -487,5 +481,4 @@ class ImportFuelSurcharges implements ShouldQueue
     {
         Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed("Fuel Surcharge Upload ($this->source)", $exception, $this->path));
     }
-
 }

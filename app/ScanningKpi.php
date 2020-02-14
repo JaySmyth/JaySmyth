@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class ScanningKpi extends Model
 {
-
     /**
      * The attributes that are mass assignable.
      *
@@ -21,5 +20,4 @@ class ScanningKpi extends Model
      * @var array
      */
     protected $dates = ['date', 'created_at', 'updated_at'];
-
 }

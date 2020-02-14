@@ -9,7 +9,7 @@
             Invoice or Account Number:
         </label>
         <div class="col-sm-6">
-            {!! Form::Text('filter', Input::get('filter'), ['class' => 'form-control', 'maxlength' => '25']) !!}
+            {!! Form::Text('filter', Request::get('filter'), ['class' => 'form-control', 'maxlength' => '25']) !!}
         </div>
     </div>
 
@@ -18,7 +18,7 @@
             Carrier Consignment or SCS Job:
         </label>
         <div class="col-sm-6">
-            {!! Form::Text('consignment', Input::get('consignment'), ['class' => 'form-control', 'maxlength' => '20']) !!}
+            {!! Form::Text('consignment', Request::get('consignment'), ['class' => 'form-control', 'maxlength' => '20']) !!}
         </div>
     </div>
 
@@ -27,7 +27,7 @@
             Carrier:
         </label>
         <div class="col-sm-6">
-            {!! Form::select('carrier',  dropDown('carriers', 'All Carriers'), Input::get('carrier'), array('class' => 'form-control')) !!}
+            {!! Form::select('carrier',  dropDown('carriers', 'All Carriers'), Request::get('carrier'), array('class' => 'form-control')) !!}
         </div>
     </div>
 
@@ -37,10 +37,10 @@
         </label>
 
         <div class="col-sm-3">
-            <input type="text" name="date_from" value="{{Input::get('date_from')}}" class="form-control datepicker" maxlength="10" placeholder="Date From">
+            <input type="text" name="date_from" value="{{Request::get('date_from')}}" class="form-control datepicker" maxlength="10" placeholder="Date From">
         </div>
         <div class="col-sm-3">
-            <input type="text" name="date_to" value="{{Input::get('date_to')}}" class="form-control datepicker" maxlength="10" placeholder="Date To">
+            <input type="text" name="date_to" value="{{Request::get('date_to')}}" class="form-control datepicker" maxlength="10" placeholder="Date To">
         </div>
     </div>
 
@@ -49,7 +49,7 @@
             Invoice Type:
         </label>
         <div class="col-sm-6">
-            {!! Form::select('type', array('' => 'All Invoice Types', 'F' => 'Freight Invoices', 'D' => 'Duty Invocies', 'O' => 'Other'), Input::get('type'), array('class' => 'form-control')) !!}
+            {!! Form::select('type', array('' => 'All Invoice Types', 'F' => 'Freight Invoices', 'D' => 'Duty Invocies', 'O' => 'Other'), Request::get('type'), array('class' => 'form-control')) !!}
         </div>
     </div>
 
@@ -58,7 +58,7 @@
             Duty Invoices:
         </label>
         <div class="col-sm-6">
-            {!! Form::select('import_export', array('' => 'All Duty Invoices', 'E' => 'Export Duty', 'I' => 'Import Duty'), Input::get('import_export'), array('class' => 'form-control')) !!}
+            {!! Form::select('import_export', array('' => 'All Duty Invoices', 'E' => 'Export Duty', 'I' => 'Import Duty'), Request::get('import_export'), array('class' => 'form-control')) !!}
         </div>
     </div>
 
@@ -67,7 +67,7 @@
             Status:
         </label>
         <div class="col-sm-6">
-            {!! Form::select('status',  dropDown('invoiceStatuses', 'All Statuses'), Input::get('status'), array('class' => 'form-control')) !!}
+            {!! Form::select('status',  dropDown('invoiceStatuses', 'All Statuses'), Request::get('status'), array('class' => 'form-control')) !!}
         </div>
     </div>
 
@@ -76,7 +76,7 @@
             Invoice Received:
         </label>
         <div class="col-sm-6">
-            {!! Form::select('received',  dropDown('boolean', 'All'), Input::get('received'), array('class' => 'form-control')) !!}
+            {!! Form::select('received',  dropDown('boolean', 'All'), Request::get('received'), array('class' => 'form-control')) !!}
         </div>
     </div>
 
@@ -85,7 +85,7 @@
             Invoice Queried:
         </label>
         <div class="col-sm-6">
-            {!! Form::select('queried',  dropDown('boolean', 'All'), Input::get('queried'), array('class' => 'form-control')) !!}
+            {!! Form::select('queried',  dropDown('boolean', 'All'), Request::get('queried'), array('class' => 'form-control')) !!}
         </div>
     </div>
 
@@ -94,7 +94,7 @@
             Costs Entered to SCS:
         </label>
         <div class="col-sm-6">
-            {!! Form::select('costs',  dropDown('boolean', 'All'), Input::get('costs'), array('class' => 'form-control')) !!}
+            {!! Form::select('costs',  dropDown('boolean', 'All'), Request::get('costs'), array('class' => 'form-control')) !!}
         </div>
     </div>
 
@@ -103,7 +103,7 @@
             Copy Docs Requested:
         </label>
         <div class="col-sm-6">
-            {!! Form::select('copy_docs',  dropDown('boolean', 'All'), Input::get('copy_docs'), array('class' => 'form-control')) !!}
+            {!! Form::select('copy_docs',  dropDown('boolean', 'All'), Request::get('copy_docs'), array('class' => 'form-control')) !!}
         </div>
     </div>
 

@@ -6,17 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class FedexRoute extends Model
 {
-
     public $timestamps = false;
 
     /**
      * Get the route id from the parameters provided.
      *
-     * @return integer
+     * @return int
      */
     public function getRouteId($shipment)
     {
-
         $code = $this->getRouteCode($shipment);
 
         return \App\Route::whereCode($code)->first()->id;
@@ -39,15 +37,15 @@ class FedexRoute extends Model
         if (isset($shipment['hazardous']) && ((is_numeric($shipment['hazardous']) || strtoupper($shipment['hazardous']) == 'E'))) {
             return 'ANT';
         }
-        
+
         // Check service_code is defined
-        if (!isset($shipment['service_code']) && isset($shipment['service_id'])) {
+        if (! isset($shipment['service_code']) && isset($shipment['service_id'])) {
             $shipment['service_code'] = Service::find($shipment['service_id'])->code;
         }
 
         // Any IPF shipments must go via IFS Antrim depot
         if (isset($shipment['service_code']) && (strtoupper($shipment['service_code']) == 'IPF')) {
-                return 'ANT';
+            return 'ANT';
         }
 
         // Any Shipments not PrePaid
@@ -77,11 +75,9 @@ class FedexRoute extends Model
 
     public function getUSRoute($shipment)
     {
-
         if (isset($shipment['recipient_postcode'])) {
-
             $fedexRoute = $this->whereCountryCode($shipment['recipient_country_code'])->whereZip($shipment['recipient_postcode'])->first();
-            if (!is_null($fedexRoute)) {
+            if (! is_null($fedexRoute)) {
                 return 'BFS';
             }
         }
@@ -96,7 +92,6 @@ class FedexRoute extends Model
         $fedexRoutes = $this->whereCountryCode($shipment['recipient_country_code'])->get();
 
         if ($fedexRoutes && isset($shipment['recipient_postcode']) && isset($shipment['service_code'])) {
-
             foreach ($fedexRoutes as $route) {
                 if ($this->zipMatch($shipment['recipient_postcode'], $route) && $this->serviceMatch($shipment['service_code'], $route)) {
                     return 'ANT';
@@ -110,7 +105,7 @@ class FedexRoute extends Model
     /**
      * Determine if we have a zip code match.
      *
-     * @return boolean
+     * @return bool
      */
     protected function zipMatch($zip, $route)
     {
@@ -142,7 +137,7 @@ class FedexRoute extends Model
      *
      * @param type $service
      * @param type $route
-     * @return boolean
+     * @return bool
      */
     protected function serviceMatch($serviceCode, $route)
     {
@@ -158,5 +153,4 @@ class FedexRoute extends Model
 
         return false;
     }
-
 }

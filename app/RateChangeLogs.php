@@ -4,8 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class RateChangeLogs extends Model {
-
+class RateChangeLogs extends Model
+{
     protected $fillable = [
         'user_id',
         'company_id',
@@ -13,7 +13,7 @@ class RateChangeLogs extends Model {
         'rate_id',
         'directory',
         'filename',
-        'action'
+        'action',
     ];
 
     /**
@@ -22,5 +22,4 @@ class RateChangeLogs extends Model {
      * @var array
      */
     protected $dates = ['created_at', 'updated_at'];
-
 }

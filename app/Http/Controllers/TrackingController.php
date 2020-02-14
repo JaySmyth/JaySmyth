@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Auth;
 use App\Carrier;
-use App\Tracking;
-use App\Shipment;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TrackingRequest;
+use App\Shipment;
+use App\Tracking;
+use Auth;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class TrackingController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -26,8 +26,8 @@ class TrackingController extends Controller
                 'trackShipment',
                 'show',
                 'easypostWebhook',
-                'tracker'
-            ]
+                'tracker',
+            ],
         ]);
     }
 
@@ -56,12 +56,12 @@ class TrackingController extends Controller
     {
         $shipment = Shipment::whereConsignmentNumber($request->tracking_number)->orWhere('carrier_tracking_number', $request->tracking_number)->first();
 
-        if (!$shipment) {
+        if (! $shipment) {
             return redirect('track')->withInput()->withErrors(['tracking_number' => 'No tracking information found!']);
         }
 
         if (Auth::Check() && $request->user()->relatedTo($shipment)) {
-            return redirect('shipments/' . $shipment->id);
+            return redirect('shipments/'.$shipment->id);
         }
 
         return view('tracking.show', compact('shipment'));
@@ -77,7 +77,7 @@ class TrackingController extends Controller
     {
         $shipment = Shipment::whereConsignmentNumber($consignmentNumber)->orWhere('carrier_tracking_number', $consignmentNumber)->first();
 
-        if (!$shipment) {
+        if (! $shipment) {
             return redirect('track')->withInput()->withErrors(['tracking_number' => 'No tracking information found!']);
         }
 
@@ -93,6 +93,7 @@ class TrackingController extends Controller
     public function show($token, $type = null)
     {
         $shipment = Shipment::where('token', $token)->firstOrFail();
+
         return view('tracking.show', compact('shipment', 'type'));
     }
 
@@ -105,6 +106,7 @@ class TrackingController extends Controller
     public function create($shipmentId)
     {
         $shipment = Shipment::findOrFail($shipmentId);
+
         return view('tracking.create', compact('shipment'));
     }
 
@@ -118,38 +120,38 @@ class TrackingController extends Controller
     {
         $shipment = Shipment::findOrFail($request->shipment_id);
 
-        $datetimeString = $request->date . ' ' . $request->time;
+        $datetimeString = $request->date.' '.$request->time;
         $datetime = gmtToCarbonUtc($datetimeString);
 
         $estimatedDeliveryDate = null;
         $localEstimatedDeliveryDate = null;
 
         if ($request->estimated_delivery_date && $request->estimated_delivery_time) {
-            $estimatedDeliveryDate = gmtToCarbonUtc($request->estimated_delivery_date . ' ' . $request->estimated_delivery_time);
-            $localEstimatedDeliveryDate = strtotime($request->estimated_delivery_date . ' ' . $request->estimated_delivery_time);
+            $estimatedDeliveryDate = gmtToCarbonUtc($request->estimated_delivery_date.' '.$request->estimated_delivery_time);
+            $localEstimatedDeliveryDate = strtotime($request->estimated_delivery_date.' '.$request->estimated_delivery_time);
         }
 
         $tracking = Tracking::firstOrCreate([
             'message' => $request->message,
             'status' => $request->status_code,
             'datetime' => $datetime,
-            'local_datetime' => strtotime($request->date . ' ' . $request->time),
+            'local_datetime' => strtotime($request->date.' '.$request->time),
             'carrier' => 'ifs',
             'city' => $request->city,
             'state' => $request->state,
             'country_code' => $request->country_code,
             'postcode' => $request->postcode,
-            'tracker_id' => str_random(12),
+            'tracker_id' => Str::random(12),
             'source' => 'ifs',
             'estimated_delivery_date' => $estimatedDeliveryDate,
             'local_estimated_delivery_date' => $localEstimatedDeliveryDate,
             'user_id' => $request->user()->id,
-            'shipment_id' => $shipment->id
+            'shipment_id' => $shipment->id,
         ]);
 
         if ($tracking) {
             switch ($request->status_code) {
-                case 'pre_transit' :
+                case 'pre_transit':
                     $shipment->received = false;
                     $shipment->delivered = false;
                     $shipment->save();
@@ -172,7 +174,7 @@ class TrackingController extends Controller
 
         flash()->success('Tracking Added!', 'Tracking event has been added successfully.');
 
-        return redirect('shipments/' . $shipment->id);
+        return redirect('shipments/'.$shipment->id);
     }
 
     /**
@@ -201,11 +203,9 @@ class TrackingController extends Controller
         //\Debugbar::disable();
 
         if ($request->isJson()) {
-
             $result = $request->json('result');
 
             if (isset($result['carrier'])) {
-
                 if ($result['carrier'] == 'UPS') {
                     $carrier = Carrier::find(3);
                 } else {
@@ -230,6 +230,7 @@ class TrackingController extends Controller
     public function createEasypostTracker()
     {
         $carriers = \App\Carrier::whereIn('id', [2, 3, 4, 5, 6, 7, 11])->pluck('name', 'easypost');
+
         return view('tracking.create_tracker', compact('carriers'));
     }
 
@@ -241,12 +242,11 @@ class TrackingController extends Controller
      */
     public function sendTrackerRequest(Request $request)
     {
-
         $this->validate($request, ['tracking_code' => 'required', 'carrier' => 'required']);
 
         $shipment = Shipment::whereConsignmentNumber($request->tracking_code)->orWhere('carrier_tracking_number', $request->tracking_code)->first();
 
-        if (!$shipment) {
+        if (! $shipment) {
             return back()->withInput()->withErrors(['tracking_code' => 'Invalid tracking code!']);
         }
 
@@ -260,13 +260,15 @@ class TrackingController extends Controller
 
         try {
             \EasyPost\EasyPost::setApiKey($easypostApiKey);
-            $tracker = \EasyPost\Tracker::create(array('tracking_code' => $trackingCode, 'carrier' => $request->carrier));
+            $tracker = \EasyPost\Tracker::create(['tracking_code' => $trackingCode, 'carrier' => $request->carrier]);
         } catch (\EasyPost\Error $ex) {
             flash()->success('Failed!', $ex, true);
+
             return back();
         }
 
-        flash()->success('Tracker Created!', 'Easypost are now tracking shipment ' . $trackingCode, true);
+        flash()->success('Tracker Created!', 'Easypost are now tracking shipment '.$trackingCode, true);
+
         return back();
     }
 
@@ -287,31 +289,29 @@ class TrackingController extends Controller
                 ->get();
         }
 
-        echo $shipments->count() . " shipments loaded<br>";
+        echo $shipments->count().' shipments loaded<br>';
 
         foreach ($shipments as $shipment) {
-
             $tracking = \App\Tracking::whereShipmentId($shipment->id)->whereSource('easypost')->first();
 
             if ($tracking) {
+                echo $shipment->consignment_number.' / '.$tracking->tracker_id.'<br>';
 
-                echo $shipment->consignment_number . " / " . $tracking->tracker_id . "<br>";
-
-                $ch = curl_init("https://api.easypost.com/v2/events");
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(["result_id" => $tracking->tracker_id]));
+                $ch = curl_init('https://api.easypost.com/v2/events');
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['result_id' => $tracking->tracker_id]));
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_USERNAME, 'mmJ7I06Yq6Ogg2soH5RncQ');
 
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
                         'Content-Type: application/json',
-                        'Content-Length: ' . strlen(json_encode(["result_id" => $tracking->tracker_id])))
+                        'Content-Length: '.strlen(json_encode(['result_id' => $tracking->tracker_id])), ]
                 );
 
                 $res = curl_exec($ch);
 
                 if ($res) {
-                    echo "success";
+                    echo 'success';
                 }
 
                 flush();
@@ -319,5 +319,4 @@ class TrackingController extends Controller
             }
         }
     }
-
 }

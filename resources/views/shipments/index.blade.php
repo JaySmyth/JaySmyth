@@ -4,14 +4,14 @@
 
 @section('advanced_search_form')
 
-    <input type="hidden" name="mode" value="{{Input::get('mode')}}">
+    <input type="hidden" name="mode" value="{{Request::get('mode')}}">
 
     <div class="form-group row">
         <label class="col-sm-3 col-form-label">
             Consignment or Reference:
         </label>
         <div class="col-sm-8">
-            {!! Form::Text('filter', Input::get('filter'), ['class' => 'form-control', 'maxlength' => '50', 'placeholder' => 'e.g. "10005149611" or "myref123"']) !!}
+            {!! Form::Text('filter', Request::get('filter'), ['class' => 'form-control', 'maxlength' => '50', 'placeholder' => 'e.g. "10005149611" or "myref123"']) !!}
         </div>
     </div>
 
@@ -21,7 +21,7 @@
                 SCS Job Number:
             </label>
             <div class="col-sm-8">
-                {!! Form::Text('scs_job_number', Input::get('scs_job_number'), ['class' => 'form-control', 'maxlength' => '14', 'placeholder' => 'e.g. "IFCUKJ00783733"']) !!}
+                {!! Form::Text('scs_job_number', Request::get('scs_job_number'), ['class' => 'form-control', 'maxlength' => '14', 'placeholder' => 'e.g. "IFCUKJ00783733"']) !!}
             </div>
         </div>
 
@@ -30,7 +30,7 @@
                 Manifest Number:
             </label>
             <div class="col-sm-8">
-                {!! Form::Text('manifest_number', Input::get('manifest_number'), ['class' => 'form-control', 'maxlength' => '14', 'placeholder' => 'e.g. "FDXI0003192"']) !!}
+                {!! Form::Text('manifest_number', Request::get('manifest_number'), ['class' => 'form-control', 'maxlength' => '14', 'placeholder' => 'e.g. "FDXI0003192"']) !!}
             </div>
         </div>
     @endif
@@ -42,17 +42,17 @@
 
         @if(Auth::user()->hasIfsRole())
             <div class="col-sm-4">
-                <input type="text" name="date_from" value="@if(!Input::get('date_from')){{date(Auth::user()->date_format)}}@else{{Input::get('date_from')}}@endif" class="form-control datepicker" maxlength="10">
+                <input type="text" name="date_from" value="@if(!Request::get('date_from')){{date(Auth::user()->date_format)}}@else{{Request::get('date_from')}}@endif" class="form-control datepicker" maxlength="10">
             </div>
             <div class="col-sm-4">
-                <input type="text" name="date_to" value="@if(!Input::get('date_to')){{date(Auth::user()->date_format)}}@else{{Input::get('date_to')}}@endif" class="form-control datepicker" maxlength="10">
+                <input type="text" name="date_to" value="@if(!Request::get('date_to')){{date(Auth::user()->date_format)}}@else{{Request::get('date_to')}}@endif" class="form-control datepicker" maxlength="10">
             </div>
         @else
             <div class="col-sm-4">
-                <input type="text" name="date_from" value="{{Input::get('date_from')}}" class="form-control datepicker" maxlength="10" placeholder="Date From">
+                <input type="text" name="date_from" value="{{Request::get('date_from')}}" class="form-control datepicker" maxlength="10" placeholder="Date From">
             </div>
             <div class="col-sm-4">
-                <input type="text" name="date_to" value="{{Input::get('date_to')}}" class="form-control datepicker" maxlength="10" placeholder="Date To">
+                <input type="text" name="date_to" value="{{Request::get('date_to')}}" class="form-control datepicker" maxlength="10" placeholder="Date To">
             </div>
         @endif
 
@@ -63,7 +63,7 @@
             Shipper:
         </label>
         <div class="col-sm-8">
-            {!! Form::select('company', dropDown('enabledSites', 'All Shippers'), Input::get('company'), array('class' => 'form-control')) !!}
+            {!! Form::select('company', dropDown('enabledSites', 'All Shippers'), Request::get('company'), array('class' => 'form-control')) !!}
         </div>
     </div>
 
@@ -72,7 +72,7 @@
             Status:
         </label>
         <div class="col-sm-8">
-            {!! Form::select('status', dropDown('statuses', 'All Statuses'), Input::get('status'), array('class' => 'form-control')) !!}
+            {!! Form::select('status', dropDown('statuses', 'All Statuses'), Request::get('status'), array('class' => 'form-control')) !!}
         </div>
     </div>
 
@@ -81,7 +81,7 @@
             Service:
         </label>
         <div class="col-sm-8">
-            {!! Form::select('service',  dropDown('uniqueServices', 'All Services'), Input::get('service'), array('class' => 'form-control')) !!}
+            {!! Form::select('service',  dropDown('uniqueServices', 'All Services'), Request::get('service'), array('class' => 'form-control')) !!}
         </div>
     </div>
 
@@ -91,7 +91,7 @@
                 Carrier:
             </label>
             <div class="col-sm-8">
-                {!! Form::select('carrier',  dropDown('carriers', 'All Carriers'), Input::get('carrier'), array('class' => 'form-control')) !!}
+                {!! Form::select('carrier',  dropDown('carriers', 'All Carriers'), Request::get('carrier'), array('class' => 'form-control')) !!}
             </div>
         </div>
     @endif
@@ -101,10 +101,10 @@
             Source / Destination:
         </label>
         <div class="col-sm-4">
-            {!! Form::select('source',  dropDown('countries', 'All Sender Countries'), Input::get('source'), array('class' => 'form-control')) !!}
+            {!! Form::select('source',  dropDown('countries', 'All Sender Countries'), Request::get('source'), array('class' => 'form-control')) !!}
         </div>
         <div class="col-sm-4">
-            {!! Form::select('destination',  dropDown('countries', 'All Recipient Countries'), Input::get('destination'), array('class' => 'form-control')) !!}
+            {!! Form::select('destination',  dropDown('countries', 'All Recipient Countries'), Request::get('destination'), array('class' => 'form-control')) !!}
         </div>
     </div>
 
@@ -113,7 +113,7 @@
             Recip. Name or Address:
         </label>
         <div class="col-sm-8">
-            {!! Form::Text('recipient_filter', Input::get('recipient_filter'), ['class' => 'form-control', 'maxlength' => '80', 'placeholder' => 'e.g. "Mark Smith" or "BT4"']) !!}
+            {!! Form::Text('recipient_filter', Request::get('recipient_filter'), ['class' => 'form-control', 'maxlength' => '80', 'placeholder' => 'e.g. "Mark Smith" or "BT4"']) !!}
         </div>
     </div>
 
@@ -122,7 +122,7 @@
             Recipient Address Type:
         </label>
         <div class="col-sm-8">
-            {!! Form::select('recipient_type',  dropDown('type', 'Commercial and Residential Addresses'), Input::get('recipient_type'), array('class' => 'form-control')) !!}
+            {!! Form::select('recipient_type',  dropDown('type', 'Commercial and Residential Addresses'), Request::get('recipient_type'), array('class' => 'form-control')) !!}
         </div>
     </div>
 
@@ -131,7 +131,7 @@
             Pieces:
         </label>
         <div class="col-sm-8">
-            {!! Form::select('pieces', ['' => 'Single and Multi-Piece', 1 => 'Single Piece', '2' => 'Multi-Piece'], Input::get('pieces'), array('class' => 'form-control')) !!}
+            {!! Form::select('pieces', ['' => 'Single and Multi-Piece', 1 => 'Single Piece', '2' => 'Multi-Piece'], Request::get('pieces'), array('class' => 'form-control')) !!}
         </div>
     </div>
 
@@ -140,7 +140,7 @@
             Traffic:
         </label>
         <div class="col-sm-8">
-            {!! Form::select('traffic', dropDown('traffic', 'All Traffic'), Input::get('traffic'), array('class' => 'form-control')) !!}
+            {!! Form::select('traffic', dropDown('traffic', 'All Traffic'), Request::get('traffic'), array('class' => 'form-control')) !!}
         </div>
     </div>
 

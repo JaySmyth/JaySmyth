@@ -3,19 +3,17 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class CustomsEntriesByCommodityExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
-
     public function __construct($customsEntries)
     {
         $this->customsEntries = $customsEntries;
     }
 
     /**
-     * 
      * @return array
      */
     public function headings(): array
@@ -36,12 +34,11 @@ class CustomsEntriesByCommodityExport implements FromCollection, WithHeadings, S
             'Duty Percent',
             'VAT',
             'Nett Weight',
-            'CPC'
+            'CPC',
         ];
     }
 
     /**
-     * 
      * @return type
      */
     public function collection()
@@ -68,16 +65,15 @@ class CustomsEntriesByCommodityExport implements FromCollection, WithHeadings, S
                     'Duty Percent' => $commodity->duty_percent,
                     'VAT' => $commodity->vat,
                     'Nett Weight' => $commodity->weight,
-                    'CPC' => $commodity->customsProcedureCode->code
+                    'CPC' => $commodity->customsProcedureCode->code,
                 ]);
 
-                $collection->push($row);
-                
-            endforeach;
+        $collection->push($row);
+
+        endforeach;
 
         endforeach;
 
         return $collection;
     }
-
 }

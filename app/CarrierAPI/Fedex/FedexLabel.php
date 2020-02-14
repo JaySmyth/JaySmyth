@@ -4,12 +4,11 @@ namespace App\CarrierAPI\Fedex;
 
 class FedexLabel extends \App\CarrierAPI\CarrierLabel
 {
-
     /**
      * Accepts Shipment and Carrier Response data
-     * and stores these to use to generate labels
+     * and stores these to use to generate labels.
      */
-    function __construct($shipment = null, $serviceCode = null, $data = null, $routeId = 1, $splitServiceBox = false)
+    public function __construct($shipment = null, $serviceCode = null, $data = null, $routeId = 1, $splitServiceBox = false)
     {
         parent::__construct($shipment, $serviceCode, $data, $routeId, $splitServiceBox);
     }
@@ -17,7 +16,7 @@ class FedexLabel extends \App\CarrierAPI\CarrierLabel
     /**
      * Takes stored Shipment and Carrier Response data
      * and uses it to create a PDF containing all the
-     * necessary labels in the following format :-
+     * necessary labels in the following format :-.
      *
      * Label 1 is a Master Label, others Package Labels
      */
@@ -26,8 +25,7 @@ class FedexLabel extends \App\CarrierAPI\CarrierLabel
 
         // Create Package labels
         foreach ($this->shipment as $awb) {
-
-            if (!isset($masterAdded)) {
+            if (! isset($masterAdded)) {
                 $this->addMasterLabel($awb);
                 $masterAdded = true;
             }
@@ -40,28 +38,27 @@ class FedexLabel extends \App\CarrierAPI\CarrierLabel
 
     /**
      * Checks to see if Master Label exists
-     * and if so adds it
+     * and if so adds it.
      *
      * @param type $awb
      */
     public function addMasterLabel($awb)
     {
         // If an Auxilliary label exists add as Master Label
-        $auxLabelExists = strstr(current(get_headers('http://' . $this->data . '/' . $awb . 'AWB.PNG')), "200");
+        $auxLabelExists = strstr(current(get_headers('http://'.$this->data.'/'.$awb.'AWB.PNG')), '200');
 
         if ($auxLabelExists) {
-
             $this->addPage();
 
-            list($width, $height) = getimagesize('http://' . $this->data . '/' . $awb . 'AWB.PNG');
+            list($width, $height) = getimagesize('http://'.$this->data.'/'.$awb.'AWB.PNG');
 
             // Image is landscape, rotate image 90
             if ($width > $height) {
                 $this->pdf->Rotate(90);
-                $this->pdf->Image('http://' . $this->data . '/' . $awb . 'AWB.PNG', -153, 0, 153, 102);
+                $this->pdf->Image('http://'.$this->data.'/'.$awb.'AWB.PNG', -153, 0, 153, 102);
                 $this->pdf->Rotate(-90);
             } else {
-                $this->pdf->Image('http://' . $this->data . '/' . $awb . 'AWB.PNG', 0, 0, 102, 153);
+                $this->pdf->Image('http://'.$this->data.'/'.$awb.'AWB.PNG', 0, 0, 102, 153);
             }
 
             $this->customizeLabel('MASTER');
@@ -77,7 +74,6 @@ class FedexLabel extends \App\CarrierAPI\CarrierLabel
     public function customizeLabel($labelType = '')
     {
 
-
         /*
          * **********************************
          * Customize Label for Fedex UK48
@@ -85,10 +81,8 @@ class FedexLabel extends \App\CarrierAPI\CarrierLabel
          */
 
         if ($labelType == 'MASTER') {
-
             $this->addServiceBox(81, 130, 22, 20, $this->serviceCode);
         } else {
-
             switch (strtoupper($this->serviceCode)) {
 
                 case 'USG':
@@ -103,17 +97,15 @@ class FedexLabel extends \App\CarrierAPI\CarrierLabel
     }
 
     /**
-     * Add Package Label
+     * Add Package Label.
      *
      * @param type $awb
      */
     public function addLabel($awb)
     {
-
         $this->addPage();
 
-        $this->pdf->Image('http://' . $this->data . '/' . $awb . '.PNG', 0, 0, 102, 153);
+        $this->pdf->Image('http://'.$this->data.'/'.$awb.'.PNG', 0, 0, 102, 153);
         $this->customizeLabel();
     }
-
 }

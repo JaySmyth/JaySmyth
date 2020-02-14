@@ -9,50 +9,56 @@ namespace App\ScsXml;
  */
 
 /**
- * Description of Reference
+ * Description of Reference.
  *
  * @author gmcbroom
  */
-class Reference {
-
+class Reference
+{
     private $indexField;
     private $string;
 
     /**
      * @return Reference
      */
-    public function setIndexfield($value) {
+    public function setIndexfield($value)
+    {
         $this->indexField = $value;
+
         return $this;
     }
 
     /**
      * @return Reference
      */
-    public function setString($value) {
+    public function setString($value)
+    {
         $this->string = $value;
+
         return $this;
     }
 
     /**
      * @return indexField
      */
-    public function getIndexfield() {
+    public function getIndexfield()
+    {
         return $this->indexField;
     }
 
     /**
      * @return string
      */
-    public function getString($value) {
+    public function getString($value)
+    {
         return $this->string;
     }
 
     /**
      * @return XML
      */
-    public function toXML() {
-        return '<Reference IndexField="' . $this->indexField . '">' . $this->string . '</Reference>';
+    public function toXML()
+    {
+        return '<Reference IndexField="'.$this->indexField.'">'.$this->string.'</Reference>';
     }
-
 }

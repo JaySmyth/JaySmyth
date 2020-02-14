@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class DespatchNote extends Model
 {
-
     public $timestamps = false;
 
     /**
@@ -18,5 +17,4 @@ class DespatchNote extends Model
     {
         return $this->belongsTo(Company::class);
     }
-
 }

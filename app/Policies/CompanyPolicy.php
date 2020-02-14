@@ -2,23 +2,22 @@
 
 namespace App\Policies;
 
-use Illuminate\Auth\Access\HandlesAuthorization;
-use App\User;
 use App\Company;
+use App\User;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CompanyPolicy
 {
-
     use HandlesAuthorization;
 
     /**
      * Intercept all checks - ensure IFS user.
      *
-     * @return boolean
+     * @return bool
      */
     public function before(User $user)
     {
-        if (!$user->hasIfsRole()) {
+        if (! $user->hasIfsRole()) {
             return false;
         }
     }
@@ -26,7 +25,7 @@ class CompanyPolicy
     /**
      * Index policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function index(User $user)
     {
@@ -38,7 +37,7 @@ class CompanyPolicy
     /**
      * Show policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function view(User $user, Company $company)
     {
@@ -50,7 +49,7 @@ class CompanyPolicy
     /**
      * Create policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function create(User $user)
     {
@@ -62,7 +61,7 @@ class CompanyPolicy
     /**
      * Update policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function update(User $user, Company $company)
     {
@@ -74,7 +73,7 @@ class CompanyPolicy
     /**
      * Delete policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function delete(User $user, Company $company)
     {
@@ -86,7 +85,7 @@ class CompanyPolicy
     /**
      * Status policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function status(User $user, Company $company)
     {
@@ -98,7 +97,7 @@ class CompanyPolicy
     /**
      * Services policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function services(User $user, Company $company)
     {
@@ -110,7 +109,7 @@ class CompanyPolicy
     /**
      * View Rate policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function viewCompanyRates(User $user, Company $company)
     {
@@ -122,7 +121,7 @@ class CompanyPolicy
     /**
      * Edit Rate policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function setCompanyRates(User $user, Company $company)
     {
@@ -134,7 +133,7 @@ class CompanyPolicy
     /**
      * Destroy Rate policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function deleteCompanyRates(User $user, Company $company)
     {
@@ -146,7 +145,7 @@ class CompanyPolicy
     /**
      * Edit Collection Settings policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function collectionSettings(User $user, Company $company)
     {
@@ -158,7 +157,7 @@ class CompanyPolicy
     /**
      * Download policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function download(User $user)
     {
@@ -166,5 +165,4 @@ class CompanyPolicy
             return true;
         }
     }
-
 }

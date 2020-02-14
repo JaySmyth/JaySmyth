@@ -9,16 +9,16 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-2">
-            <input type="text" name="date_from" value="{{Input::get('date_from')}}" class="form-control datepicker" placeholder="Date from">
+            <input type="text" name="date_from" value="{{Request::get('date_from')}}" class="form-control datepicker" placeholder="Date from">
         </div>
         <div class="col-sm-2">
-            <input type="text" name="date_to" value="{{Input::get('date_to')}}" class="form-control datepicker" placeholder="Date To">
+            <input type="text" name="date_to" value="{{Request::get('date_to')}}" class="form-control datepicker" placeholder="Date To">
         </div>
         <div class="col-sm-3">
-            {!! Form::select('carrier',  dropDown('carriers', 'All Carriers'), Input::get('carrier'), array('class' => 'form-control')) !!}
+            {!! Form::select('carrier',  dropDown('carriers', 'All Carriers'), Request::get('carrier'), array('class' => 'form-control')) !!}
         </div>
         <div class="col-sm-4">
-            {!! Form::select('service', dropDown('services', 'All Services'), Input::get('service'), array('class' => 'form-control')) !!}
+            {!! Form::select('service', dropDown('services', 'All Services'), Request::get('service'), array('class' => 'form-control')) !!}
         </div>
         <div class="col-sm-1">
             <button type="submit" class="btn btn-secondary ">Search</button>

@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\TransportAddress;
+use Illuminate\Http\Request;
 
 class TransportAddressesController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -20,7 +19,7 @@ class TransportAddressesController extends Controller
 
     /**
      * List addresses.
-     * 
+     *
      * @param Request $request
      * @return type
      */
@@ -33,7 +32,7 @@ class TransportAddressesController extends Controller
 
     /**
      * Show an address.
-     * 
+     *
      * @param type $id
      * @param Request $request
      * @return type
@@ -47,7 +46,7 @@ class TransportAddressesController extends Controller
 
     /**
      * Handle create address form. Save the address.
-     * 
+     *
      * @param AddressRequest $request
      * @return type
      */
@@ -60,7 +59,7 @@ class TransportAddressesController extends Controller
 
     /**
      * Handle edit address form. Updates the address record.
-     * 
+     *
      * @param type $id
      * @param AddressRequest $request
      * @return type
@@ -70,6 +69,7 @@ class TransportAddressesController extends Controller
         if ($request->ajax()) {
             $address = TransportAddress::findOrFail($id);
             $address->update($request->all());
+
             return $address->id;
         }
     }
@@ -77,8 +77,8 @@ class TransportAddressesController extends Controller
     /**
      * Delete an address.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function destroy($id)
     {
@@ -87,7 +87,7 @@ class TransportAddressesController extends Controller
 
     /**
      * Address search.
-     * 
+     *
      * @param type $request
      * @return type
      */
@@ -100,5 +100,4 @@ class TransportAddressesController extends Controller
                         ->orderBy('company_name')
                         ->get();
     }
-
 }

@@ -3,7 +3,7 @@
 /*
  * ******************************************
  * CountryWide Pricing
- * 
+ *
  * Allows overiding specific methods for carrier
  * ******************************************
  */
@@ -14,11 +14,11 @@ class PricingModel6 extends PricingModel
 {
     /*
      * *************************************
-     * Class contains Carrier specific 
+     * Class contains Carrier specific
      * extensions for the PricingModel class
-     * 
+     *
      * Available functions
-     * 
+     *
      *      price($shipment, $rate, $priceType)
      *      getZone()
      *      getPackagingType($pkgNo = 0)
@@ -35,10 +35,6 @@ class PricingModel6 extends PricingModel
 
     public function __construct()
     {
-
         parent::__construct();
     }
-
-    }
-
-?>
+}

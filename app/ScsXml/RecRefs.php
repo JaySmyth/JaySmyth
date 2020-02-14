@@ -9,30 +9,29 @@
 namespace App\ScsXml;
 
 /**
- * Description of DocAdds
+ * Description of DocAdds.
  *
  * @author gmcbroom
  */
-class RecRefs extends SCSTable {
-
-    public function __construct() {
-
-        $this->tableName = "rec-refs";
+class RecRefs extends SCSTable
+{
+    public function __construct()
+    {
+        $this->tableName = 'rec-refs';
 
         $this->attributes = [
-            "rec-id" => "",
-            "address-code" => "",
-            "contact-type" => "",
-            "line-no" => "",
-            "log-isl" => "",
-            "number" => "",
-            "record-link" => "",
-            "rec-type" => "",
-            "ref-type" => "",
-            "ref-value" => "",
-            "syn-field" => "",
-            "syn-table" => ""
+            'rec-id' => '',
+            'address-code' => '',
+            'contact-type' => '',
+            'line-no' => '',
+            'log-isl' => '',
+            'number' => '',
+            'record-link' => '',
+            'rec-type' => '',
+            'ref-type' => '',
+            'ref-value' => '',
+            'syn-field' => '',
+            'syn-table' => '',
         ];
     }
-
 }

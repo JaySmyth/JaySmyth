@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 
 class FileUploadsController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -20,7 +19,7 @@ class FileUploadsController extends Controller
 
     /**
      * List mail reports.
-     * 
+     *
      * @param Request $request
      * @return type
      */
@@ -38,8 +37,8 @@ class FileUploadsController extends Controller
     /**
      * Displays a user record.
      *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function show($id)
     {
@@ -52,7 +51,7 @@ class FileUploadsController extends Controller
 
     /**
      * Retry file upload.
-     * 
+     *
      * @param type $id
      * @return type
      */
@@ -68,5 +67,4 @@ class FileUploadsController extends Controller
 
         return back();
     }
-
 }

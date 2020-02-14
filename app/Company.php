@@ -2,23 +2,21 @@
 
 namespace App;
 
+use App\Carrier;
+use App\CompanyPackagingType;
 use App\Rate;
 use App\Service;
-use App\Surcharge;
 use App\Shipment;
-use App\CompanyPackagingType;
-use App\Carrier;
+use App\Surcharge;
 use Illuminate\Database\Eloquent\Model;
 
 class Company extends Model
 {
-
     use Logable;
-
 
     /*
      * Black list of NON mass assignable - all others are mass assignable.
-     * 
+     *
      * @var array
      */
 
@@ -32,7 +30,7 @@ class Company extends Model
     protected $dates = ['created_at', 'updated_at'];
 
     /**
-     * A user may belong to multiple companies
+     * A user may belong to multiple companies.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
@@ -49,7 +47,6 @@ class Company extends Model
     public function shipments()
     {
         return $this->hasMany(Shipment::class)->orderBy('id', 'DESC')->with('service', 'status', 'mode');
-
     }
 
     /**
@@ -103,7 +100,7 @@ class Company extends Model
     }
 
     /**
-     * Relationship
+     * Relationship.
      *
      * @return
      */
@@ -113,7 +110,7 @@ class Company extends Model
     }
 
     /**
-     * Returns Rates quoted for a customer
+     * Returns Rates quoted for a customer.
      *
      * @return
      */
@@ -133,7 +130,7 @@ class Company extends Model
     }
 
     /**
-     * A company has one localisation
+     * A company has one localisation.
      *
      * @return
      */
@@ -179,7 +176,7 @@ class Company extends Model
 
     /**
      * Get collection settings for a specific day. If no collection settings are defined, default
-     * the values from the postcodes table.  Days numbered 0 - 6 (Sunday = 0)
+     * the values from the postcodes table.  Days numbered 0 - 6 (Sunday = 0).
      *
      * @param int $day
      *
@@ -209,47 +206,44 @@ class Company extends Model
     }
 
     /**
-     * Returns Company specific Sales rate for specified service
+     * Returns Company specific Sales rate for specified service.
      *
      *
      * @return id of rate
      */
     public function salesRateForService($serviceId)
     {
-
-        if (!empty($serviceId)) {
-
+        if (! empty($serviceId)) {
             $quotedRate = $this->companyRates->where('service_id', $serviceId)->first();
 
             // If no Customer specific rate defined then use default rate from service
             if (empty($quotedRate)) {
-
                 $service = Service::find($serviceId);
 
                 // If Service does not exist return null
                 if (empty($service)) {
-
-                    return null;
+                    return;
                 } else {
 
                     // Return Default Service Sales Rate
                     $rateObj = Rate::find($service->sales_rate_id);
-                    if (!empty($rateObj)) {
+                    if (! empty($rateObj)) {
                         $rate = $rateObj->toArray();
                         $rate['fuel_cap'] = 99;
                         $rate['discount'] = 0;
                         $rate['special_discount'] = 0;
+
                         return $rate;
                     }
                 }
             } else {
-
                 $rateObj = Rate::find($quotedRate['rate_id']);
-                if (!empty($rateObj)) {
+                if (! empty($rateObj)) {
                     $rate = $rateObj->toArray();
                     $rate['fuel_cap'] = $quotedRate['fuel_cap'];
                     $rate['discount'] = $quotedRate['discount'];
                     $rate['special_discount'] = $quotedRate['special_discount'];
+
                     return $rate;
                 }
             }
@@ -258,61 +252,54 @@ class Company extends Model
 
     public function surcharges()
     {
-
         return $this->hasMany(Surcharge::class);
     }
 
     /**
-     * Returns Company specific Sales rate for specified service
+     * Returns Company specific Sales rate for specified service.
      *
      *
      * @return id of rate
      */
     public function getSurcharges($serviceId)
     {
-
-        if (!empty($serviceId)) {
+        if (! empty($serviceId)) {
 
             // Get Services for my company for this service
-            $charges = $this->surcharges()->where("service_id", $serviceId)->get();
+            $charges = $this->surcharges()->where('service_id', $serviceId)->get();
 
             // If no Customer specific rate defined then use default rate from service
             if ($charges->isEmpty()) {
-
                 return Surcharge::where('company_id', '0')->where('service_id', $serviceId)->get();
             } else {
-
                 return $charges;
             }
         }
-
-        return null;
     }
 
     /**
-     * Returns Company specific Sales rate for specified service
+     * Returns Company specific Sales rate for specified service.
      *
      *
      * @return id of rate
      */
     public function costRateForService($serviceId = '')
     {
-        if (!empty($serviceId)) {
-
+        if (! empty($serviceId)) {
             $service = Service::find($serviceId);
 
             // If Service does not exist return null
             if (empty($service)) {
-
-                return null;
+                return;
             } else {
 
                 // Return Default Service Sales Rate
                 $rateObj = Rate::find($service->cost_rate_id);
-                if (!empty($rateObj)) {
+                if (! empty($rateObj)) {
                     $rate = $rateObj->toArray();
                     $rate['fuel_cap'] = 999;
                     $rate['discount'] = '';
+
                     return $rate;
                 }
             }
@@ -408,7 +395,7 @@ class Company extends Model
     }
 
     /**
-     * Get the company's salesperson
+     * Get the company's salesperson.
      *
      * @return string
      */
@@ -420,7 +407,7 @@ class Company extends Model
     }
 
     /**
-     * Get the company's default label size
+     * Get the company's default label size.
      *
      * @return string
      */
@@ -432,7 +419,7 @@ class Company extends Model
     }
 
     /**
-     * Get the country
+     * Get the country.
      *
      * @return string
      */
@@ -444,46 +431,48 @@ class Company extends Model
     /**
      * Flag indicating if the company uses default services only.
      *
-     * @return boolean
+     * @return bool
      */
     public function getUsesDefaultServicesAttribute()
     {
         if ($this->services->count() > 0) {
             return false;
         }
+
         return true;
     }
 
     /**
      * Flag indicating if the company uses defined services.
      *
-     * @return boolean
+     * @return bool
      */
     public function getUsesDefinedServicesAttribute()
     {
         if ($this->services->count() > 0) {
             return true;
         }
+
         return false;
     }
 
     /**
-     * Scope
+     * Scope.
      *
      * @return
      */
     public function scopeFilter($query, $filter)
     {
         if ($filter) {
-            return $query->where('company_name', 'LIKE', '%' . $filter . '%')
-                            ->orWhere('address1', 'LIKE', '%' . $filter . '%')
-                            ->orWhere('address2', 'LIKE', '%' . $filter . '%')
-                            ->orWhere('postcode', 'LIKE', '%' . $filter . '%');
+            return $query->where('company_name', 'LIKE', '%'.$filter.'%')
+                            ->orWhere('address1', 'LIKE', '%'.$filter.'%')
+                            ->orWhere('address2', 'LIKE', '%'.$filter.'%')
+                            ->orWhere('postcode', 'LIKE', '%'.$filter.'%');
         }
     }
 
     /**
-     * Scope
+     * Scope.
      *
      * @return
      */
@@ -501,7 +490,7 @@ class Company extends Model
     }
 
     /**
-     * Scope
+     * Scope.
      *
      * @return
      */
@@ -513,7 +502,7 @@ class Company extends Model
     }
 
     /**
-     * Scope
+     * Scope.
      *
      * @return
      */
@@ -525,7 +514,7 @@ class Company extends Model
     }
 
     /**
-     * Scope
+     * Scope.
      *
      * @return
      */
@@ -539,7 +528,7 @@ class Company extends Model
     /**
      * Returns all Packaging Types available
      * To the company for the current mode
-     * of Transport
+     * of Transport.
      *
      * @parm modeId Mode of shipment
      * @return CompanyPackagingType
@@ -589,13 +578,13 @@ class Company extends Model
      * Update a company's services.
      *
      * @param array $services       An array of service IDs
-     * @param boolean $useDefault   Use default services boolean
+     * @param bool $useDefault   Use default services boolean
      *
      * @return mixed
      */
     public function syncServices($services, $useDefault)
     {
-        if (!$services || $useDefault) {
+        if (! $services || $useDefault) {
             return $this->services()->detach();
         }
 
@@ -605,9 +594,9 @@ class Company extends Model
     /**
      * Function accepts mode_id and Carrier Code then
      * builds an array of all Packaging Types available
-     * for this Carrier inc the Carriers Equivalent code
+     * for this Carrier inc the Carriers Equivalent code.
      *
-     * @param integer $modeId
+     * @param int $modeId
      * @param string $carrierCode
      * @return array $packageTypeArray
      */
@@ -620,13 +609,11 @@ class Company extends Model
         $packagingTypes = $this->getPackagingTypes($modeId);
 
         // Build array of allowed PackageTypes and their Fedex equivalent
-        $carrier = Carrier::where("code", $carrierCode)->first();
+        $carrier = Carrier::where('code', $carrierCode)->first();
 
         if ($carrier) {
-
             foreach ($packagingTypes as $type) {
-
-                $carrierPackaging = CarrierPackagingType::where("packaging_type_id", $type->packaging_type_id)
+                $carrierPackaging = CarrierPackagingType::where('packaging_type_id', $type->packaging_type_id)
                         ->where('carrier_id', $carrier->id)
                         ->first();
 
@@ -640,10 +627,10 @@ class Company extends Model
     }
 
     /**
-     * Identifies if User is a member of this company
+     * Identifies if User is a member of this company.
      *
      * @param int $userId
-     * @return boolean
+     * @return bool
      */
     public function hasUser($userId)
     {
@@ -667,5 +654,4 @@ class Company extends Model
 
         return 'Inactive';
     }
-
 }

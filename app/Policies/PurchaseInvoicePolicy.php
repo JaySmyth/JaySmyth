@@ -7,17 +7,16 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PurchaseInvoicePolicy
 {
-
     use HandlesAuthorization;
 
     /**
      * Intercept all checks - ensure IFS user.
      *
-     * @return boolean
+     * @return bool
      */
     public function before(User $user)
     {
-        if (!$user->hasIfsRole() && !$user->hasPermission('view_purchase_invoice')) {
+        if (! $user->hasIfsRole() && ! $user->hasPermission('view_purchase_invoice')) {
             return false;
         }
     }
@@ -25,7 +24,7 @@ class PurchaseInvoicePolicy
     /**
      * Index policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function view(User $user)
     {
@@ -37,7 +36,7 @@ class PurchaseInvoicePolicy
     /**
      * Toggle invoice flags policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function flags(User $user)
     {
@@ -49,7 +48,7 @@ class PurchaseInvoicePolicy
     /**
      * Index policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function admin(User $user)
     {
@@ -57,5 +56,4 @@ class PurchaseInvoicePolicy
             return true;
         }
     }
-
 }

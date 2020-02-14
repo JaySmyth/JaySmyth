@@ -4,8 +4,8 @@ namespace App\Legacy;
 
 use Illuminate\Database\Eloquent\Model;
 
-class FxRateH extends Model {
-
+class FxRateH extends Model
+{
     /**
      * The connection name for the model.
      *
@@ -40,7 +40,7 @@ class FxRateH extends Model {
         /*
          * ***************************************
          * Tables may be retrieved by :-
-         * 
+         *
          *      Company/ Service
          *      Table name/ Service
          * ***************************************
@@ -49,9 +49,9 @@ class FxRateH extends Model {
         $rate = $this->findRate($company, $app, $service, $table, $ship_date);
 
         if ($rate) {
-
-            if ($this->debug)
-                echo "Company Specific Rate found : " . $rate->id . "<br>";
+            if ($this->debug) {
+                echo 'Company Specific Rate found : '.$rate->id.'<br>';
+            }
 
             return $rate;
         }
@@ -60,38 +60,34 @@ class FxRateH extends Model {
         $rate = $this->findRate('DEF', $app, $service, $table, $ship_date);
 
         if ($rate) {
-            if ($this->debug)
-                echo "Company Default Rate found : " . $rate->id . "<br>";
+            if ($this->debug) {
+                echo 'Company Default Rate found : '.$rate->id.'<br>';
+            }
 
             return $rate;
         }
 
-        if ($this->debug)
-            echo "No Rate Found<br>";
-
-
-        return NULL;
+        if ($this->debug) {
+            echo 'No Rate Found<br>';
+        }
     }
 
-    function findRate($company, $app, $service, $table, $ship_date)
+    public function findRate($company, $app, $service, $table, $ship_date)
     {
-
-        if ($this->debug)
+        if ($this->debug) {
             display("select * from FX_RateH where company = \"$company\" and app = \"$app\" and Service = \"$service\" and table_id = \"$table\" and valid_from <= \"$ship_date\" and valid_to >= \"$ship_date\"");
+        }
 
         if (strtoupper($table == 'COST')) {
-
-            return FxRateH::where('company', $company)
+            return self::where('company', $company)
                             ->where('app', $app)
                             ->where('service', $service)
                             ->where('table_id', $table)
                             ->where('valid_from', '<=', $ship_date)
                             ->where('valid_to', '>=', $ship_date)->first();
         } else {
-
             if ($table > '') {
-
-                return FxRateH::where('company', $company)
+                return self::where('company', $company)
                                 ->where('app', $app)
                                 ->where('service', $service)
                                 ->where('table_id', $table)
@@ -99,8 +95,7 @@ class FxRateH extends Model {
                                 ->where('valid_from', '<=', $ship_date)
                                 ->where('valid_to', '>=', $ship_date)->first();
             } else {
-
-                return FxRateH::where('company', $company)
+                return self::where('company', $company)
                                 ->where('app', $app)
                                 ->where('service', $service)
                                 ->where('table_id', '!=', 'Cost')
@@ -110,7 +105,7 @@ class FxRateH extends Model {
         }
     }
 
-    function getCostTable($company = '', $app = '', $service = '', $table = '', $ship_date = '')
+    public function getCostTable($company = '', $app = '', $service = '', $table = '', $ship_date = '')
     {
         /*
          * ****************************************
@@ -125,12 +120,12 @@ class FxRateH extends Model {
             // If no Customer specific costs then use "IFS" generic cost table
             $rate_id = $this->getRateTable('4', $app, $service, $table, $ship_date);
         }
+
         return $rate_id;
     }
 
     public function readLegacyRate($company, $service)
     {
-
         $rateId = -1;
 
         if ($service->gateway == 'UPS') {
@@ -149,16 +144,17 @@ class FxRateH extends Model {
                 break;
         }
 
-        if ($this->debug)
-            display("Service : " . $service->code . " Tablename : $tableName");
+        if ($this->debug) {
+            display('Service : '.$service->code." Tablename : $tableName");
+        }
 
         // If Tablename not defined then there is no table
         if ($tableName > '') {
+            $rateHeader = $this->getRateTable($company->company, 'courier'.$gateway, $service->service, $tableName, date('Y-m-d'));
 
-            $rateHeader = $this->getRateTable($company->company, 'courier' . $gateway, $service->service, $tableName, date('Y-m-d'));
-
-            if ($this->debug)
-                display($rateHeader, "Rate Header");
+            if ($this->debug) {
+                display($rateHeader, 'Rate Header');
+            }
 
             if (isset($rateHeader->id) && $rateHeader->id != '') {
                 $rateId = $rateHeader->id;
@@ -173,7 +169,7 @@ class FxRateH extends Model {
     }
 
     /**
-     * Migrate Rate from old system to the New System
+     * Migrate Rate from old system to the New System.
      *
      * @param type $companyId
      * @param type $service
@@ -181,9 +177,7 @@ class FxRateH extends Model {
      */
     public function migrate($company, $legacyRate, $newRateId, $newService)
     {
-
         if ($legacyRate) {
-
             $newRate = \App\RateDetail::where('rate_id', $newRateId)
                     ->where('from_date', '<=', date('Y-m-d'))
                     ->where('to_date', '>=', date('Y-m-d'))
@@ -191,13 +185,13 @@ class FxRateH extends Model {
                     ->get();
 
             if ($this->ratesMatch($legacyRate, $newRate)) {
-
                 $this->clearExistingDiscounts($company->company, $newRateId, $newService->id);
                 foreach ($legacyRate as $row) {
 
                     // Create Discount or return false
-                    if (!$this->addDiscount($row, $company->company, $newRateId, $newService)) {
+                    if (! $this->addDiscount($row, $company->company, $newRateId, $newService)) {
                         $this->clearExistingDiscounts($company->company, $newRateId, $newService->id);
+
                         return false;
                     }
                 }
@@ -219,7 +213,6 @@ class FxRateH extends Model {
 
     public function addDiscount($row, $companyId, $newRateId, $newService)
     {
-
         $flag = ['Y' => true, 'N' => false, 'y' => true, 'n' => false];
 
         // Read Standard Rate on new system
@@ -234,7 +227,6 @@ class FxRateH extends Model {
                 ->first();
 
         if ($newRate) {
-
             $weightDiscount = 0;
             $packageDiscount = 0;
             $consignmentDiscount = 0;
@@ -249,7 +241,6 @@ class FxRateH extends Model {
 
             // If a discounted rate then insert discount
             if ($newRate->weight_rate != 0 || $newRate->consignment_rate != 0) {
-
                 $rowDiscount = \App\RateDiscount::create([
                             'company_id' => $companyId,
                             'rate_id' => $newRateId,
@@ -263,7 +254,7 @@ class FxRateH extends Model {
                             'package_discount' => $packageDiscount,
                             'consignment_discount' => $consignmentDiscount,
                             'from_date' => $newRate->from_date,
-                            'to_date' => '2099-12-31'
+                            'to_date' => '2099-12-31',
                 ]);
             }
 
@@ -271,30 +262,29 @@ class FxRateH extends Model {
         } else {
 
             // No Rate Found
-            echo "select * from rate_details where 'rate_id' = '" . $newRateId . "'"
-            . " and 'residential' = '0'"
-            . " and 'piece_limit' = '" . $row->piece_limit . "'"
-            . " and 'package_type' = '" . $row->p_type . "'"
-            . " and 'zone' = '" . $row->zone . "'"
-            . " and 'break_point' = '" . $row->b_point . "'"
-            . " and 'from_date' <= " . date('Y-m-d') . "'"
-            . " and 'to_date' >= " . date('Y-m-d') . "'";
+            echo "select * from rate_details where 'rate_id' = '".$newRateId."'"
+            ." and 'residential' = '0'"
+            ." and 'piece_limit' = '".$row->piece_limit."'"
+            ." and 'package_type' = '".$row->p_type."'"
+            ." and 'zone' = '".$row->zone."'"
+            ." and 'break_point' = '".$row->b_point."'"
+            ." and 'from_date' <= ".date('Y-m-d')."'"
+            ." and 'to_date' >= ".date('Y-m-d')."'";
             dd($newRate);
+
             return false;
         }
     }
 
     public function display($message, $data)
     {
-
         echo "*** $message***<pre>";
         print_r($data);
-        echo "</pre>";
+        echo '</pre>';
     }
 
     public function ratesMatch($oldRate, $newRate)
     {
-
         $oldKeys = [];
         $newKeys = [];
         $oldKeys = $this->buildLegacyKeys($oldRate);
@@ -302,29 +292,28 @@ class FxRateH extends Model {
 
         $diff = array_diff($oldKeys, $newKeys);
 
-        if (empty($diff))
+        if (empty($diff)) {
             return true;
+        }
 
-        echo "Legacy : " . count($oldKeys) . " New " . count($newKeys) . " ";
-        display("Rates for following service do not match - " . count($diff) . " differences");
-        echo "<pre>";
+        echo 'Legacy : '.count($oldKeys).' New '.count($newKeys).' ';
+        display('Rates for following service do not match - '.count($diff).' differences');
+        echo '<pre>';
         print_r($oldKeys);
         print_r($newKeys);
-        echo "</pre>";
+        echo '</pre>';
+
         return false;
     }
 
     public function buildLegacyKeys($rate)
     {
-
         $flag = ['N' => 0, 'Y' => 1];
 
         foreach ($rate as $row) {
-
             try {
-                $keys[] = strtoupper($flag[$row['residential']] . $row['piece_limit'] . $row['p_type'] . $row['zone'] . $row->b_point);
+                $keys[] = strtoupper($flag[$row['residential']].$row['piece_limit'].$row['p_type'].$row['zone'].$row->b_point);
             } catch (Exception $exc) {
-
                 echo $exc->getTraceAsString();
             }
         }
@@ -334,13 +323,11 @@ class FxRateH extends Model {
 
     public function buildNewKeys($rate)
     {
-
         $keys = [];
         foreach ($rate as $row) {
-            $keys[] = strtoupper($row->residential . $row->piece_limit . $row->package_type . $row->zone . $row->break_point);
+            $keys[] = strtoupper($row->residential.$row->piece_limit.$row->package_type.$row->zone.$row->break_point);
         }
 
         return $keys;
     }
-
 }

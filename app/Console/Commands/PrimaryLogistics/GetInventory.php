@@ -2,15 +2,14 @@
 
 namespace App\Console\Commands\PrimaryLogistics;
 
-use GuzzleHttp\Psr7;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
-use GuzzleHttp\Exception\GuzzleException;
 
 class GetInventory extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -39,7 +38,7 @@ class GetInventory extends Command
         parent::__construct();
         $this->user = config('services.cartrover.api_user');
         $this->key = config('services.cartrover.api_key');
-        $this->tempFile = storage_path('app/temp/inventory_' . time() . '.csv');
+        $this->tempFile = storage_path('app/temp/inventory_'.time().'.csv');
     }
 
     /**
@@ -59,14 +58,13 @@ class GetInventory extends Command
             // Get cart rover response
             $reply = json_decode($response->getBody()->getContents(), true);
 
-            if (!empty($reply['success_code'])) {
-
-                $handle = fopen($this->tempFile, "a");
+            if (! empty($reply['success_code'])) {
+                $handle = fopen($this->tempFile, 'a');
                 $headers = ['SKU', 'Qty Available', 'Qty On Hand'];
                 fputcsv($handle, $headers);
 
                 foreach ($reply['response'] as $item) {
-                    $line = [$item["sku"], $item["qty_available"], $item["qty_on_hand"]];
+                    $line = [$item['sku'], $item['qty_available'], $item['qty_on_hand']];
                     fputcsv($handle, $line);
                 }
 
@@ -80,5 +78,4 @@ class GetInventory extends Command
             }
         }
     }
-
 }

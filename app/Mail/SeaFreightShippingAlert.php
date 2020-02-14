@@ -3,13 +3,12 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class SeaFreightShippingAlert extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -39,9 +38,8 @@ class SeaFreightShippingAlert extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.shipments.' . str_replace(' ', '_', $this->email))
-                        ->subject('Shipment ' . ucwords($this->email) . '- ' . $this->shipment->consignment_number)
+        return $this->view('emails.shipments.'.str_replace(' ', '_', $this->email))
+                        ->subject('Shipment '.ucwords($this->email).'- '.$this->shipment->consignment_number)
                         ->with(['shipment' => $this->shipment]);
     }
-
 }

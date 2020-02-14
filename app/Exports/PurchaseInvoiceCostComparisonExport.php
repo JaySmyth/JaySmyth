@@ -3,19 +3,17 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class PurchaseInvoiceCostComparisonExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
-
     public function __construct($purchaseInvoice)
     {
         $this->purchaseInvoice = $purchaseInvoice;
     }
 
     /**
-     * 
      * @return array
      */
     public function headings(): array
@@ -34,12 +32,11 @@ class PurchaseInvoiceCostComparisonExport implements FromCollection, WithHeading
             'Other IFS',
             'Total Carrier',
             'Total IFS',
-            'Difference'
+            'Difference',
         ];
     }
 
     /**
-     * 
      * @return type
      */
     public function collection()
@@ -65,11 +62,10 @@ class PurchaseInvoiceCostComparisonExport implements FromCollection, WithHeading
                 'Difference' => $line->difference_formatted,
             ]);
 
-            $collection->push($row);
+        $collection->push($row);
 
         endforeach;
 
         return $collection;
     }
-
 }

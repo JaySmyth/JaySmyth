@@ -4,7 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class DomesticRateDiscount extends Model {
+class DomesticRateDiscount extends Model
+{
     /*
      * Not mass assignable
      */
@@ -18,5 +19,4 @@ class DomesticRateDiscount extends Model {
      */
     protected $dates = ['from_date', 'to_date', 'created_at', 'updated_at'];
     public $timestamps = true;
-
 }

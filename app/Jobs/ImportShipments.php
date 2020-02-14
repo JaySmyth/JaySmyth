@@ -2,22 +2,21 @@
 
 namespace App\Jobs;
 
-use App\User;
-use App\Department;
 use App\Carrier;
-use App\Service;
-use App\Country;
-use App\Postcode;
-use Validator;
-use Carbon\Carbon;
 use App\CarrierAPI\Facades\CarrierAPI;
-use Illuminate\Support\Facades\Mail;
+use App\Country;
+use App\Department;
+use App\Postcode;
+use App\Service;
+use App\User;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Mail;
+use Validator;
 
 class ImportShipments implements ShouldQueue
 {
-
     use Queueable;
 
     /**
@@ -41,7 +40,7 @@ class ImportShipments implements ShouldQueue
      * Create a new job instance.
      *
      * @param string $path
-     * @param integer $importConfigId
+     * @param int $importConfigId
      * @param User $user
      *
      * @return void
@@ -125,8 +124,9 @@ class ImportShipments implements ShouldQueue
         $rowNumber = 1;
         if (($handle = fopen($this->path, 'r')) !== false) {
             while (($data = fgetcsv($handle, 1000, $this->getDelimiter())) !== false) {
-                if ($rowNumber >= $this->importConfig->start_row)
+                if ($rowNumber >= $this->importConfig->start_row) {
                     $this->processRow($rowNumber, $data);
+                }
                 $rowNumber++;
             }
             fclose($handle);
@@ -163,15 +163,17 @@ class ImportShipments implements ShouldQueue
 
         // Invalid number of fields, return false
         if (count($data) != count($this->fields)) {
-            $this->setRowFailed($rowNumber, [0 => "Invalid number of fields detected. Detected " . count($data) . " fields. " . count($this->fields) . " required"]);
+            $this->setRowFailed($rowNumber, [0 => 'Invalid number of fields detected. Detected '.count($data).' fields. '.count($this->fields).' required']);
+
             return false;
         }
 
         // Attempt to supply values for any information not provided
         $this->completeEmptyFields();
 
-        if (!$this->getService()) {
+        if (! $this->getService()) {
             $this->setRowFailed($rowNumber, [0 => 'Unable to determine service']);
+
             return false;
         }
 
@@ -180,7 +182,8 @@ class ImportShipments implements ShouldQueue
             $count = \App\Shipment::whereCompanyId(808)->whereBetween('ship_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->whereNotIn('status_id', [1, 7])->count();
 
             if ($count >= 500) {
-                $this->setRowFailed($rowNumber, [0 => "Exceeded monthly shipment allowance for " . $this->company->company_name]);
+                $this->setRowFailed($rowNumber, [0 => 'Exceeded monthly shipment allowance for '.$this->company->company_name]);
+
                 return false;
             }
         }
@@ -199,9 +202,9 @@ class ImportShipments implements ShouldQueue
             'pieces' => 'required|min:1|max:99',
             'weight' => 'required|min:0.1|max:19999',
             'shipment_reference' => 'required|string',
-            'service_code' => "sometimes|exists:services,code",
+            'service_code' => 'sometimes|exists:services,code',
             'product_quantity' => 'sometimes|min:1|max:999999',
-            'customs_value' => 'sometimes|min:1|max:9999999'
+            'customs_value' => 'sometimes|min:1|max:9999999',
         ];
 
         $validator = Validator::make($this->row, $rules);
@@ -215,14 +218,13 @@ class ImportShipments implements ShouldQueue
 
         $country = null;
         $country = Country::where('country_code', $this->row['recipient_country_code'])->first();
-        if (isset($country->postal_validation) && $country->postal_validation > "") {
-
-            $validator = Validator::make($this->row, ['recipient_postcode' => 'regex:' . $country->postal_validation]);
+        if (isset($country->postal_validation) && $country->postal_validation > '') {
+            $validator = Validator::make($this->row, ['recipient_postcode' => 'regex:'.$country->postal_validation]);
 
             if ($validator->fails()) {
-                $error = "Invalid Postcode format.";
-                if (isset($country->postcode_example) && $country->postcode_example > "") {
-                    $error .= " Example : " . $country->postcode_example;
+                $error = 'Invalid Postcode format.';
+                if (isset($country->postcode_example) && $country->postcode_example > '') {
+                    $error .= ' Example : '.$country->postcode_example;
                 }
                 $this->errors[] = $error;
             }
@@ -231,11 +233,13 @@ class ImportShipments implements ShouldQueue
         if ($this->errors != []) {
             $this->setRowFailed($rowNumber, $this->errors);
             $this->errors = [];
+
             return false;
         }
 
         if ($this->shipmentExists()) {
             $this->setRowFailed($rowNumber, [0 => 'Shipment already exists']);
+
             return false;
         }
 
@@ -243,12 +247,14 @@ class ImportShipments implements ShouldQueue
         $result = CarrierAPI::createShipment($this->row);
 
         // If no errors, return false and add to error array
-        if (!isset($result['errors']) || $result['errors'] == []) {
+        if (! isset($result['errors']) || $result['errors'] == []) {
             $this->setRowSucceeded($rowNumber, $result);
+
             return true;
         }
 
         $this->setRowFailed($rowNumber, $result['errors']);
+
         return false;
     }
 
@@ -263,7 +269,6 @@ class ImportShipments implements ShouldQueue
     {
         $i = 0;
         foreach ($this->fields as $field) {
-
             switch ($field) {
                 case 'sender_postcode':
                 case 'recipient_postcode':
@@ -293,8 +298,7 @@ class ImportShipments implements ShouldQueue
     }
 
     /**
-     * Attempt to supply values for any information not provided
-     *
+     * Attempt to supply values for any information not provided.
      */
     private function completeEmptyFields()
     {
@@ -333,7 +337,7 @@ class ImportShipments implements ShouldQueue
         $this->row['country_of_destination'] = $this->row['recipient_country_code'];
         $this->row['department_id'] = Department::where('code', identifyDepartment($this->row))->first()->id;
         $this->row['alerts'] = (isset($this->userPreferences['alerts'])) ? $this->userPreferences['alerts'] : [];
-        $this->row['other_email'] = (isset($this->userPreferences['other_email'])) ? $this->userPreferences['other_email'] : "";
+        $this->row['other_email'] = (isset($this->userPreferences['other_email'])) ? $this->userPreferences['other_email'] : '';
         $this->row['product_quantity'] = (empty($this->row['product_quantity'])) ? 1 : $this->row['product_quantity'];
 
         // If Recipient Type not specified then Guess
@@ -347,7 +351,6 @@ class ImportShipments implements ShouldQueue
 
         // Check for collection date
         if (empty($this->row['collection_date'])) {
-
             $pickUpTime = new Postcode();
 
             // Get first available pickupdate in Y-m-d format
@@ -363,7 +366,7 @@ class ImportShipments implements ShouldQueue
 
     /**
      * Complete Sender details if not supplied
-     * Based on Company and User details
+     * Based on Company and User details.
      */
     private function defaultSenderDetails()
     {
@@ -383,7 +386,7 @@ class ImportShipments implements ShouldQueue
 
     /**
      * Builds package array since Package details cannot be set
-     * Using a one line per shipment import
+     * Using a one line per shipment import.
      */
     private function setPackagesDetails()
     {
@@ -396,10 +399,8 @@ class ImportShipments implements ShouldQueue
          * ************************************
          */
         // If weight not defined use package default
-        if (!isset($this->row['weight']) || $this->row['weight'] <= 0) {
-
+        if (! isset($this->row['weight']) || $this->row['weight'] <= 0) {
             if ($packaging) {
-
                 $this->row['weight'] = $packaging->weight;
             }
         }
@@ -428,13 +429,11 @@ class ImportShipments implements ShouldQueue
 
                 // If supplied, use Total Shipment Volumetric Weight to apportion across packages
                 if (isset($this->row['volumetric_weight']) && $this->row['volumetric_weight'] > 0) {
-
                     $this->calcDimsUsingWeight($this->row['volumetric_weight']);
                 } else {
 
                     // If supplied, use Total Shipment Actual Weight to apportion across packages
                     if (isset($this->row['weight']) && $this->row['weight'] > 0) {
-
                         $this->calcDimsUsingWeight($this->row['weight']);
                     } else {
 
@@ -448,17 +447,14 @@ class ImportShipments implements ShouldQueue
 
     private function setPackageWeight($pkgWeight = 0)
     {
-
         $total_weight = 0;
         for ($i = 0; $i < $this->row['pieces']; $i++) {
-
             if ($pkgWeight > 0) {
 
                 // Set package weight to PackageType weight and calc Shipment Total Weight
                 $this->row['packages'][$i]['weight'] = $pkgWeight;
                 $this->row['weight'] = $pkgWeight * $this->row['pieces'];
             } else {
-
                 if ($this->row['pieces'] == 1) {
 
                     // If only one piece set to Shipment Weight
@@ -467,8 +463,9 @@ class ImportShipments implements ShouldQueue
 
                     // ensure total of individual package weight equals the record['weight']
                     $calcWeight = ceil(round(($this->row['weight'] - $total_weight) / ($this->row['pieces'] - $i), 2) * 2) / 2;
-                    if ($calcWeight < .5)
+                    if ($calcWeight < .5) {
                         $calcWeight = .5;
+                    }
                     $total_weight += $calcWeight;
                     $this->row['packages'][$i]['weight'] = $calcWeight;
                 }
@@ -484,18 +481,16 @@ class ImportShipments implements ShouldQueue
 
     /**
      * Check to see if dims supplied in feed if so
-     * then set package dims
+     * then set package dims.
      *
-     * @return boolean
+     * @return bool
      */
     private function packageDimsSupplied($data)
     {
 
         // Check to see if user has supplied dims
         if (isset($data['length']) && isset($data['width']) && isset($data['height'])) {
-
             if ($data['length'] > 0 && $data['width'] > 0 && $data['height'] > 0) {
-
                 return true;
             }
         }
@@ -505,11 +500,8 @@ class ImportShipments implements ShouldQueue
 
     private function setPackageDims($data)
     {
-
         if (isset($data['length']) && isset($data['width']) && isset($data['height'])) {
-
             if ($data['length'] > 0 && $data['width'] > 0 && $data['height'] > 0) {
-
                 for ($i = 0; $i < $data['pieces']; $i++) {
                     $this->setDimsForPackage($i, $data['length'], $data['width'], $data['height']);
                 }
@@ -545,18 +537,16 @@ class ImportShipments implements ShouldQueue
 
     /**
      * Sets package weight to supplied package weight or
-     * Guesses it from volumetric or actual weight
+     * Guesses it from volumetric or actual weight.
      *
      * @param type $packagingWeight
      */
     private function calcDimsUsingWeight($totalWeight)
     {
-
         $packageWeight = $totalWeight / $this->row['pieces'];
 
         // Do this for each Package
         for ($i = 0; $i < $this->row['pieces']; $i++) {
-
             $length = 0;
             $width = 0;
             $height = 0;
@@ -579,7 +569,7 @@ class ImportShipments implements ShouldQueue
     }
 
     /**
-     * Builds Contents Array
+     * Builds Contents Array.
      */
     private function setContentsDetails()
     {
@@ -589,16 +579,18 @@ class ImportShipments implements ShouldQueue
         if (customsEntryRequired($this->row['sender_country_code'], $this->row['recipient_country_code'])) {
             if (empty($this->row['product_code'])) {
                 $this->errors[] = 'Product code required for this destination';
+
                 return;
             }
 
             if (empty($this->row['product_quantity'])) {
                 $this->errors[] = 'Product quantity required for this destination';
+
                 return;
             }
         }
 
-        if (!empty($this->row['product_code'])) {
+        if (! empty($this->row['product_code'])) {
             $commodity = \App\Commodity::whereProductCode($this->row['product_code'])->whereCompanyId($this->company->id)->first();
         }
 
@@ -619,7 +611,7 @@ class ImportShipments implements ShouldQueue
             $this->row['contents'][0]['weight_uom'] = $commodity->weight_uom;
         }
 
-        if (!$commodity && customsEntryRequired($this->row['sender_country_code'], $this->row['recipient_country_code'])) {
+        if (! $commodity && customsEntryRequired($this->row['sender_country_code'], $this->row['recipient_country_code'])) {
             $this->errors[] = 'Product code not found';
         }
     }
@@ -627,14 +619,13 @@ class ImportShipments implements ShouldQueue
     /**
      * Get service.
      *
-     * @return boolean
+     * @return bool
      */
     private function getService()
     {
         $service = $this->chooseService();
 
         if ($service) {
-
             $this->row['service_id'] = $service['id'];
             $this->row['service_code'] = strtoupper($service['code']);
             $this->row['carrier_id'] = $service['carrier_id'];
@@ -657,7 +648,7 @@ class ImportShipments implements ShouldQueue
 
         $carrierChoice = strtolower($this->company->carrier_choice);
 
-        if (!is_array($availableServices)) {
+        if (! is_array($availableServices)) {
             return false;
         }
 
@@ -674,7 +665,6 @@ class ImportShipments implements ShouldQueue
         }
 
         if ($services) {
-
             return reset($services);
         }
 
@@ -684,7 +674,7 @@ class ImportShipments implements ShouldQueue
     /**
      * Check to see if a shipment record has already been created.
      *
-     * @return boolean
+     * @return bool
      */
     private function shipmentExists()
     {
@@ -728,10 +718,10 @@ class ImportShipments implements ShouldQueue
     private function exportResultsToCsvFiles()
     {
         if (count($this->results['success']) > 0) {
-            $this->exportRowsToCsv($this->results['success'], 'success_' . $this->source);
+            $this->exportRowsToCsv($this->results['success'], 'success_'.$this->source);
         }
         if (count($this->results['failed']) > 0) {
-            $this->exportRowsToCsv($this->results['failed'], 'failed_' . $this->source);
+            $this->exportRowsToCsv($this->results['failed'], 'failed_'.$this->source);
         }
     }
 
@@ -747,7 +737,6 @@ class ImportShipments implements ShouldQueue
     {
         // Build an array that will be written to csv
         foreach ($rows as $key => $row) {
-
             foreach ($this->fields as $field) {
                 $data[$key][$field] = (isset($row[$field])) ? $row[$field] : null;
             }
@@ -773,10 +762,10 @@ class ImportShipments implements ShouldQueue
             }
         }
 
-        $result = writeCsv(storage_path() . '/app/temp/' . $fileName . '.csv', $data);
+        $result = writeCsv(storage_path().'/app/temp/'.$fileName.'.csv', $data);
 
         // Add the filename to the results array
-        $this->results['files'][] = storage_path() . '/app/temp/' . $fileName . '.csv';
+        $this->results['files'][] = storage_path().'/app/temp/'.$fileName.'.csv';
     }
 
     /**
@@ -796,7 +785,7 @@ class ImportShipments implements ShouldQueue
      */
     private function setSubject()
     {
-        $this->results['subject'] = 'Shipment Upload (' . $this->importConfig->mode->label . ') - ' . $this->importConfig->company->company_name . ' - ' . count($this->results['success']) . ' created / ' . count($this->results['failed']) . ' failed';
+        $this->results['subject'] = 'Shipment Upload ('.$this->importConfig->mode->label.') - '.$this->importConfig->company->company_name.' - '.count($this->results['success']).' created / '.count($this->results['failed']).' failed';
     }
 
     /**
@@ -824,11 +813,10 @@ class ImportShipments implements ShouldQueue
     {
         $customsValue = (empty($this->row['customs_value']) || $this->row['customs_value'] < 1 || $this->row['customs_value'] == '') ? $this->importConfig->default_customs_value : trim($this->row['customs_value']);
 
-        if (!is_numeric($customsValue)) {
-             return (float)str_replace(' ', '.', $customsValue);
+        if (! is_numeric($customsValue)) {
+            return (float) str_replace(' ', '.', $customsValue);
         }
 
         return $customsValue;
     }
-
 }

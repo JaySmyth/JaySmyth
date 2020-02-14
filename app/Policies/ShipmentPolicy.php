@@ -2,19 +2,18 @@
 
 namespace App\Policies;
 
-use Illuminate\Auth\Access\HandlesAuthorization;
-use App\User;
 use App\Shipment;
+use App\User;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ShipmentPolicy
 {
-
     use HandlesAuthorization;
 
     /**
      * Index policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function index(User $user)
     {
@@ -26,7 +25,7 @@ class ShipmentPolicy
     /**
      * Show policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function view(User $user, Shipment $shipment)
     {
@@ -38,7 +37,7 @@ class ShipmentPolicy
     /**
      * Create policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function create(User $user)
     {
@@ -50,7 +49,7 @@ class ShipmentPolicy
     /**
      * Update policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function update(User $user, Shipment $shipment)
     {
@@ -68,7 +67,7 @@ class ShipmentPolicy
     /**
      * Cancel policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function cancel(User $user, Shipment $shipment)
     {
@@ -80,7 +79,7 @@ class ShipmentPolicy
     /**
      * Hold policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function hold(User $user, Shipment $shipment)
     {
@@ -92,7 +91,7 @@ class ShipmentPolicy
     /**
      * Receive policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function receive(User $user, Shipment $shipment)
     {
@@ -104,7 +103,7 @@ class ShipmentPolicy
     /**
      * Undo cancel policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function undoCancel(User $user, Shipment $shipment)
     {
@@ -116,7 +115,7 @@ class ShipmentPolicy
     /**
      * DIMS policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function dims(User $user)
     {
@@ -128,7 +127,7 @@ class ShipmentPolicy
     /**
      * Download policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function download(User $user)
     {
@@ -140,7 +139,7 @@ class ShipmentPolicy
     /**
      * Upload policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function upload(User $user)
     {
@@ -152,7 +151,7 @@ class ShipmentPolicy
     /**
      * Raw data policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function rawData(User $user)
     {
@@ -164,7 +163,7 @@ class ShipmentPolicy
     /**
      * Test emails policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function sendTestEmail(User $user)
     {
@@ -172,5 +171,4 @@ class ShipmentPolicy
             return true;
         }
     }
-
 }

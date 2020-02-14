@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class ShipTrack extends Model
 {
-
     /**
      * The connection name for the model.
      *
@@ -30,5 +29,4 @@ class ShipTrack extends Model
      * No timestamps.
      */
     public $timestamps = false;
-
 }

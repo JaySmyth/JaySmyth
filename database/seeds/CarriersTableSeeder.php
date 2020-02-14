@@ -4,7 +4,6 @@ use Illuminate\Database\Seeder;
 
 class CarriersTableSeeder extends Seeder
 {
-
     /**
      * Run the database seeds.
      *
@@ -24,5 +23,4 @@ class CarriersTableSeeder extends Seeder
             ['id' => '8', 'code' => 'ps', 'name' => 'Pallet Service Carrier'],
         ]);
     }
-
 }

@@ -6,7 +6,6 @@ use App\Http\Requests\Request;
 
 class SurchargeRequest extends Request
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -34,8 +33,7 @@ class SurchargeRequest extends Request
             'weight_rate' => 'required|numeric',
             'package_rate' => 'required|numeric',
             'consignment_rate' => 'required|numeric',
-            'min' => 'required|numeric'           
+            'min' => 'required|numeric',
         ];
     }
-
 }

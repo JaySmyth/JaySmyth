@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class ShipmentContent extends Model
 {
-
     public $timestamps = false;
     protected $fillable = [
         'package_index',
@@ -22,7 +21,6 @@ class ShipmentContent extends Model
         'currency_code',
         'unit_weight',
         'weight_uom',
-        'shipment_id'
+        'shipment_id',
     ];
-
 }

@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AddTypeToFedexEasTable extends Migration
 {
@@ -14,7 +14,7 @@ class AddTypeToFedexEasTable extends Migration
     public function up()
     {
         Schema::table('fedex_eas', function (Blueprint $table) {
-            $table->string('type','3')->after('locn');
+            $table->string('type', '3')->after('locn');
         });
     }
 

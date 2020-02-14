@@ -46,7 +46,7 @@ class PricingModel5 extends PricingModel
 
     /**
      * Gets the Packaging Type of the current package
-     * and set this->packagingType to the IFS equivalent
+     * and set this->packagingType to the IFS equivalent.
      *
      * @param type $pkgNo
      */
@@ -54,7 +54,7 @@ class PricingModel5 extends PricingModel
     {
         // A Document only shipment can only contain documents for DHL
         if ($this->shipment['packages'][$pkgNo]['packaging_code'] == 'ENV' && $this->shipment['ship_reason'] != 'documents') {
-            $this->shipment['packages'][$pkgNo]['packaging_code'] = "CTN";
+            $this->shipment['packages'][$pkgNo]['packaging_code'] = 'CTN';
         }
 
         parent::getPackagingType();
@@ -64,9 +64,9 @@ class PricingModel5 extends PricingModel
     {
         $eas = new DhlEas();
         // Implemented at child level
-        $this->log("   Using Country: " . $this->shipment['recipient_country_code']);
-        $this->log("   City: " . $this->shipment['recipient_city']);
-        $this->log("   Postcode: " . $this->shipment['recipient_postcode']);
+        $this->log('   Using Country: '.$this->shipment['recipient_country_code']);
+        $this->log('   City: '.$this->shipment['recipient_city']);
+        $this->log('   Postcode: '.$this->shipment['recipient_postcode']);
 
         return $eas->isEas($this->shipment['recipient_country_code'], $this->shipment['recipient_city'], $this->shipment['recipient_postcode']);
     }

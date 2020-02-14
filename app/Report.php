@@ -6,12 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Report extends Model
 {
-
     public $timestamps = false;
 
     /**
-     * A report belongs to a mode of transport (courier, air, etc.)
-     * 
+     * A report belongs to a mode of transport (courier, air, etc.).
+     *
      * @return
      */
     public function mode()
@@ -28,5 +27,4 @@ class Report extends Model
     {
         return $this->belongsTo(Depot::class);
     }
-
 }

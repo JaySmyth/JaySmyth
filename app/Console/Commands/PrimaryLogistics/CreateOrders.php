@@ -2,15 +2,14 @@
 
 namespace App\Console\Commands\PrimaryLogistics;
 
-use GuzzleHttp\Psr7;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
-use GuzzleHttp\Exception\GuzzleException;
 
 class CreateOrders extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -53,11 +52,10 @@ class CreateOrders extends Command
         $shipments = \App\Shipment::whereCarrierId(12)->whereCompanyId(874)->whereReceivedSent(0)->whereNotIn('status_id', [1, 7])->whereIn('recipient_country_code', ['US', 'CA'])->get();
 
         foreach ($shipments as $shipment) {
-
             $json = $this->buildJson($shipment);
 
-            if (!$json) {
-                Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Create Primary Logistics Order Failed (' . $shipment->company->company_name . '/' . $shipment->consignment_number . ')', 'Failed to json encode data'));
+            if (! $json) {
+                Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Create Primary Logistics Order Failed ('.$shipment->company->company_name.'/'.$shipment->consignment_number.')', 'Failed to json encode data'));
                 continue;
             }
 
@@ -75,12 +73,11 @@ class CreateOrders extends Command
                     $shipment->source = 'cartrover';
                     $shipment->save();
                 } else {
-                    Mail::to('courier@antrim.ifsgroup.com')->cc(['it@antrim.ifsgroup.com'])->send(new \App\Mail\GenericError('Create Primary Logistics Order Failed (' . $shipment->company->company_name . '/' . $shipment->consignment_number . ')', $reply['message'],false, 'Courier Department - please verify shipment details. Error received when trying to create shipment:'));
+                    Mail::to('courier@antrim.ifsgroup.com')->cc(['it@antrim.ifsgroup.com'])->send(new \App\Mail\GenericError('Create Primary Logistics Order Failed ('.$shipment->company->company_name.'/'.$shipment->consignment_number.')', $reply['message'], false, 'Courier Department - please verify shipment details. Error received when trying to create shipment:'));
                 }
             } catch (GuzzleException $exc) {
-
                 if ($exc->hasResponse()) {
-                    Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Create Primary Logistics Order (' . $shipment->company->company_name . '/' . $shipment->consignment_number . ')', Psr7\str($exc->getResponse())));
+                    Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Create Primary Logistics Order ('.$shipment->company->company_name.'/'.$shipment->consignment_number.')', Psr7\str($exc->getResponse())));
                 }
             }
         }
@@ -107,7 +104,7 @@ class CreateOrders extends Command
 
         $json = [
             'cust_ref' => $shipment->consignment_number,
-            'cust_po_no' => $shipment->shipment_reference . '/' . $shipment->consignment_number,
+            'cust_po_no' => $shipment->shipment_reference.'/'.$shipment->consignment_number,
             'ship_company' => $shipment->recipient_company_name,
             'ship_first_name' => $shipment->recipient_name,
             'ship_address_1' => $shipment->recipient_address1,
@@ -130,10 +127,9 @@ class CreateOrders extends Command
             'cust_country' => $shipment->sender_country_code,
             'cust_phone' => $shipment->sender_telephone,
             'cust_e_mail' => $shipment->sender_email,
-            'shipping_instructions' => $shipment->special_instructions
+            'shipping_instructions' => $shipment->special_instructions,
         ];
 
         return json_encode($json, JSON_HEX_AMP | JSON_HEX_APOS);
     }
-
 }

@@ -4,7 +4,6 @@ use Illuminate\Database\Seeder;
 
 class CPCTableSeeder extends Seeder
 {
-
     /**
      * Run the database seeds.
      *
@@ -154,5 +153,4 @@ class CPCTableSeeder extends Seeder
         // Modify a few records
         DB::table('customs_procedure_codes')->insert($cpc);
     }
-
 }

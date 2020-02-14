@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Address extends Model
 {
-
     protected $fillable = [
         'name',
         'company_name',
@@ -22,7 +21,7 @@ class Address extends Model
         'type',
         'definition',
         'account_number',
-        'company_id'
+        'company_id',
     ];
 
     /**
@@ -42,7 +41,7 @@ class Address extends Model
      */
     public function getFullNameAttribute()
     {
-        return $this->name . " - " . $this->company_name;
+        return $this->name.' - '.$this->company_name;
     }
 
     /**
@@ -86,9 +85,10 @@ class Address extends Model
      */
     public function scopeOfDefinition($query, $definition)
     {
-        if (!in_array($definition, ['sender', 'recipient'])) {
+        if (! in_array($definition, ['sender', 'recipient'])) {
             \App::abort(404);
         }
+
         return $query->where('definition', $definition);
     }
 
@@ -103,9 +103,9 @@ class Address extends Model
     {
         if ($filter) {
             return $query->where(function ($query) use ($filter) {
-                $query->where('name', 'LIKE', '%' . $filter . '%')
-                    ->orWhere('company_name', 'LIKE', '%' . $filter . '%')
-                    ->orWhere('postcode', 'LIKE', '%' . $filter . '%');
+                $query->where('name', 'LIKE', '%'.$filter.'%')
+                    ->orWhere('company_name', 'LIKE', '%'.$filter.'%')
+                    ->orWhere('postcode', 'LIKE', '%'.$filter.'%');
             });
         }
     }
@@ -134,7 +134,7 @@ class Address extends Model
     public function scopeHasCity($query, $city)
     {
         if ($city) {
-            return $query->where('city', 'LIKE', '%' . $city . '%');
+            return $query->where('city', 'LIKE', '%'.$city.'%');
         }
     }
 
@@ -161,5 +161,4 @@ class Address extends Model
     {
         return $query->whereIn('company_id', $companyIds);
     }
-
 }

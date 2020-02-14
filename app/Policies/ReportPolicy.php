@@ -7,17 +7,16 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ReportPolicy
 {
-
     use HandlesAuthorization;
 
     /**
      * Intercept all checks - ensure IFS user.
      *
-     * @return boolean
+     * @return bool
      */
     public function before(User $user)
     {
-        if (!$user->hasPermission('view_reports')) {
+        if (! $user->hasPermission('view_reports')) {
             return false;
         }
     }
@@ -25,7 +24,7 @@ class ReportPolicy
     /**
      * Index policy.
      *
-     * @return boolean
+     * @return bool
      */
     public function index(User $user)
     {
@@ -36,8 +35,8 @@ class ReportPolicy
 
     /**
      * View report.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function fedexCustoms(User $user)
     {
@@ -48,8 +47,8 @@ class ReportPolicy
 
     /**
      * View report.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function shippers(User $user)
     {
@@ -60,8 +59,8 @@ class ReportPolicy
 
     /**
      * View report.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function nonShippers(User $user)
     {
@@ -72,8 +71,8 @@ class ReportPolicy
 
     /**
      * View report.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function scanning(User $user)
     {
@@ -84,8 +83,8 @@ class ReportPolicy
 
     /**
      * View report.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function dims(User $user)
     {
@@ -96,8 +95,8 @@ class ReportPolicy
 
     /**
      * View report.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function activeShipments(User $user)
     {
@@ -108,8 +107,8 @@ class ReportPolicy
 
     /**
      * View report.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function pod(User $user)
     {
@@ -120,8 +119,8 @@ class ReportPolicy
 
     /**
      * View report.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function exceptions(User $user)
     {
@@ -132,8 +131,8 @@ class ReportPolicy
 
     /**
      * View report.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function unknownJobs(User $user)
     {
@@ -144,8 +143,8 @@ class ReportPolicy
 
     /**
      * View report.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function dailyStats(User $user)
     {
@@ -156,8 +155,8 @@ class ReportPolicy
 
     /**
      * View report.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function fedexInternationalAvailable(User $user)
     {
@@ -168,8 +167,8 @@ class ReportPolicy
 
     /**
      * View report.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function margins(User $user)
     {
@@ -180,8 +179,8 @@ class ReportPolicy
 
     /**
      * View report.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function carrierScans(User $user)
     {
@@ -192,8 +191,8 @@ class ReportPolicy
 
     /**
      * View report.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function purchaseInvoiceLines(User $user)
     {
@@ -204,8 +203,8 @@ class ReportPolicy
 
     /**
      * View report.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function preTransit(User $user)
     {
@@ -216,8 +215,8 @@ class ReportPolicy
 
     /**
      * View report.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function hazardous(User $user)
     {
@@ -228,8 +227,8 @@ class ReportPolicy
 
     /**
      * View report.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function shipmentsByCarrier(User $user)
     {
@@ -240,8 +239,8 @@ class ReportPolicy
 
     /**
      * View report.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function collectionSettings(User $user)
     {
@@ -252,8 +251,8 @@ class ReportPolicy
 
     /**
      * View report.
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function scanningKpis(User $user)
     {
@@ -261,5 +260,4 @@ class ReportPolicy
             return true;
         }
     }
-
 }

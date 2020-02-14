@@ -4,7 +4,6 @@ use Illuminate\Database\Seeder;
 
 class PackagingTableSeeder extends Seeder
 {
-
     /**
      * Run the database seeds.
      *
@@ -12,7 +11,7 @@ class PackagingTableSeeder extends Seeder
      */
     public function run()
     {
-          // Define IFS Packaging
+        // Define IFS Packaging
         DB::table('packaging_types')->insert([
             ['code' => 'CTN', 'name' => 'Carton', 'mode_id' => '1'],
             ['code' => 'HPA', 'name' => 'Half Pallet', 'mode_id' => '1'],
@@ -50,7 +49,7 @@ class PackagingTableSeeder extends Seeder
                 'display_order' => '',
                 'company_id' => '0',
                 'packaging_type_id' => '1',
-                'mode_id' => '1'
+                'mode_id' => '1',
             ],
             [
                 'code' => 'HPA',
@@ -62,7 +61,7 @@ class PackagingTableSeeder extends Seeder
                 'display_order' => '',
                 'company_id' => '0',
                 'packaging_type_id' => '2',
-                'mode_id' => '1'
+                'mode_id' => '1',
             ],
             [
                 'code' => 'PAL',
@@ -74,7 +73,7 @@ class PackagingTableSeeder extends Seeder
                 'display_order' => '',
                 'company_id' => '0',
                 'packaging_type_id' => '3',
-                'mode_id' => '1'
+                'mode_id' => '1',
             ],
             [
                 'code' => 'PAK',
@@ -86,7 +85,7 @@ class PackagingTableSeeder extends Seeder
                 'display_order' => '',
                 'company_id' => '0',
                 'packaging_type_id' => '4',
-                'mode_id' => '1'
+                'mode_id' => '1',
             ],
             [
                 'code' => 'BOX',
@@ -98,7 +97,7 @@ class PackagingTableSeeder extends Seeder
                 'display_order' => '',
                 'company_id' => '0',
                 'packaging_type_id' => '5',
-                'mode_id' => '1'
+                'mode_id' => '1',
             ],
             [
                 'code' => 'BOX15',
@@ -110,7 +109,7 @@ class PackagingTableSeeder extends Seeder
                 'display_order' => '',
                 'company_id' => '0',
                 'packaging_type_id' => '6',
-                'mode_id' => '1'
+                'mode_id' => '1',
             ],
             [
                 'code' => 'BOX25',
@@ -122,7 +121,7 @@ class PackagingTableSeeder extends Seeder
                 'display_order' => '',
                 'company_id' => '0',
                 'packaging_type_id' => '7',
-                'mode_id' => '1'
+                'mode_id' => '1',
             ],
             [
                 'code' => 'ENV',
@@ -134,9 +133,8 @@ class PackagingTableSeeder extends Seeder
                 'display_order' => '',
                 'company_id' => '0',
                 'packaging_type_id' => '8',
-                'mode_id' => '1'
+                'mode_id' => '1',
             ],
         ]);
     }
-
 }

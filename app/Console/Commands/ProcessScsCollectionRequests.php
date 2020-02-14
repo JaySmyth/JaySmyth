@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Mail;
 
 class ProcessScsCollectionRequests extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -24,15 +23,15 @@ class ProcessScsCollectionRequests extends Command
 
     /**
      * Command running in test mode.
-     * 
-     * @var boolean 
+     *
+     * @var bool
      */
     protected $testMode = false;
 
     /**
      * Transport types to ignore.
-     * 
-     * @var array 
+     *
+     * @var array
      */
     protected $ignoreTransportTypes = ['AX', 'CX', 'RX', 'SX'];
 
@@ -61,12 +60,11 @@ class ProcessScsCollectionRequests extends Command
         // Get viable collections (where dirty flag is set and a header record is present)
         $jobCols = \App\Multifreight\JobCol::whereDirty(1)->orderBy('id', 'ASC')->get();
 
-        $this->info($jobCols->count() . " unprocessed records found");
+        $this->info($jobCols->count().' unprocessed records found');
 
         $today = date('Y-m-d', time());
 
         foreach ($jobCols as $jobCol) {
-
             $jobDel = \App\Multifreight\JobDel::where('job_id', $jobCol->job_id)->where('del_no', $jobCol->col_no)->where('del_date', '>=', $today)->first();
 
             if ($this->isViableJob($jobCol, $jobDel)) {
@@ -74,18 +72,18 @@ class ProcessScsCollectionRequests extends Command
                 // Get array to update the transport jobs table with
                 $job = $this->getDataArray($jobCol, $jobDel);
 
-                // Job created/updated successfully - mark as clean              
+                // Job created/updated successfully - mark as clean
                 if ($this->createOrUpdateTransportJob($job)) {
-                    if (!$this->testMode) {
+                    if (! $this->testMode) {
                         $jobCol->clean();
                     }
                 } else {
-                    Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Failed to create transport job for: ' . $job->scs_job_number, $job));
+                    Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Failed to create transport job for: '.$job->scs_job_number, $job));
                 }
             } else {
-                // Job not viable or not recent, mark as clean. Leave un-viable jobs from today as dirty as they may be partial records that may come in later. 
-                if (!$this->testMode) {
-                    if ($jobDel && !empty($jobCol->scs_job_number) || !$jobCol->created_at->isToday()) {
+                // Job not viable or not recent, mark as clean. Leave un-viable jobs from today as dirty as they may be partial records that may come in later.
+                if (! $this->testMode) {
+                    if ($jobDel && ! empty($jobCol->scs_job_number) || ! $jobCol->created_at->isToday()) {
                         $jobCol->clean();
                     }
                 }
@@ -95,23 +93,25 @@ class ProcessScsCollectionRequests extends Command
 
     /**
      * Check if a job if viable to raise a request.
-     * 
+     *
      * @param type $jobCol
      * @param type $jobDel
-     * @return boolean
+     * @return bool
      */
     protected function isViableJob($jobCol, $jobDel)
     {
-        if (!$jobDel || empty($jobCol->scs_job_number)) {
+        if (! $jobDel || empty($jobCol->scs_job_number)) {
             $this->error('Skipping job: corresponding delivery or header record not found');
+
             return false;
         }
 
         $department = \App\Department::whereCode($jobCol->header->job_dept)->first();
 
-        if (!$department) {
-            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Failed to create transport job:' . $jobCol->scs_job_number, 'Department not recognised: ' . $jobCol->header->job_dept));
-            $this->error('Skipping job: department ' . $jobCol->header->job_dept . ' not recognised');
+        if (! $department) {
+            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Failed to create transport job:'.$jobCol->scs_job_number, 'Department not recognised: '.$jobCol->header->job_dept));
+            $this->error('Skipping job: department '.$jobCol->header->job_dept.' not recognised');
+
             return false;
         }
 
@@ -129,16 +129,19 @@ class ProcessScsCollectionRequests extends Command
 
         if ($colPrinted == 'no' && $delPrinted == 'no') {
             $this->info('Job not viable: collection or delivery note not printed.');
+
             return false;
         }
 
         if (empty($jobCol->name) || empty($jobCol->address1) || empty($jobCol->town)) {
             $this->info('Job not viable: does not contain minimum content.');
+
             return false;
         }
 
         if (in_array($jobCol->header->transport_type, $this->ignoreTransportTypes)) {
-            $this->info('Job not viable: ignored transport type (' . $jobCol->header->transport_type . ').');
+            $this->info('Job not viable: ignored transport type ('.$jobCol->header->transport_type.').');
+
             return false;
         }
 
@@ -146,6 +149,7 @@ class ProcessScsCollectionRequests extends Command
         if ($department->id == 8) {
             if (in_array($jobCol->name, ['BELFAST CONTAINER TERMINAL', 'COASTAL CONTAINER LINE LTD'])) {
                 $this->info('Job not viable: sea freight container.');
+
                 return false;
             }
         }
@@ -155,10 +159,10 @@ class ProcessScsCollectionRequests extends Command
 
     /**
      * Build an array to create/update the transport jobs table with.
-     * 
+     *
      * @param type $jobCol
      * @param type $jobDel
-     * 
+     *
      * @return array
      */
     protected function getDataArray($jobCol, $jobDel)
@@ -166,9 +170,9 @@ class ProcessScsCollectionRequests extends Command
         $goodsDescription = $jobCol->header->product_desc;
         $instructions = strip_tags($jobCol->extra_details);
 
-        if (!empty($jobCol->package_type)) {
-            $goodsDescription = $goodsDescription . ' (' . $jobCol->pieces . ' x ' . $jobCol->package_type . ')';
-            $instructions = $instructions . ' (' . $jobCol->pieces . ' x ' . $jobCol->package_type . ')';
+        if (! empty($jobCol->package_type)) {
+            $goodsDescription = $goodsDescription.' ('.$jobCol->pieces.' x '.$jobCol->package_type.')';
+            $instructions = $instructions.' ('.$jobCol->pieces.' x '.$jobCol->package_type.')';
         }
 
         return [
@@ -206,18 +210,18 @@ class ProcessScsCollectionRequests extends Command
             'to_telephone' => $jobDel->telephone,
             'to_email' => $jobDel->email,
             'visible' => '1',
-            'date_requested' => (stristr('IFS Global', $jobDel->name)) ? $jobCol->col_date . ' ' . $jobCol->col_time : $jobDel->del_date . ' ' . $jobDel->del_time,
+            'date_requested' => (stristr('IFS Global', $jobDel->name)) ? $jobCol->col_date.' '.$jobCol->col_time : $jobDel->del_date.' '.$jobDel->del_time,
             'department_id' => \App\Department::whereCode($jobCol->header->job_dept)->first()->id,
-            'depot_id' => 1
+            'depot_id' => 1,
         ];
     }
 
     /**
      * Create or update a record in the transport jobs table.
-     * 
+     *
      * @param type $job
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     protected function createOrUpdateTransportJob($job)
     {
@@ -228,10 +232,9 @@ class ProcessScsCollectionRequests extends Command
 
         // Existing job
         if ($transportJob) {
+            $this->info('Updating transport job '.$transportJob->number.' / '.$job['reference']);
 
-            $this->info("Updating transport job " . $transportJob->number . " / " . $job['reference']);
-
-            if (!$this->testMode) {
+            if (! $this->testMode) {
                 $transportJob->update($job);
                 $transportJob->setTransendRoute();
             }
@@ -239,10 +242,9 @@ class ProcessScsCollectionRequests extends Command
             return true;
         }
 
-        $this->info("Create transport job for : " . $job['reference']);
+        $this->info('Create transport job for : '.$job['reference']);
 
-        if (!$this->testMode) {
-
+        if (! $this->testMode) {
             $transportJob = \App\TransportJob::create($job);
 
             // New job created, set the job number and status
@@ -250,6 +252,7 @@ class ProcessScsCollectionRequests extends Command
                 $transportJob->number = nextAvailable('JOB');
                 $transportJob->setStatus('unmanifested');
                 $transportJob->setTransendRoute();
+
                 return true;
             }
         }
@@ -260,5 +263,4 @@ class ProcessScsCollectionRequests extends Command
 
         return false;
     }
-
 }

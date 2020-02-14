@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\RateSurcharge;
 use App\Company;
+use App\RateSurcharge;
 use Illuminate\Http\Request;
 
-class RateSurchargeController extends Controller {
-
+class RateSurchargeController extends Controller
+{
     /**
      * Create a new controller instance.
      *
@@ -25,10 +25,9 @@ class RateSurchargeController extends Controller {
      */
     public function index()
     {
-        
         $this->authorize(new RateSurcharge);
 
-        dd("Index");
+        dd('Index');
     }
 
     /**
@@ -40,7 +39,7 @@ class RateSurchargeController extends Controller {
     {
         $this->authorize(new RateSurcharge);
 
-        dd("Create");
+        dd('Create');
     }
 
     /**
@@ -53,7 +52,7 @@ class RateSurchargeController extends Controller {
     {
         $this->authorize(new RateSurcharge);
 
-        dd("Store");
+        dd('Store');
     }
 
     /**
@@ -66,7 +65,7 @@ class RateSurchargeController extends Controller {
     {
         $this->authorize(new RateSurcharge);
 
-        dd("Show");
+        dd('Show');
     }
 
     /**
@@ -78,16 +77,15 @@ class RateSurchargeController extends Controller {
     public function edit(RateSurcharge $rateSurcharge, Company $company)
     {
         $rateSurcharge = \App\RateSurcharge::find(1);
-        
-        
+
         echo $rateSurcharge->name;
         //dd($rateSurcharge);
-                
+
         //tr
-        
+
         $this->authorize($rateSurcharge);
 
-        dd("Edit2");
+        dd('Edit2');
     }
 
     /**
@@ -101,7 +99,7 @@ class RateSurchargeController extends Controller {
     {
         $this->authorize(new RateSurcharge);
 
-        dd("Update");
+        dd('Update');
     }
 
     /**
@@ -112,13 +110,12 @@ class RateSurchargeController extends Controller {
      */
     public function destroy(RateSurcharge $rateSurcharge)
     {
-
         $this->authorize(new RateSurcharge);
-        
+
         $rateSurcharge->delete();
 
         flash()->success('Success!', 'Surcharge Reset');
+
         return back();
     }
-
 }

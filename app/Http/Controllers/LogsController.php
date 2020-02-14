@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 
 class LogsController extends Controller
 {
-
     /**
      * Create a new controller instance.
      *
@@ -20,7 +19,7 @@ class LogsController extends Controller
 
     /**
      * List all log entries.
-     * 
+     *
      * @param Request $request
      * @return type
      */
@@ -35,14 +34,13 @@ class LogsController extends Controller
 
     /**
      * Get data.
-     * 
+     *
      * @param \App\Http\Controllers\Log $log
      * @return type
      */
     public function getData(Log $log)
     {
         if (request()->wantsJson()) {
-
             $this->authorize($log);
 
             $array = json_decode($log->data, true);
@@ -59,10 +57,10 @@ class LogsController extends Controller
 
     /*
      * Log search.
-     * 
+     *
      * @param   $request
      * @param   $paginate
-     * 
+     *
      * @return
      */
 
@@ -74,11 +72,10 @@ class LogsController extends Controller
                 ->hasInformation($request->information)
                 ->hasComments($request->comments);
 
-        if (!$paginate) {
+        if (! $paginate) {
             return $query->get();
         }
 
         return $query->paginate(50);
     }
-
 }

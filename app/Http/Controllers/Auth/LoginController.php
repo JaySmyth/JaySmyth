@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Jenssegers\Agent\Agent;
 
 class LoginController extends Controller
@@ -20,7 +21,7 @@ class LoginController extends Controller
       |
      */
 
-use AuthenticatesUsers;
+    use AuthenticatesUsers;
 
     /**
      * Where to redirect users after login / registration.
@@ -49,17 +50,15 @@ use AuthenticatesUsers;
     {
         $credentials = $request->only($this->loginUsername(), 'password');
 
-        return array_add($credentials, 'enabled', '1');
+        return Arr::add($credentials, 'enabled', '1');
     }
 
     /**
      * Override authenticated method to check user config.
-     *
      */
     public function authenticated(Request $request, $user)
     {
         if ($user->isConfigured()) {
-
             $this->updateLastLogin($request, $user);
 
             $this->flashMessages($user);
@@ -69,24 +68,24 @@ use AuthenticatesUsers;
                 return redirect('/customs-entries');
             }
 
-            if (!$user->hasMultipleModes() && $user->getOnlyMode() == 'sea') {
+            if (! $user->hasMultipleModes() && $user->getOnlyMode() == 'sea') {
                 return redirect('/sea-freight');
             }
 
             return redirect()->intended($this->redirectPath());
         }
 
-        // Account not configured, so logout and redirect    
+        // Account not configured, so logout and redirect
         $this->logout($request);
 
         return redirect('/login')->withErrors([
-                    'config' => 'Sorry, account not configured. Please contact IFS.'
+                    'config' => 'Sorry, account not configured. Please contact IFS.',
         ]);
     }
 
     /**
      * Update the last login timestamp.
-     * 
+     *
      * @param type $user
      */
     private function updateLastLogin($request, $user)
@@ -95,15 +94,15 @@ use AuthenticatesUsers;
         $browser = $agent->browser();
 
         $user->last_login = time();
-        $user->browser = $browser . ' ' . $agent->version($browser);
+        $user->browser = $browser.' '.$agent->version($browser);
         $user->platform = $agent->platform();
         $user->screen_resolution = $request->screen_resolution;
         $user->save();
     }
 
     /**
-     * Flash any notification messages to the user
-     * 
+     * Flash any notification messages to the user.
+     *
      * @param type $param
      */
     private function flashMessages($user)
@@ -116,7 +115,7 @@ use AuthenticatesUsers;
         foreach ($user->getMessages() as $message) {
 
             // If sticky OR not previously viewed by the user, display the message
-            if ($message->sticky || (!$message->sticky && $message->users()->where('user_id', $user->id)->count() == 0)) {
+            if ($message->sticky || (! $message->sticky && $message->users()->where('user_id', $user->id)->count() == 0)) {
                 flash()->info($message->title, $message->message, true, true);
             }
 
@@ -124,5 +123,4 @@ use AuthenticatesUsers;
             $message->users()->syncWithoutDetaching($user->id);
         }
     }
-
 }

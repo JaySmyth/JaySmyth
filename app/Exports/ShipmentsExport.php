@@ -3,19 +3,17 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class ShipmentsExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
-
     public function __construct($shipments)
     {
         $this->shipments = $shipments;
     }
 
     /**
-     * 
      * @return array
      */
     public function headings(): array
@@ -58,7 +56,7 @@ class ShipmentsExport implements FromCollection, WithHeadings, ShouldAutoSize
             'Status',
             'POD Signature',
             'Delivery Date',
-            'Tracking'
+            'Tracking',
         ];
     }
 
@@ -73,7 +71,7 @@ class ShipmentsExport implements FromCollection, WithHeadings, ShouldAutoSize
                 'Carrier Consignment Number' => $shipment->carrier_consignment_number,
                 'Shipment Reference' => $shipment->shipment_reference,
                 'Pieces' => $shipment->pieces,
-                'Weight' => $shipment->weight . strtoupper($shipment->weight_uom),
+                'Weight' => $shipment->weight.strtoupper($shipment->weight_uom),
                 'Volume' => $shipment->volumetric_weight,
                 'Customs Value' => $shipment->customs_value,
                 'Customs Currency' => strtoupper($shipment->customs_value_currency_code),
@@ -106,14 +104,13 @@ class ShipmentsExport implements FromCollection, WithHeadings, ShouldAutoSize
                 'Status' => $shipment->status->name,
                 'POD Signature' => $shipment->pod_signature,
                 'Delivery Date' => $shipment->getDeliveryDate('d-m-Y H:i'),
-                'Tracking' => url('/tracking/' . $shipment->token),
+                'Tracking' => url('/tracking/'.$shipment->token),
             ]);
 
-            $collection->push($row);
+        $collection->push($row);
 
         endforeach;
 
         return $collection;
     }
-
 }

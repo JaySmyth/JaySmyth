@@ -3,13 +3,12 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class PasswordReset extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -38,5 +37,4 @@ class PasswordReset extends Mailable
                         ->subject('IFS Global Logistics - New Password')
                         ->with(['user' => $this->user, 'password' => $this->password]);
     }
-
 }

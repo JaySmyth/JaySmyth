@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Mail;
 
 class UploadShipmentsToExpressFreight extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -57,9 +56,8 @@ class UploadShipmentsToExpressFreight extends Command
     {
         parent::__construct();
 
-        $this->fileName = 'express_freight_' . time() . '.csv';
-        $this->filePath = '/home/expressfreight/manifests/roi/' . $this->fileName;
-
+        $this->fileName = 'express_freight_'.time().'.csv';
+        $this->filePath = '/home/expressfreight/manifests/roi/'.$this->fileName;
     }
 
     /**
@@ -80,7 +78,7 @@ class UploadShipmentsToExpressFreight extends Command
 
         // Send notification
         if (count($this->validShipments) > 0) {
-            Mail::to('ASteenson@expressfreight.co.uk')->cc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight Manifest (' . count($this->validShipments) . ' shipments)', 'Please see attached file', $this->filePath));
+            Mail::to('ASteenson@expressfreight.co.uk')->cc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight Manifest ('.count($this->validShipments).' shipments)', 'Please see attached file', $this->filePath));
         }
     }
 
@@ -91,7 +89,7 @@ class UploadShipmentsToExpressFreight extends Command
      */
     private function createFile()
     {
-        $handle = fopen($this->filePath, "w");
+        $handle = fopen($this->filePath, 'w');
 
         // Add heading row
         fputcsv($handle, ['Consignment', 'IFS Reference', 'Piece', 'Weight', 'Ship Date', 'Name', 'Company', 'Address 1', 'Address 2', 'City', 'County', 'Postcode', 'Country Code', 'Cancelled']);
@@ -99,13 +97,12 @@ class UploadShipmentsToExpressFreight extends Command
         foreach ($this->shipments as $shipment) :
 
             if ($this->isValid($shipment)) {
-
                 foreach ($shipment->packages as $package):
 
                     $line = [
                         $package->carrier_tracking_number,
                         $shipment->consignment_number,
-                        'Pkg ' . $package->index . ' of ' . $shipment->pieces,
+                        'Pkg '.$package->index.' of '.$shipment->pieces,
                         $package->weight,
                         $shipment->ship_date->format('d/m/Y'),
                         $shipment->recipient_name,
@@ -116,18 +113,18 @@ class UploadShipmentsToExpressFreight extends Command
                         $shipment->recipient_state,
                         $shipment->recipient_postcode,
                         $shipment->recipient_country_code,
-                        0
+                        0,
                     ];
 
-                    // Remove any commas
-                    $line = array_map(
+                // Remove any commas
+                $line = array_map(
                         function ($str) {
                             return str_replace(',', '', $str);
                         },
                         $line
                     );
 
-                    fputcsv($handle, $line);
+                fputcsv($handle, $line);
 
                 endforeach;
 
@@ -143,7 +140,7 @@ class UploadShipmentsToExpressFreight extends Command
     /**
      * Check that a shipment is valid for express Freight upload.
      *
-     * @return boolean
+     * @return bool
      */
     private function isValid($shipment)
     {
@@ -166,5 +163,4 @@ class UploadShipmentsToExpressFreight extends Command
             'source' => $this->fileName,
         ]);
     }
-
 }

@@ -6,7 +6,6 @@ use App\Http\Requests\Request;
 
 class SeaFreightShipmentRequest extends Request
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -33,5 +32,4 @@ class SeaFreightShipmentRequest extends Request
             'value' => 'required',
         ];
     }
-
 }

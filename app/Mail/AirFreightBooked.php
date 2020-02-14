@@ -8,7 +8,6 @@ use Illuminate\Queue\SerializesModels;
 
 class AirFreightBooked extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -37,8 +36,7 @@ class AirFreightBooked extends Mailable
     public function build()
     {
         return $this->view('emails.shipments.air_freight_booked')
-                        ->subject('Air Freight Booked - ' . $this->shipment->company->site_name . ' (' . $this->shipment->consignment_number . ')')
+                        ->subject('Air Freight Booked - '.$this->shipment->company->site_name.' ('.$this->shipment->consignment_number.')')
                         ->with(['shipment' => $this->shipment]);
     }
-
 }

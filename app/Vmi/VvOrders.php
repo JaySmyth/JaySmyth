@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class VvOrders extends Model
 {
-
     /**
      * The connection name for the model.
      *
@@ -33,7 +32,7 @@ class VvOrders extends Model
 
     /**
      * Get the associated courier company.
-     * 
+     *
      * @return type
      */
     public function getCompany()
@@ -48,7 +47,6 @@ class VvOrders extends Model
     }
 
     /**
-     * 
      * @return type
      */
     public function stockItems()
@@ -63,9 +61,8 @@ class VvOrders extends Model
     {
         $this->dispatch_carrier = $result['carrier'];
         $this->dispatch_tracking_number = $result['ifs_consignment_number'];
-        $this->dispatch_comments = 'Dispatched via ' . $result['carrier'] . ' - ' . $result['consignment_number'];
+        $this->dispatch_comments = 'Dispatched via '.$result['carrier'].' - '.$result['consignment_number'];
         $this->courier_dispatch_status = 2;
         $this->save();
     }
-
 }

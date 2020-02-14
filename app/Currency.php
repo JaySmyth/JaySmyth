@@ -8,7 +8,7 @@ class Currency extends Model
 {
     /*
      * Black list of NON mass assignable - all others are mass assignable.
-     * 
+     *
      * @var array
      */
 
@@ -20,5 +20,4 @@ class Currency extends Model
      * @var array
      */
     protected $dates = ['created_at', 'updated_at'];
-
 }

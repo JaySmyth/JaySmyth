@@ -45,7 +45,7 @@ class SurchargeDetailsController extends Controller
     public function index(Request $request)
     {
         $this->authorize(new Surcharge);
-        $title = "Surcharge Details";
+        $title = 'Surcharge Details';
 
         $this->setCompanyIds($request);
         $companyId = $this->companyId;
@@ -112,7 +112,7 @@ class SurchargeDetailsController extends Controller
         $query->whereDate('from_date', '<=', $effectiveDate)
             ->whereDate('to_date', '>=', $effectiveDate);
 
-        if (!$paginate) {
+        if (! $paginate) {
             return $query->get();
         }
 
@@ -162,7 +162,8 @@ class SurchargeDetailsController extends Controller
         if ($surcharge) {
             $request->name = $surcharge->name;
         } else {
-            flash()->error('Failed!', "Sorry, default surcharge does not exist.", true);
+            flash()->error('Failed!', 'Sorry, default surcharge does not exist.', true);
+
             return back();
         }
 
@@ -175,11 +176,11 @@ class SurchargeDetailsController extends Controller
 
         // If it exists then close it off
         if ($surchargeDetails) {
-            $newToDate = date('Y-m-d', strtotime($request->from_date . ' -1 day'));
+            $newToDate = date('Y-m-d', strtotime($request->from_date.' -1 day'));
             if ($surchargeDetails->from_date >= $newToDate) {
                 $surchargeDetails->delete();
             } else {
-                $surchargeDetails->to_date =  $newToDate;
+                $surchargeDetails->to_date = $newToDate;
                 $surchargeDetails->save();
             }
         }
@@ -187,6 +188,7 @@ class SurchargeDetailsController extends Controller
         // Finally create new surcharge detail record
         SurchargeDetail::create($request->all());
         flash()->success('Created!', 'Surcharge created successfully.');
+
         return redirect("surchargedetails/$surcharge/$company/index");
     }
 
@@ -239,11 +241,11 @@ class SurchargeDetailsController extends Controller
 
             $surchargeId = (isset($request->surcharge_id)) ? $request->surcharge_id : 0;
             $companyId = (isset($request->company_id)) ? $request->company_id : 0;
-            $url = 'surchargedetails' . '/' . $surcharge->surcharge_id . '/' . $companyId . '/index';
+            $url = 'surchargedetails'.'/'.$surcharge->surcharge_id.'/'.$companyId.'/index';
 
             return redirect($url);
         }
-        flash()->error('Failed!', "Sorry, surcharge not found.", true);
+        flash()->error('Failed!', 'Sorry, surcharge not found.', true);
 
         return back();
     }

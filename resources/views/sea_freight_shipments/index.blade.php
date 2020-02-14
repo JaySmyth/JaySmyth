@@ -4,14 +4,14 @@
 
 @section('advanced_search_form')
 
-<input type="hidden" name="mode" value="{{Input::get('mode')}}">
+<input type="hidden" name="mode" value="{{Request::get('mode')}}">
 
 <div class="form-group row">
     <label class="col-sm-4  col-form-label">
         Shipment number, reference or destination:
     </label>
     <div class="col-sm-7">
-        {!! Form::Text('filter', Input::get('filter'), ['class' => 'form-control', 'maxlength' => '50']) !!}
+        {!! Form::Text('filter', Request::get('filter'), ['class' => 'form-control', 'maxlength' => '50']) !!}
     </div>   
 </div>
 
@@ -20,7 +20,7 @@
         Date from:
     </label>
     <div class="col-sm-7">
-        <input type="text" name="date_from" value="{{Input::get('date_from')}}" class="form-control datepicker" placeholder="">
+        <input type="text" name="date_from" value="{{Request::get('date_from')}}" class="form-control datepicker" placeholder="">
     </div>   
 </div>
 
@@ -29,7 +29,7 @@
         Date To:
     </label>
     <div class="col-sm-7">
-        <input type="text" name="date_to" value="{{Input::get('date_to')}}" class="form-control datepicker" placeholder="">
+        <input type="text" name="date_to" value="{{Request::get('date_to')}}" class="form-control datepicker" placeholder="">
     </div>   
 </div>
 
@@ -38,7 +38,7 @@
         Shipper:
     </label>
     <div class="col-sm-7">
-        {!! Form::select('company', dropDown('sites', 'All Shippers'), Input::get('company'), array('class' => 'form-control')) !!}
+        {!! Form::select('company', dropDown('sites', 'All Shippers'), Request::get('company'), array('class' => 'form-control')) !!}
     </div>   
 </div>
 
@@ -47,7 +47,7 @@
         Status:
     </label>
     <div class="col-sm-7">
-        {!! Form::select('status', dropDown('seaFreightStatuses', 'All Statuses'), Input::get('status'), array('class' => 'form-control')) !!}
+        {!! Form::select('status', dropDown('seaFreightStatuses', 'All Statuses'), Request::get('status'), array('class' => 'form-control')) !!}
     </div>   
 </div>
 

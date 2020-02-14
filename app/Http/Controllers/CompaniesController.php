@@ -2,38 +2,39 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Mail;
-use App\Http\Requests\CompanyRequest;
-use Illuminate\Http\Request;
 use App\Company;
-use App\Service;
-use App\Rate;
 use App\CompanyRates;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\CompanyRequest;
+use App\Rate;
+use App\Service;
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Validator;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
+use Validator;
 
 class CompaniesController extends Controller
 {
-
     /**
-    * Create a new controller instance.
-    *
-    * @return void
-    */
+     * Create a new controller instance.
+     *
+     * @return void
+     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
     /**
-    * List company records.
-    *
-    * @param
-    * @return
-    */
+     * List company records.
+     *
+     * @param
+     * @return
+     */
     public function index(Request $request)
     {
         $this->authorize(new Company);
@@ -44,11 +45,11 @@ class CompaniesController extends Controller
     }
 
     /**
-    * Show a company record.
-    *
-    * @param
-    * @return
-    */
+     * Show a company record.
+     *
+     * @param
+     * @return
+     */
     public function show($id)
     {
         $company = Company::findOrFail($id);
@@ -61,11 +62,11 @@ class CompaniesController extends Controller
     }
 
     /**
-    * Display create company form.
-    *
-    * @param
-    * @return
-    */
+     * Display create company form.
+     *
+     * @param
+     * @return
+     */
     public function create()
     {
         $this->authorize(new Company);
@@ -74,17 +75,17 @@ class CompaniesController extends Controller
     }
 
     /**
-    * Store a new company record.
-    *
-    * @param
-    * @return
-    */
+     * Store a new company record.
+     *
+     * @param
+     * @return
+     */
     public function store(CompanyRequest $request)
     {
         $this->authorize(new Company);
 
         // Add a company code to the request array (not captured on form)
-        $array = array_add($request->all(), 'company_code', str_random(6));
+        $array = Arr::add($request->all(), 'company_code', Str::random(6));
 
         $company = Company::create($array);
 
@@ -92,15 +93,15 @@ class CompaniesController extends Controller
 
         flash()->success('Created!', 'Company created successfully.');
 
-        return redirect('companies/' . $company->id);
+        return redirect('companies/'.$company->id);
     }
 
     /**
-    * Display edit company form.
-    *
-    * @param
-    * @return
-    */
+     * Display edit company form.
+     *
+     * @param
+     * @return
+     */
     public function edit($id)
     {
         $company = Company::findOrFail($id);
@@ -111,11 +112,11 @@ class CompaniesController extends Controller
     }
 
     /**
-    * Update a company record.
-    *
-    * @param
-    * @return
-    */
+     * Update a company record.
+     *
+     * @param
+     * @return
+     */
     public function update(CompanyRequest $request, $id)
     {
         $company = Company::findOrFail($id);
@@ -126,15 +127,15 @@ class CompaniesController extends Controller
 
         flash()->success('Updated!', 'Company updated successfully.');
 
-        return redirect('companies/' . $id);
+        return redirect('companies/'.$id);
     }
 
     /**
-    * Show the change status form.
-    *
-    * @param
-    * @return
-    */
+     * Show the change status form.
+     *
+     * @param
+     * @return
+     */
     public function status($id)
     {
         $company = Company::findOrFail($id);
@@ -145,11 +146,11 @@ class CompaniesController extends Controller
     }
 
     /**
-    * Change the company status (enabled/disabled).
-    *
-    * @param
-    * @return
-    */
+     * Change the company status (enabled/disabled).
+     *
+     * @param
+     * @return
+     */
     public function updateStatus(Request $request, $id)
     {
         $company = Company::findOrFail($id);
@@ -167,16 +168,16 @@ class CompaniesController extends Controller
 
         Mail::to('rates@antrim.ifsgroup.com')->cc([$request->user()->email, 'it@antrim.ifsgroup.com', 'imaguire@antrim.ifsgroup.com', 'rbeck@antrim.ifsgroup.com', 'pjohnston@antrim.ifsgroup.com'])->queue(new \App\Mail\CompanyStatusChange($company, $request->user()));
 
-        return redirect('companies/' . $id);
+        return redirect('companies/'.$id);
     }
 
     /**
-    * Gets the the localisation settings for a company
-    * Expects all requests via ajax call.
-    *
-    * @param   Illuminate\Http\Request
-    * @return  json data array
-    */
+     * Gets the the localisation settings for a company
+     * Expects all requests via ajax call.
+     *
+     * @param   Illuminate\Http\Request
+     * @return  json data array
+     */
     public function getLocalisation(Request $request)
     {
         if ($request->ajax()) {
@@ -185,28 +186,24 @@ class CompaniesController extends Controller
     }
 
     /**
-    *
-    *
-    * @param
-    * @return
-    */
+     * @param
+     * @return
+     */
     public function services($id)
     {
         $company = Company::findOrFail($id);
 
         $this->authorize($company);
 
-        $services = Service::whereDepotId($company->depot_id)->orderBy('default', 'DESC')->orderBy("carrier_id")->orderBy('name')->orderBy("carrier_name")->get();
+        $services = Service::whereDepotId($company->depot_id)->orderBy('default', 'DESC')->orderBy('carrier_id')->orderBy('name')->orderBy('carrier_name')->get();
 
         return view('companies.services', compact('company', 'services'));
     }
 
     /**
-    *
-    *
-    * @param
-    * @return
-    */
+     * @param
+     * @return
+     */
     public function setServices(Request $request, $id)
     {
         $company = Company::findOrFail($id);
@@ -219,15 +216,13 @@ class CompaniesController extends Controller
 
         flash()->success('Services Set!', 'Services set successfully.');
 
-        return redirect('companies/' . $company->id);
+        return redirect('companies/'.$company->id);
     }
 
     /**
-    *
-    *
-    * @param
-    * @return
-    */
+     * @param
+     * @return
+     */
     public function viewCompanyRates($companyId, $serviceId)
     {
         $company = Company::findOrFail($companyId);
@@ -252,11 +247,9 @@ class CompaniesController extends Controller
     }
 
     /**
-    *
-    *
-    * @param
-    * @return
-    */
+     * @param
+     * @return
+     */
     public function setCompanyRates(Request $request, $id)
     {
         $company = Company::findOrFail($id);
@@ -283,7 +276,7 @@ class CompaniesController extends Controller
             ['rate_id' => $request->rate_id,
                 'special_discount' => $special,
                 'discount' => 0,
-                'fuel_cap' => $request->fuel_cap
+                'fuel_cap' => $request->fuel_cap,
             ]
         );
 
@@ -291,7 +284,7 @@ class CompaniesController extends Controller
         $companyRate->setDiscount($request->discount, date('Y-m-d)'));
 
         // Log changes
-        $action = 'Set Rate. Discount : ' . $request->discount . ' Fuel Cap : ' . $request->fuel_cap;
+        $action = 'Set Rate. Discount : '.$request->discount.' Fuel Cap : '.$request->fuel_cap;
         $changeLog = logRateChange(Auth::user()->id, $request->company_id, $request->service_id, $request->rate_id, '', '', $action);
 
         // Log the rate change
@@ -299,7 +292,7 @@ class CompaniesController extends Controller
 
         flash()->success('Rate Set!', 'Rate set successfully.');
 
-        return redirect('companies/' . $company->id);
+        return redirect('companies/'.$company->id);
     }
 
     public function buildCriteria($rateId, $companyId, $serviceId)
@@ -307,7 +300,7 @@ class CompaniesController extends Controller
         $criteria = ['company_id' => $companyId, 'service_id' => $serviceId];
         $rate = Rate::find($rateId);
         if ($rate) {
-            if ($rate->model == "domestic") {
+            if ($rate->model == 'domestic') {
                 $criteria = [
                     'company_id' => $companyId,
                 ];
@@ -318,10 +311,9 @@ class CompaniesController extends Controller
     }
 
     /**
-    *
-    * @param type $id
-    * @return type
-    */
+     * @param type $id
+     * @return type
+     */
     public function deleteCompanyRates($companyId, $serviceId)
     {
         $company = Company::findOrFail($companyId);
@@ -339,10 +331,10 @@ class CompaniesController extends Controller
                 flash()->error('Rate Not Set!', 'Unable to Reset Rate.');
             }
         } else {
-            flash()->info('No Action Taken', "Already Using Default Rate");
+            flash()->info('No Action Taken', 'Already Using Default Rate');
         }
 
-        return redirect('companies/' . $companyId);
+        return redirect('companies/'.$companyId);
     }
 
     /*
@@ -365,7 +357,7 @@ class CompaniesController extends Controller
         ->whereIn('id', $request->user()->getAllowedCompanyIds())
         ->with('users', 'depot');
 
-        if (!$paginate) {
+        if (! $paginate) {
             return $query->get();
         }
 
@@ -373,11 +365,11 @@ class CompaniesController extends Controller
     }
 
     /**
-    * Display the collection settings form.
-    *
-    * @param
-    * @return
-    */
+     * Display the collection settings form.
+     *
+     * @param
+     * @return
+     */
     public function collectionSettings($id)
     {
         $company = Company::findOrFail($id);
@@ -394,11 +386,11 @@ class CompaniesController extends Controller
     }
 
     /**
-    * Store the collection settings for the company.
-    *
-    * @param
-    * @return
-    */
+     * Store the collection settings for the company.
+     *
+     * @param
+     * @return
+     */
     public function storeCollectionSettings(Request $request, $id)
     {
         $company = Company::findOrFail($id);
@@ -415,7 +407,7 @@ class CompaniesController extends Controller
                 'delivery_route' => 'required',
             ];
 
-            $messageBags = array();
+            $messageBags = [];
 
             foreach ($request->settings as $key => $value) {
                 $validator = Validator::make($value, $rules);
@@ -425,7 +417,7 @@ class CompaniesController extends Controller
             }
 
             if (count($messageBags) > 0) {
-                return redirect('companies/' . $company->id . '/collection-settings')
+                return redirect('companies/'.$company->id.'/collection-settings')
                 ->with('messageBags', $messageBags)
                 ->withInput();
             }
@@ -447,15 +439,15 @@ class CompaniesController extends Controller
 
         Mail::to('transport@antrim.ifsgroup.com')->cc([$request->user()->email, 'it@antrim.ifsgroup.com'])->queue(new \App\Mail\CollectionSettingsChange($company, $request->user()));
 
-        return redirect('companies/' . $company->id);
+        return redirect('companies/'.$company->id);
     }
 
     /**
-    * Download the result set to an Excel Document.
-    *
-    * @param  Request
-    * @return Excel document
-    */
+     * Download the result set to an Excel Document.
+     *
+     * @param  Request
+     * @return Excel document
+     */
     public function download(Request $request)
     {
         $this->authorize(new Company);

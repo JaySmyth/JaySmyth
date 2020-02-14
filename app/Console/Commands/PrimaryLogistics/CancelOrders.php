@@ -2,15 +2,14 @@
 
 namespace App\Console\Commands\PrimaryLogistics;
 
-use GuzzleHttp\Psr7;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
-use GuzzleHttp\Exception\GuzzleException;
 
 class CancelOrders extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -53,11 +52,10 @@ class CancelOrders extends Command
         $shipments = \App\Shipment::whereSource('cartrover')->whereCarrierId(12)->whereCompanyId(874)->whereReceivedSent(1)->whereStatusId(7)->whereIn('recipient_country_code', ['US', 'CA'])->get();
 
         foreach ($shipments as $shipment) {
-
             try {
 
                 // Send the request to CartRover
-                $response = $client->get($this->uri . $shipment->consignment_number);
+                $response = $client->get($this->uri.$shipment->consignment_number);
 
                 // Get cart rover response
                 $reply = json_decode($response->getBody()->getContents(), true);
@@ -68,15 +66,13 @@ class CancelOrders extends Command
                     $shipment->source = 'cartrover_cancelled';
                     $shipment->save();
                 } else {
-                    Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Cancel Primary Logistics Order Failed (' . $shipment->company->company_name . '/' . $shipment->consignment_number . ')', $reply['message']));
+                    Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Cancel Primary Logistics Order Failed ('.$shipment->company->company_name.'/'.$shipment->consignment_number.')', $reply['message']));
                 }
             } catch (GuzzleException $exc) {
-
                 if ($exc->hasResponse()) {
-                    Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Cancel Primary Logistics Order (' . $shipment->company->company_name . '/' . $shipment->consignment_number . ')', Psr7\str($exc->getResponse())));
+                    Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Cancel Primary Logistics Order ('.$shipment->company->company_name.'/'.$shipment->consignment_number.')', Psr7\str($exc->getResponse())));
                 }
             }
         }
     }
-
 }

@@ -8,8 +8,8 @@
 
 namespace App\Pricing;
 
-use App\UpsEas;
 use App\Surcharge;
+use App\UpsEas;
 
 class PricingModel3 extends PricingModel
 {
@@ -51,8 +51,8 @@ class PricingModel3 extends PricingModel
     {
 
         // Identify if Surcharge applies and if so what type
-        $easType = $this->getEasType("RAS");
-        if ($easType == "RAS") {
+        $easType = $this->getEasType('RAS');
+        if ($easType == 'RAS') {
             return true;
         } else {
             return false;
@@ -63,9 +63,9 @@ class PricingModel3 extends PricingModel
     {
 
         // Identify if Surcharge applies and if so what type
-        $easType = $this->getEasType("EAS");
+        $easType = $this->getEasType('EAS');
 
-        if ($easType == "EAS") {
+        if ($easType == 'EAS') {
             return true;
         } else {
             return false;
@@ -92,13 +92,13 @@ class PricingModel3 extends PricingModel
 
         if ($eas) {
             switch ($eas->destination_surcharge) {
-                case "Remote Area Surcharge":
-                    return "RAS";
+                case 'Remote Area Surcharge':
+                    return 'RAS';
                     break;
 
                 default:
                     // Assume all others are "Extended Area Surcharge":
-                    return "EAS";
+                    return 'EAS';
                     break;
             }
         }
@@ -107,7 +107,7 @@ class PricingModel3 extends PricingModel
     }
 
     /**
-     * Returns true if any piece in the shipment has any dim greater than 120cm
+     * Returns true if any piece in the shipment has any dim greater than 120cm.
      */
     public function isOSP()
     {
@@ -125,7 +125,7 @@ class PricingModel3 extends PricingModel
     }
 
     /**
-     * Returns true if any piece in the shipment has any dim greater than 120cm
+     * Returns true if any piece in the shipment has any dim greater than 120cm.
      */
     public function isOWP()
     {
@@ -141,10 +141,10 @@ class PricingModel3 extends PricingModel
     public function isPeakSeason()
     {
         /**
-        *   4th Nov to 10 Jan
-        */
-        $startDate = date('Y-m-d', strtotime(date('Y') . "/11/04"));
-        $endDate = date('Y-m-d', strtotime(date('Y') + 1 . "/01/10"));
+         *   4th Nov to 10 Jan.
+         */
+        $startDate = date('Y-m-d', strtotime(date('Y').'/11/04'));
+        $endDate = date('Y-m-d', strtotime(date('Y') + 1 .'/01/10'));
         $currentDate = date('Y-m-d');
         if ($currentDate >= $startDate && $currentDate <= $endDate) {
             return true;

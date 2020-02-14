@@ -6,11 +6,10 @@ use App\Legacy\array2xml;
 
 trait PurchaseInvoiceToMultifreightXml
 {
-
     protected $schema = 'xsi:noNamespaceSchemaLocation="PI_Invoice.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"';
-    protected $expenseCodes = array('IFCEX' => '092015', 'IFCIM' => '093015', 'IFCUK' => '095015');
-    protected $mfMatchingArray = array();
-    protected $overheadArray = array();
+    protected $expenseCodes = ['IFCEX' => '092015', 'IFCIM' => '093015', 'IFCUK' => '095015'];
+    protected $mfMatchingArray = [];
+    protected $overheadArray = [];
     protected $key = 0;
 
     /**
@@ -33,6 +32,7 @@ trait PurchaseInvoiceToMultifreightXml
     {
         $xml = new array2xml();
         $xml->setArray($array);
+
         return $xml->outputXML('return');
     }
 
@@ -75,17 +75,17 @@ trait PurchaseInvoiceToMultifreightXml
         }
 
         // Build the context array
-        $contextArray = array('Context' => array('ifs' => $this->getFormattedInvoiceNumber()));
+        $contextArray = ['Context' => ['ifs' => $this->getFormattedInvoiceNumber()]];
 
         // Merge arrays together
         $multifreightImport = array_merge($contextArray, $this->getPiPostingArray(), $this->getPiHeaderArray(), $this->getPiVatArray(), $this->mfMatchingArray, $this->overheadArray);
 
         // Build final array
         if ($this->type != 'F') {
-            return array("PI_Invoice $this->schema" => $multifreightImport);
+            return ["PI_Invoice $this->schema" => $multifreightImport];
         }
 
-        return array('Multifreight' => array("PI_Invoice $this->schema" => $multifreightImport));
+        return ['Multifreight' => ["PI_Invoice $this->schema" => $multifreightImport]];
     }
 
     /**
@@ -131,15 +131,15 @@ trait PurchaseInvoiceToMultifreightXml
      */
     private function addToMfMatchingArray($line, $charge, $actualBilledAmount)
     {
-        $this->mfMatchingArray[$this->key . 'MF_Matching']['MF_Reference_Type'] = 'JOBNO';
-        $this->mfMatchingArray[$this->key . 'MF_Matching']['MF_Department'] = substr($line->scs_job_number, 0, 5);
-        $this->mfMatchingArray[$this->key . 'MF_Matching']['MF_Reference'] = $line->scs_job_number;
-        $this->mfMatchingArray[$this->key . 'MF_Matching']['MF_Charge_Type'] = $charge->scs_charge_code;
-        $this->mfMatchingArray[$this->key . 'MF_Matching']['MF_Charge_Source'] = 'OCR';
-        $this->mfMatchingArray[$this->key . 'MF_Matching']['MF_Fully_Match'] = 'NO';
-        $this->mfMatchingArray[$this->key . 'MF_Matching']['MF_Matched_Amount'] = ($actualBilledAmount) ? $actualBilledAmount : $charge->actual_billed_amount;
-        $this->mfMatchingArray[$this->key . 'MF_Matching']['MF_Match_VAT_Code'] = $line->scs_vat_code;
-        $this->mfMatchingArray[$this->key . 'MF_Matching']['PO_Number'] = null;
+        $this->mfMatchingArray[$this->key.'MF_Matching']['MF_Reference_Type'] = 'JOBNO';
+        $this->mfMatchingArray[$this->key.'MF_Matching']['MF_Department'] = substr($line->scs_job_number, 0, 5);
+        $this->mfMatchingArray[$this->key.'MF_Matching']['MF_Reference'] = $line->scs_job_number;
+        $this->mfMatchingArray[$this->key.'MF_Matching']['MF_Charge_Type'] = $charge->scs_charge_code;
+        $this->mfMatchingArray[$this->key.'MF_Matching']['MF_Charge_Source'] = 'OCR';
+        $this->mfMatchingArray[$this->key.'MF_Matching']['MF_Fully_Match'] = 'NO';
+        $this->mfMatchingArray[$this->key.'MF_Matching']['MF_Matched_Amount'] = ($actualBilledAmount) ? $actualBilledAmount : $charge->actual_billed_amount;
+        $this->mfMatchingArray[$this->key.'MF_Matching']['MF_Match_VAT_Code'] = $line->scs_vat_code;
+        $this->mfMatchingArray[$this->key.'MF_Matching']['PO_Number'] = null;
     }
 
     /**
@@ -150,16 +150,16 @@ trait PurchaseInvoiceToMultifreightXml
      */
     private function addToOverheadArray($line, $charge, $actualBilledAmount)
     {
-        $this->overheadArray[$this->key . 'Overhead']['MF_Department'] = 'IFCEX';
-        $this->overheadArray[$this->key . 'Overhead']['Charge_Type'] = $charge->scs_charge_code;
-        $this->overheadArray[$this->key . 'Overhead']['Description'] = 'Inv:' . $this->getFormattedInvoiceNumber();
-        $this->overheadArray[$this->key . 'Overhead']['Currency_Amount'] = ($actualBilledAmount) ? $actualBilledAmount : $charge->actual_billed_amount;
-        $this->overheadArray[$this->key . 'Overhead']['Exchange_Rate'] = '1.0000';
-        $this->overheadArray[$this->key . 'Overhead']['Base_Amount'] = ($actualBilledAmount) ? $actualBilledAmount : $charge->actual_billed_amount;
-        $this->overheadArray[$this->key . 'Overhead']['VAT_Code'] = $line->scs_vat_code;
-        $this->overheadArray[$this->key . 'Overhead']['VAT_Rate'] = 20;
-        $this->overheadArray[$this->key . 'Overhead']['Cost_Centre'] = '02';
-        $this->overheadArray[$this->key . 'Overhead']['Expense_Code'] = $this->expenseCodes['IFCEX'];
+        $this->overheadArray[$this->key.'Overhead']['MF_Department'] = 'IFCEX';
+        $this->overheadArray[$this->key.'Overhead']['Charge_Type'] = $charge->scs_charge_code;
+        $this->overheadArray[$this->key.'Overhead']['Description'] = 'Inv:'.$this->getFormattedInvoiceNumber();
+        $this->overheadArray[$this->key.'Overhead']['Currency_Amount'] = ($actualBilledAmount) ? $actualBilledAmount : $charge->actual_billed_amount;
+        $this->overheadArray[$this->key.'Overhead']['Exchange_Rate'] = '1.0000';
+        $this->overheadArray[$this->key.'Overhead']['Base_Amount'] = ($actualBilledAmount) ? $actualBilledAmount : $charge->actual_billed_amount;
+        $this->overheadArray[$this->key.'Overhead']['VAT_Code'] = $line->scs_vat_code;
+        $this->overheadArray[$this->key.'Overhead']['VAT_Rate'] = 20;
+        $this->overheadArray[$this->key.'Overhead']['Cost_Centre'] = '02';
+        $this->overheadArray[$this->key.'Overhead']['Expense_Code'] = $this->expenseCodes['IFCEX'];
     }
 
     /**
@@ -167,7 +167,7 @@ trait PurchaseInvoiceToMultifreightXml
      */
     private function getPiHeaderArray()
     {
-        $piHeaderArray = array();
+        $piHeaderArray = [];
         $piHeaderArray['PI_Header']['Supplier_Code'] = $this->scs_supplier_code;
         $piHeaderArray['PI_Header']['Currency'] = $this->currency_code;
         $piHeaderArray['PI_Header']['Invoice_Number'] = $this->getFormattedInvoiceNumber();
@@ -176,6 +176,7 @@ trait PurchaseInvoiceToMultifreightXml
         $piHeaderArray['PI_Header']['PO_number'] = '';
         $piHeaderArray['PI_Header']['Due_Date'] = '';
         $piHeaderArray['PI_Header']['Document_Source'] = '';
+
         return $piHeaderArray;
     }
 
@@ -186,18 +187,18 @@ trait PurchaseInvoiceToMultifreightXml
      */
     private function getPiVatArray()
     {
-        $piVatArray = array();
+        $piVatArray = [];
 
         if ($this->total_non_taxable > 0) {
-            $piVatArray [0 . 'PI_VAT']['VAT_Code'] = 'Z';
-            $piVatArray [0 . 'PI_VAT']['VAT_Goods'] = $this->total_non_taxable;
-            $piVatArray [0 . 'PI_VAT']['VAT_Amount'] = '0.00';
+            $piVatArray[0 .'PI_VAT']['VAT_Code'] = 'Z';
+            $piVatArray[0 .'PI_VAT']['VAT_Goods'] = $this->total_non_taxable;
+            $piVatArray[0 .'PI_VAT']['VAT_Amount'] = '0.00';
         }
 
         if ($this->total_taxable > 0) {
-            $piVatArray [1 . 'PI_VAT']['VAT_Code'] = '1';
-            $piVatArray [1 . 'PI_VAT']['VAT_Goods'] = number_format($this->total_taxable, 2, '.', '');
-            $piVatArray [1 . 'PI_VAT']['VAT_Amount'] = number_format($this->vat, 2, '.', '');
+            $piVatArray[1 .'PI_VAT']['VAT_Code'] = '1';
+            $piVatArray[1 .'PI_VAT']['VAT_Goods'] = number_format($this->total_taxable, 2, '.', '');
+            $piVatArray[1 .'PI_VAT']['VAT_Amount'] = number_format($this->vat, 2, '.', '');
         }
 
         return $piVatArray;
@@ -210,16 +211,15 @@ trait PurchaseInvoiceToMultifreightXml
      */
     private function getPiPostingArray()
     {
-        return array(
-            'PI_Posting' => array(
+        return [
+            'PI_Posting' => [
                 'MF_Department' => 'IFCEX',
                 'Action' => 'POST',
                 'Authorised_by' => 'IFS Global Logistics',
                 'Source_Document_Location' => '',
                 'Notes' => '',
-                'Notify_Email' => null
-            )
-        );
+                'Notify_Email' => null,
+            ],
+        ];
     }
-
 }

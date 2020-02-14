@@ -10,22 +10,22 @@
 
         <div class="form-group">
             <label for="filter">Date</label>
-            <input type="text" name="date" value="@if(!Input::get('date')){{date(Auth::user()->date_format)}}@else{{Input::get('date')}}@endif" class="form-control datepicker" placeholder="Date">
+            <input type="text" name="date" value="@if(!Request::get('date')){{date(Auth::user()->date_format)}}@else{{Request::get('date')}}@endif" class="form-control datepicker" placeholder="Date">
         </div>
 
         <div class="form-group">
             <label for="month">Shipper</label>
-            {!! Form::select('company', dropDown('enabledSites', 'All Shippers'), Input::get('company'), array('class' => 'form-control')) !!}
+            {!! Form::select('company', dropDown('enabledSites', 'All Shippers'), Request::get('company'), array('class' => 'form-control')) !!}
         </div>
 
         <div class="form-group">
             <label for="month">Received</label>
-            {!! Form::select('received', dropDown('boolean', 'All'), Input::get('received'), array('class' => 'form-control')) !!}
+            {!! Form::select('received', dropDown('boolean', 'All'), Request::get('received'), array('class' => 'form-control')) !!}
         </div>
 
         <div class="form-group">
             <label for="month">Routed</label>
-            {!! Form::select('routed', dropDown('boolean', 'All'), Input::get('routed'), array('class' => 'form-control')) !!}
+            {!! Form::select('routed', dropDown('boolean', 'All'), Request::get('routed'), array('class' => 'form-control')) !!}
         </div>
 
         <button type="submit" class="btn btn-primary mt-3">Update Report</button>

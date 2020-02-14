@@ -2,12 +2,11 @@
 
 namespace App;
 
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 trait ShipmentScopes
 {
-
     /**
      * Scope ship date.
      *
@@ -15,11 +14,11 @@ trait ShipmentScopes
      */
     public function scopeShipDateBetween($query, $dateFrom, $dateTo)
     {
-        if (!$dateFrom && $dateTo) {
+        if (! $dateFrom && $dateTo) {
             return $query->where('ship_date', '<', Carbon::parse($dateTo)->endOfDay());
         }
 
-        if ($dateFrom && !$dateTo) {
+        if ($dateFrom && ! $dateTo) {
             return $query->where('ship_date', '>', Carbon::parse($dateFrom)->startOfDay());
         }
 
@@ -36,13 +35,12 @@ trait ShipmentScopes
     public function scopeFilter($query, $filter)
     {
         if ($filter) {
-
             $filter = trim($filter);
 
             return $query->where('consignment_number', $filter)
                 ->orWhere('carrier_consignment_number', $filter)
                 ->orWhere('carrier_tracking_number', $filter)
-                ->orWhere('shipment_reference', 'LIKE', '%' . $filter . '%');
+                ->orWhere('shipment_reference', 'LIKE', '%'.$filter.'%');
         }
     }
 
@@ -54,7 +52,6 @@ trait ShipmentScopes
     public function scopeHasScsJobNumber($query, $scsJobNumber)
     {
         if ($scsJobNumber) {
-
             $scsJobNumber = trim($scsJobNumber);
 
             return $query->where('scs_job_number', $scsJobNumber);
@@ -69,14 +66,13 @@ trait ShipmentScopes
     public function scopeRecipientFilter($query, $filter)
     {
         if ($filter) {
-
             $filter = trim($filter);
 
-            return $query->where('recipient_company_name', 'LIKE', '%' . $filter . '%')
-                ->orWhere('recipient_name', 'LIKE', '%' . $filter . '%')
-                ->orWhere('recipient_address1', 'LIKE', '%' . $filter . '%')
-                ->orWhere('recipient_city', 'LIKE', '%' . $filter . '%')
-                ->orWhere('recipient_postcode', 'LIKE', '%' . $filter . '%');
+            return $query->where('recipient_company_name', 'LIKE', '%'.$filter.'%')
+                ->orWhere('recipient_name', 'LIKE', '%'.$filter.'%')
+                ->orWhere('recipient_address1', 'LIKE', '%'.$filter.'%')
+                ->orWhere('recipient_city', 'LIKE', '%'.$filter.'%')
+                ->orWhere('recipient_postcode', 'LIKE', '%'.$filter.'%');
         }
     }
 
@@ -87,7 +83,6 @@ trait ShipmentScopes
      */
     public function scopeHasMode($query, $mode)
     {
-
         if (is_numeric($mode)) {
             return $query->where('shipments.mode_id', $mode);
         }
@@ -116,7 +111,6 @@ trait ShipmentScopes
         }
 
         if ($status) {
-
             $query->select('shipments.*')->join('statuses', 'shipments.status_id', '=', 'statuses.id');
 
             if (is_array($status)) {
@@ -294,7 +288,7 @@ trait ShipmentScopes
 
     public function scopeWithinEu($query)
     {
-        if (!isJoined($query, 'countries')) {
+        if (! isJoined($query, 'countries')) {
             $query->join('countries', 'shipments.recipient_country_code', '=', 'countries.country_code');
         }
 
@@ -308,7 +302,7 @@ trait ShipmentScopes
 
     public function scopeEuExcludingUkDomestic($query)
     {
-        if (!isJoined($query, 'countries')) {
+        if (! isJoined($query, 'countries')) {
             $query->join('countries', 'shipments.recipient_country_code', '=', 'countries.country_code');
         }
 
@@ -339,7 +333,7 @@ trait ShipmentScopes
 
     public function scopeNotEu($query)
     {
-        if (!isJoined($query, 'countries')) {
+        if (! isJoined($query, 'countries')) {
             $query->join('countries', 'shipments.recipient_country_code', '=', 'countries.country_code');
         }
 
@@ -374,7 +368,6 @@ trait ShipmentScopes
     public function scopeHasPieces($query, $pieces)
     {
         if (is_numeric($pieces)) {
-
             if ($pieces == 1) {
                 return $query->where('pieces', $pieces);
             }
@@ -456,7 +449,7 @@ trait ShipmentScopes
 
     public function scopeFedexRouteParis($query)
     {
-        if (!isJoined($query, 'countries')) {
+        if (! isJoined($query, 'countries')) {
             $query->join('countries', 'shipments.recipient_country_code', '=', 'countries.country_code');
         }
 
@@ -470,7 +463,7 @@ trait ShipmentScopes
 
     public function scopeFedexRouteMemphis($query)
     {
-        if (!isJoined($query, 'countries')) {
+        if (! isJoined($query, 'countries')) {
             $query->join('countries', 'shipments.recipient_country_code', '=', 'countries.country_code');
         }
 
@@ -512,7 +505,7 @@ trait ShipmentScopes
         // Exclude IFS Demo accounts and Unit Test Account
         $excludedCompanies = ['57', '508', '849', '707'];
 
-        if (!isJoined($query, 'companies')) {
+        if (! isJoined($query, 'companies')) {
             $query->join('companies', 'shipments.company_id', '=', 'companies.id');
         }
 
@@ -575,16 +568,13 @@ trait ShipmentScopes
     public function scopeHasManifestNumber($query, $manifestNumber)
     {
         if ($manifestNumber) {
-
             $manifestNumber = trim($manifestNumber);
 
-            if (!isJoined($query, 'manifests')) {
+            if (! isJoined($query, 'manifests')) {
                 $query->join('manifests', 'shipments.manifest_id', '=', 'manifests.id');
             }
 
             return $query->where('manifests.number', $manifestNumber);
         }
-
     }
-
 }

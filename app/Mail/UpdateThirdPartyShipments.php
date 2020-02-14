@@ -8,7 +8,6 @@ use Illuminate\Queue\SerializesModels;
 
 class UpdateThirdPartyShipments extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -32,7 +31,7 @@ class UpdateThirdPartyShipments extends Mailable
     public function build()
     {
         // Attach the CSV files
-        if (!empty($this->results['file'])) {
+        if (! empty($this->results['file'])) {
             if (file_exists($this->results['file'])) {
                 $this->attach($this->results['file']);
             }
@@ -42,5 +41,4 @@ class UpdateThirdPartyShipments extends Mailable
                         ->subject($this->results['subject'])
                         ->with(['results' => $this->results]);
     }
-
 }

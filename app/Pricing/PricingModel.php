@@ -2,14 +2,14 @@
 
 namespace App\Pricing;
 
-use App\PricingZones;
+use App\CarrierPackagingType;
+use App\Company;
 use App\Countries;
 use App\FuelSurcharge;
+use App\PricingZones;
 use App\Rate;
 use App\RateDetail;
-use App\Company;
 use App\Service;
-use App\CarrierPackagingType;
 use App\Surcharge;
 use App\SurchargeDetail;
 
@@ -27,7 +27,7 @@ class PricingModel
     public $packagingType;
     public $costsRequired;
     public $priceType;
-    public $response = array();
+    public $response = [];
     public $models;
     public $model;
     public $surcharge;
@@ -72,7 +72,7 @@ class PricingModel
 
     public function log($msg)
     {
-        $this->log[] = $msg . " - " . date('H:i:s');
+        $this->log[] = $msg.' - '.date('H:i:s');
     }
 
     public function __construct($debug = false)
@@ -80,7 +80,7 @@ class PricingModel
         $this->debug = $debug;
 
         if ($this->debug) {
-            $this->log("**** Logging On ****");
+            $this->log('**** Logging On ****');
         }
         /*
          * *****************************************************
@@ -128,29 +128,29 @@ class PricingModel
         $this->weightConv = [
             'lb' => [
                 'kg' => 0.453592,
-                'lb' => 1
+                'lb' => 1,
             ],
             'kg' => [
                 'lb' => 2.20462,
-                'kg' => 1
-            ]
+                'kg' => 1,
+            ],
         ];
 
         $this->dimConv = [
             'in' => [
                 'lb' => 1,
-                'kg' => 0.45359237
+                'kg' => 0.45359237,
             ],
             'cm' => [
                 'lb' => 2.2046333,
-                'kg' => 1
-            ]
+                'kg' => 1,
+            ],
         ];
     }
 
     /**
      * Accepts a shipment, rate and price type (Cost/ Sales)
-     * and calculates the appropriate price
+     * and calculates the appropriate price.
      *
      * @param array $shipment
      * @param array $rate
@@ -168,15 +168,15 @@ class PricingModel
         $this->service = Service::find($shipment['service_id']);
 
         $this->log("PriceType: $priceType");
-        $this->log("ServiceId: ".$shipment['service_id']);
+        $this->log('ServiceId: '.$shipment['service_id']);
 
         // Save Rate Header
         $this->rate = $rate;
         if (empty($rate)) {
             $this->log('Rate not defined');
-            $this->response['errors'][] = "Unable to identify " . $this->priceType . " Rate";
+            $this->response['errors'][] = 'Unable to identify '.$this->priceType.' Rate';
         } else {
-            $this->log("Using Rate: ".$this->rate['id'] . ' - '.$this->rate['description']);
+            $this->log('Using Rate: '.$this->rate['id'].' - '.$this->rate['description']);
             $this->model = $this->models[$this->rate['model']];
 
             // Get Pricing zone
@@ -199,7 +199,7 @@ class PricingModel
                 $this->response['rate_id'] = $this->rate['id'];
                 $this->response['packaging'] = $this->packagingType;
             } else {
-                $this->log("*** Failed with errors");
+                $this->log('*** Failed with errors');
             }
         }
         $this->response['log'] = $this->log;
@@ -208,7 +208,7 @@ class PricingModel
     }
 
     /**
-     * Identify the correct pricing zone
+     * Identify the correct pricing zone.
      *
      * @return type
      */
@@ -218,20 +218,21 @@ class PricingModel
 
         // Get appropriate zone for the rate model
         $this->log('Find Zone using');
-        $this->log('company_id: ' . $this->shipment['company_id']);
-        $this->log('   sender_country_code: ' . $this->shipment['sender_country_code']);
-        $this->log('   sender_postcode: ' . $this->shipment['sender_postcode']);
-        $this->log('   service_code : ' . $this->shipment['service_code']);
-        $this->log('   recipient_country_code: ' . $this->shipment['recipient_country_code']);
-        $this->log('   recipient_postcode: ' . $this->shipment['recipient_postcode']);
-        $this->log('   model: ' . $this->model);
+        $this->log('company_id: '.$this->shipment['company_id']);
+        $this->log('   sender_country_code: '.$this->shipment['sender_country_code']);
+        $this->log('   sender_postcode: '.$this->shipment['sender_postcode']);
+        $this->log('   service_code : '.$this->shipment['service_code']);
+        $this->log('   recipient_country_code: '.$this->shipment['recipient_country_code']);
+        $this->log('   recipient_postcode: '.$this->shipment['recipient_postcode']);
+        $this->log('   model: '.$this->model);
         $zone = $pricingZones->getZone($this->shipment, $this->models[$this->rate['model']]);
         $zoneType = ($this->priceType == 'Sales') ? 'sale_zone' : 'cost_zone';
 
         if (empty($zone->$zoneType)) {
-            $error = "Unable to identify " . $this->priceType . " Zone";
+            $error = 'Unable to identify '.$this->priceType.' Zone';
             $this->log($error);
             $this->response['errors'][] = $error;
+
             return;
         }
 
@@ -240,12 +241,12 @@ class PricingModel
         } else {
             $this->zone = (isset($zone->cost_zone)) ? $zone->cost_zone : null;
         }
-        $this->log("Using ".$this->priceType." Zone: ".$this->zone);
+        $this->log('Using '.$this->priceType.' Zone: '.$this->zone);
     }
 
     /**
      * Gets the Packaging Type of the current package
-     * and set this->packagingType to the IFS equivalent
+     * and set this->packagingType to the IFS equivalent.
      *
      * @param type $pkgNo
      */
@@ -254,8 +255,8 @@ class PricingModel
 
         // Temporary fix to treat "BOX" as "CTN" for pricing purposes
         // May be removed when legacy system disabled
-        if ($this->shipment['packages'][$pkgNo]['packaging_code'] == "BOX") {
-            $this->shipment['packages'][$pkgNo]['packaging_code'] = "CTN";
+        if ($this->shipment['packages'][$pkgNo]['packaging_code'] == 'BOX') {
+            $this->shipment['packages'][$pkgNo]['packaging_code'] = 'CTN';
         }
 
         // Identify Shipment Package type for pricing
@@ -278,26 +279,26 @@ class PricingModel
             $this->packagingType = $this->shipment['packages'][$pkgNo]['packaging_code'];
         }
 
-        $this->log("Packaging Type: ".$this->packagingType);
+        $this->log('Packaging Type: '.$this->packagingType);
     }
 
     /**
-     * Calculates the Chargeable weight
+     * Calculates the Chargeable weight.
      *
      * sets $this->chargeableWeight
      */
     public function calcChargeable()
     {
-        if (!isset($this->shipment['weight'])) {
+        if (! isset($this->shipment['weight'])) {
             $this->shipment['weight'] = 0;
         }
 
         $this->calcChargeableWeights();
 
         $this->chargeableWeight = max($this->shipment['weight'], $this->shipment['volumetric_weight']);
-        $this->log("Act Wgt: ".$this->shipment['weight']);
-        $this->log("Vol Wgt: ".$this->shipment['volumetric_weight']);
-        $this->log("Chargeable: ".$this->chargeableWeight);
+        $this->log('Act Wgt: '.$this->shipment['weight']);
+        $this->log('Vol Wgt: '.$this->shipment['volumetric_weight']);
+        $this->log('Chargeable: '.$this->chargeableWeight);
 
         if ($this->chargeableWeight == 0) {
             $this->response['errors'][] = 'Chargable weight must be greater than 0';
@@ -322,29 +323,29 @@ class PricingModel
                 $dimRate = $this->dimConv[$this->shipment['dims_uom']][$this->rate['weight_units']];
 
                 if ($this->isLPSPackage($package)) {
-                    $this->log("LPS Package so weight min 40kgs");
+                    $this->log('LPS Package so weight min 40kgs');
                     $minPkgWeight = 40 * $wgRate;
                 } else {
-                    $this->log("Not LPS Package so no min weight");
+                    $this->log('Not LPS Package so no min weight');
                     $minPkgWeight = 0;
                 }
 
-                $this->log("Vol Divisor for rate: ".$this->rate["volumetric_divisor"]);
+                $this->log('Vol Divisor for rate: '.$this->rate['volumetric_divisor']);
                 $pkgVolWt = calcVolume(
                     $package['length'],
                     $package['width'],
                     $package['height'],
-                    $this->rate["volumetric_divisor"]
+                    $this->rate['volumetric_divisor']
                 );
 
                 // Convert weight into same unit as the rate sheet
                 $pkgVolWt = $pkgVolWt * $dimRate;
-                $this->log("Pkg Vol Weight in rate units: ".$pkgVolWt);
+                $this->log('Pkg Vol Weight in rate units: '.$pkgVolWt);
 
                 $this->shipment['weight'] += max($minPkgWeight, $package['weight'] * $wgRate);
                 $this->shipment['volumetric_weight'] += max($minPkgWeight, $pkgVolWt);
-                $this->log("Package Weight: ".$this->shipment['weight']);
-                $this->log("Package Volume: ".$this->shipment['volumetric_weight']);
+                $this->log('Package Weight: '.$this->shipment['weight']);
+                $this->log('Package Volume: '.$this->shipment['volumetric_weight']);
             } else {
 
                 // If Dims not present stop calculation
@@ -355,7 +356,7 @@ class PricingModel
 
     /**
      * Gets the fuel % for the specified Pricing Model
-     * and sets $this->fuelPercentage
+     * and sets $this->fuelPercentage.
      */
     public function getFuelPercentage()
     {
@@ -364,22 +365,22 @@ class PricingModel
 
         if (empty($fuelPercentage)) {
             $this->fuelPercentage = 0;
-            $error = 'Unable to determine Fuel surcharge. Carrier :' . $this->shipment['carrier_id']
-                    . " Service :" . $this->shipment['service_code']
-                    . " Date :" . $this->shipment['ship_date'];
+            $error = 'Unable to determine Fuel surcharge. Carrier :'.$this->shipment['carrier_id']
+                    .' Service :'.$this->shipment['service_code']
+                    .' Date :'.$this->shipment['ship_date'];
             $this->response['errors'][] = $error;
             $this->log($error);
         } else {
             $this->fuelPercentage = $fuelPercentage->fuel_percent;
-            $this->log("Fuel%: ".$fuelPercentage->fuel_percent);
+            $this->log('Fuel%: '.$fuelPercentage->fuel_percent);
         }
     }
 
-    public function getSurcharge($chargeType, $basedOn = "service")
+    public function getSurcharge($chargeType, $basedOn = 'service')
     {
-        $this->log("Surcharge based on Service");
+        $this->log('Surcharge based on Service');
         $surchargeDetails = [];
-        if ($basedOn == "service") {
+        if ($basedOn == 'service') {
 
             // Identify surcharge from service
             $this->surchargeId = ($this->priceType == 'Sales') ? $this->service->sales_surcharge_id : $this->service->costs_surcharge_id;
@@ -394,16 +395,18 @@ class PricingModel
             $this->surcharge = Surcharge::find($this->surchargeId);
             $surchargeDetails = $this->surcharge->getCharges($this->surchargeId, $chargeType, $this->shipment['company_id'], date('Y-m-d', strtotime($this->shipment['ship_date'])));
         } else {
-            $this->log("No Surcharge found");
+            $this->log('No Surcharge found');
         }
 
         if (isset($surchargeDetails[0])) {
-            $this->log("Surcharge ".$surchargeDetails[0]->name. " Found");
+            $this->log('Surcharge '.$surchargeDetails[0]->name.' Found');
+
             return $surchargeDetails[0];
         } else {
             if (isset($surchargeDetails->name)) {
-                $this->log("Surcharge ".$surchargeDetails->name. " Found");
+                $this->log('Surcharge '.$surchargeDetails->name.' Found');
             }
+
             return $surchargeDetails;
         }
     }
@@ -411,7 +414,7 @@ class PricingModel
     public function calcSurcharge($code, $packages = 0)
     {
         $this->surchargeDetails = $this->getSurcharge($code);
-        $description = (isset($this->surchargeDetails->name)) ? $this->surchargeDetails->name : "Surcharge";
+        $description = (isset($this->surchargeDetails->name)) ? $this->surchargeDetails->name : 'Surcharge';
         if ($packages == 0) {
             $packages = $this->shipment['pieces'];
         } else {
@@ -431,12 +434,12 @@ class PricingModel
             }
             $this->log(
                 "Surcharge $code : Cons val ".$this->surchargeDetails->consignment_rate
-                ." + wght val ".$this->chargeableWeight * $this->surchargeDetails->weight_rate
-                ." + pkg val ". $packages * $this->surchargeDetails->package_rate
+                .' + wght val '.$this->chargeableWeight * $this->surchargeDetails->weight_rate
+                .' + pkg val '.$packages * $this->surchargeDetails->package_rate
             );
             $this->addSurcharge($charge);
         } else {
-            $this->log("No surcharge applicable");
+            $this->log('No surcharge applicable');
             $this->surcharge = null;
         }
     }
@@ -444,7 +447,7 @@ class PricingModel
     /**
      * If shipment is to a residential address and a
      * Residential surcharge has been set for the rate
-     * Then it is added to the pricing Response
+     * Then it is added to the pricing Response.
      */
     public function calcSurcharges()
     {
@@ -456,17 +459,17 @@ class PricingModel
             $this->log("$i LPS Packages found");
             $this->calcSurcharge('LPS', $i);
             if ($this->isPeakSeason()) {
-                $this->log("Add Peak Season PSS");
+                $this->log('Add Peak Season PSS');
                 $this->calcSurcharge('PLP', $i);
             }
         } else {
 
             // Oversize Piece
             if ($this->isOSP()) {
-                $this->log("OSP Packages found");
+                $this->log('OSP Packages found');
                 $this->calcSurcharge('OSP');
                 if ($this->isPeakSeason()) {
-                    $this->log("Add Peak Season PSS");
+                    $this->log('Add Peak Season PSS');
                     $i = $this->countOSPPackages();
                     $this->calcSurcharge('PAH', $i);
                 }
@@ -474,10 +477,10 @@ class PricingModel
 
                 // OverWeight Piece
                 if ($this->isOWP()) {
-                    $this->log("OWP Packages found");
+                    $this->log('OWP Packages found');
                     $this->calcSurcharge('OWP');
                     if ($this->isPeakSeason()) {
-                        $this->log("Add Peak Season PSS");
+                        $this->log('Add Peak Season PSS');
                         $i = $this->countOWPPackages();
                         $this->calcSurcharge('PAH', $i);
                     }
@@ -493,7 +496,7 @@ class PricingModel
         $surchargeCodes = 'ADH,COL,EAS,MAX,RAS,OOA,RES';
 
         // If Intl shipment add additional Intl only Surcharge codes
-        if (!isDomestic($this->shipment['sender_country_code'], $this->shipment['recipient_country_code'])) {
+        if (! isDomestic($this->shipment['sender_country_code'], $this->shipment['recipient_country_code'])) {
             $surchargeCodes .= ',ADG,EQT,IDG,ICE,DTP,BRO';
         }
 
@@ -539,7 +542,6 @@ class PricingModel
             return true;
         }
 
-
         return false;
     }
 
@@ -576,11 +578,11 @@ class PricingModel
     public function isBRO()
     {
         $broker = false;
-        if (isset($this->shipment['broker_name']) && $this->shipment['broker_name'] != "") {
+        if (isset($this->shipment['broker_name']) && $this->shipment['broker_name'] != '') {
             $broker = true;
         }
 
-        if (isset($this->shipment['broker_company_name']) && $this->shipment['broker_company_name'] != "") {
+        if (isset($this->shipment['broker_company_name']) && $this->shipment['broker_company_name'] != '') {
             $broker = true;
         }
 
@@ -640,7 +642,7 @@ class PricingModel
     }
 
     /**
-     * Returns true if any piece in the shipment has any dim greater than 120cm
+     * Returns true if any piece in the shipment has any dim greater than 120cm.
      */
     public function isOSP()
     {
@@ -660,7 +662,7 @@ class PricingModel
     }
 
     /**
-     * Returns true if any piece in the shipment has a weight in excess of 69.5 kg
+     * Returns true if any piece in the shipment has a weight in excess of 69.5 kg.
      */
     public function isOWP()
     {
@@ -674,7 +676,7 @@ class PricingModel
     }
 
     /**
-     * Returns true if this is a large package shipment
+     * Returns true if this is a large package shipment.
      */
     public function isLPS()
     {
@@ -689,7 +691,7 @@ class PricingModel
     }
 
     /**
-     * Returns true if this is a large package shipment
+     * Returns true if this is a large package shipment.
      */
     public function isLPSPackage($package)
     {
@@ -705,7 +707,7 @@ class PricingModel
     }
 
     /**
-     * Returns true if this is a large package shipment
+     * Returns true if this is a large package shipment.
      */
     public function countLPSPackages()
     {
@@ -720,7 +722,7 @@ class PricingModel
     }
 
     /**
-     * Returns true if this is a large package shipment
+     * Returns true if this is a large package shipment.
      */
     public function countOSPPackages()
     {
@@ -738,7 +740,7 @@ class PricingModel
     }
 
     /**
-     * Returns true if this is a large package shipment
+     * Returns true if this is a large package shipment.
      */
     public function countOWPPackages()
     {
@@ -764,7 +766,7 @@ class PricingModel
         if (isset($charge['value']) && $charge['value'] != 0) {
             $charge['value'] = number_format($charge['value'], 2, '.', '');
             $this->response['charges'][] = $charge;
-            $this->log('<' . $charge['description'] . ' - ' . $charge['value'] . '>');
+            $this->log('<'.$charge['description'].' - '.$charge['value'].'>');
         }
     }
 
@@ -783,7 +785,8 @@ class PricingModel
 
         // If we do not require costs
         if ($this->priceType == 'costs' && $this->costsRequired == 'N') {
-            $this->log("Costs not required");
+            $this->log('Costs not required');
+
             return;
         }
 
@@ -793,38 +796,38 @@ class PricingModel
     }
 
     /**
-     * Calculate the Freight portion of the price
+     * Calculate the Freight portion of the price.
      */
     public function calcFreight()
     {
 
         // Get Package Type
         $this->getPackagingType();
-        $packagingType = ($this->packagingType == '') ? 'Unknown' : $this->packagingType . "(s)";
+        $packagingType = ($this->packagingType == '') ? 'Unknown' : $this->packagingType.'(s)';
         $this->log("Using Packaging type of $packagingType");
 
         // Get Rate Details for this Packaging Type/zone/pieces/weight
-        $this->log("Looking for Rate for");
-        $this->log("   CompanyId: ".$this->shipment['company_id']);
-        $this->log("   RateId: ".$this->rate['id']);
-        $this->log("   ServiceId: " . $this->shipment['service_id']);
-        $this->log("   Recipient Type: " . $this->shipment['recipient_type']);
-        $this->log("   Packaging Type: " . $this->packagingType);
-        $this->log("   Pieces: " . $this->shipment['pieces']);
-        $this->log("   Chargable Weight: " . $this->chargeableWeight);
-        $this->log("   Zone: " . $this->zone);
-        $this->log("   ShipDate: " . $this->shipment['ship_date']);
+        $this->log('Looking for Rate for');
+        $this->log('   CompanyId: '.$this->shipment['company_id']);
+        $this->log('   RateId: '.$this->rate['id']);
+        $this->log('   ServiceId: '.$this->shipment['service_id']);
+        $this->log('   Recipient Type: '.$this->shipment['recipient_type']);
+        $this->log('   Packaging Type: '.$this->packagingType);
+        $this->log('   Pieces: '.$this->shipment['pieces']);
+        $this->log('   Chargable Weight: '.$this->chargeableWeight);
+        $this->log('   Zone: '.$this->zone);
+        $this->log('   ShipDate: '.$this->shipment['ship_date']);
         $currentRateLine = $this->getRateDetails($this->shipment['company_id'], $this->rate['id'], $this->shipment['service_id'], $this->shipment['recipient_type'], $this->packagingType, $this->shipment['pieces'], $this->chargeableWeight, $this->zone, $this->shipment['ship_date']);
         if ($currentRateLine) {
             $result = ['charge' => 0, 'break_point' => 0];
-            $charge = ['code' => 'FRT', 'description' => $this->shipment['pieces'] . " " . $packagingType . " to Area " . strtoupper($this->zone), 'value' => 0];
+            $charge = ['code' => 'FRT', 'description' => $this->shipment['pieces'].' '.$packagingType.' to Area '.strtoupper($this->zone), 'value' => 0];
 
             /*
              * ******************************************************
              *  Special treatment for all non Fedex per kg cost rates
              * ******************************************************
              */
-            if ($this->shipment['carrier_id'] != '2' || $this->priceType == "Sales") {
+            if ($this->shipment['carrier_id'] != '2' || $this->priceType == 'Sales') {
 
                 /*
                  * *********************************************
@@ -837,7 +840,7 @@ class PricingModel
                     // Recursively price all per kg break points
                     $result = $this->getPrevSegmentCharge($currentRateLine);
                     $charge['value'] = $result['charge'];
-                    $this->log($charge['description'] . ' - ' .$charge['value']);
+                    $this->log($charge['description'].' - '.$charge['value']);
                 }
             }
             /*
@@ -849,7 +852,7 @@ class PricingModel
             $charge = $this->calcSegmentCharge($currentRateLine, $incrementalWeight, $charge);
             $this->addSurcharge($charge);
         } else {
-            $this->log("No Rate found");
+            $this->log('No Rate found');
         }
     }
 
@@ -865,14 +868,14 @@ class PricingModel
         if ($currentRateLine->weight_rate > 0) {
             $rateValue = $this->applyDiscount($currentRateLine->weight_rate, $this->rate['discount']);
             $charge['value'] += round(ceil($incrementalWeight / $currentRateLine->weight_increment) * $rateValue, 2);
-            $this->log("Add Segment Kg charge: ".ceil($incrementalWeight / $currentRateLine->weight_increment). " kgs * $rateValue");
+            $this->log('Add Segment Kg charge: '.ceil($incrementalWeight / $currentRateLine->weight_increment)." kgs * $rateValue");
         }
 
         // Is there a Package related charge
         if ($currentRateLine->package_rate > 0) {
             $rateValue = $this->applyDiscount($currentRateLine->package_rate, $this->rate['discount']);
             $charge['value'] += $this->shipment['pieces'] * $rateValue;
-            $this->log("Add Segment Pkg charge: ".$this->shipment['pieces']. " pkgs * $rateValue");
+            $this->log('Add Segment Pkg charge: '.$this->shipment['pieces']." pkgs * $rateValue");
         }
 
         // Is there a Consignment related charge
@@ -887,7 +890,7 @@ class PricingModel
 
     /**
      * Recursive function to calculate freight costs/ charges
-     * Valid only for weight and consignment charges only
+     * Valid only for weight and consignment charges only.
      *
      * @param type $rateTableLine
      * @param type $chargeableWeight
@@ -912,17 +915,17 @@ class PricingModel
 
                 // How many kgs does this weight break apply to
                 $weightIncrement = round($currentRateLine->break_point - $reply['break_point'], 2);
-                $this->log("Calculate for segment ".$currentRateLine->break_point." to " . $reply['break_point']. " Weight Inc: $weightIncrement");
+                $this->log('Calculate for segment '.$currentRateLine->break_point.' to '.$reply['break_point']." Weight Inc: $weightIncrement");
 
                 // Add this weight breaks kg charge to charges already calculated
                 $rateValue = $this->applyDiscount($currentRateLine->weight_rate, $this->rate['discount']);
                 $reply['charge'] += round(ceil($weightIncrement / $currentRateLine->weight_increment) * $rateValue, 2);
-                $this->log("Weight Charge: ".ceil($weightIncrement / $currentRateLine->weight_increment)." * ".$rateValue);
+                $this->log('Weight Charge: '.ceil($weightIncrement / $currentRateLine->weight_increment).' * '.$rateValue);
             } else {
 
                 // Calculate Consignment charge
                 $reply['charge'] = $this->applyDiscount($currentRateLine->consignment_rate, $this->rate['discount']);
-                $this->log("Cons Charge: ".$reply['charge']);
+                $this->log('Cons Charge: '.$reply['charge']);
             }
 
             // Return value of weight up to which we have calculated charges
@@ -935,7 +938,7 @@ class PricingModel
     public function applyDiscount($charge, $discount = 0)
     {
         $discountAmt = 0;
-        if ($discount <> 0) {
+        if ($discount != 0) {
             $discountAmt = round(($charge * $discount / 100), 2);
         }
 
@@ -974,7 +977,7 @@ class PricingModel
     }
 
     /**
-     * Calculate the correct Fuel Surcharge
+     * Calculate the correct Fuel Surcharge.
      */
     public function calcFuel()
     {
@@ -1001,7 +1004,7 @@ class PricingModel
 
     /**
      * Receives a list of all charges and
-     * totals all freight related charges
+     * totals all freight related charges.
      *
      * @param type
      */
@@ -1049,19 +1052,19 @@ class PricingModel
 
         // If No rate found set error message
         if (empty($rateDetail)) {
-            $this->response['errors'][] = "No " . $this->priceType . " rate/ current rate found";
-            $this->response['debug'][] = "RateId : " . $this->rate['id']
-                    . ", Packaging : " . $this->packagingType
-                    . ", Zone : " . $this->zone
-                    . ", Piece Limit >= " . $this->shipment['pieces']
-                    . ", BreakPoint >= " . $this->chargeableWeight;
+            $this->response['errors'][] = 'No '.$this->priceType.' rate/ current rate found';
+            $this->response['debug'][] = 'RateId : '.$this->rate['id']
+                    .', Packaging : '.$this->packagingType
+                    .', Zone : '.$this->zone
+                    .', Piece Limit >= '.$this->shipment['pieces']
+                    .', BreakPoint >= '.$this->chargeableWeight;
         }
 
         return $rateDetail;
     }
 
     /**
-     * Calculate the appropriate discount to apply
+     * Calculate the appropriate discount to apply.
      */
     public function calcDiscount()
     {
@@ -1080,7 +1083,7 @@ class PricingModel
                     // And a discount % exists
                     if ($this->rate['discount'] > 0) {
                         $charge['value'] -= round(($charge['value'] * $this->rate['discount'] / 100), 2, PHP_ROUND_HALF_UP);
-                        $this->log($charge['code'] . " Discounted by " . round(($charge['value'] * $this->rate['discount'] / 100), 2, PHP_ROUND_HALF_UP));
+                        $this->log($charge['code'].' Discounted by '.round(($charge['value'] * $this->rate['discount'] / 100), 2, PHP_ROUND_HALF_UP));
                     }
                 }
 
@@ -1098,6 +1101,6 @@ class PricingModel
     {
         echo "$desc : <pre>";
         print_r($var);
-        echo "</pre><br>";
+        echo '</pre><br>';
     }
 }

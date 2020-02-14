@@ -6,7 +6,6 @@ use App\Http\Requests\Request;
 
 class DocumentRequest extends Request
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -27,10 +26,9 @@ class DocumentRequest extends Request
         return [
             'file'       => 'required|mimes:pdf',
             'document_type' => 'required|min:3|max:80',
-            'description' => 'required|min:3|max:80',            
+            'description' => 'required|min:3|max:80',
             'parent' => 'required',
-            'id' => 'required|integer'
+            'id' => 'required|integer',
         ];
     }
-
 }

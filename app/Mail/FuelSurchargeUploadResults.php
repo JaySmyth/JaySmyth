@@ -3,13 +3,12 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class FuelSurchargeUploadResults extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -44,5 +43,4 @@ class FuelSurchargeUploadResults extends Mailable
                         ->subject($this->results['subject'])
                         ->with(['results' => $this->results]);
     }
-
 }

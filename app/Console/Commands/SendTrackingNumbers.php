@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Mail;
 
 class SendTrackingNumbers extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -37,7 +36,7 @@ class SendTrackingNumbers extends Command
     public function __construct()
     {
         parent::__construct();
-        $this->tempFile = storage_path('app/temp/tracking_' . time() . '.csv');
+        $this->tempFile = storage_path('app/temp/tracking_'.time().'.csv');
     }
 
     /**
@@ -47,15 +46,14 @@ class SendTrackingNumbers extends Command
      */
     public function handle()
     {
-
         $shipments = \App\Shipment::whereReceived(1)->whereReceivedSent(0)->whereCompanyId(855)->orderBy('id', 'DESC')->get();
 
-        $this->info($shipments->count() . " shipments found");
+        $this->info($shipments->count().' shipments found');
 
-        $handle = fopen($this->tempFile, "w");
+        $handle = fopen($this->tempFile, 'w');
 
         foreach ($shipments as $shipment) {
-            $this->line("Adding shipment " . $shipment->consignment_number);
+            $this->line('Adding shipment '.$shipment->consignment_number);
             fputcsv($handle, [$shipment->shipment_reference, 1, $shipment->pieces, $shipment->carrier_consignment_number]);
         }
 
@@ -63,10 +61,9 @@ class SendTrackingNumbers extends Command
 
         // Set the source field on all shipments to that of the filename
         \App\Shipment::whereIn('id', $shipments->pluck('id'))->update([
-            'received_sent' => 1
+            'received_sent' => 1,
         ]);
-        
-        Mail::to('kerrikids1526376033@in.fulfillment.stock-sync.com')->cc(['it@antrim.ifsgroup.com', 'info@babocush.com'])->send(new \App\Mail\GenericError('Babocush Tracking Numbers (non US) - ' . $shipments->count() . ' shipments', 'Please see attached file', $this->tempFile));
-    }
 
+        Mail::to('kerrikids1526376033@in.fulfillment.stock-sync.com')->cc(['it@antrim.ifsgroup.com', 'info@babocush.com'])->send(new \App\Mail\GenericError('Babocush Tracking Numbers (non US) - '.$shipments->count().' shipments', 'Please see attached file', $this->tempFile));
+    }
 }

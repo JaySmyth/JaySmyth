@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class JobDel extends Model
 {
-
     /**
      * The connection name for the model.
      *
@@ -32,5 +31,4 @@ class JobDel extends Model
      * @var array
      */
     protected $dates = ['created_at', 'updated_at'];
-
 }

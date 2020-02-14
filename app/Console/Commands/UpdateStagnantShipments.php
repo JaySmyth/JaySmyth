@@ -2,13 +2,12 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Shipment;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
 
 class UpdateStagnantShipments extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -46,15 +45,14 @@ class UpdateStagnantShipments extends Command
 
         $shipments = Shipment::orderBy('ship_date', 'ASC')->isActive()->where('ship_date', '<=', $cutOff)->whereModeId(1)->get();
 
-        $this->info($shipments->count() . " shipments within cut off period: $cutOff");
+        $this->info($shipments->count()." shipments within cut off period: $cutOff");
 
         foreach ($shipments as $shipment):
 
             if ($shipment->tracking) {
-
                 $lastEvent = $shipment->tracking->first();
 
-                $this->info($shipment->consignment_number . ' - ' . $shipment->ship_date->format('d-m-Y') . ' - ' . $lastEvent->status . ' - ' . $lastEvent->message . ' - ' . $lastEvent->city);
+                $this->info($shipment->consignment_number.' - '.$shipment->ship_date->format('d-m-Y').' - '.$lastEvent->status.' - '.$lastEvent->message.' - '.$lastEvent->city);
 
                 if ($lastEvent->status == 'delivered') {
                     $shipment->setDelivered($lastEvent->datetime, 'Unknown', 0, false);
@@ -64,7 +62,6 @@ class UpdateStagnantShipments extends Command
                 if (($lastEvent->message == 'On carrier vehicle for delivery' && $lastEvent->city == 'ANTRIM GB') || stristr($lastEvent->message, 'returned to sender')) {
                     $shipment->setStatus('return_to_sender', 0, false, false);
                 } else {
-
                     switch ($lastEvent->status) {
                         case 'return_to_sender':
                         case 'failure':
@@ -79,12 +76,11 @@ class UpdateStagnantShipments extends Command
 
                 $total++;
             } else {
-                $this->error('No tracking found for ' . $shipment->consignment_number);
+                $this->error('No tracking found for '.$shipment->consignment_number);
             }
 
         endforeach;
 
         $this->info("** $total shipment(s) updated **");
     }
-
 }

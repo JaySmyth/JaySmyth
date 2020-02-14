@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Role;
-use App\Permission;
 use App\Mode;
+use App\Permission;
+use App\Role;
 use App\User;
+use Illuminate\Http\Request;
 
 class RolesController extends Controller
 {
@@ -32,10 +32,8 @@ class RolesController extends Controller
     }
 
     /**
-     * 
-     *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function index()
     {
@@ -47,10 +45,8 @@ class RolesController extends Controller
     }
 
     /**
-     * 
-     *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function permissions(Request $request, $id)
     {
@@ -74,10 +70,8 @@ class RolesController extends Controller
     }
 
     /**
-     * 
-     *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function setPermissions(Request $request, $id)
     {
@@ -92,22 +86,20 @@ class RolesController extends Controller
         }
 
         flash()->success('Permissions Set!', 'Role has been updated.');
+
         return redirect('roles');
     }
 
     /**
-     * 
-     *
-     * @param  
-     * @return 
+     * @param
+     * @return
      */
     public function getRoles(Request $request)
     {
         $this->authorize(new Role());
 
         if ($request->ajax()) {
-
-            if (!filter_var($request->email, FILTER_VALIDATE_EMAIL)) {
+            if (! filter_var($request->email, FILTER_VALIDATE_EMAIL)) {
                 return 'error';
             }
 
@@ -118,5 +110,4 @@ class RolesController extends Controller
             return Role::wherePrimary(1)->whereIfsOnly(isset($ifsOnly) ? 1 : 0)->orderBy('label')->pluck('label', 'id');
         }
     }
-
 }

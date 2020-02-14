@@ -2,21 +2,19 @@
 
 namespace App\CarrierAPI\DHL;
 
+use App\CarrierAPI\DHL\DHLLabel;
 use App\Service;
 use Illuminate\Support\Arr;
-use App\CarrierAPI\DHL\DHLLabel;
 use Illuminate\Support\Facades\Validator;
 
 /**
- * Description of DHLAPI
+ * Description of DHLAPI.
  *
  * @author gmcbroom
  */
 class DHLAPI extends \App\CarrierAPI\CarrierBase
 {
-
     /**
-     *
      * @param type $shipment
      * @return type
      */
@@ -27,7 +25,7 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
 
         $errors = $this->validateShipment($shipment);
 
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             return $this->generateErrorResponse($response, $errors);
         }
 
@@ -36,8 +34,7 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
         $reply = $dhl->sendRequest();
 
         // Request unsuccessful - return errors
-        if (!isset($reply['ShipmentResponse']['ShipmentIdentificationNumber']) && isset($reply['ShipmentResponse']['Notification'])) {
-
+        if (! isset($reply['ShipmentResponse']['ShipmentIdentificationNumber']) && isset($reply['ShipmentResponse']['Notification'])) {
             $errors = Arr::pluck($reply['ShipmentResponse']['Notification'], 'Message');
 
             $errors = $this->cleanErrors($errors);
@@ -55,7 +52,6 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     *
      * @param type $shipment
      * @return type
      */
@@ -73,32 +69,31 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     *
      * @param type $shipment
      * @return type
      */
     public function validateShipment($shipment)
     {
         /**
-         * Don't allow residential shipments to russia
+         * Don't allow residential shipments to russia.
          */
         $v = Validator::make($shipment, [
             'recipient_type' => 'required',
-            'recipient_country_code' => 'required|not_in:IR,KP,CU'
+            'recipient_country_code' => 'required|not_in:IR,KP,CU',
         ], [
             'recipient_type.not_supported' => 'Residential address not supported',
             'recipient_country_code.not_in' => 'Recipient country not supported. Please contact Courier department',
         ]);
 
         $v->sometimes('recipient_type', 'not_supported', function ($input) {
-            return (strtolower($input->recipient_type) == 'r' && strtolower($input->recipient_country_code) == 'ru');
+            return strtolower($input->recipient_type) == 'r' && strtolower($input->recipient_country_code) == 'ru';
         });
 
         if ($v->fails()) {
             return $this->buildValidationErrors($v->errors());
         }
 
-        /**
+        /*
          * Standard validation resumes
          */
         $rules['bill_shipping_account'] = 'required|digits:9';
@@ -122,9 +117,7 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
      */
     protected function cleanErrors($errors)
     {
-
         foreach ($errors as $key => $value) {
-
             if (stristr($value, 'Process failure occurred')) {
                 unset($errors[$key]);
             }
@@ -138,7 +131,6 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     *
      * @param type $reply
      * @param type $serviceCode
      * @param type $route_id
@@ -161,7 +153,7 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
         foreach ($reply['ShipmentResponse']['PackagesResult']['PackageResult'] as $package) {
             $response['packages'][$i]['index'] = $package['@number'];
             $response['packages'][$i]['carrier_tracking_number'] = $package['TrackingNumber'];
-            $response['packages'][$i]['barcode'] = 'J' . $package['TrackingNumber'];
+            $response['packages'][$i]['barcode'] = 'J'.$package['TrackingNumber'];
             $response['packages'][$i]['carrier_tracking_code'] = $package['TrackingNumber'];
             $i++;
         }
@@ -176,15 +168,12 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     *
      * @param type $reply
      */
     private function generatePdf($shipment, $serviceCode, $labelData)
     {
         $label = new DHLLabel($shipment, $serviceCode, $labelData);
+
         return $label->create();
     }
-
 }
-
-?>

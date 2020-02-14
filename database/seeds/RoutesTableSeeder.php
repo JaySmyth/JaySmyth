@@ -4,7 +4,6 @@ use Illuminate\Database\Seeder;
 
 class RoutesTableSeeder extends Seeder
 {
-
     /**
      * Run the database seeds.
      *
@@ -14,9 +13,8 @@ class RoutesTableSeeder extends Seeder
     {
         DB::table('routes')->insert([
             ['code' => 'ANT', 'name' => 'IFS Antrim Depot', 'depot_id' => 1],
-            ['code' => 'BFS', 'name' => 'Belfast International Airport', 'depot_id' => 1],            
+            ['code' => 'BFS', 'name' => 'Belfast International Airport', 'depot_id' => 1],
             ['code' => 'MIA', 'name' => 'ECX Miami', 'depot_id' => 3],
         ]);
     }
-
 }

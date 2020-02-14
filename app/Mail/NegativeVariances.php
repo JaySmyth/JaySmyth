@@ -3,13 +3,12 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class NegativeVariances extends Mailable
 {
-
     use Queueable,
         SerializesModels;
 
@@ -35,8 +34,7 @@ class NegativeVariances extends Mailable
     public function build()
     {
         return $this->view('emails.purchase_invoices.negative_variances')
-                        ->subject('Negative Variances - ' . $this->invoice->invoice_number)
+                        ->subject('Negative Variances - '.$this->invoice->invoice_number)
                         ->with(['invoice' => $this->invoice, 'lines' => $this->lines]);
     }
-
 }

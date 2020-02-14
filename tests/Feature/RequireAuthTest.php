@@ -19,5 +19,4 @@ class RequireAuthTest extends TestCase
         $this->get('/users')->assertStatus(302);
         $this->get('/account')->assertStatus(302);
     }
-
 }

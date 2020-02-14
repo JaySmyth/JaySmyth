@@ -8,14 +8,15 @@
 
 namespace App\Pricing;
 
-class PricingModel2 extends PricingModel {
+class PricingModel2 extends PricingModel
+{
     /*
      * *************************************
-     * Class contains Carrier specific 
+     * Class contains Carrier specific
      * extensions for the PricingModel class
-     * 
+     *
      * Available functions
-     * 
+     *
      *      price($shipment, $rate, $priceType)
      *      getZone()
      *      getPackagingType($pkgNo = 0)
@@ -32,9 +33,8 @@ class PricingModel2 extends PricingModel {
 
     public function __construct()
     {
-
         parent::__construct();
-        
+
         // Calculate Fuel Surcharge on the following charge codes
         $this->fuelChargeCodes = ['DISC', 'FRT'];
     }
@@ -44,27 +44,24 @@ class PricingModel2 extends PricingModel {
      * Carrier Specific Surcharges
      * **********************************
      */
-    
-    public function isOWP() {
-        
+
+    public function isOWP()
+    {
         return false;
     }
 
-    public function isOSP() {
-        
+    public function isOSP()
+    {
         return false;
     }
 
-    public function isLPS() {
-        
+    public function isLPS()
+    {
         return false;
     }
 
-    public function isRES() {
-        
+    public function isRES()
+    {
         return false;
     }
-    
 }
-
-?>

@@ -1,4 +1,4 @@
-{!! Form::hidden('definition', Input::get('definition')) !!}
+{!! Form::hidden('definition', Request::get('definition')) !!}
 <div class="row">
     <div class="col-sm-6">
 

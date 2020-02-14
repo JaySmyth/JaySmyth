@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Role extends Model
 {
-
     public $timestamps = false;
 
     /**
@@ -20,7 +19,7 @@ class Role extends Model
     }
 
     /**
-     * A user may belong to multiple roles
+     * A user may belong to multiple roles.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
@@ -41,5 +40,4 @@ class Role extends Model
                         Permission::whereName($permission)->firstOrFail()
         );
     }
-
 }

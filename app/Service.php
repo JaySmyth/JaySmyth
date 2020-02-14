@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Service extends Model
 {
-
     public $timestamps = false;
     protected $dates = ['created_at', 'updated_at'];
 
@@ -17,17 +16,17 @@ class Service extends Model
      */
     public function mode()
     {
-        return $this->belongsTo('App\Mode');
+        return $this->belongsTo(\App\Mode::class);
     }
 
     /**
-     * A service has one carrier
+     * A service has one carrier.
      *
      * @return
      */
     public function carrier()
     {
-        return $this->belongsTo('App\Carrier');
+        return $this->belongsTo(\App\Carrier::class);
     }
 
     /*
@@ -36,29 +35,31 @@ class Service extends Model
 
     public function companies()
     {
-        return $this->belongsToMany('App\Company')->withTimestamps();
+        return $this->belongsToMany(\App\Company::class)->withTimestamps();
     }
 
     /**
      * Enable this Service for provided Company
-     * and set the rate to be used
-     * 
+     * and set the rate to be used.
+     *
      * @param type $companyId
      * @param type $rateId
-     * @return boolean
+     * @return bool
      */
     public function enableForCompany($companyId, $rateId)
     {
 
         // If $companyId or $rateId missing return false
-        if (empty($companyId) || empty($rateId))
+        if (empty($companyId) || empty($rateId)) {
             return false;
+        }
 
         $effectiveDate = date('Y-m-d');
 
         // Attach service to the company if not already defined
-        if (!$this->companies()->where('company_id', $companyId)->first())
+        if (! $this->companies()->where('company_id', $companyId)->first()) {
             $this->companies()->attach($companyId);
+        }
 
         $companyRates = new CompanyRates();
         $minDiscount = $companyRates->getMinMaxDiscount($companyId, $rateId, $this->code, $effectiveDate, 'min');
@@ -69,8 +70,8 @@ class Service extends Model
                 ->fill([
                     'rate_id' => $rateId,
                     'discount' => 0.00,
-                    'special_discount' => !($minDiscount == 0 && $maxDiscount == 0),
-                    'fuel_cap' => 99.99
+                    'special_discount' => ! ($minDiscount == 0 && $maxDiscount == 0),
+                    'fuel_cap' => 99.99,
                 ])
                 ->save();
 
@@ -79,12 +80,11 @@ class Service extends Model
 
     public function surcharge()
     {
-        return $this->hasOne('App\Surcharge', 'id', 'surcharge_id');
+        return $this->hasOne(\App\Surcharge::class, 'id', 'surcharge_id');
     }
 
     public function getSurcharges($companyId = '0', $code = '', $shipDate = '')
     {
         return Surcharge::getCharges($this->surcharge_id, $code, $companyId, $shipDate);
     }
-
 }

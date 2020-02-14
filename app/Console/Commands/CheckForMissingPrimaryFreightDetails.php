@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Mail;
 
 class CheckForMissingPrimaryFreightDetails extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -41,7 +40,6 @@ class CheckForMissingPrimaryFreightDetails extends Command
      */
     public function handle()
     {
-
         $date = Carbon::now();
         $shipDate = $date->subWeekday()->format('Y-m-d');
         $shipDate = $date->format('Y-m-d');
@@ -55,9 +53,7 @@ class CheckForMissingPrimaryFreightDetails extends Command
                         ->orderBy('consignment_number')->get();
 
         if ($shipments->count() > 0) {
-
             Mail::to(['ryepez@primaryfreight.com', 'chenderson@primarylogistics.net'])->cc(['aplatt@antrim.ifsgroup.com', 'babocushenquiry@antrim.ifsgroup.com'])->bcc(['gmcbroom@antrim.ifsgroup.com'])->send(new \App\Mail\MissingPrimaryFreightDetails($shipments));
         }
     }
-
 }

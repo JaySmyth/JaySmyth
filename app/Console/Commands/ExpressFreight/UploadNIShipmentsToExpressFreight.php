@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Mail;
 
 class UploadNIShipmentsToExpressFreight extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -57,9 +56,8 @@ class UploadNIShipmentsToExpressFreight extends Command
     {
         parent::__construct();
 
-        $this->fileName = 'exp_ni_' . time() . '.csv';
-        $this->filePath = '/home/expressfreight/manifests/ni/' . $this->fileName;
-
+        $this->fileName = 'exp_ni_'.time().'.csv';
+        $this->filePath = '/home/expressfreight/manifests/ni/'.$this->fileName;
     }
 
     /**
@@ -82,10 +80,9 @@ class UploadNIShipmentsToExpressFreight extends Command
 
             // Send notification
             if (count($this->validShipments) > 0) {
-                Mail::to('ASteenson@expressfreight.co.uk')->cc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight NI Manifest (' . count($this->validShipments) . ' shipments)', 'Please see attached file', $this->filePath));
+                Mail::to('ASteenson@expressfreight.co.uk')->cc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight NI Manifest ('.count($this->validShipments).' shipments)', 'Please see attached file', $this->filePath));
             }
         }
-
     }
 
     /**
@@ -95,7 +92,7 @@ class UploadNIShipmentsToExpressFreight extends Command
      */
     private function createFile()
     {
-        $handle = fopen($this->filePath, "w");
+        $handle = fopen($this->filePath, 'w');
 
         // Add heading row
         fputcsv($handle, ['Consignment Number', 'Despatch Date', 'Consignee Name', 'Street 1', 'Street 2', 'City/Town', 'County', 'Postcode', 'Location', 'Instructions', 'Contact Number', 'Number Of Cartons', 'Carton Weight', 'Number Of Pallets', 'Pallet Weight', 'Number Of Others', 'Other Weight', 'Number Of Sets', 'Set Weight', 'COD Amount', 'COD Currency', 'Parcel number', 'Service Type', 'Contact Name']);
@@ -103,12 +100,11 @@ class UploadNIShipmentsToExpressFreight extends Command
         foreach ($this->shipments as $shipment) :
 
             if ($this->isValid($shipment)) {
-
                 $line = [
                     $shipment->carrier_consignment_number,
                     $shipment->ship_date->format('d/m/Y'),
                     $shipment->recipient_name,
-                    $shipment->recipient_company_name . ' - ' . $shipment->recipient_address1,
+                    $shipment->recipient_company_name.' - '.$shipment->recipient_address1,
                     $shipment->recipient_address2,
                     $shipment->recipient_city,
                     $shipment->recipient_state,
@@ -128,7 +124,7 @@ class UploadNIShipmentsToExpressFreight extends Command
                     null,
                     $shipment->consignment_number,
                     'STANDARD',
-                    $shipment->recipient_name
+                    $shipment->recipient_name,
                 ];
 
                 // Remove any commas
@@ -153,7 +149,7 @@ class UploadNIShipmentsToExpressFreight extends Command
     /**
      * Check that a shipment is valid for express Freight upload.
      *
-     * @return boolean
+     * @return bool
      */
     private function isValid($shipment)
     {
@@ -180,5 +176,4 @@ class UploadNIShipmentsToExpressFreight extends Command
             'source' => $this->fileName,
         ]);
     }
-
 }

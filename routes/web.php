@@ -25,7 +25,6 @@ Route::get('preferences', 'PreferencesController@getPreferences');
 Route::put('preferences', 'PreferencesController@setPreferences');
 Route::delete('preferences', 'PreferencesController@resetPreferences');
 
-
 /*
   |--------------------------------------------------------------------------
   | Shipment Routes
@@ -80,12 +79,10 @@ Route::resource('shipments', 'ShipmentsController');
   |--------------------------------------------------------------------------
  */
 
-
 Route::get('invoice-runs', 'InvoiceRunController@index');
 Route::get('invoice-runs/create', 'InvoiceRunController@create');
 Route::get('invoice-runs/{id}', 'InvoiceRunController@show');
 Route::post('invoice-runs', 'InvoiceRunController@store');
-
 
 /*
   |--------------------------------------------------------------------------
@@ -99,7 +96,6 @@ Route::patch('account/settings', 'AccountController@update');
 Route::get('account/password', 'AccountController@password');
 Route::post('account/password', 'AccountController@changePassword');
 
-
 /*
   |--------------------------------------------------------------------------
   | User Routes
@@ -112,8 +108,6 @@ Route::post('users/{users}/reset-password', 'UsersController@updatePassword');
 Route::get('users/{users}/remove-company/{companyId}', 'UsersController@removeCompany');
 
 Route::resource('users', 'UsersController');
-
-
 
 /*
   |--------------------------------------------------------------------------
@@ -137,7 +131,6 @@ Route::post('create-tracker', 'TrackingController@sendTrackerRequest');
 Route::get('bulk-create-trackers', 'TrackingController@bulkCreateTrackers');
 
 Route::get('easypost-push', 'TrackingController@requestPushToWebhook');
-
 
 /*
   |--------------------------------------------------------------------------
@@ -165,7 +158,6 @@ Route::post('companies/{companies}/collection-settings', 'CompaniesController@st
 
 Route::resource('companies', 'CompaniesController');
 Route::get('localisation', 'CompaniesController@getLocalisation');
-
 
 /*
   |--------------------------------------------------------------------------
@@ -225,7 +217,6 @@ Route::get('purchase-invoices/export-invoices', 'PurchaseInvoicesController@expo
 
 Route::resource('purchase-invoices', 'PurchaseInvoicesController');
 
-
 /*
  *
  */
@@ -255,7 +246,6 @@ Route::get('manifest-profiles/run', 'ManifestProfilesController@run');
 Route::post('manifest-profiles/run/{id}', 'ManifestProfilesController@runManifest');
 Route::post('bulk-hold', 'ManifestProfilesController@bulkHold');
 Route::resource('manifest-profiles', 'ManifestProfilesController');
-
 
 /*
   |--------------------------------------------------------------------------
@@ -393,7 +383,6 @@ Route::resource('sea-freight', 'SeaFreightShipmentController');
 Route::get('sea-freight-tracking/{seaFreightTracking}/edit', 'SeaFreightTrackingController@edit');
 Route::patch('sea-freight-tracking/{seaFreightTracking}', 'SeaFreightTrackingController@update');
 
-
 /*
   |--------------------------------------------------------------------------
   | Fuel Surcharges
@@ -421,8 +410,6 @@ Route::resource('currencies', 'CurrenciesController');
 Route::resource('carrier-charge-codes', 'CarrierChargeCodesController');
 //});
 
-
-
 /*
   |--------------------------------------------------------------------------
   | Drivers
@@ -430,14 +417,12 @@ Route::resource('carrier-charge-codes', 'CarrierChargeCodesController');
  */
 Route::resource('drivers', 'DriversController');
 
-
 /*
   |--------------------------------------------------------------------------
   | Vehicles
   |--------------------------------------------------------------------------
  */
 Route::resource('vehicles', 'VehiclesController');
-
 
 /*
   |--------------------------------------------------------------------------
@@ -501,7 +486,6 @@ Route::get('company-rate/{company}/{service}/{discount?}/{date?}', 'RateControll
  Route::get('surchargedetails/{surcharge}/{company}/edit', 'SurchargeDetailsController@edit');
  Route::patch('surchargedetails/{surcharge}', 'SurchargeDetailsController@update');
  Route::delete('surchargedetails/{surcharge}/{company}/delete', 'SurchargeDetailsController@destroy');
-
 
 /*
   |--------------------------------------------------------------------------
@@ -568,15 +552,12 @@ Route::post('logs/{log}/get-data', 'LogsController@getData');
  */
 Route::get('error-logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index')->middleware('ifsAdmin');
 
-
-
 /*
   |--------------------------------------------------------------------------
   | Shipment uploads
   |--------------------------------------------------------------------------
  */
 Route::resource('shipment-uploads', 'ShipmentUploadsController');
-
 
 /*
   |--------------------------------------------------------------------------
