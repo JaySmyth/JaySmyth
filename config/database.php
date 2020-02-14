@@ -35,64 +35,80 @@ return [
 
     'connections' => [
 
-        'sqlite' => [
-            'driver' => 'sqlite',
-            'url' => env('DATABASE_URL'),
-            'database' => env('DB_DATABASE', database_path('database.sqlite')),
-            'prefix' => '',
-            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
-        ],
-
         'mysql' => [
             'driver' => 'mysql',
-            'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'host' => env('DB_HOST', 'localhost'),
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE', 'forge'),
             'username' => env('DB_USERNAME', 'forge'),
             'password' => env('DB_PASSWORD', ''),
-            'unix_socket' => env('DB_SOCKET', ''),
-            'charset' => 'utf8mb4',
-            'collation' => 'utf8mb4_unicode_ci',
+            'charset' => 'utf8',
+            'collation' => 'utf8_unicode_ci',
             'prefix' => '',
-            'prefix_indexes' => true,
-            'strict' => true,
+            'strict' => false,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'options' => (env('DB_AWS_CA_PEM')) ? [PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_PEM_TEMP')] : null
         ],
 
-        'pgsql' => [
-            'driver' => 'pgsql',
-            'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '5432'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
+        'apitest' => [
+            'driver' => 'mysql',
+            'host' => env('APITEST_HOST', 'localhost'),
+            'port' => env('APITEST_PORT', '3306'),
+            'database' => env('APITEST_DATABASE', 'forge'),
+            'username' => env('APITEST_USERNAME', 'forge'),
+            'password' => env('APITEST_PASSWORD', ''),
             'charset' => 'utf8',
+            'collation' => 'utf8_unicode_ci',
             'prefix' => '',
-            'prefix_indexes' => true,
-            'schema' => 'public',
-            'sslmode' => 'prefer',
+            'strict' => false,
+            'engine' => null,
+            'options' => (env('DB_AWS_CA_PEM')) ? [PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_PEM_TEMP')] : null
         ],
 
-        'sqlsrv' => [
-            'driver' => 'sqlsrv',
-            'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', 'localhost'),
-            'port' => env('DB_PORT', '1433'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
+        'legacy' => [
+            'driver' => 'mysql',
+            'host' => env('LEGACY_DB_HOST', 'localhost'),
+            'port' => env('LEGACY_DB_PORT', '3306'),
+            'database' => env('LEGACY_DB_DATABASE', 'forge'),
+            'username' => env('LEGACY_DB_USERNAME', 'forge'),
+            'password' => env('LEGACY_DB_PASSWORD', ''),
             'charset' => 'utf8',
+            'collation' => 'utf8_unicode_ci',
             'prefix' => '',
-            'prefix_indexes' => true,
+            'strict' => false,
+            'engine' => null,
         ],
+
+        'vmi' => [
+            'driver' => 'mysql',
+            'host' => env('VMI_DB_HOST', 'localhost'),
+            'port' => env('VMI_DB_PORT', '3306'),
+            'database' => env('VMI_DB_DATABASE', 'forge'),
+            'username' => env('VMI_DB_USERNAME', 'forge'),
+            'password' => env('VMI_DB_PASSWORD', ''),
+            'charset' => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix' => '',
+            'strict' => false,
+            'engine' => null,
+        ],
+
+        'multifreight' => [
+            'driver' => 'mysql',
+            'host' => env('MULTIFREIGHT_DB_HOST', 'localhost'),
+            'port' => env('MULTIFREIGHT_DB_PORT', '3306'),
+            'database' => env('MULTIFREIGHT_DB_DATABASE', 'forge'),
+            'username' => env('MULTIFREIGHT_DB_USERNAME', 'forge'),
+            'password' => env('MULTIFREIGHT_DB_PASSWORD', ''),
+            'charset' => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix' => '',
+            'strict' => false,
+            'engine' => null,
+            'options' => (env('DB_AWS_CA_PEM')) ? [PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_PEM')] : null
+        ]
 
     ],
-
     /*
     |--------------------------------------------------------------------------
     | Migration Repository Table
@@ -123,7 +139,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
         ],
 
         'default' => [

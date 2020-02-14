@@ -30,4 +30,31 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'fxrs' => [
+        'url' => env('FEDEX_HOST'),
+        'port' => '2000'
+    ],
+
+    'rfserver' => [
+        'name' => env('RFSERVER'),
+        'path_to_node' => env('PATH_TO_NODE'),
+        'host' => env('APP_HOST'),
+    ],
+
+    'easypost' => [
+        'key' => env('EASYPOST_KEY'),
+    ],
+
+    'cartrover' => [
+        'api_user' => env('CARTROVER_API_USER'),
+        'api_key' => env('CARTROVER_API_KEY'),
+    ],
+
+    'ups' => [
+        'user' => env('UPS_API_USER'),
+        'password' => env('UPS_API_PASSWORD'),
+        'key' => env('UPS_API_KEY'),
+        'url' => env('UPS_API_URL'),
+    ],
+
 ];
