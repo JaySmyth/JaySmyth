@@ -53,7 +53,7 @@ class ShipmentsController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize(new Shipment);
+       // $this->authorize(new Shipment);
         $company = null;
         $user = null;
 
