@@ -34,6 +34,18 @@ class ReportPolicy
     }
 
     /**
+     * Index policy.
+     *
+     * @return bool
+     */
+    public function viewAny(User $user)
+    {
+        if ($user->hasPermission('view_reports')) {
+            return true;
+        }
+    }
+
+    /**
      * View report.
      *
      * @return bool
