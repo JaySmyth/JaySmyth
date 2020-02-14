@@ -298,7 +298,7 @@ class ReportsController extends Controller
             ->hasStatus($request->status)
             ->shipDateBetween($dateFrom, $dateTo)
             ->whereNotIn('status_id', [1])
-            ->paginate(500);
+            ->paginate(250);
 
         return view('reports.dims', compact('report', 'shipments'));
     }
