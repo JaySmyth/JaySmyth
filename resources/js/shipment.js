@@ -360,6 +360,10 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
     $("#ship_reason").change(function () {
         setDocumentsOnlyVisibility($(this).val());
         setDomestic();
+
+        if ($(this).val() == 'personal') {
+            alert('Please contact the courier department for assistance prior to shipping personal effects.');
+        }
     });
 
     setDocumentsOnlyVisibility($("#ship_reason").val());
