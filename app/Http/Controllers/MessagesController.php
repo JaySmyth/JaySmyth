@@ -59,7 +59,7 @@ class MessagesController extends Controller
      */
     public function create()
     {
-        $this->authorize('index', new Message);
+        $this->authorize('viewAny', new Message);
 
         return view('messages.create');
     }
@@ -119,7 +119,7 @@ class MessagesController extends Controller
     {
         $message = Message::findOrFail($id);
 
-        $this->authorize('index', $message);
+        $this->authorize('viewAny', $message);
 
         $message->update([
             'title' => $request->title,

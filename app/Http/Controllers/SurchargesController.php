@@ -44,7 +44,7 @@ class SurchargesController extends Controller
      */
     public function create()
     {
-        $this->authorize('index', new Surcharge);
+        $this->authorize('viewAny', new Surcharge);
 
         return view('surcharges.create');
     }
@@ -57,7 +57,7 @@ class SurchargesController extends Controller
      */
     public function store(SurchargeRequest $request)
     {
-        $this->authorize('index', new Surcharge);
+        $this->authorize('viewAny', new Surcharge);
 
         // Check to see if record already exists
         $surcharge = Surcharge::where('service_id', $request->service_id)
@@ -85,7 +85,7 @@ class SurchargesController extends Controller
      */
     public function edit(Surcharge $surcharge)
     {
-        $this->authorize('index', new Surcharge);
+        $this->authorize('viewAny', new Surcharge);
 
         return view('surcharges.edit', compact('surcharge'));
     }
@@ -98,7 +98,7 @@ class SurchargesController extends Controller
      */
     public function update(Surcharge $surcharge, SurchargeRequest $request)
     {
-        $this->authorize('index', new Surcharge);
+        $this->authorize('viewAny', new Surcharge);
 
         $surcharge->update($request->all());
         flash()->success('Updated!', 'Surcharge updated successfully.');
@@ -114,7 +114,7 @@ class SurchargesController extends Controller
      */
     public function destroy(Surcharge $surcharge)
     {
-        $this->authorize('index', new Surcharge);
+        $this->authorize('viewAny', new Surcharge);
 
         if ($request->ajax()) {
             return $surcharge->delete();
@@ -129,7 +129,7 @@ class SurchargesController extends Controller
      */
     public function download(Request $request)
     {
-        $this->authorize('index', new Surcharge);
+        $this->authorize('viewAny', new Surcharge);
 
         $surcharges = $this->search($request, false);
 

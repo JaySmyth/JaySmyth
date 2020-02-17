@@ -127,7 +127,7 @@ class SurchargeDetailsController extends Controller
      */
     public function create(Surcharge $surcharge)
     {
-        $this->authorize('index', new Surcharge);
+        $this->authorize('viewAny', new Surcharge);
 
         // Can only get Surcharge Codes already configured
         $surchargeCodes = SurchargeDetail::where('surcharge_id', $surcharge->id)
@@ -148,7 +148,7 @@ class SurchargeDetailsController extends Controller
      */
     public function store(Request $request, $surcharge, $company)
     {
-        $this->authorize('index', new Surcharge);
+        $this->authorize('viewAny', new Surcharge);
 
         // If no Company specified assume all - 0
         $companyId = ($request->company_id == '') ? 0 : $request->company_id;
@@ -200,7 +200,7 @@ class SurchargeDetailsController extends Controller
      */
     public function edit(SurchargeDetail $surcharge)
     {
-        $this->authorize('index', new Surcharge);
+        $this->authorize('viewAny', new Surcharge);
 
         return view('surcharge_details.edit', compact('surcharge'));
     }
@@ -213,7 +213,7 @@ class SurchargeDetailsController extends Controller
      */
     public function update(SurchargeDetail $surcharge, SurchargeDetailRequest $request)
     {
-        $this->authorize('index', new Surcharge);
+        $this->authorize('viewAny', new Surcharge);
 
         $surchargeDetails = SurchargeDetail::find($request->charge_id);
 
@@ -258,7 +258,7 @@ class SurchargeDetailsController extends Controller
      */
     public function destroy(SurchargeDetail $surcharge, Request $request)
     {
-        $this->authorize('index', new Surcharge);
+        $this->authorize('viewAny', new Surcharge);
 
         if ($request->ajax()) {
             return $surcharge->delete();
@@ -282,7 +282,7 @@ class SurchargeDetailsController extends Controller
      */
     public function download(Request $request)
     {
-        $this->authorize('index', new Surcharge);
+        $this->authorize('viewAny', new Surcharge);
 
         $surcharges = $this->search($request, false);
 

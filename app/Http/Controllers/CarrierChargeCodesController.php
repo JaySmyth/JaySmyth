@@ -39,7 +39,7 @@ class CarrierChargeCodesController extends Controller
     {
         $carrierChargeCode = CarrierChargeCode::findOrFail($id);
 
-        $this->authorize('index', $carrierChargeCode);
+        $this->authorize('viewAny', $carrierChargeCode);
 
         return view('carrier_charge_codes.edit', compact('carrierChargeCode'));
     }
@@ -52,7 +52,7 @@ class CarrierChargeCodesController extends Controller
     {
         $carrierChargeCode = CarrierChargeCode::findOrFail($id);
 
-        $this->authorize('index', $carrierChargeCode);
+        $this->authorize('viewAny', $carrierChargeCode);
 
         $carrierChargeCode->scs_code = $request->scs_code;
         $carrierChargeCode->description = $request->description;

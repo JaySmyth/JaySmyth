@@ -40,7 +40,7 @@ class PostcodesController extends Controller
      */
     public function create()
     {
-        $this->authorize('index', new Postcode);
+        $this->authorize('viewAny', new Postcode);
 
         return view('postcodes.create');
     }
@@ -51,7 +51,7 @@ class PostcodesController extends Controller
      */
     public function store(PostcodeRequest $request)
     {
-        $this->authorize('index', new Postcode);
+        $this->authorize('viewAny', new Postcode);
 
         $postcode = Postcode::create($request->all());
 
@@ -68,7 +68,7 @@ class PostcodesController extends Controller
     {
         $postcode = Postcode::findOrFail($id);
 
-        $this->authorize('index', $postcode);
+        $this->authorize('viewAny', $postcode);
 
         return view('postcodes.edit', compact('postcode'));
     }
@@ -81,7 +81,7 @@ class PostcodesController extends Controller
     {
         $postcode = Postcode::findOrFail($id);
 
-        $this->authorize('index', $postcode);
+        $this->authorize('viewAny', $postcode);
 
         $postcode->update($request->all());
 
@@ -98,7 +98,7 @@ class PostcodesController extends Controller
      */
     public function ifsNonDeliveryPostcodes()
     {
-        $this->authorize('index', new Postcode);
+        $this->authorize('viewAny', new Postcode);
 
         $postcodes = IfsNdPostcode::orderBy('postcode')->paginate(1000);
 
@@ -113,7 +113,7 @@ class PostcodesController extends Controller
      */
     public function storeIfsNonDeliveryPostcode(Request $request)
     {
-        $this->authorize('index', new Postcode);
+        $this->authorize('viewAny', new Postcode);
 
         $validator = Validator::make($request->all(), [
             'postcode' => 'required',

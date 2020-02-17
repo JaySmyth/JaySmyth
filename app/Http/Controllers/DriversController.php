@@ -40,7 +40,7 @@ class DriversController extends Controller
      */
     public function create()
     {
-        $this->authorize('index', new Driver);
+        $this->authorize('viewAny', new Driver);
 
         return view('drivers.create');
     }
@@ -53,7 +53,7 @@ class DriversController extends Controller
      */
     public function store(DriverRequest $request)
     {
-        $this->authorize('index', new Driver);
+        $this->authorize('viewAny', new Driver);
 
         $driver = Driver::create([
                     'name' => $request->name,
@@ -78,7 +78,7 @@ class DriversController extends Controller
     {
         $driver = Driver::findOrFail($id);
 
-        $this->authorize('index', $driver);
+        $this->authorize('viewAny', $driver);
 
         return view('drivers.edit', compact('driver'));
     }
@@ -93,7 +93,7 @@ class DriversController extends Controller
     {
         $driver = Driver::findOrFail($id);
 
-        $this->authorize('index', $driver);
+        $this->authorize('viewAny', $driver);
 
         $driver->update([
             'name' => $request->name,

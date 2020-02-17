@@ -239,7 +239,7 @@ class CustomsEntriesController extends Controller
      */
     public function download(Request $request)
     {
-        $this->authorize('index', new CustomsEntry);
+        $this->authorize('viewAny', new CustomsEntry);
 
         $customsEntries = $this->search($request, false);
 
@@ -256,7 +256,7 @@ class CustomsEntriesController extends Controller
      */
     public function downloadByCommodity(Request $request)
     {
-        $this->authorize('index', new CustomsEntry);
+        $this->authorize('viewAny', new CustomsEntry);
 
         $customsEntries = $this->search($request, false);
 

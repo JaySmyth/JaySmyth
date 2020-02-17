@@ -41,7 +41,7 @@ class VehiclesController extends Controller
      */
     public function create()
     {
-        $this->authorize('index', new Vehicle);
+        $this->authorize('viewAny', new Vehicle);
 
         return view('vehicles.create');
     }
@@ -54,7 +54,7 @@ class VehiclesController extends Controller
      */
     public function store(VehicleRequest $request)
     {
-        $this->authorize('index', new Vehicle);
+        $this->authorize('viewAny', new Vehicle);
 
         $vehicle = Vehicle::create($request->all());
 
@@ -73,7 +73,7 @@ class VehiclesController extends Controller
     {
         $vehicle = Vehicle::findOrFail($id);
 
-        $this->authorize('index', $vehicle);
+        $this->authorize('viewAny', $vehicle);
 
         return view('vehicles.edit', compact('vehicle'));
     }
@@ -88,7 +88,7 @@ class VehiclesController extends Controller
     {
         $vehicle = Vehicle::findOrFail($id);
 
-        $this->authorize('index', $vehicle);
+        $this->authorize('viewAny', $vehicle);
 
         $vehicle->update($request->all());
 

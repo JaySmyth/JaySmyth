@@ -38,7 +38,7 @@ class CurrenciesController extends Controller
      */
     public function create()
     {
-        $this->authorize('index', new Currency);
+        $this->authorize('viewAny', new Currency);
 
         return view('currencies.create');
     }
@@ -49,7 +49,7 @@ class CurrenciesController extends Controller
      */
     public function store(CurrencyRequest $request)
     {
-        $this->authorize('index', new Currency);
+        $this->authorize('viewAny', new Currency);
 
         $currency = Currency::create($request->all());
 
@@ -66,7 +66,7 @@ class CurrenciesController extends Controller
     {
         $currency = Currency::findOrFail($id);
 
-        $this->authorize('index', $currency);
+        $this->authorize('viewAny', $currency);
 
         return view('currencies.edit', compact('currency'));
     }
@@ -79,7 +79,7 @@ class CurrenciesController extends Controller
     {
         $currency = Currency::findOrFail($id);
 
-        $this->authorize('index', $currency);
+        $this->authorize('viewAny', $currency);
 
         $currency->update($request->all());
 

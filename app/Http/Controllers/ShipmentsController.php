@@ -673,7 +673,7 @@ class ShipmentsController extends Controller
      */
     public function collectionManifestPdf(Request $request)
     {
-        $this->authorize('index', new Shipment);
+        $this->authorize('viewAny', new Shipment);
 
         $shipments = Shipment::orderBy('ship_date', 'DESC')
             ->hasCompany($request->company)
@@ -703,7 +703,7 @@ class ShipmentsController extends Controller
             }
         }
 
-        $this->authorize('index', new Shipment);
+        $this->authorize('viewAny', new Shipment);
 
         $shipments = $this->search($request, false, false);
 
