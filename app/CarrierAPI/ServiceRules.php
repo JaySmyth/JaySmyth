@@ -139,6 +139,13 @@ class ServiceRules
 
         }
 
+        // Lithium battery check
+        if (!empty($shipment['lithium_batteries']) && $shipment['lithium_batteries'] > 0) {
+            if (!$serviceDetails['lithium_batteries']) {
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -381,7 +388,7 @@ class ServiceRules
 
             // EU shipment but not allowed so fail
             if ($this->debug) {
-                echo "$test - Failed".$this->eol;
+                echo "Failed".$this->eol;
             }
 
             return false;
