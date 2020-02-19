@@ -434,6 +434,20 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
      */
     public function validateShipment($shipment)
     {
+        /**
+         * Don't allow DG shipments to CW & VN.
+         */
+        $v = Validator::make($shipment, [], [
+            'hazardous.not_supported' => 'Hazardous shipments not supported to recipient country'
+        ]);
+
+        $v->sometimes('hazardous', 'not_supported', function ($input) {
+            return (is_numeric($input->hazardous) || $input->hazardous == 'E') && in_array(strtoupper($input->recipient_country_code), ['CW', 'VN']);
+        });
+
+        if ($v->fails()) {
+            return $this->buildValidationErrors($v->errors());
+        }
 
         /*
          * ****************************************
@@ -441,7 +455,6 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
          * ****************************************
          */
 
-        $errors = [];
         $rules = [];
 
         // Check Service is valid for Carrier
