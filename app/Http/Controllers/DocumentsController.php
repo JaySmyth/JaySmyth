@@ -74,7 +74,7 @@ class DocumentsController extends Controller
         $this->authorize('view', $parentModel);
 
         // Generate a file path for the document
-        $filePath = 'documents/'.$request->parent.'/'.$parentModel->id.'/'.time().Str::random(8).'.pdf';
+        $filePath = 'documents/' . $request->parent . '/' . $parentModel->id . '/' . time() . Str::random(8) . '.pdf';
 
         // Uploaded file
         $file = $request->file('file');
@@ -82,21 +82,11 @@ class DocumentsController extends Controller
         // Read the contents of the file
         $fileContents = file_get_contents($file);
 
-        /*
-        // Check for EOF
-        $endOfFile = substr($fileContents, -5);
-
-        if ($endOfFile != "%%EOF") {
-            flash()->error('Document corrupt!', 'This document is corrupt and cannot be uploaded.');
-            return back();
-        }
-        */
-
         // Upload the file to S3
         $s3 = Storage::disk('s3');
         $s3->put($filePath, $fileContents, 'public');
 
-        if (! $s3->exists($filePath)) {
+        if (!$s3->exists($filePath)) {
             flash()->error('Problem Uploading!', 'Unable to upload document. Please try again.');
 
             return back();
@@ -115,22 +105,13 @@ class DocumentsController extends Controller
 
         // Save a copy to the temp directory for batch printing later in the day
         if ($request->parent == 'shipment' && $request->document_type == 'invoice') {
-            Storage::disk('local')->put('temp/invoice'.$result->id.'.pdf', $fileContents);
+            Storage::disk('local')->put('temp/invoice' . $result->id . '.pdf', $fileContents);
         }
 
         flash()->success('Document Added!', 'Document uploaded successfully.');
 
-        switch ($request->parent) {
-            case 'customs-entry':
-                return redirect('customs-entries');
-                break;
-            case 'sea-freight-shipment':
-                return redirect('sea-freight');
-                break;
-            default:
-                return redirect($request->parent.'s');
-                break;
-        }
+        return back();
+
     }
 
     /**
