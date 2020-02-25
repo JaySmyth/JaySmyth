@@ -203,11 +203,11 @@ class ManifestProfile extends Model
             ->hasRoute($this->route_id);
 
         if ($this->collect_shipments_only && $this->carrier_id == 2) {
-            $query->scopeIsFedexCollect($query);
+            $query->isFedexCollect($query);
         }
 
         if ($this->exclude_collect_shipments && $this->carrier_id == 2) {
-            $query->scopeIsNotFedexCollect($query);
+            $query->isNotFedexCollect($query);
         }
 
         if ($this->services->count() > 0) {
