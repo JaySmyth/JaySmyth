@@ -61,8 +61,42 @@ class ProcessFiles extends Command
      * @var array
      */
     protected $fields = [
-        0 => ['RecordType', 'JobRef1', 'JobRef2', 'JobRef3', 'JobRef4', 'JobTypeCode', 'RouteNumber', 'RouteDate', 'VehicleReg', 'DriverName', 'CompletedTime', 'TypedName', 'Signature', 'Barcode', 'Description', 'Quantity', 'UnitMeasure', 'TickOrScan', 'ExceptionReasonCode', 'ExceptionQty'],
-        1 => ['RecordType', 'JobRef1', 'JobRef2', 'JobRef3', 'JobRef4', 'JobTypeCode', 'RouteNumber', 'RouteDate', 'VehicleReg', 'DriverName', 'CompletedTime', 'ExceptionReasonCode'],
+        0 => [
+            'RecordType',
+            'JobRef1',
+            'JobRef2',
+            'JobRef3',
+            'JobRef4',
+            'JobTypeCode',
+            'RouteNumber',
+            'RouteDate',
+            'VehicleReg',
+            'DriverName',
+            'CompletedTime',
+            'TypedName',
+            'Signature',
+            'Barcode',
+            'Description',
+            'Quantity',
+            'UnitMeasure',
+            'TickOrScan',
+            'ExceptionReasonCode',
+            'ExceptionQty'
+        ],
+        1 => [
+            'RecordType',
+            'JobRef1',
+            'JobRef2',
+            'JobRef3',
+            'JobRef4',
+            'JobTypeCode',
+            'RouteNumber',
+            'RouteDate',
+            'VehicleReg',
+            'DriverName',
+            'CompletedTime',
+            'ExceptionReasonCode'
+        ],
     ];
 
     /**
@@ -104,19 +138,19 @@ class ProcessFiles extends Command
         // Download the files from remote FTP site
         $this->downloadFiles();
 
-        $this->line('Checking '.$this->directory.' for files to process');
+        $this->line('Checking ' . $this->directory . ' for files to process');
 
         if ($handle = opendir($this->directory)) {
             while (false !== ($file = readdir($handle))) {
                 if (! is_dir($file) && stristr($file, '.csv')) {
-
                     // File already exists in the archive - delete it
-                    if (file_exists($this->directory.$this->archiveDirectory.'/'.$file)) {
-                        if (file_exists($this->directory.$file)) {
-                            unlink($this->directory.$file);
+                    if (file_exists($this->directory . $this->archiveDirectory . '/' . $file)) {
+                        if (file_exists($this->directory . $file)) {
+                            unlink($this->directory . $file);
                         }
 
-                        Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('File already exists in archive directory', "$file already processed"));
+                        Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('File already exists in archive directory',
+                            "$file already processed"));
                     } else {
                         $this->processFile($file);
                     }
@@ -146,7 +180,7 @@ class ProcessFiles extends Command
 
         // Check connection was made
         if (! $connection) {
-            $this->error('Unable to connect to FTP host -> '.$this->ftpHost);
+            $this->error('Unable to connect to FTP host -> ' . $this->ftpHost);
 
             return false;
         }
@@ -154,12 +188,12 @@ class ProcessFiles extends Command
         $loginResult = ftp_login($connection, $this->ftpUsername, $this->ftpPassword);
 
         if (! $loginResult) {
-            $this->error('Unable to login to FTP host -> '.$this->ftpHost);
+            $this->error('Unable to login to FTP host -> ' . $this->ftpHost);
 
             return false;
         }
 
-        $this->info('Connection established to FTP host -> '.$this->ftpHost);
+        $this->info('Connection established to FTP host -> ' . $this->ftpHost);
 
         /*
          * FTP BETWEEN TWO EC2 INSTANCES REQUIRES PASSIVE AND IP IGNORE
@@ -171,26 +205,25 @@ class ProcessFiles extends Command
         // Get the file list for /
         $fileList = ftp_rawlist($connection, $this->ftpWorkingDirectory);
 
-        $this->line(count($fileList).' files on remote server');
+        $this->line(count($fileList) . ' files on remote server');
 
         foreach ($fileList as $file):
 
             if ($filename = $this->validateFile($file)) {
-
                 // Open a local file to write to
-                $handle = fopen($this->directory.'/'.$filename, 'w');
+                $handle = fopen($this->directory . '/' . $filename, 'w');
 
                 // Download file
-                ftp_fget($connection, $handle, $this->ftpWorkingDirectory.$filename, FTP_ASCII, 0);
+                ftp_fget($connection, $handle, $this->ftpWorkingDirectory . $filename, FTP_ASCII, 0);
 
                 if (! $this->testMode) {
-                    if (file_exists($this->directory.'/'.$filename)) {
+                    if (file_exists($this->directory . '/' . $filename)) {
                         $this->line('Attempting to delete file from remote server');
 
-                        if (ftp_delete($connection, $this->ftpWorkingDirectory.$filename)) {
+                        if (ftp_delete($connection, $this->ftpWorkingDirectory . $filename)) {
                             $this->info('File deleted from remote server');
                         } else {
-                            $this->error('Unable to delete file:'.$this->ftpWorkingDirectory.$filename);
+                            $this->error('Unable to delete file:' . $this->ftpWorkingDirectory . $filename);
                         }
                     }
                 }
@@ -216,7 +249,7 @@ class ProcessFiles extends Command
         $filename = end($pieces);
 
         // Check the current directory and the archive directory to see if the file has already been downloaded
-        if (file_exists($this->directory.'/'.$filename) || file_exists($this->directory.$this->archiveDirectory.'/'.$filename)) {
+        if (file_exists($this->directory . '/' . $filename) || file_exists($this->directory . $this->archiveDirectory . '/' . $filename)) {
             $this->error("File $filename has already been downloaded");
 
             return false;
@@ -234,7 +267,7 @@ class ProcessFiles extends Command
     {
         $this->line("Processing file $file");
 
-        if (($handle = fopen($this->directory.$file, 'r')) !== false) {
+        if (($handle = fopen($this->directory . $file, 'r')) !== false) {
             while (($data = fgetcsv($handle, 2000, ',')) !== false) {
                 $row = $this->assignFieldNames($data);
 
@@ -246,7 +279,8 @@ class ProcessFiles extends Command
                     $this->shipment = ($this->transportJob->shipment) ? $this->transportJob->shipment : false;
 
                     // Log the transaction
-                    $this->transportJob->log('Transend transaction received', ($this->transendCode) ? $this->transendCode->description : null, $row);
+                    $this->transportJob->log('Transend transaction received',
+                        ($this->transendCode) ? $this->transendCode->description : null, $row);
                 }
 
                 $datetime = $this->parseDateTime($row['CompletedTime']);
@@ -322,31 +356,30 @@ class ProcessFiles extends Command
                 $this->shipment = $package->shipment;
                 $this->info('Found shipment record from package barcode');
             } else {
-                $this->error('Package not found: '.$row['Barcode']);
+                $this->error('Package not found: ' . $row['Barcode']);
             }
         }
 
         if ($package) {
-
             // Process the different job types
             switch ($row['JobTypeCode']) {
-
                 case 'LOADJOB':
 
                     if (! $this->testMode && $row['ExceptionReasonCode'] != 'LOADSHORT') {
-
                         // Packaged loaded to vehicle
                         $package->setLoaded($datetime);
 
                         // Insert a tracking event to show package loaded
-                        $this->shipment->addTracking($this->shipment->status->code, $datetime, 0, 'Package '.$package->index.' loaded onto vehicle');
+                        $this->shipment->addTracking($this->shipment->status->code, $datetime, 0,
+                            'Package ' . $package->index . ' loaded onto vehicle');
 
                         // NI delivery loaded - set the shipment status to "out for delivery"
-                        if (in_array(strtoupper($this->shipment->service->carrier_code), ['NI24', 'NI48']) && $this->shipment->isActive()) {
+                        if (in_array(strtoupper($this->shipment->service->carrier_code),
+                                ['NI24', 'NI48']) && $this->shipment->isActive()) {
                             $this->shipment->setStatus('out_for_delivery', 0, $datetime->addMinutes(5));
                         }
 
-                        $this->info($this->shipment->consignment_number.': '.'Package '.$package->index.' loaded onto vehicle');
+                        $this->info($this->shipment->consignment_number . ': ' . 'Package ' . $package->index . ' loaded onto vehicle');
                     }
 
                     break;
@@ -365,20 +398,20 @@ class ProcessFiles extends Command
                         }
                     }
 
-                    $this->info($this->shipment->consignment_number.': '.'Package '.$package->index.' received');
+                    $this->info($this->shipment->consignment_number . ': ' . 'Package ' . $package->index . ' received');
 
                     break;
 
                 default:
 
                     if ($this->canBeCollected($package, $row)) {
-
                         // Mark the package as collected
                         $package->setCollected($datetime);
 
-                        $this->shipment->addTracking($this->shipment->status->code, $datetime, 0, 'Package '.$package->index.' collected', 'shipper');
+                        $this->shipment->addTracking($this->shipment->status->code, $datetime, 0,
+                            'Package ' . $package->index . ' collected', 'shipper');
 
-                        $this->info($this->shipment->consignment_number.': '.'Package '.$package->index.' collected');
+                        $this->info($this->shipment->consignment_number . ': ' . 'Package ' . $package->index . ' collected');
                     }
 
                     break;
@@ -386,12 +419,12 @@ class ProcessFiles extends Command
         }
 
         if ($this->transportJob) {
-
             // We have a signature, job not completed, not a loadjob, not a shortage, not package collected
             if ($this->canBeClosedOff($row)) {
-                $this->transportJob->close($datetime, $row['TypedName'], 0, $this->getSignatureImageUrl($row['Signature']));
+                $this->transportJob->close($datetime, $row['TypedName'], 0,
+                    $this->getSignatureImageUrl($row['Signature']));
 
-                $this->info($this->transportJob->number.' CLOSED!');
+                $this->info($this->transportJob->number . ' CLOSED!');
             }
 
             if (! empty($row['ExceptionReasonCode'])) {
@@ -420,12 +453,10 @@ class ProcessFiles extends Command
             return false;
         }
 
-        if (! $this->transportJob) {
-            return false;
-        }
-
-        if ($this->transportJob->type != 'c') {
-            return false;
+        if ($this->transportJob) {
+            if ($this->transportJob->type != 'c') {
+                return false;
+            }
         }
 
         if ($this->transendCode) {
@@ -485,7 +516,7 @@ class ProcessFiles extends Command
     protected function getSignatureImageUrl($signature)
     {
         if (strlen($signature) > 0) {
-            return 'https://tsapp.ifsgroup.com/images/signatures/'.$signature;
+            return 'https://tsapp.ifsgroup.com/images/signatures/' . $signature;
         }
     }
 
@@ -506,8 +537,9 @@ class ProcessFiles extends Command
         if ($this->transendCode) {
             if ($this->transendCode->notify_department) {
                 // Notify relevant department that an exception has been received
-                $subject = 'Possible issue with '.verboseCollectionDelivery($this->transportJob->type).' '.$this->transportJob->number.' / '.$this->transportJob->scs_job_number.' ('.$this->transportJob->from_company_name.' > '.$this->transportJob->to_company_name.')';
-                Mail::to($this->transportJob->department->email)->send(new \App\Mail\GenericError($subject, 'The IFS driver allocated job '.$this->transportJob->number.' / '.$this->transportJob->scs_job_number.' has reported: '.$this->transendCode->description.'. Please investigate further.'));
+                $subject = 'Possible issue with ' . verboseCollectionDelivery($this->transportJob->type) . ' ' . $this->transportJob->number . ' / ' . $this->transportJob->scs_job_number . ' (' . $this->transportJob->from_company_name . ' > ' . $this->transportJob->to_company_name . ')';
+                Mail::to($this->transportJob->department->email)->send(new \App\Mail\GenericError($subject,
+                    'The IFS driver allocated job ' . $this->transportJob->number . ' / ' . $this->transportJob->scs_job_number . ' has reported: ' . $this->transendCode->description . '. Please investigate further.'));
             }
 
             // Update the transport job to "not sent"
@@ -516,14 +548,14 @@ class ProcessFiles extends Command
                     $this->transportJob->resend($this->transendCode->resend_same_day);
                 }
 
-                $this->line('Job resent: '.$this->transportJob->number);
+                $this->line('Job resent: ' . $this->transportJob->number);
 
                 if ($this->transendCode->hold) {
                     if (! $this->testMode) {
                         $this->transportJob->setTransendRoute('HOLD');
                     }
 
-                    $this->line('Job added to HOLD route: '.$this->transportJob->number);
+                    $this->line('Job added to HOLD route: ' . $this->transportJob->number);
                 }
             }
 
@@ -532,18 +564,20 @@ class ProcessFiles extends Command
                 $scanLocation = ($this->transportJob->type == 'c') ? 'shipper' : 'destination';
 
                 if (! $this->testMode) {
-                    $this->shipment->addTracking($this->shipment->status->code, $datetime, 0, $this->transendCode->description, $scanLocation);
+                    $this->shipment->addTracking($this->shipment->status->code, $datetime, 0,
+                        $this->transendCode->description, $scanLocation);
                 }
 
-                $this->line('Tracking event added to shipment '.$this->shipment->consignment_number.': '.$this->transendCode->description);
+                $this->line('Tracking event added to shipment ' . $this->shipment->consignment_number . ': ' . $this->transendCode->description);
             }
 
             return;
         } else {
-            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Unknown transend exception code - '.$code, $code.' not defined in transend_codes table'));
+            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Unknown transend exception code - ' . $code,
+                $code . ' not defined in transend_codes table'));
         }
 
-        $this->error('Unable to find transend code: '.$code);
+        $this->error('Unable to find transend code: ' . $code);
     }
 
     /**
@@ -556,8 +590,8 @@ class ProcessFiles extends Command
     {
         $this->info("Archiving file $file");
 
-        $originalFile = $this->directory.$file;
-        $archiveFile = $this->directory.$this->archiveDirectory.'/'.$file;
+        $originalFile = $this->directory . $file;
+        $archiveFile = $this->directory . $this->archiveDirectory . '/' . $file;
 
         $this->info("Moving $originalFile to archive");
 
@@ -572,7 +606,8 @@ class ProcessFiles extends Command
             }
         } else {
             $this->error("Problem archiving $archiveFile  - already exists");
-            Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Error archiving transend export file', "Problem archiving $archiveFile  - already exists"));
+            Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Error archiving transend export file',
+                "Problem archiving $archiveFile  - already exists"));
         }
     }
 }
