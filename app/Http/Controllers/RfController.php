@@ -150,6 +150,8 @@ class RfController extends Controller
 
         $scanCount = $package->shipment->getPackageScanCount();
 
+        $package->shipment->log('Pkg ' . $this->data . ' scanned in Antrim WH');
+
         // Successful scan
         return $this->getDisplay("Pkg $scanCount scanned!", 'Scan Package');
     }
