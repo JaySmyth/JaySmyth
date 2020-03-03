@@ -380,6 +380,8 @@ class ProcessFiles extends Command
                         }
 
                         $this->info($this->shipment->consignment_number . ': ' . 'Package ' . $package->index . ' loaded onto vehicle');
+
+                        $package->shipment->log('Package ' . $package->index . ' loaded to route by TranSend LOADJOB: ' . $datetime->toDateTimeString());
                     }
 
                     break;
@@ -400,6 +402,8 @@ class ProcessFiles extends Command
 
                     $this->info($this->shipment->consignment_number . ': ' . 'Package ' . $package->index . ' received');
 
+                    $package->shipment->log('Package ' . $package->index . ' marked as received by TranSend UNLOADJOB: ' . $datetime->toDateTimeString());
+
                     break;
 
                 default:
@@ -412,6 +416,8 @@ class ProcessFiles extends Command
                             'Package ' . $package->index . ' collected', 'shipper');
 
                         $this->info($this->shipment->consignment_number . ': ' . 'Package ' . $package->index . ' collected');
+
+                        $package->shipment->log('Package ' . $package->index . ' marked as collected by TranSend: ' . $datetime->toDateTimeString());
                     }
 
                     break;
