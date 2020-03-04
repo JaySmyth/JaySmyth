@@ -807,8 +807,7 @@ class ReportsController extends Controller
 
         $this->authorize(new Report);
 
-        $logs = Log::select('logs.logable_type')
-            ->select('logs.*')
+        $logs = Log::select('logs.*')
             ->join('users', 'logs.user_id', '=', 'users.id')
             ->dateBetween($request->date_from, $request->date_to)
             ->hasInformation('Downloaded Label')

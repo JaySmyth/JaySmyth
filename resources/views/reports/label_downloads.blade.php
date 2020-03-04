@@ -31,15 +31,17 @@
         <table id="log-table" class="table table-striped table-sm">
             <thead>
             <tr>
-                <th><i class="far fa-file mr-2"></i>Record</th>
-                <th><i class="fas fa-user mr-2" aria-hidden="true"></i> User</th>
-                <th><i class="far fa-calendar-alt mr-2" aria-hidden="true"></i> Date / Time</th>
+                <th>Consignment</th>
+                <th>Company</th>
+                <th>User</th>
+                <th>Date / Time</th>
             </tr>
             </thead>
             <tbody>
             @foreach ($logs as $log)
                 <tr>
-                    <td><a href="{{$log->parent_url}}">{{$log->logable_type}}</a></td>
+                    <td><a href="{{$log->parent_url}}">{{$log->logable->carrier_consignment_number}}</a></td>
+                    <td>{{$log->logable->sender_company_name}}</td>
                     <td>@can('view_user')<a href="{{ url('/users', $log->user->id) }}">{{$log->user->name}}</a> @else {{$log->user->name}}@endcan</td>
                     <td>{{$log->created_at->timezone(Auth::user()->time_zone)->format('d-m-Y H:i:s')}}</td>
                 </tr>
