@@ -294,6 +294,7 @@ Route::get('reports/haz-dry-ice/{id}', 'ReportsController@hazardous');
 Route::get('reports/collection-settings/{id}', 'ReportsController@collectionSettings');
 Route::get('reports/shipments-by-carrier/{id}', 'ReportsController@shipmentsByCarrier');
 Route::get('reports/scanning-kpis/{id}', 'ReportsController@scanningKpis');
+Route::get('reports/label-downloads/{id}', 'ReportsController@labelDownloads');
 
 /*
   |--------------------------------------------------------------------------

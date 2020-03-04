@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Company;
+use App\Log;
 use App\Manifest;
 use App\Report;
 use App\Service;
@@ -791,4 +792,29 @@ class ReportsController extends Controller
 
         return view('reports.scanning_kpis', compact('report', 'kpis', 'collectionPercentageForMonth', 'receiptPercentageForMonth', 'routePercentageForMonth', 'totalReceiptMissed', 'totalRouteMissed', 'averageReceiptMissed', 'averageRouteMissed'));
     }
+
+
+    /**
+     * Label downloads.
+     *
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function labelDownloads(Request $request, $id)
+    {
+        $report = Report::findOrFail($id);
+
+        $this->authorize(new Report);
+
+        $logs = Log::orderBy('logs.id', 'DESC')
+            ->join('users', 'logs.user_id', '=', 'users.id')
+            ->dateBetween($request->date_from, $request->date_to)
+            ->hasInformation('Downloaded Label')
+            ->where('users.email', 'LIKE', '%@antrim.ifsgroup.com%')
+            ->paginate(250);
+
+        return view('reports.label_downloads', compact('report', 'logs'));
+    }
+
 }

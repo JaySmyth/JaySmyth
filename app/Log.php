@@ -61,15 +61,15 @@ class Log extends Model
     public function scopeDateBetween($query, $dateFrom, $dateTo)
     {
         if (! $dateFrom && $dateTo) {
-            return $query->where('created_at', '<', Carbon::parse($dateTo)->endOfDay());
+            return $query->where('logs.created_at', '<', Carbon::parse($dateTo)->endOfDay());
         }
 
         if ($dateFrom && ! $dateTo) {
-            return $query->where('created_at', '>', Carbon::parse($dateFrom)->startOfDay());
+            return $query->where('logs.created_at', '>', Carbon::parse($dateFrom)->startOfDay());
         }
 
         if ($dateFrom && $dateTo) {
-            return $query->whereBetween('created_at', [Carbon::parse($dateFrom)->startOfDay(), Carbon::parse($dateTo)->endOfDay()]);
+            return $query->whereBetween('logs.created_at', [Carbon::parse($dateFrom)->startOfDay(), Carbon::parse($dateTo)->endOfDay()]);
         }
     }
 
