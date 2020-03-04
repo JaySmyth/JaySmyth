@@ -492,9 +492,8 @@ class ShipmentsController extends Controller
         if (! Auth::guest()) {
 
             // warehouse login
-            if (Auth::user()->id == 3026) {
+            if (in_array(Auth::user()->id, [3026, 283, 2534])) {
                 flash()->error('Warning', 'Not authorised to print label.', true);
-
                 return back();
             }
 
