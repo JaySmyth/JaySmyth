@@ -807,11 +807,13 @@ class ReportsController extends Controller
 
         $this->authorize(new Report);
 
-        $logs = Log::orderBy('logs.id', 'DESC')
+        $logs = Log::select('logs.logable_type')
+            ->select('logs.*')
             ->join('users', 'logs.user_id', '=', 'users.id')
             ->dateBetween($request->date_from, $request->date_to)
             ->hasInformation('Downloaded Label')
             ->where('users.email', 'LIKE', '%@antrim.ifsgroup.com%')
+            ->orderBy('logs.id', 'DESC')
             ->paginate(250);
 
         return view('reports.label_downloads', compact('report', 'logs'));
