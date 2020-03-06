@@ -10,6 +10,8 @@
 namespace App\Models\Models\CarrierAPI;
 
 use App;
+use App\Jobs\CreateEasypostTracker;
+use App\Models\Mode;
 use App\Models\Models\CarrierAPI\APIShipment;
 use App\Models\Models\CarrierAPI\CWide\CWideAPI;
 use App\Models\Models\CarrierAPI\DHL\DHLAPI;
@@ -26,12 +28,10 @@ use App\Models\Models\CarrierAPI\UPS\UPSAPI;
 use App\Models\Models\Company;
 use App\Models\Models\Country;
 use App\Models\Models\Department;
-use App\Jobs\CreateEasypostTracker;
-use App\Models\Mode;
-use App\Pricing\Facades\Pricing;
 use App\Models\Service;
 use App\Models\Shipment;
 use App\Models\State;
+use App\Pricing\Facades\Pricing;
 use Carbon\Carbon;
 use DB;
 use Exception;

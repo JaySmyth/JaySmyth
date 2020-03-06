@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Models\CarrierAPI\Pdf;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TransportJobRequest;
+use App\Models\Models\CarrierAPI\Pdf;
 use App\Models\TransportJob;
 use Carbon\Carbon;
 use Illuminate\Http\Request;

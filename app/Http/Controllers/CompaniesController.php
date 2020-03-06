@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Models\Company;
-use App\Models\Models\CompanyRates;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CompanyRequest;
+use App\Models\Models\Company;
+use App\Models\Models\CompanyRates;
 use App\Models\Rate;
 use App\Models\Service;
 use Illuminate\Http\Request;

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Models\CustomsEntry;
-use App\Models\Models\Document;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DocumentRequest;
+use App\Models\Models\CustomsEntry;
+use App\Models\Models\Document;
 use App\Models\SeaFreightShipment;
 use App\Models\Shipment;
 use Auth;

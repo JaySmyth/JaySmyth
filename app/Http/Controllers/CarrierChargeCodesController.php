@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Models\CarrierChargeCode;
 use App\Http\Controllers\Controller;
+use App\Models\Models\CarrierChargeCode;
 use Illuminate\Http\Request;
 
 class CarrierChargeCodesController extends Controller

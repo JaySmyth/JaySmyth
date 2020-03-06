@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Models\CustomsEntryCommodity;
 use App\Http\Requests\CustomsEntryCommodityRequest;
+use App\Models\Models\CustomsEntryCommodity;
 
 class CustomsEntryCommoditiesController extends Controller
 {

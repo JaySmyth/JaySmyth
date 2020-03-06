@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Models\CarrierAPI\Pdf;
 use App\Http\Requests\QuotationRequest;
+use App\Models\Models\CarrierAPI\Pdf;
 use App\Models\Quotation;
 use Auth;
 use Illuminate\Http\Request;

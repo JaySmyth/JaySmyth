@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use App\Models\Models\Country;
 use App\Legacy\FukShipment;
 use App\Mail\GenericError;
 use App\Mail\TransportJobReinstated;
+use App\Models\Models\Country;
 use App\Pricing\Pricing;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;

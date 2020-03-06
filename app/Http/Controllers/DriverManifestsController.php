@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\Models\CarrierAPI\Pdf;
 use App\Models\Models\Driver;
 use App\Models\Models\DriverManifest;
-use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 

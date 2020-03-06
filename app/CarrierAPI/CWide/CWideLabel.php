@@ -2,8 +2,8 @@
 
 namespace App\Models\Models\CarrierAPI\CWide;
 
-use App\Models\Models\Depot;
 use App\Models\Mode;
+use App\Models\Models\Depot;
 use App\Models\Route;
 use App\Models\Service;
 

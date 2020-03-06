@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Models\Company;
 use App\Http\Requests\ContainerRequest;
 use App\Http\Requests\ProcessSeaFreightShipmentRequest;
 use App\Http\Requests\SeaFreightShipmentRequest;
+use App\Models\Models\Company;
 use App\Models\SeaFreightShipment;
 use Auth;
 use Illuminate\Http\Request;

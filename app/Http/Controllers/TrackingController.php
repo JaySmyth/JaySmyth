@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Models\Carrier;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TrackingRequest;
+use App\Models\Models\Carrier;
 use App\Models\Shipment;
 use App\Models\Tracking;
 use Auth;

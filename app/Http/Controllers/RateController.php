@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Models\Carrier;
-use App\Models\Models\Company;
-use App\Models\Models\CompanyRates;
-use App\Models\Models\DomesticRate;
-use App\Models\Models\DomesticRateDiscount;
 use App\Legacy\Fuk_RateH;
 use App\Legacy\FukCustService;
 use App\Legacy\FukRate;
 use App\Legacy\FxRateH;
 use App\Legacy\OldCompany;
+use App\Models\Models\Carrier;
+use App\Models\Models\Company;
+use App\Models\Models\CompanyRates;
+use App\Models\Models\DomesticRate;
+use App\Models\Models\DomesticRateDiscount;
 use App\Models\Rate;
 use App\Models\RateChangeLogs;
 use App\Models\RateDetail;

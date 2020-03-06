@@ -7,6 +7,8 @@ use App\Models\Models\ChargeCodes;
 use App\Models\Models\Company;
 use App\Models\Models\Department;
 use App\Models\Package;
+use App\Models\Service;
+use App\Models\Shipment;
 use App\Pricing\Pricing;
 use App\ScsXml\Context;
 use App\ScsXml\DocAdds;
@@ -20,8 +22,6 @@ use App\ScsXml\JobLine;
 use App\ScsXml\RecChg;
 use App\ScsXml\RecCost;
 use App\ScsXml\RecJny;
-use App\Models\Service;
-use App\Models\Shipment;
 
 /*
  * To change this license header, choose License Headers in Project Properties.

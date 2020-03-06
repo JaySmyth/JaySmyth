@@ -3,9 +3,9 @@
 namespace App\Jobs;
 
 use App\Models\Models\InvoiceRun;
-use App\ScsXml\ISLEDI;
 use App\Models\Shipment;
 use App\Models\User;
+use App\ScsXml\ISLEDI;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;

@@ -2,9 +2,9 @@
 
 namespace App\Pricing;
 
+use App\Countries;
 use App\Models\Models\CarrierPackagingType;
 use App\Models\Models\Company;
-use App\Countries;
 use App\Models\Models\FuelSurcharge;
 use App\Models\PricingZones;
 use App\Models\Rate;

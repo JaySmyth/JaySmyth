@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Models\Commodity;
 use App\Http\Requests;
 use App\Http\Requests\CommodityRequest;
+use App\Models\Models\Commodity;
 use Illuminate\Http\Request;
 
 class CommoditiesController extends Controller

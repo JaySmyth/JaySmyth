@@ -23,6 +23,8 @@ use App\Models\Models\Carrier;
 use App\Models\Models\Company;
 use App\Models\Models\CompanyRate;
 use App\Models\Package;
+use App\Models\Service;
+use App\Models\Shipment;
 use App\Pricing\PricingModel0;
 use App\Pricing\PricingModel1;
 use App\Pricing\PricingModel2;
@@ -30,8 +32,6 @@ use App\Pricing\PricingModel3;
 use App\Pricing\PricingModel4;
 use App\Pricing\PricingModel5;
 use App\Pricing\PricingModel6;
-use App\Models\Service;
-use App\Models\Shipment;
 
 /**
  * ********************************

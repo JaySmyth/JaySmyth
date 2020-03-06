@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Models\Currency;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CurrencyRequest;
+use App\Models\Models\Currency;
 use Illuminate\Http\Request;
 
 class CurrenciesController extends Controller
