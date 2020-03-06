@@ -2,13 +2,13 @@
 
 namespace app\CarrierAPI\Fedex;
 
-use App\Carrier;
-use App\CarrierAPI\Fedex\FedexLabel;
-use App\CarrierAPI\Fedex\FedexSettings;
-use App\CarrierPackagingType;
-use App\Company;
-use App\Sequence;
-use App\TransactionLog;
+use App\Models\Models\Carrier;
+use App\Models\Models\CarrierAPI\Fedex\FedexLabel;
+use App\Models\Models\CarrierAPI\Fedex\FedexSettings;
+use App\Models\Models\CarrierPackagingType;
+use App\Models\Models\Company;
+use App\Models\Sequence;
+use App\Models\TransactionLog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 
@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Validator;
  *
  * @author gmcbroom
  */
-class FedexAPI extends \App\CarrierAPI\CarrierBase
+class FedexAPI extends \App\Models\Models\CarrierAPI\CarrierBase
 {
     /*
      *  Carrier Specific Variable declarations
@@ -364,7 +364,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
                 // Request unsuccessful - return errors
                 return $this->generateErrorResponse($response, $reply[3]);
             } else {
-                $fedexRoute = new \App\FedexRoute();
+                $fedexRoute = new \App\Models\Models\FedexRoute();
                 $route_id = $fedexRoute->getRouteId($shipment);
 
                 // Set splitServiceBox if Rughouse Economy UK48

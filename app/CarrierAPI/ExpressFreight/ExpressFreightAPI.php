@@ -1,16 +1,16 @@
 <?php
 
-namespace App\CarrierAPI\ExpressFreight;
+namespace App\Models\Models\CarrierAPI\ExpressFreight;
 
-use App\CarrierAPI\ExpressFreight\ExpressFreightLabel;
-use App\TransactionLog;
+use App\Models\Models\CarrierAPI\ExpressFreight\ExpressFreightLabel;
+use App\Models\TransactionLog;
 
 /**
  * Description of IFSWebAPI.
  *
  * @author gmcbroom
  */
-class ExpressFreightAPI extends \App\CarrierAPI\CarrierBase
+class ExpressFreightAPI extends \App\Models\Models\CarrierAPI\CarrierBase
 {
     /*
      *  Carrier Specific Variable declarations

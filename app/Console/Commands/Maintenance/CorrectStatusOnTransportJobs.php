@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands\Maintenance;
 
-use App\TransportJob;
+use App\Models\TransportJob;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 

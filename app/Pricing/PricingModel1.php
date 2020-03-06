@@ -8,11 +8,11 @@
 
 namespace App\Pricing;
 
-use App\CarrierPackagingType;
-use App\Company;
-use App\DomesticRate;
-use App\DomesticZone;
-use App\FedexEas;
+use App\Models\Models\CarrierPackagingType;
+use App\Models\Models\Company;
+use App\Models\Models\DomesticRate;
+use App\Models\Models\DomesticZone;
+use App\Models\Models\FedexEas;
 
 class PricingModel1 extends PricingModel
 {
@@ -384,7 +384,7 @@ class PricingModel1 extends PricingModel
 
     public function isEAS()
     {
-        $surcharge = new \App\FedexEas();
+        $surcharge = new \App\Models\Models\FedexEas();
         if (strtoupper($surcharge->getSurcharge($this->shipment['recipient_postcode'])) == 'EAS') {
             return true;
         }
@@ -394,7 +394,7 @@ class PricingModel1 extends PricingModel
 
     public function isRAS()
     {
-        $surcharge = new \App\FedexEas();
+        $surcharge = new \App\Models\Models\FedexEas();
         if (strtoupper($surcharge->getSurcharge($this->shipment['recipient_postcode'])) == 'RAS') {
             return true;
         }
@@ -404,7 +404,7 @@ class PricingModel1 extends PricingModel
 
     public function isOOA()
     {
-        $surcharge = new \App\FedexEas();
+        $surcharge = new \App\Models\Models\FedexEas();
         if (strtoupper($surcharge->getSurcharge($this->shipment['recipient_postcode'])) == 'OOA') {
             return true;
         }

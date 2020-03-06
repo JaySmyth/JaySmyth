@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Company;
-use App\CustomsEntry;
-use App\Document;
+use App\Models\Models\Company;
+use App\Models\Models\CustomsEntry;
+use App\Models\Models\Document;
 use App\Http\Requests\CustomsEntryCommodityRequest;
 use App\Http\Requests\CustomsEntryRequest;
 use Auth;

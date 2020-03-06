@@ -159,7 +159,7 @@ trait HasRoles
         if ($count > 0) {
 
             // Count the number of viable reports for user's allowed modes and depots.
-            return \App\Report::whereIn('mode_id', $this->getAllowedModeIds())->whereIn('depot_id', $this->getDepotIds())->count();
+            return \App\Models\Report::whereIn('mode_id', $this->getAllowedModeIds())->whereIn('depot_id', $this->getDepotIds())->count();
         }
 
         return false;
@@ -325,10 +325,10 @@ trait HasRoles
     public function depots()
     {
         if ($this->hasRole('ifsa')) {
-            return \App\Depot::orderBy('name')->get();
+            return \App\Models\Models\Depot::orderBy('name')->get();
         }
 
-        return \App\Depot::whereIn('id', $this->getDepotIds())->orderBy('name')->get();
+        return \App\Models\Models\Depot::whereIn('id', $this->getDepotIds())->orderBy('name')->get();
     }
 
     /**
@@ -484,7 +484,7 @@ trait HasRoles
      */
     public function getImportConfigs()
     {
-        return \App\ImportConfig::select('id', 'company_name')->whereIn('company_id', $this->getAllowedCompanyIds(1))->where('enabled', 1)->orderBy('company_name')->get();
+        return \App\Models\Models\ImportConfig::select('id', 'company_name')->whereIn('company_id', $this->getAllowedCompanyIds(1))->where('enabled', 1)->orderBy('company_name')->get();
     }
 
     /*

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\FuelSurcharge;
+use App\Models\Models\FuelSurcharge;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FuelSurchargeRequest;
 use Illuminate\Http\Request;

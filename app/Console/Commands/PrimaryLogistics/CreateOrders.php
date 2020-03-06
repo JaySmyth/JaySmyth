@@ -49,7 +49,7 @@ class CreateOrders extends Command
         $client = new Client(['auth' => [$this->user, $this->key]]);
 
         // Retreive the shipments to be created on cartrover (Babocush US only)
-        $shipments = \App\Shipment::whereCarrierId(12)->whereCompanyId(874)->whereReceivedSent(0)->whereNotIn('status_id', [1, 7])->whereIn('recipient_country_code', ['US', 'CA'])->get();
+        $shipments = \App\Models\Shipment::whereCarrierId(12)->whereCompanyId(874)->whereReceivedSent(0)->whereNotIn('status_id', [1, 7])->whereIn('recipient_country_code', ['US', 'CA'])->get();
 
         foreach ($shipments as $shipment) {
             $json = $this->buildJson($shipment);

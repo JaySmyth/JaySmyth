@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\DomesticRate;
-use App\RateDetail;
+use App\Models\Models\DomesticRate;
+use App\Models\RateDetail;
 use DB;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;

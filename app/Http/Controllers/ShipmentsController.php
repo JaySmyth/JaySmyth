@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\CarrierAPI\Facades\CarrierAPI;
-use App\CarrierAPI\Pdf;
-use App\Company;
+use App\Models\Models\CarrierAPI\Facades\CarrierAPI;
+use App\Models\Models\CarrierAPI\Pdf;
+use App\Models\Models\Company;
 use App\Exports\DimsExport;
 use App\Exports\ShipmentsExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
 use App\Jobs\ImportShipments;
 use App\Jobs\LogScanningKpis;
-use App\Mode;
+use App\Models\Mode;
 use App\Pricing\Pricing;
-use App\Shipment;
-use App\TransactionLog;
-use App\User;
+use App\Models\Shipment;
+use App\Models\TransactionLog;
+use App\Models\User;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;

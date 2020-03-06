@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Shipment;
-use App\User;
+use App\Models\Shipment;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ShipmentPolicy

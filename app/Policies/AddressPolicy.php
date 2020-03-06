@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Address;
-use App\User;
+use App\Models\Models\Address;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class AddressPolicy

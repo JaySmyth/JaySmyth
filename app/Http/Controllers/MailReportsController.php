@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\MailReportRecipientRequest;
-use App\MailReport;
+use App\Models\Models\MailReport;
 use Illuminate\Http\Request;
 
 class MailReportsController extends Controller
@@ -91,7 +91,7 @@ class MailReportsController extends Controller
     {
         $mailReport = MailReport::findOrFail($id);
 
-        $recipient = \App\MailReportRecipient::findOrFail($recipientId);
+        $recipient = \App\Models\Models\MailReportRecipient::findOrFail($recipientId);
 
         return view('mail_reports.edit_recipient', compact('mailReport', 'recipient'));
     }
@@ -106,7 +106,7 @@ class MailReportsController extends Controller
     {
         $mailReport = MailReport::findOrFail($id);
 
-        $recipient = \App\MailReportRecipient::findOrFail($recipientId);
+        $recipient = \App\Models\Models\MailReportRecipient::findOrFail($recipientId);
 
         $recipient->update($request->all());
 

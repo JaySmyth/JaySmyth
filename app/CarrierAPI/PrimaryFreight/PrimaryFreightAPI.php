@@ -1,11 +1,11 @@
 <?php
 
-namespace App\CarrierAPI\PrimaryFreight;
+namespace App\Models\Models\CarrierAPI\PrimaryFreight;
 
 /**
  * @author gmcbroom
  */
-class PrimaryFreightAPI extends \App\CarrierAPI\CarrierBase
+class PrimaryFreightAPI extends \App\Models\Models\CarrierAPI\CarrierBase
 {
     /**
      * @param type $shipment
@@ -103,7 +103,7 @@ class PrimaryFreightAPI extends \App\CarrierAPI\CarrierBase
      */
     protected function log($type, $direction, $msg)
     {
-        \App\TransactionLog::create([
+        \App\Models\TransactionLog::create([
             'type' => $type,
             'carrier' => 'pri',
             'direction' => $direction,

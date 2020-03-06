@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\CarrierAPI\Facades\CarrierAPI;
-use App\User;
+use App\Models\Models\CarrierAPI\Facades\CarrierAPI;
+use App\Models\User;
 use Tests\TestCase;
 
 class ApiShipmentAvailabilityTest extends TestCase

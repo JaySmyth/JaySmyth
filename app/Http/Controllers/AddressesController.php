@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Address;
+use App\Models\Models\Address;
 use App\Http\Requests;
 use App\Http\Requests\AddressRequest;
 use Illuminate\Http\Request;

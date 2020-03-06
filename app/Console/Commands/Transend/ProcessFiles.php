@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands\Transend;
 
-use App\Package;
+use App\Models\Package;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
@@ -271,8 +271,8 @@ class ProcessFiles extends Command
             while (($data = fgetcsv($handle, 2000, ',')) !== false) {
                 $row = $this->assignFieldNames($data);
 
-                $this->transportJob = (! empty($row['JobRef1'])) ? \App\TransportJob::whereNumber($row['JobRef1'])->first() : false;
-                $this->transendCode = (! empty($row['ExceptionReasonCode'])) ? \App\TransendCode::whereCode($row['ExceptionReasonCode'])->first() : false;
+                $this->transportJob = (! empty($row['JobRef1'])) ? \App\Models\TransportJob::whereNumber($row['JobRef1'])->first() : false;
+                $this->transendCode = (! empty($row['ExceptionReasonCode'])) ? \App\Models\TransendCode::whereCode($row['ExceptionReasonCode'])->first() : false;
                 $this->shipment = false;
 
                 if ($this->transportJob) {

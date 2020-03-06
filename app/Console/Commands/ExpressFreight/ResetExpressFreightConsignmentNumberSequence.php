@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands\ExpressFreight;
 
-use App\Sequence;
+use App\Models\Sequence;
 use Illuminate\Console\Command;
 
 class ResetExpressFreightConsignmentNumberSequence extends Command

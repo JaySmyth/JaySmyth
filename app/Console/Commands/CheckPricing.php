@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Company;
-use App\Service;
-use App\Shipment;
+use App\Models\Models\Company;
+use App\Models\Service;
+use App\Models\Shipment;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Console\Command;

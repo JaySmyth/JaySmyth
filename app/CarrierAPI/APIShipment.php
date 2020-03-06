@@ -6,14 +6,14 @@
  * and open the template in the editor.
  */
 
-namespace App\CarrierAPI;
+namespace App\Models\Models\CarrierAPI;
 
-use App\Company;
-use App\CompanyPackagingType;
-use App\Country;
-use App\Currency;
-use App\Postcode;
-use App\Service;
+use App\Models\Models\Company;
+use App\Models\Models\CompanyPackagingType;
+use App\Models\Models\Country;
+use App\Models\Models\Currency;
+use App\Models\Postcode;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 

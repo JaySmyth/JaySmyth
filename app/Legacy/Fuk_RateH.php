@@ -131,7 +131,7 @@ class Fuk_RateH extends Model
      */
     public function migrate($company, $legacyRate, $newRateId, $newService)
     {
-        $newRate = \App\RateDetail::where('rate_id', $newRateId)
+        $newRate = \App\Models\RateDetail::where('rate_id', $newRateId)
                 ->where('from_date', '<=', date('Y-m-d'))
                 ->where('to_date', '>=', date('Y-m-d'))
                 ->orderBy('residential', 'piece_limit', 'package_type', 'zone', 'break_point')
@@ -160,14 +160,14 @@ class Fuk_RateH extends Model
     {
 
         // Clear any existing discounts
-        $rate = \App\RateDiscount::where('rate_id', $newRateId)->delete();
+        $rate = \App\Models\RateDiscount::where('rate_id', $newRateId)->delete();
     }
 
     public function addDiscount($row, $companyId, $newRateId, $newService)
     {
 
         // Read Current Standard Rate on new system
-        $newRate = \App\RateDetail::where('rate_id', $newRateId)
+        $newRate = \App\Models\RateDetail::where('rate_id', $newRateId)
                 ->where('residential', false)
                 ->where('piece_limit', $row->piece_limit)
                 ->where('package_type', $row->p_type)
@@ -191,7 +191,7 @@ class Fuk_RateH extends Model
 
             // If a discounted rate then insert discount
             if ($weightDiscount != 0 || $consignmentDiscount != 0) {
-                $rowDiscount = \App\RateDiscount::create([
+                $rowDiscount = \App\Models\RateDiscount::create([
                             'company_id' => $companyId,
                             'rate_id' => $newRateId,
                             'service_id' => $newService->id,

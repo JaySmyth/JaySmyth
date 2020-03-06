@@ -8,8 +8,8 @@
 
 namespace App\Pricing;
 
-use App\Surcharge;
-use App\UpsEas;
+use App\Models\Surcharge;
+use App\Models\UpsEas;
 
 class PricingModel3 extends PricingModel
 {

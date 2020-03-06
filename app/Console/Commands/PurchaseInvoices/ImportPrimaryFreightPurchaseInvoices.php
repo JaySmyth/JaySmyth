@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands\PurchaseInvoices;
 
-use App\PurchaseInvoice;
-use App\PurchaseInvoiceCharge;
-use App\PurchaseInvoiceLine;
+use App\Models\PurchaseInvoice;
+use App\Models\PurchaseInvoiceCharge;
+use App\Models\PurchaseInvoiceLine;
 use Illuminate\Console\Command;
 
 class ImportPrimaryFreightPurchaseInvoices extends Command
@@ -142,7 +142,7 @@ class ImportPrimaryFreightPurchaseInvoices extends Command
 
                     if ($rowTotal > 0) {
                         // Lookup shipment
-                        $shipment = \App\Shipment::whereConsignmentNumber($row['ConsignmentNumber'])->first();
+                        $shipment = \App\Models\Shipment::whereConsignmentNumber($row['ConsignmentNumber'])->first();
 
                         $purchaseInvoiceLine = new PurchaseInvoiceLine();
                         $purchaseInvoiceLine->purchase_invoice_id = $this->purchaseInvoice->id;

@@ -7,31 +7,31 @@
  * function getServiceByDest($shipment, $possibleServices);
  */
 
-namespace App\CarrierAPI;
+namespace App\Models\Models\CarrierAPI;
 
 use App;
-use App\CarrierAPI\APIShipment;
-use App\CarrierAPI\CWide\CWideAPI;
-use App\CarrierAPI\DHL\DHLAPI;
-use App\CarrierAPI\DHLGlobalMail\DHLGlobalMailAPI;
-use App\CarrierAPI\ExpressFreight\ExpressFreightAPI;
-use App\CarrierAPI\ExpressFreightNI\ExpressFreightNIAPI;
-use App\CarrierAPI\Fedex\FedexAPI;
-use App\CarrierAPI\IFS\IFSAPI;
-use App\CarrierAPI\Pdf;
-use App\CarrierAPI\PrimaryFreight\PrimaryFreightAPI;
-use App\CarrierAPI\ServiceRules;
-use App\CarrierAPI\TNT\TNTAPI;
-use App\CarrierAPI\UPS\UPSAPI;
-use App\Company;
-use App\Country;
-use App\Department;
+use App\Models\Models\CarrierAPI\APIShipment;
+use App\Models\Models\CarrierAPI\CWide\CWideAPI;
+use App\Models\Models\CarrierAPI\DHL\DHLAPI;
+use App\Models\Models\CarrierAPI\DHLGlobalMail\DHLGlobalMailAPI;
+use App\Models\Models\CarrierAPI\ExpressFreight\ExpressFreightAPI;
+use App\Models\Models\CarrierAPI\ExpressFreightNI\ExpressFreightNIAPI;
+use App\Models\Models\CarrierAPI\Fedex\FedexAPI;
+use App\Models\Models\CarrierAPI\IFS\IFSAPI;
+use App\Models\Models\CarrierAPI\Pdf;
+use App\Models\Models\CarrierAPI\PrimaryFreight\PrimaryFreightAPI;
+use App\Models\Models\CarrierAPI\ServiceRules;
+use App\Models\Models\CarrierAPI\TNT\TNTAPI;
+use App\Models\Models\CarrierAPI\UPS\UPSAPI;
+use App\Models\Models\Company;
+use App\Models\Models\Country;
+use App\Models\Models\Department;
 use App\Jobs\CreateEasypostTracker;
-use App\Mode;
+use App\Models\Mode;
 use App\Pricing\Facades\Pricing;
-use App\Service;
-use App\Shipment;
-use App\State;
+use App\Models\Service;
+use App\Models\Shipment;
+use App\Models\State;
 use Carbon\Carbon;
 use DB;
 use Exception;
@@ -249,7 +249,7 @@ class CarrierAPI
         if (isset($serviceDetails['pivot']['monthly_limit']) && $serviceDetails['pivot']['monthly_limit'] > 0) {
 
             // Count the shipments for the month
-            $count = \App\Shipment::whereCompanyId($this->company->id)->whereBetween('ship_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->whereNotIn('status_id', [1, 7])->count();
+            $count = \App\Models\Shipment::whereCompanyId($this->company->id)->whereBetween('ship_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->whereNotIn('status_id', [1, 7])->count();
 
             // Limit has been exceeded, remove from array
             if ($count >= $serviceDetails['pivot']['monthly_limit']) {
@@ -677,7 +677,7 @@ class CarrierAPI
             $to = config('mail.error');
             $subject = 'WebClient DB Error - '.$to;
             $message = 'Web Client failed to insert shipment '."\r\n\r\n".
-                    'App\CarrierAPI\CarrierAPI.php : '."\r\n\r\n".
+                    'App\Models\Models\CarrierAPI\CarrierAPI.php : '."\r\n\r\n".
                     'Function addShipment() : '."\r\n\r\n".
                     'IFS Consignment Number : '.$data['consignment_number']."\r\n\r\n".
                     'Carrier Consignment Number : '.$data['carrier_consignment_number']."\r\n\r\n".

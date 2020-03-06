@@ -1,16 +1,16 @@
 <?php
 
-namespace App\CarrierAPI\TNT;
+namespace App\Models\Models\CarrierAPI\TNT;
 
-use App\CarrierAPI\TNT\TNT;
-use App\Service;
+use App\Models\Models\CarrierAPI\TNT\TNT;
+use App\Models\Service;
 
 /**
  * Description of TNTAPI.
  *
  * @author gmcbroom
  */
-class TNTAPI extends \App\CarrierAPI\CarrierBase
+class TNTAPI extends \App\Models\Models\CarrierAPI\CarrierBase
 {
     /**
      * @param type $shipment

@@ -58,7 +58,7 @@ class UploadFiles extends Command
     {
         $queue = [];
 
-        $fileUploads = \App\FileUpload::whereEnabled(1)->get();
+        $fileUploads = \App\Models\Models\FileUpload::whereEnabled(1)->get();
 
         /*
          * Build a queue of uploads that are scheduled for processing now.
@@ -264,7 +264,7 @@ class UploadFiles extends Command
             Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('File Upload Failed', $this->log, $tempFile));
         }
 
-        $log = \App\FileUploadLog::create([
+        $log = \App\Models\Models\FileUploadLog::create([
             'output' => implode('<br>', $this->log),
             'uploaded' => $uploaded,
             'file_upload_id' => $fileUpload->id,
@@ -275,7 +275,7 @@ class UploadFiles extends Command
             $fileUpload->setNextUpload();
 
             // Update "sent" flag on records after successful transfer
-            \App\Shipment::whereIn('id', $this->idsSent)->update([$fileUpload->type.'_sent' => 1]);
+            \App\Models\Shipment::whereIn('id', $this->idsSent)->update([$fileUpload->type.'_sent' => 1]);
         }
     }
 
@@ -395,7 +395,7 @@ class UploadFiles extends Command
      */
     protected function getPodShipments($companyId)
     {
-        return \App\Shipment::whereDelivered(1)->wherePodSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
+        return \App\Models\Shipment::whereDelivered(1)->wherePodSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
     }
 
     /**
@@ -406,7 +406,7 @@ class UploadFiles extends Command
      */
     protected function getReceivedShipments($companyId)
     {
-        return \App\Shipment::whereReceived(1)->whereReceivedSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
+        return \App\Models\Shipment::whereReceived(1)->whereReceivedSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
     }
 
     /**
@@ -417,6 +417,6 @@ class UploadFiles extends Command
      */
     protected function getCreatedShipments($companyId)
     {
-        return \App\Shipment::whereNotIn('status_id', [1, 7])->whereCreatedSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
+        return \App\Models\Shipment::whereNotIn('status_id', [1, 7])->whereCreatedSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
     }
 }

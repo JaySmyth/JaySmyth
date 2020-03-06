@@ -1,9 +1,9 @@
 <?php
 
-namespace App\CarrierAPI\DHL;
+namespace App\Models\Models\CarrierAPI\DHL;
 
-use App\CarrierAPI\DHL\DHLLabel;
-use App\Service;
+use App\Models\Models\CarrierAPI\DHL\DHLLabel;
+use App\Models\Service;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 
@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Validator;
  *
  * @author gmcbroom
  */
-class DHLAPI extends \App\CarrierAPI\CarrierBase
+class DHLAPI extends \App\Models\Models\CarrierAPI\CarrierBase
 {
     /**
      * @param type $shipment

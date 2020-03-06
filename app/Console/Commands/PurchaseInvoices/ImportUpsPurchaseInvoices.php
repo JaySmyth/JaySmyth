@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands\PurchaseInvoices;
 
-use App\PurchaseInvoice;
-use App\PurchaseInvoiceCharge;
-use App\PurchaseInvoiceLine;
+use App\Models\PurchaseInvoice;
+use App\Models\PurchaseInvoiceCharge;
+use App\Models\PurchaseInvoiceLine;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;

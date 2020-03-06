@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\CarrierAPI\Pdf;
-use App\Manifest;
-use App\Shipment;
+use App\Models\Models\CarrierAPI\Pdf;
+use App\Models\Models\Manifest;
+use App\Models\Shipment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;

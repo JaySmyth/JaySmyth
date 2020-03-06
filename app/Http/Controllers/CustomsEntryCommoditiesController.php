@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\CustomsEntryCommodity;
+use App\Models\Models\CustomsEntryCommodity;
 use App\Http\Requests\CustomsEntryCommodityRequest;
 
 class CustomsEntryCommoditiesController extends Controller

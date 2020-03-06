@@ -1,13 +1,13 @@
 <?php
 
-namespace App\CarrierAPI\CWide;
+namespace App\Models\Models\CarrierAPI\CWide;
 
-use App\Depot;
-use App\Mode;
-use App\Route;
-use App\Service;
+use App\Models\Models\Depot;
+use App\Models\Mode;
+use App\Models\Route;
+use App\Models\Service;
 
-class CWideLabel extends \App\CarrierAPI\CarrierLabel
+class CWideLabel extends \App\Models\Models\CarrierAPI\CarrierLabel
 {
     /**
      * Accepts Shipment and Carrier Response data

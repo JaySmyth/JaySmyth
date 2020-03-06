@@ -24,7 +24,7 @@ class APIResponseProvider extends ServiceProvider
     public function register()
     {
         $this->app->bind('APIResponse', function () {
-            return new \App\CarrierAPI\APIResponse;
+            return new \App\Models\Models\CarrierAPI\APIResponse;
         });
     }
 }

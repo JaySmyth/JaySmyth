@@ -176,7 +176,7 @@ class PermissionsRolesSeeder extends Seeder
           |--------------------------------------------------------------------------
          */
 
-        $role = \App\Role::whereName('cust')->firstOrFail();
+        $role = \App\Models\Role::whereName('cust')->firstOrFail();
         $role->assignPermission('create_shipment');
         $role->assignPermission('update_shipment');
         $role->assignPermission('cancel_shipment');
@@ -186,7 +186,7 @@ class PermissionsRolesSeeder extends Seeder
           | Assign permissions to the Customer Admin (cusa)
           |--------------------------------------------------------------------------
          */
-        $role = \App\Role::whereName('cusa')->firstOrFail();
+        $role = \App\Models\Role::whereName('cusa')->firstOrFail();
         $role->assignPermission('create_shipment');
         $role->assignPermission('update_shipment');
         $role->assignPermission('cancel_shipment');
@@ -201,7 +201,7 @@ class PermissionsRolesSeeder extends Seeder
           |--------------------------------------------------------------------------
          */
 
-        $role = \App\Role::whereName('cudv')->firstOrFail();
+        $role = \App\Models\Role::whereName('cudv')->firstOrFail();
         $role->assignPermission('view_customs_entry');
         $role->assignPermission('download_customs_entry');
 
@@ -210,28 +210,28 @@ class PermissionsRolesSeeder extends Seeder
           | Assign permissions to the Courier Shipper role (courier)
           |--------------------------------------------------------------------------
          */
-        $role = \App\Role::whereName('courier')->firstOrFail();
+        $role = \App\Models\Role::whereName('courier')->firstOrFail();
         $role->assignPermission('courier');
         /*
           |--------------------------------------------------------------------------
           | Assign permissions to the Air Shipper role (air)
           |--------------------------------------------------------------------------
          */
-        $role = \App\Role::whereName('air')->firstOrFail();
+        $role = \App\Models\Role::whereName('air')->firstOrFail();
         $role->assignPermission('air');
         /*
           |--------------------------------------------------------------------------
           | Assign permissions to the Road Shipper role (road)
           |--------------------------------------------------------------------------
          */
-        $role = \App\Role::whereName('road')->firstOrFail();
+        $role = \App\Models\Role::whereName('road')->firstOrFail();
         $role->assignPermission('road');
         /*
           |--------------------------------------------------------------------------
           | Assign permissions to the Sea Shipper role (sea)
           |--------------------------------------------------------------------------
          */
-        $role = \App\Role::whereName('sea')->firstOrFail();
+        $role = \App\Models\Role::whereName('sea')->firstOrFail();
         $role->assignPermission('sea');
         /*
           |--------------------------------------------------------------------------
@@ -240,10 +240,10 @@ class PermissionsRolesSeeder extends Seeder
          */
 
         // Get an array of shipping modes
-        $modes = \App\Mode::all()->pluck('name')->toArray();
-        $permissions = \App\Permission::whereNotIn('name', $modes)->get();
+        $modes = \App\Models\Mode::all()->pluck('name')->toArray();
+        $permissions = \App\Models\Permission::whereNotIn('name', $modes)->get();
 
-        $role = \App\Role::whereName('ifsu')->firstOrFail();
+        $role = \App\Models\Role::whereName('ifsu')->firstOrFail();
 
         foreach ($permissions as $permission) {
             $role->assignPermission($permission->name);
@@ -254,7 +254,7 @@ class PermissionsRolesSeeder extends Seeder
           | Assign permissions to the IFS Managaer role (ifsm)
           |--------------------------------------------------------------------------
          */
-        $role = \App\Role::whereName('ifsm')->firstOrFail();
+        $role = \App\Models\Role::whereName('ifsm')->firstOrFail();
 
         foreach ($permissions as $permission) {
             $role->assignPermission($permission->name);
@@ -265,7 +265,7 @@ class PermissionsRolesSeeder extends Seeder
           | Assign permissions to the IFS Sales role (ifss)
           |--------------------------------------------------------------------------
          */
-        $role = \App\Role::whereName('ifss')->firstOrFail();
+        $role = \App\Models\Role::whereName('ifss')->firstOrFail();
         $role->assignPermission('view_reports');
 
         /*
@@ -273,7 +273,7 @@ class PermissionsRolesSeeder extends Seeder
           | Assign permissions to the IFS Finance/Accounts role (ifsf)
           |--------------------------------------------------------------------------
          */
-        $role = \App\Role::whereName('ifsf')->firstOrFail();
+        $role = \App\Models\Role::whereName('ifsf')->firstOrFail();
         $role->assignPermission('view_purchase_invoice');
         $role->assignPermission('compare_purchase_invoice');
         $role->assignPermission('purchase_invoice_admin');
@@ -283,7 +283,7 @@ class PermissionsRolesSeeder extends Seeder
           | Assign permissions to the IFS Customs role (ifsc)
           |--------------------------------------------------------------------------
          */
-        $role = \App\Role::whereName('ifsc')->firstOrFail();
+        $role = \App\Models\Role::whereName('ifsc')->firstOrFail();
         $role->assignPermission('view_customs_entry');
         $role->assignPermission('create_customs_entry');
         $role->assignPermission('delete_customs_entry');

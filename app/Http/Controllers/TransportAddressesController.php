@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\TransportAddress;
+use App\Models\TransportAddress;
 use Illuminate\Http\Request;
 
 class TransportAddressesController extends Controller

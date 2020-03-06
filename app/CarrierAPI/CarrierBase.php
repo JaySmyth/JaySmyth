@@ -2,7 +2,7 @@
 
 namespace app\CarrierAPI;
 
-use App\Carrier;
+use App\Models\Models\Carrier;
 use Illuminate\Support\Facades\Validator;
 
 /**

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests;
-use App\State;
+use App\Models\State;
 use Illuminate\Http\Request;
 
 class StatesController extends Controller

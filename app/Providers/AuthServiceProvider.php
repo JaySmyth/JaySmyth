@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Permission;
+use App\Models\Permission;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
@@ -15,36 +15,36 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        \App\Shipment::class => \App\Policies\ShipmentPolicy::class,
-        \App\Company::class => \App\Policies\CompanyPolicy::class,
-        \App\User::class => \App\Policies\UserPolicy::class,
-        \App\Role::class => \App\Policies\RolePolicy::class,
-        \App\Address::class => \App\Policies\AddressPolicy::class,
-        \App\Commodity::class => \App\Policies\CommodityPolicy::class,
-        \App\Manifest::class => \App\Policies\ManifestPolicy::class,
-        \App\ManifestProfile::class => \App\Policies\ManifestProfilePolicy::class,
-        \App\Service::class => \App\Policies\ServicePolicy::class,
-        \App\Report::class => \App\Policies\ReportPolicy::class,
-        \App\Preferences::class => \App\Policies\PreferencesPolicy::class,
-        \App\CustomsEntry::class => \App\Policies\CustomsEntryPolicy::class,
-        \App\FuelSurcharge::class => \App\Policies\FuelSurchargePolicy::class,
-        \App\InvoiceRun::class => \App\Policies\InvoiceRunPolicy::class,
-        \App\PurchaseInvoice::class => \App\Policies\PurchaseInvoicePolicy::class,
-        \App\Report::class => \App\Policies\ReportPolicy::class,
-        \App\SeaFreightShipment::class => \App\Policies\SeaFreightShipmentPolicy::class,
-        \App\Currency::class => \App\Policies\CurrencyPolicy::class,
-        \App\Driver::class => \App\Policies\DriverPolicy::class,
-        \App\Vehicle::class => \App\Policies\VehiclePolicy::class,
-        \App\TransportJob::class => \App\Policies\TransportJobPolicy::class,
-        \App\DriverManifest::class => \App\Policies\DriverManifestPolicy::class,
-        \App\TransportAddress::class => \App\Policies\TransportAddressPolicy::class,
-        \App\CarrierChargeCode::class => \App\Policies\CarrierChargeCodePolicy::class,
-        \App\RateSurcharge::class => \App\Policies\RateSurchargePolicy::class,
-        \App\Surcharge::class => \App\Policies\SurchargePolicy::class,
-        \App\Postcode::class => \App\Policies\PostcodePolicy::class,
-        \App\Quotation::class => \App\Policies\QuotationPolicy::class,
-        \App\Log::class => \App\Policies\LogPolicy::class,
-        \App\SeaFreightTracking::class => \App\Policies\SeaFreightTrackingPolicy::class,
+        \App\Models\Shipment::class => \App\Policies\ShipmentPolicy::class,
+        \App\Models\Models\Company::class => \App\Policies\CompanyPolicy::class,
+        \App\Models\User::class => \App\Policies\UserPolicy::class,
+        \App\Models\Role::class => \App\Policies\RolePolicy::class,
+        \App\Models\Models\Address::class => \App\Policies\AddressPolicy::class,
+        \App\Models\Models\Commodity::class => \App\Policies\CommodityPolicy::class,
+        \App\Models\Models\Manifest::class => \App\Policies\ManifestPolicy::class,
+        \App\Models\Models\ManifestProfile::class => \App\Policies\ManifestProfilePolicy::class,
+        \App\Models\Service::class => \App\Policies\ServicePolicy::class,
+        \App\Models\Report::class => \App\Policies\ReportPolicy::class,
+        \App\Models\Preferences::class => \App\Policies\PreferencesPolicy::class,
+        \App\Models\Models\CustomsEntry::class => \App\Policies\CustomsEntryPolicy::class,
+        \App\Models\Models\FuelSurcharge::class => \App\Policies\FuelSurchargePolicy::class,
+        \App\Models\Models\InvoiceRun::class => \App\Policies\InvoiceRunPolicy::class,
+        \App\Models\PurchaseInvoice::class => \App\Policies\PurchaseInvoicePolicy::class,
+        \App\Models\Report::class => \App\Policies\ReportPolicy::class,
+        \App\Models\SeaFreightShipment::class => \App\Policies\SeaFreightShipmentPolicy::class,
+        \App\Models\Models\Currency::class => \App\Policies\CurrencyPolicy::class,
+        \App\Models\Models\Driver::class => \App\Policies\DriverPolicy::class,
+        \App\Models\Vehicle::class => \App\Policies\VehiclePolicy::class,
+        \App\Models\TransportJob::class => \App\Policies\TransportJobPolicy::class,
+        \App\Models\Models\DriverManifest::class => \App\Policies\DriverManifestPolicy::class,
+        \App\Models\TransportAddress::class => \App\Policies\TransportAddressPolicy::class,
+        \App\Models\Models\CarrierChargeCode::class => \App\Policies\CarrierChargeCodePolicy::class,
+        \App\Models\RateSurcharge::class => \App\Policies\RateSurchargePolicy::class,
+        \App\Models\Surcharge::class => \App\Policies\SurchargePolicy::class,
+        \App\Models\Postcode::class => \App\Policies\PostcodePolicy::class,
+        \App\Models\Quotation::class => \App\Policies\QuotationPolicy::class,
+        \App\Models\Models\Log::class => \App\Policies\LogPolicy::class,
+        \App\Models\SeaFreightTracking::class => \App\Policies\SeaFreightTrackingPolicy::class,
     ];
 
     /**

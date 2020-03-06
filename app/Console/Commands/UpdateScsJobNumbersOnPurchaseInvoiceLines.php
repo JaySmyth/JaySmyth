@@ -3,8 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Multifreight\JobHdr;
-use App\PurchaseInvoice;
-use App\Shipment;
+use App\Models\PurchaseInvoice;
+use App\Models\Shipment;
 use Illuminate\Console\Command;
 
 class UpdateScsJobNumbersOnPurchaseInvoiceLines extends Command

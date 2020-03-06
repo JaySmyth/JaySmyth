@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands\ExpressFreight;
 
-use App\Shipment;
+use App\Models\Shipment;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
@@ -68,7 +68,7 @@ class UploadShipmentsToExpressFreight extends Command
     public function handle()
     {
         // Load shipments that have been received at IFS
-        $this->shipments = \App\Shipment::whereCarrierId(14)->whereReceived(1)->whereReceivedSent(0)->whereNotIn('status_id', [1, 7])->get();
+        $this->shipments = \App\Models\Shipment::whereCarrierId(14)->whereReceived(1)->whereReceivedSent(0)->whereNotIn('status_id', [1, 7])->get();
 
         // Create the file to upload
         $this->createFile();

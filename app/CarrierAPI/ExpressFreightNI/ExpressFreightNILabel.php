@@ -1,10 +1,10 @@
 <?php
 
-namespace App\CarrierAPI\ExpressFreightNI;
+namespace App\Models\Models\CarrierAPI\ExpressFreightNI;
 
-use App\ExpressFreightGazetteer;
+use App\Models\Models\ExpressFreightGazetteer;
 
-class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
+class ExpressFreightNILabel extends \App\Models\Models\CarrierAPI\CarrierLabel
 {
     /**
      * Accepts Shipment and Carrier Response data

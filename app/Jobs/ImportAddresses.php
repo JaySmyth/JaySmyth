@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Address;
-use App\User;
+use App\Models\Models\Address;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;

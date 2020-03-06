@@ -24,7 +24,7 @@ class CarrierAPIProvider extends ServiceProvider
     public function register()
     {
         $this->app->bind('CarrierAPI', function () {
-            return new \App\CarrierAPI\CarrierAPI;
+            return new \App\Models\Models\CarrierAPI\CarrierAPI;
         });
     }
 }

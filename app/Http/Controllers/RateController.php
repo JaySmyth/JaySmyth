@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Carrier;
-use App\Company;
-use App\CompanyRates;
-use App\DomesticRate;
-use App\DomesticRateDiscount;
+use App\Models\Models\Carrier;
+use App\Models\Models\Company;
+use App\Models\Models\CompanyRates;
+use App\Models\Models\DomesticRate;
+use App\Models\Models\DomesticRateDiscount;
 use App\Legacy\Fuk_RateH;
 use App\Legacy\FukCustService;
 use App\Legacy\FukRate;
 use App\Legacy\FxRateH;
 use App\Legacy\OldCompany;
-use App\Rate;
-use App\RateChangeLogs;
-use App\RateDetail;
-use App\RateDiscount;
-use App\Service;
+use App\Models\Rate;
+use App\Models\RateChangeLogs;
+use App\Models\RateDetail;
+use App\Models\RateDiscount;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

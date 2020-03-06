@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ImportConfigRequest;
-use App\ImportConfig;
+use App\Models\Models\ImportConfig;
 use Faker\Generator as Faker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -55,7 +55,7 @@ class ImportConfigsController extends Controller
     {
         $fields = dropDown('importConfigFields', 'Please select');
 
-        $importConfig = \App\ImportConfig::whereCompanyName('*TEMPLATE*')->first();
+        $importConfig = \App\Models\Models\ImportConfig::whereCompanyName('*TEMPLATE*')->first();
 
         return view('import_configs.create', compact('importConfig', 'fields'));
     }

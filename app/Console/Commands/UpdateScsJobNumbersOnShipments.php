@@ -42,9 +42,9 @@ class UpdateScsJobNumbersOnShipments extends Command
         $company = $this->option('company');
 
         if (is_numeric($company)) {
-            $shipments = \App\Shipment::where('invoicing_status', $invoiced)->whereNull('scs_job_number')->whereNotIn('status_id', [1, 7])->whereNotIn('carrier_id', [6])->whereCompanyId($company)->orderBy('id', 'ASC')->get();
+            $shipments = \App\Models\Shipment::where('invoicing_status', $invoiced)->whereNull('scs_job_number')->whereNotIn('status_id', [1, 7])->whereNotIn('carrier_id', [6])->whereCompanyId($company)->orderBy('id', 'ASC')->get();
         } else {
-            $shipments = \App\Shipment::where('invoicing_status', $invoiced)->whereNull('scs_job_number')->whereNotIn('status_id', [1, 7])->whereNotIn('carrier_id', [6])->where('updated_at', '>=', Carbon::parse('-2 months'))->orderBy('id', 'ASC')->get();
+            $shipments = \App\Models\Shipment::where('invoicing_status', $invoiced)->whereNull('scs_job_number')->whereNotIn('status_id', [1, 7])->whereNotIn('carrier_id', [6])->where('updated_at', '>=', Carbon::parse('-2 months'))->orderBy('id', 'ASC')->get();
         }
 
         foreach ($shipments as $shipment) {

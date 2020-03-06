@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\CarrierAPI\Pdf;
-use App\Driver;
-use App\DriverManifest;
+use App\Models\Models\CarrierAPI\Pdf;
+use App\Models\Models\Driver;
+use App\Models\Models\DriverManifest;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -90,7 +90,7 @@ class DriverManifestsController extends Controller
 
         if (! $driverManifest) {
             DriverManifest::create([
-                    'number' => \App\Sequence::whereCode('DRIVER')->lockForUpdate()->first()->getNextAvailable(),
+                    'number' => \App\Models\Sequence::whereCode('DRIVER')->lockForUpdate()->first()->getNextAvailable(),
                     'driver_id' => $driverId,
                     'vehicle_id' => $request->driver[$driverId]['vehicle'],
                     'date' => strtotime($request->driver[$driverId]['date']),

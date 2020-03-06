@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands\PurchaseInvoices;
 
-use App\PurchaseInvoice;
-use App\PurchaseInvoiceCharge;
-use App\PurchaseInvoiceLine;
+use App\Models\PurchaseInvoice;
+use App\Models\PurchaseInvoiceCharge;
+use App\Models\PurchaseInvoiceLine;
 use Illuminate\Console\Command;
 
 class ImportTntPurchaseInvoices extends Command
@@ -116,7 +116,7 @@ class ImportTntPurchaseInvoices extends Command
                     $this->createPurchaseInvoice($row);
 
                     // Lookup shipment
-                    $shipment = \App\Shipment::whereCarrierConsignmentNumber($row['Consignment Number'])->whereCarrierId(4)->first();
+                    $shipment = \App\Models\Shipment::whereCarrierConsignmentNumber($row['Consignment Number'])->whereCarrierId(4)->first();
 
                     $purchaseInvoiceLine = new PurchaseInvoiceLine();
                     $purchaseInvoiceLine->purchase_invoice_id = $this->purchaseInvoice->id;

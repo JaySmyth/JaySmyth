@@ -5,11 +5,11 @@
 <h2 class="float-left">
     Create Sales Invoices <span class="badge badge-secondary">{{$shipments->count()}}</span> 
     @if(Request::get('department'))
-    <small class="text-muted ml-sm-4">{{App\Department::find(Request::get('department'))->first()->name}}</small>
+    <small class="text-muted ml-sm-4">{{App\Models\Models\Department::find(Request::get('department'))->first()->name}}</small>
     @endif
 
     @if(Request::get('company'))   
-     <small class="text-muted ml-sm-4">{{App\Company::find(Request::get('company'))->first()->company_name}}</small>
+     <small class="text-muted ml-sm-4">{{App\Models\Models\Company::find(Request::get('company'))->first()->company_name}}</small>
     @endif
     
     @if ($shipments->count() > 998)

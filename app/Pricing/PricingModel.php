@@ -2,16 +2,16 @@
 
 namespace App\Pricing;
 
-use App\CarrierPackagingType;
-use App\Company;
+use App\Models\Models\CarrierPackagingType;
+use App\Models\Models\Company;
 use App\Countries;
-use App\FuelSurcharge;
-use App\PricingZones;
-use App\Rate;
-use App\RateDetail;
-use App\Service;
-use App\Surcharge;
-use App\SurchargeDetail;
+use App\Models\Models\FuelSurcharge;
+use App\Models\PricingZones;
+use App\Models\Rate;
+use App\Models\RateDetail;
+use App\Models\Service;
+use App\Models\Surcharge;
+use App\Models\SurchargeDetail;
 
 class PricingModel
 {

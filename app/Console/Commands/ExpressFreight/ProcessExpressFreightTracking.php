@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands\ExpressFreight;
 
-use App\Tracking;
+use App\Models\Tracking;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Validator;
@@ -114,7 +114,7 @@ class ProcessExpressFreightTracking extends Command
         if ($this->validateRow($rowNumber, $data, $row)) {
 
             // Load the shipment record
-            $shipment = \App\Shipment::where('carrier_tracking_number', $row['carrier_tracking_number'])->whereIn('carrier_id', [14, 15])->first();
+            $shipment = \App\Models\Shipment::where('carrier_tracking_number', $row['carrier_tracking_number'])->whereIn('carrier_id', [14, 15])->first();
 
             if ($shipment) {
                 $datetime = Carbon::createFromformat('YmdHis', $row['datetime']);

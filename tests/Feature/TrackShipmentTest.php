@@ -2,8 +2,8 @@
 
 namespace Tests\Unit;
 
-use App\Shipment;
-use App\User;
+use App\Models\Shipment;
+use App\Models\User;
 use Tests\TestCase;
 
 class TrackShipmentTest extends TestCase

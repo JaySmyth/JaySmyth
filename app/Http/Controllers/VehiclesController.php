@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\VehicleRequest;
-use App\Vehicle;
+use App\Models\Vehicle;
 
 class VehiclesController extends Controller
 {

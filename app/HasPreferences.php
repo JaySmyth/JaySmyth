@@ -18,7 +18,7 @@ trait HasPreferences
      */
     public function preferences()
     {
-        return $this->hasMany(\App\Preference::class);
+        return $this->hasMany(\App\Models\Preference::class);
     }
 
     /**

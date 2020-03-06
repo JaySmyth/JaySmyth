@@ -16,20 +16,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Carrier;
-use App\CarrierAPI\APIShipment;
-use App\CarrierAPI\Facades\APIResponse;
-use App\CarrierAPI\Facades\CarrierAPI;
-use App\CarrierService;
-use App\Company;
-use App\CompanyPackagingType;
-use App\CompanyService;
-use App\CompanyUser;
-use App\Postcode;
+use App\Models\Models\Carrier;
+use App\Models\Models\CarrierAPI\APIShipment;
+use App\Models\Models\CarrierAPI\Facades\APIResponse;
+use App\Models\Models\CarrierAPI\Facades\CarrierAPI;
+use App\Models\Models\CarrierService;
+use App\Models\Models\Company;
+use App\Models\Models\CompanyPackagingType;
+use App\Models\Models\CompanyService;
+use App\Models\Models\CompanyUser;
+use App\Models\Postcode;
 use App\Pricing\Facades\Pricing;
 use App\Scan;
-use App\Shipment;
-use App\TransactionLog;
+use App\Models\Shipment;
+use App\Models\TransactionLog;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -817,7 +817,7 @@ class APIController extends Controller
         $json = TransactionLog::find($id)->msg;
         $data = json_decode($json, true);
 
-        $upsLabel = new \App\CarrierAPI\UPS\UPSLabel('', $data);
+        $upsLabel = new \App\Models\Models\CarrierAPI\UPS\UPSLabel('', $data);
         $response = $upsLabel->create();
 
         return response(base64_decode($response))->header('Content-Type', 'application/pdf');

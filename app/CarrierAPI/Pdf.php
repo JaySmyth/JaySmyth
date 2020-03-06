@@ -1,10 +1,10 @@
 <?php
 
-namespace App\CarrierAPI;
+namespace App\Models\Models\CarrierAPI;
 
-use App\Company;
-use App\PrintFormat;
-use App\Shipment;
+use App\Models\Models\Company;
+use App\Models\PrintFormat;
+use App\Models\Shipment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -809,7 +809,7 @@ class Pdf
         // If available get description of ship reason else use the code
         $shipReason = $shipment->ship_reason;
         if (isset($shipment->ship_reason)) {
-            $reason = \App\ShipReason::where('code', $shipment->ship_reason)->first();
+            $reason = \App\Models\ShipReason::where('code', $shipment->ship_reason)->first();
             if ($reason) {
                 $shipReason = $reason->description;
             }

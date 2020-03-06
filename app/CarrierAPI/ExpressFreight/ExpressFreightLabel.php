@@ -1,11 +1,11 @@
 <?php
 
-namespace App\CarrierAPI\ExpressFreight;
+namespace App\Models\Models\CarrierAPI\ExpressFreight;
 
-use App\Route;
-use App\Service;
+use App\Models\Route;
+use App\Models\Service;
 
-class ExpressFreightLabel extends \App\CarrierAPI\CarrierLabel
+class ExpressFreightLabel extends \App\Models\Models\CarrierAPI\CarrierLabel
 {
     /**
      * Accepts Shipment and Carrier Response data

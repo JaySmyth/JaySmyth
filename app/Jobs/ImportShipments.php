@@ -2,13 +2,13 @@
 
 namespace App\Jobs;
 
-use App\Carrier;
-use App\CarrierAPI\Facades\CarrierAPI;
-use App\Country;
-use App\Department;
-use App\Postcode;
-use App\Service;
-use App\User;
+use App\Models\Models\Carrier;
+use App\Models\Models\CarrierAPI\Facades\CarrierAPI;
+use App\Models\Models\Country;
+use App\Models\Models\Department;
+use App\Models\Postcode;
+use App\Models\Service;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -48,7 +48,7 @@ class ImportShipments implements ShouldQueue
     public function __construct($path, $importConfigId, User $user)
     {
         $this->path = $path;
-        $this->importConfig = \App\ImportConfig::find($importConfigId);
+        $this->importConfig = \App\Models\Models\ImportConfig::find($importConfigId);
         $this->user = $user;
         $this->company = $this->importConfig->company;
         $this->userPreferences = $user->getPreferences($this->company->id, $this->importConfig->mode_id, true);
@@ -179,7 +179,7 @@ class ImportShipments implements ShouldQueue
 
         // Count the number of shipments raised this month for kukoon economy
         if ($this->company->id == 808) {
-            $count = \App\Shipment::whereCompanyId(808)->whereBetween('ship_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->whereNotIn('status_id', [1, 7])->count();
+            $count = \App\Models\Shipment::whereCompanyId(808)->whereBetween('ship_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->whereNotIn('status_id', [1, 7])->count();
 
             if ($count >= 500) {
                 $this->setRowFailed($rowNumber, [0 => 'Exceeded monthly shipment allowance for '.$this->company->company_name]);
@@ -591,7 +591,7 @@ class ImportShipments implements ShouldQueue
         }
 
         if (! empty($this->row['product_code'])) {
-            $commodity = \App\Commodity::whereProductCode($this->row['product_code'])->whereCompanyId($this->company->id)->first();
+            $commodity = \App\Models\Models\Commodity::whereProductCode($this->row['product_code'])->whereCompanyId($this->company->id)->first();
         }
 
         if ($commodity) {
@@ -678,7 +678,7 @@ class ImportShipments implements ShouldQueue
      */
     private function shipmentExists()
     {
-        $shipment = \App\Shipment::whereShipmentReference(strtoupper($this->row['shipment_reference']))
+        $shipment = \App\Models\Shipment::whereShipmentReference(strtoupper($this->row['shipment_reference']))
             ->whereRecipientPostcode($this->row['recipient_postcode'])
             ->wherePieces($this->row['pieces'])
             ->whereCompanyId($this->company->id)
@@ -775,7 +775,7 @@ class ImportShipments implements ShouldQueue
      */
     private function getCommercialInvoiceCount()
     {
-        return \App\Shipment::whereSource($this->source)->notEu()->notDomestic()->notUkDomestic()->where('service_id', '!=', 29)->count();
+        return \App\Models\Shipment::whereSource($this->source)->notEu()->notDomestic()->notUkDomestic()->where('service_id', '!=', 29)->count();
     }
 
     /**

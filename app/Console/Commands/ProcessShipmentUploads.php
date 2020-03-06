@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\ShipmentUpload;
+use App\Models\ShipmentUpload;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Company;
+use App\Models\Models\Company;
 use App\Http\Requests\ContainerRequest;
 use App\Http\Requests\ProcessSeaFreightShipmentRequest;
 use App\Http\Requests\SeaFreightShipmentRequest;
-use App\SeaFreightShipment;
+use App\Models\SeaFreightShipment;
 use Auth;
 use Illuminate\Http\Request;
 
@@ -225,7 +225,7 @@ class SeaFreightShipmentController extends Controller
 
         $this->authorize('addContainer', $shipment);
 
-        $container = \App\Container::findOrFail($containerId);
+        $container = \App\Models\Models\Container::findOrFail($containerId);
 
         return view('sea_freight_shipments.edit_container', compact('shipment', 'container'));
     }
@@ -242,7 +242,7 @@ class SeaFreightShipmentController extends Controller
 
         $this->authorize('addContainer', $shipment);
 
-        $container = \App\Container::findOrFail($containerId);
+        $container = \App\Models\Models\Container::findOrFail($containerId);
 
         // Update the container
         $container->update($request->all());
@@ -262,7 +262,7 @@ class SeaFreightShipmentController extends Controller
     {
         $shipment = SeaFreightShipment::findOrFail($id);
 
-        $container = \App\Container::findOrFail($containerId);
+        $container = \App\Models\Models\Container::findOrFail($containerId);
 
         if ($container->seal_number) {
             flash()->error('Already completed!', 'Seal number has already been set.');
@@ -283,7 +283,7 @@ class SeaFreightShipmentController extends Controller
     {
         $shipment = SeaFreightShipment::findOrFail($id);
 
-        $container = \App\Container::findOrFail($containerId);
+        $container = \App\Models\Models\Container::findOrFail($containerId);
 
         $this->validate($request, [
             'seal_number' => 'required',
@@ -309,7 +309,7 @@ class SeaFreightShipmentController extends Controller
 
         $this->authorize($shipment);
 
-        $statuses = \App\SeaFreightStatus::where('id', '>', $shipment->sea_freight_status_id)->select('name', 'id')->orderBy('id')->pluck('name', 'id');
+        $statuses = \App\Models\SeaFreightStatus::where('id', '>', $shipment->sea_freight_status_id)->select('name', 'id')->orderBy('id')->pluck('name', 'id');
 
         //$lastDatetime = $shipment->tracking->first()->datetime->subDay()->toDateString();
         $lastDatetime = '-6 months';

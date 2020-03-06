@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Tracking;
+namespace App\Models\Tracking;
 
-use App\ProblemEvent;
+use App\Models\ProblemEvent;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Mail;
 
@@ -32,7 +32,7 @@ abstract class Tracking
         if (is_array($events)) {
             foreach ($events as $event) {
                 if (! $this->ignoreEvent($event)) {
-                    $tracking = \App\Tracking::firstOrCreate(['message' => $event['message'], 'status' => $event['status'], 'shipment_id' => $this->shipment->id])->update($event);
+                    $tracking = \App\Models\Tracking::firstOrCreate(['message' => $event['message'], 'status' => $event['status'], 'shipment_id' => $this->shipment->id])->update($event);
 
                     if ($tracking) {
                         $this->processEvent($event);

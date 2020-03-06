@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Driver;
+use App\Models\Models\Driver;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DriverRequest;
 

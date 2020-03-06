@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Commodity;
+use App\Models\Models\Commodity;
 use App\Http\Requests;
 use App\Http\Requests\CommodityRequest;
 use Illuminate\Http\Request;

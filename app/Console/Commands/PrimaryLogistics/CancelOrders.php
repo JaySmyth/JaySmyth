@@ -49,7 +49,7 @@ class CancelOrders extends Command
         $client = new Client(['auth' => [$this->user, $this->key]]);
 
         // Retreive the shipments to be cancelled
-        $shipments = \App\Shipment::whereSource('cartrover')->whereCarrierId(12)->whereCompanyId(874)->whereReceivedSent(1)->whereStatusId(7)->whereIn('recipient_country_code', ['US', 'CA'])->get();
+        $shipments = \App\Models\Shipment::whereSource('cartrover')->whereCarrierId(12)->whereCompanyId(874)->whereReceivedSent(1)->whereStatusId(7)->whereIn('recipient_country_code', ['US', 'CA'])->get();
 
         foreach ($shipments as $shipment) {
             try {

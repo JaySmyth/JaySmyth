@@ -6,13 +6,13 @@
  * and open the template in the editor.
  */
 
-namespace App\CarrierAPI;
+namespace App\Models\Models\CarrierAPI;
 
-use App\Carrier;
-use App\CompanyPackagingType;
-use App\Country;
-use App\IfsNdPostcode;
-use App\PackagingType;
+use App\Models\Models\Carrier;
+use App\Models\Models\CompanyPackagingType;
+use App\Models\Models\Country;
+use App\Models\Models\IfsNdPostcode;
+use App\Models\PackagingType;
 
 /**
  * Description of ServiceRules.

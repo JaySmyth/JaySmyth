@@ -155,7 +155,7 @@ class UpdatePrimaryFreightShipments extends Command
             $proceed = true;
 
             // Load the shipment record
-            $shipment = \App\Shipment::where('consignment_number', $consignmentNumber)->first();
+            $shipment = \App\Models\Shipment::where('consignment_number', $consignmentNumber)->first();
 
             // Shipment not found
             if (! $shipment) {

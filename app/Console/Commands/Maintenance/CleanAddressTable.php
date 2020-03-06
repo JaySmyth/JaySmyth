@@ -39,17 +39,17 @@ class CleanAddressTable extends Command
     {
         $total = 0;
 
-        $addresses = \App\Address::whereNotNull('id')->groupBy('company_id', 'name', 'company_name', 'address1')->havingRaw('count(*) > 1')->get();
+        $addresses = \App\Models\Models\Address::whereNotNull('id')->groupBy('company_id', 'name', 'company_name', 'address1')->havingRaw('count(*) > 1')->get();
 
         $this->info($addresses->count().' duplicate addresses found');
 
         foreach ($addresses as $duplicate) {
-            $duplicateAddress = \App\Address::whereCompanyId($duplicate->company_id)->whereName($duplicate->name)->whereCompanyName($duplicate->company_name)->whereAddress1($duplicate->address1)->orderBy('id', 'ASC')->get();
+            $duplicateAddress = \App\Models\Models\Address::whereCompanyId($duplicate->company_id)->whereName($duplicate->name)->whereCompanyName($duplicate->company_name)->whereAddress1($duplicate->address1)->orderBy('id', 'ASC')->get();
 
             $this->line($duplicateAddress->count().' duplicate addresses loaded');
 
             foreach ($duplicateAddress as $add) {
-                $count = \App\Address::whereCompanyId($duplicate->company_id)->whereName($duplicate->name)->whereCompanyName($duplicate->company_name)->whereAddress1($duplicate->address1)->count();
+                $count = \App\Models\Models\Address::whereCompanyId($duplicate->company_id)->whereName($duplicate->name)->whereCompanyName($duplicate->company_name)->whereAddress1($duplicate->address1)->count();
 
                 if ($count > 1) {
                     $this->error('Deleting duplicate ('.$add->id.'): '.$add->name.' - '.$add->address1);
@@ -63,10 +63,10 @@ class CleanAddressTable extends Command
 
         $this->line('Deleting records associated with redundant companies');
 
-        $companies = \App\Company::whereDepotId(4)->get();
+        $companies = \App\Models\Models\Company::whereDepotId(4)->get();
 
         foreach ($companies as $company) {
-            $deleted = \App\Address::whereCompanyId($company->id)->delete();
+            $deleted = \App\Models\Models\Address::whereCompanyId($company->id)->delete();
 
             if ($deleted > 0) {
                 $this->error($company->company_name.' (redundant): '.$deleted.' addresses deleted');

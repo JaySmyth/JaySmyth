@@ -3,8 +3,8 @@
 namespace Tests\Unit;
 
 use App\Pricing\Pricing;
-use App\Service;
-use App\User;
+use App\Models\Service;
+use App\Models\User;
 use Tests\TestCase;
 
 class PricingTest extends TestCase

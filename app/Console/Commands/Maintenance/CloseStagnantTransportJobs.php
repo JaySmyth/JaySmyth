@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands\Maintenance;
 
-use App\TransportJob;
+use App\Models\TransportJob;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
@@ -72,13 +72,13 @@ class CloseStagnantTransportJobs extends Command
          * Delete any duplicates
          */
 
-        $transportJobs = \App\TransportJob::whereNotNull('shipment_id')->whereType('d')->groupBy('shipment_id')->havingRaw('count(*) > 1')->orderBy('shipment_id')->get();
+        $transportJobs = \App\Models\TransportJob::whereNotNull('shipment_id')->whereType('d')->groupBy('shipment_id')->havingRaw('count(*) > 1')->orderBy('shipment_id')->get();
 
         foreach ($transportJobs as $job) {
-            $duplicateTransportJobs = \App\TransportJob::whereShipmentId($job->shipment_id)->whereType($job->type)->whereCompleted(0)->get();
+            $duplicateTransportJobs = \App\Models\TransportJob::whereShipmentId($job->shipment_id)->whereType($job->type)->whereCompleted(0)->get();
 
             foreach ($duplicateTransportJobs as $dup) {
-                $count = \App\TransportJob::whereShipmentId($job->shipment_id)->whereType($job->type)->count();
+                $count = \App\Models\TransportJob::whereShipmentId($job->shipment_id)->whereType($job->type)->count();
 
                 if ($count > 1) {
                     $this->error('Deleting '.$dup->number.' / '.$job->reference);

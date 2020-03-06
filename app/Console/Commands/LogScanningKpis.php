@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Package;
-use App\ScanningKpi;
+use App\Models\Package;
+use App\Models\ScanningKpi;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Country;
-use App\ManifestProfile;
-use App\Service;
+use App\Models\Models\Country;
+use App\Models\Models\ManifestProfile;
+use App\Models\Service;
 use Illuminate\Http\Request;
 
 class ManifestProfilesController extends Controller
@@ -145,7 +145,7 @@ class ManifestProfilesController extends Controller
         // load eligible shipments that are on hold
         $shipmentsOnHold = $manifestProfile->getShipments(1);
 
-        $previousManifest = \App\Manifest::whereManifestProfileId($manifestProfile->id)->orderBy('id', 'desc')->first();
+        $previousManifest = \App\Models\Models\Manifest::whereManifestProfileId($manifestProfile->id)->orderBy('id', 'desc')->first();
 
         $withinTimePeriod = false;
 

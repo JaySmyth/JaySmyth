@@ -1,6 +1,6 @@
 <?php
 
-namespace App\CarrierAPI;
+namespace App\Models\Models\CarrierAPI;
 
 use Illuminate\Support\Facades\Validator;
 

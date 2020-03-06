@@ -46,7 +46,7 @@ class SendTrackingNumbers extends Command
      */
     public function handle()
     {
-        $shipments = \App\Shipment::whereReceived(1)->whereReceivedSent(0)->whereCompanyId(855)->orderBy('id', 'DESC')->get();
+        $shipments = \App\Models\Shipment::whereReceived(1)->whereReceivedSent(0)->whereCompanyId(855)->orderBy('id', 'DESC')->get();
 
         $this->info($shipments->count().' shipments found');
 
@@ -60,7 +60,7 @@ class SendTrackingNumbers extends Command
         fclose($handle);
 
         // Set the source field on all shipments to that of the filename
-        \App\Shipment::whereIn('id', $shipments->pluck('id'))->update([
+        \App\Models\Shipment::whereIn('id', $shipments->pluck('id'))->update([
             'received_sent' => 1,
         ]);
 

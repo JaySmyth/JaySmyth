@@ -1,8 +1,8 @@
 <?php
 
-namespace App\CarrierAPI\TNT;
+namespace App\Models\Models\CarrierAPI\TNT;
 
-use App\Service;
+use App\Models\Service;
 use Illuminate\Support\Str;
 use SimpleXMLElement;
 
@@ -327,7 +327,7 @@ class TNT
      */
     protected function getTntPostcode()
     {
-        $tntPostcode = new \App\TntPostcode();
+        $tntPostcode = new \App\Models\TntPostcode();
 
         $postcode = $tntPostcode->getPostcode($this->shipment['recipient_country_code'], $this->shipment['recipient_city']);
 
@@ -425,7 +425,7 @@ class TNT
      */
     protected function log($type, $direction, $msg)
     {
-        \App\TransactionLog::create([
+        \App\Models\TransactionLog::create([
             'type' => $type,
             'carrier' => 'tnt',
             'direction' => $direction,
