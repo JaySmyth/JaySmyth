@@ -8,6 +8,7 @@ use App\Models\Rate;
 use App\Models\Service;
 use App\Models\Shipment;
 use App\Models\Surcharge;
+use App\Traits\Logable;
 use Illuminate\Database\Eloquent\Model;
 
 class Company extends Model

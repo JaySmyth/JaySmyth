@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\PurchaseInvoiceToMultifreightXml;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
@@ -172,6 +173,7 @@ class PurchaseInvoice extends Model
                     case 'I':
                     case 'FR':
                         $invoiceType = 'F'; // freight
+                        // no break
                     case 'C':
                     case 'DT':
                         $invoiceType = 'D'; // duty & taxes
@@ -181,6 +183,7 @@ class PurchaseInvoice extends Model
                 switch ($type) {
                     case '01':
                         $invoiceType = 'F'; // freight
+                        // no break
                     case '06':
                     case '12':
                         $invoiceType = 'D'; // duty & taxes
@@ -188,6 +191,7 @@ class PurchaseInvoice extends Model
                 break;
             case 'dhl':
                 $invoiceType = 'F'; // freight
+                // no break
             default:
                 $invoiceType = 'O'; // other
         }

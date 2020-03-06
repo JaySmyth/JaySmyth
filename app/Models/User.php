@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\HasPreferences;
+use App\Traits\HasRoles;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 

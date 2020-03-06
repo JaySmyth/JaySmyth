@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Logable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 

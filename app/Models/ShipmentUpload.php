@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Logable;
 use Illuminate\Database\Eloquent\Model;
 
 class ShipmentUpload extends Model

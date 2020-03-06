@@ -8,4 +8,6 @@ Thumbs.db
 /phpunit.xml
 /.idea
 /.vscode
+/.ftpconfig
+/.remote-sync.json
 .phpunit.result.cache
