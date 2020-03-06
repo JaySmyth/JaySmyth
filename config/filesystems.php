@@ -64,21 +64,21 @@ return [
             'url' => env('AWS_URL'),
         ],
 
-        'salesinvoices' => [
-            'driver' => 'local',
-            'root' => '/home/ifssalesinv/invoices/',
-            'permissions' => [
-                'file' => [
-                    'public' => 0774,
-                    'private' => 0600,
-                ],
-                'dir' => [
-                    'public' => 0775,
-                    'private' => 0700,
-                ],
-            ],
-        ],
+    ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Symbolic Links
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the symbolic links that will be created when the
+    | `storage:link` Artisan command is executed. The array keys should be
+    | the locations of the links and the values should be their targets.
+    |
+    */
+
+    'links' => [
+        public_path('storage') => storage_path('app/public'),
     ],
 
 ];
