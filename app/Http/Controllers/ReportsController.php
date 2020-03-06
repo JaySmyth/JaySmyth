@@ -793,7 +793,6 @@ class ReportsController extends Controller
         return view('reports.scanning_kpis', compact('report', 'kpis', 'collectionPercentageForMonth', 'receiptPercentageForMonth', 'routePercentageForMonth', 'totalReceiptMissed', 'totalRouteMissed', 'averageReceiptMissed', 'averageRouteMissed'));
     }
 
-
     /**
      * Label downloads.
      *
@@ -817,5 +816,4 @@ class ReportsController extends Controller
 
         return view('reports.label_downloads', compact('report', 'logs'));
     }
-
 }

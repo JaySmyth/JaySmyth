@@ -47,7 +47,7 @@ return [
             'prefix' => '',
             'strict' => false,
             'engine' => null,
-            'options' => (env('DB_AWS_CA_PEM')) ? [PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_PEM')] : null
+            'options' => (env('DB_AWS_CA_PEM')) ? [PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_PEM')] : null,
         ],
 
         'apitest' => [
@@ -62,7 +62,7 @@ return [
             'prefix' => '',
             'strict' => false,
             'engine' => null,
-            'options' => (env('DB_AWS_CA_PEM')) ? [PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_PEM')] : null
+            'options' => (env('DB_AWS_CA_PEM')) ? [PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_PEM')] : null,
         ],
 
         'legacy' => [
@@ -105,8 +105,8 @@ return [
             'prefix' => '',
             'strict' => false,
             'engine' => null,
-            'options' => (env('DB_AWS_CA_PEM')) ? [PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_PEM')] : null
-        ]
+            'options' => (env('DB_AWS_CA_PEM')) ? [PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_PEM')] : null,
+        ],
 
     ],
     /*
@@ -139,7 +139,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
         ],
 
         'default' => [

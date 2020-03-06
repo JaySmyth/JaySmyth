@@ -60,7 +60,6 @@ return [
         'name' => env('MAIL_FROM_NAME', 'noreply@antrim.ifsgroup.com'),
     ],
 
-
     /*
 
     /*

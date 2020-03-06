@@ -438,7 +438,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
          * Don't allow DG shipments to CW & VN.
          */
         $v = Validator::make($shipment, [], [
-            'hazardous.not_supported' => 'Hazardous shipments not supported to recipient country'
+            'hazardous.not_supported' => 'Hazardous shipments not supported to recipient country',
         ]);
 
         $v->sometimes('hazardous', 'not_supported', function ($input) {
