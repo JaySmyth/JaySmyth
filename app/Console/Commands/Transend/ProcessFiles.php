@@ -397,12 +397,12 @@ class ProcessFiles extends Command
                         if ($row['ExceptionReasonCode'] != 'UNLODSHORT') {
                             // Mark the package as received
                             $package->setReceived($datetime);
+
+                            $this->info($this->shipment->consignment_number . ': ' . 'Package ' . $package->index . ' received');
+
+                            $package->shipment->log('Package ' . $package->index . ' marked as received by TranSend UNLOADJOB: ' . $datetime->toDateTimeString());
                         }
                     }
-
-                    $this->info($this->shipment->consignment_number . ': ' . 'Package ' . $package->index . ' received');
-
-                    $package->shipment->log('Package ' . $package->index . ' marked as received by TranSend UNLOADJOB: ' . $datetime->toDateTimeString());
 
                     break;
 
