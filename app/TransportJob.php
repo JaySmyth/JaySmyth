@@ -357,7 +357,7 @@ class TransportJob extends Model
 
         if ($podShipment) {
             // If job linked to a shipment, and this is a delivery request, set the shipment to delivered (only POD NI shipments)
-            if ($this->shipment && $this->type == 'd' && in_array(strtoupper($this->shipment->service->carrier_code), ['NI24', 'NI48', 'IE24', 'IE48'])) {
+            if ($this->shipment && $this->type == 'd' && in_array(strtoupper($this->shipment->service->carrier_code), ['NI24', 'NI48', 'IE24', 'IE48', 'NI24PD', 'NI48PD'])) {
                 $this->shipment->setDelivered($podDatetime, $podSignature, $userId, true, $podImage);
             }
         }
