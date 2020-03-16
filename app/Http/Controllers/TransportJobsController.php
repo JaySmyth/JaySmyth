@@ -62,7 +62,13 @@ class TransportJobsController extends Controller
     {
         $this->authorize(new TransportJob);
 
-        return view('transport_jobs.create')->with('address', 'from');
+        $type = ($request->type) ? $request->type : 'collection';
+
+        $submitButtonText = ($type == 'delivery') ? 'Create Delivery Request' : 'Create Collection Request';
+
+        $address = ($type == 'delivery') ? 'to' : 'from';
+
+        return view('transport_jobs.create', ['type' => $type, 'submitButtonText' => $submitButtonText, 'address' => $address]);
     }
 
     /**
@@ -75,7 +81,7 @@ class TransportJobsController extends Controller
     {
         $this->authorize(new TransportJob);
 
-        $address = 'to';
+        $address = ($request->type == 'delivery') ? 'to' : 'from';
 
         $depot = \App\Depot::find($request->depot_id);
 

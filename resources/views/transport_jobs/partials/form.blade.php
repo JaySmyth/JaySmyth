@@ -1,10 +1,10 @@
-{!! Form::hidden('type', 'c', array('id' => 'type')) !!}
+{!! Form::hidden('type', substr(strtolower($type), 0, 1), array('id' => 'type')) !!}
 {!! Form::hidden('depot_id',1) !!}
 
 <div class="row">
 
     <div class="col-sm-6">
-        @include('transport_jobs.partials.address', ['type' => 'collection', 'address' => $address])
+        @include('transport_jobs.partials.address', ['type' => $type, 'address' => $address])
     </div>
 
     <div class="col-sm-6">
