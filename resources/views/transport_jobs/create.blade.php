@@ -19,8 +19,11 @@
 <hr class="mt-1">
 
 {!! Form::Open(['url' => 'transport-jobs', 'class' => 'form-compact']) !!}
+
 {!! Form::hidden('address_id',  old('address_id'), array('id' => 'address_id')) !!}
+
 @include('transport_jobs.partials.form', ['submitButtonText' => $submitButtonText, 'address' => $address])
+
 {!! Form::Close() !!}
 
 @include('partials.modals.address_book')

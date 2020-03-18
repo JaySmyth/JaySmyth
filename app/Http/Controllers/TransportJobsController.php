@@ -62,7 +62,7 @@ class TransportJobsController extends Controller
     {
         $this->authorize(new TransportJob);
 
-        $type = ($request->type) ? $request->type : 'collection';
+        $type = ($request->type) ? 'delivery' : 'collection';
 
         $submitButtonText = ($type == 'delivery') ? 'Create Delivery Request' : 'Create Collection Request';
 
@@ -81,7 +81,7 @@ class TransportJobsController extends Controller
     {
         $this->authorize(new TransportJob);
 
-        $address = ($request->type == 'delivery') ? 'to' : 'from';
+        $address = ($request->type == 'd') ? 'from' : 'to';
 
         $depot = \App\Depot::find($request->depot_id);
 
