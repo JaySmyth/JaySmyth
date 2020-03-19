@@ -88,7 +88,7 @@ class GetTrackingNumbers extends Command
         }
 
         if ($this->updated > 0) {
-            Mail::to('kerrikids1526376033@in.fulfillment.stock-sync.com')->cc(['it@antrim.ifsgroup.com', 'info@babocush.com'])->send(new \App\Mail\GenericError('Tracking Numbers - '.$this->updated.' shipments', null, $this->tempFile));
+            Mail::to('kerrikids1526376033@in.fulfillment.stock-sync.com')->cc(['it@antrim.ifsgroup.com', 'info@babocush.com', 'kerry.nevins@babocush.com'])->send(new \App\Mail\GenericError('Tracking Numbers - '.$this->updated.' shipments', null, $this->tempFile));
         }
     }
 
