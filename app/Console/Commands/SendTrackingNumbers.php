@@ -64,6 +64,6 @@ class SendTrackingNumbers extends Command
             'received_sent' => 1,
         ]);
 
-        Mail::to('kerrikids1526376033@in.fulfillment.stock-sync.com')->cc(['it@antrim.ifsgroup.com', 'info@babocush.com'])->send(new \App\Mail\GenericError('Babocush Tracking Numbers (non US) - '.$shipments->count().' shipments', 'Please see attached file', $this->tempFile));
+        Mail::to('kerrikids1526376033@in.fulfillment.stock-sync.com')->cc(['it@antrim.ifsgroup.com', 'info@babocush.com', 'kerry.nevins@babocush.com'])->send(new \App\Mail\GenericError('Babocush Tracking Numbers (non US) - '.$shipments->count().' shipments', 'Please see attached file', $this->tempFile));
     }
 }
