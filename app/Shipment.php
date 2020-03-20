@@ -1183,6 +1183,7 @@ class Shipment extends Model
 
         // Reinstate transport jobs
         if ($this->transportJobs) {
+
             $collection = $this->transportJobs->where('type', 'c')->first();
 
             if ($collection) {
@@ -1192,15 +1193,16 @@ class Shipment extends Model
                 } else {
                     $collection->setStatus('completed');
                 }
-            }
 
-            // Notify transport
-            Mail::to('transport@antrim.ifsgroup.com')->cc('it@antrim.ifsgroup.com')->queue(new TransportJobReinstated($collection));
+                // Notify transport
+                Mail::to('transport@antrim.ifsgroup.com')->cc('it@antrim.ifsgroup.com')->queue(new TransportJobReinstated($collection));
+            }
 
             // Reinstate delivery request if exists
             $delivery = $this->transportJobs->where('type', 'd')->first();
 
             if ($delivery) {
+
                 $delivery->unmanifest();
 
                 // Notify transport
