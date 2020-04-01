@@ -497,7 +497,7 @@ class PricingModel
 
         // If Intl shipment add additional Intl only Surcharge codes
         if (! isDomestic($this->shipment['sender_country_code'], $this->shipment['recipient_country_code'])) {
-            $surchargeCodes .= ',ADG,EQT,IDG,ICE,DTP,BRO';
+            $surchargeCodes .= ',ADG,EQT,IDG,ICE,DTP,BRO,ESS';
         }
 
         $surcharges = explode(',', $surchargeCodes);
@@ -522,6 +522,28 @@ class PricingModel
     // Address Correction
     public function isCOR()
     {
+        return false;
+    }
+
+    // Emergency situation surcharge
+    public function isESS()
+    {
+        if (in_array($this->shipment['service_id'], [25,26,27,56,57,58])) {
+            $value = 180.00;
+            if ($this->chargeableWeight <= 2.50) {
+                return false;
+            } elseif ($this->chargeableWeight <= 30) {
+                $value = 2.25;
+            } elseif ($this->chargeableWeight <= 70) {
+                $value = 13.50;
+            } elseif ($this->chargeableWeight <= 300) {
+                $value = 45.00;
+            }
+
+            $this->addSurcharge(['code' => 'ADH', 'description' => "Emergency Situation Surcharge", 'value' => $value]);
+        }
+
+
         return false;
     }
 
