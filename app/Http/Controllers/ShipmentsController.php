@@ -644,7 +644,7 @@ class ShipmentsController extends Controller
     {
         $this->authorize(new Shipment);
 
-        $shipments = $this->search($request, false, 5000);
+        $shipments = $this->search($request, false, 10000);
 
         return Excel::download(new ShipmentsExport($shipments), 'shipments.xlsx');
     }
