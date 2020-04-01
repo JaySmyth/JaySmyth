@@ -530,10 +530,12 @@ class PricingModel
     public function isESS()
     {
         // Convert Collection date into a known format
-        $localisation = Company::find($this->shipment['company_id'])->localisation;
+        // $localisation = Company::find($this->shipment['company_id'])->localisation;
 
-        $date_format = getDateFormat($this->shipment['date_format']);
-        $collectionDate = Carbon::createFromformat($date_format, $this->shipment['collection_date'], $localisation->time_zone)->format('Y-m-d');
+        // $date_format = getDateFormat($this->shipment['date_format']);
+        // $collectionDate = Carbon::createFromformat($date_format, $this->shipment['collection_date'], $localisation->time_zone)->format('Y-m-d');
+
+        $collectionDate = date('Y-m-d');
 
         // DHL
         if (in_array($this->shipment['service_id'], [25,26,27])) {
