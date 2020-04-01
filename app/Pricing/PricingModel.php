@@ -12,6 +12,7 @@ use App\RateDetail;
 use App\Service;
 use App\Surcharge;
 use App\SurchargeDetail;
+use Carbon\Carbon;
 
 class PricingModel
 {
@@ -528,22 +529,29 @@ class PricingModel
     // Emergency situation surcharge
     public function isESS()
     {
+        // Convert Collection date into a known format
+        // $localisation = Company::find($this->shipment['company_id'])->localisation;
+
+        // $date_format = getDateFormat($this->shipment['date_format']);
+        // $collectionDate = Carbon::createFromformat($date_format, $this->shipment['collection_date'], $localisation->time_zone)->format('Y-m-d');
+
+        $shipmentDate = date('Y-m-d');
+
         // DHL
-        $today = date('Y-m-d');
-        if (in_array($this->shipment['service_id'], [25,26,27,56,57,58])) {
-            if ($today >= '2020-04-01') {
+        if (in_array($this->shipment['service_id'], [25,26,27])) {
+            if ($shipmentDate >= '2020-04-01') {
                 $this->dhlESS();
             }
         }
         // Fedex
         if (in_array($this->shipment['service_id'], [10,46])) {
-            if ($today >= '2020-04-06') {
+            if ($shipmentDate >= '2020-04-06') {
                 $this->fedexESS();
             }
         }
         // TNT
         if (in_array($this->shipment['service_id'], [21,36])) {
-            if ($today >= '2020-04-06') {
+            if ($shipmentDate >= '2020-04-06') {
                 $this->fedexESS();
             }
         }
