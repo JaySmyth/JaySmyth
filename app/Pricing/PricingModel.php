@@ -535,24 +535,23 @@ class PricingModel
         // $date_format = getDateFormat($this->shipment['date_format']);
         // $collectionDate = Carbon::createFromformat($date_format, $this->shipment['collection_date'], $localisation->time_zone)->format('Y-m-d');
 
-        $collectionDate = date('Y-m-d');
+        $shipmentDate = date('Y-m-d');
 
         // DHL
         if (in_array($this->shipment['service_id'], [25,26,27])) {
-            if ($collectionDate >= '2020-04-01') {
+            if ($shipmentDate >= '2020-04-01') {
                 $this->dhlESS();
             }
         }
         // Fedex
         if (in_array($this->shipment['service_id'], [10,46])) {
-            if ($collectionDate >= '2020-04-06') {
+            if ($shipmentDate >= '2020-04-06') {
                 $this->fedexESS();
             }
         }
         // TNT
         if (in_array($this->shipment['service_id'], [21,36])) {
-            if ($collectionDate >= '2020-04-06') {
-                dd("is TNT");
+            if ($shipmentDate >= '2020-04-06') {
                 $this->fedexESS();
             }
         }
