@@ -529,21 +529,20 @@ class PricingModel
     public function isESS()
     {
         // DHL
-        $today = date('Y-m-d');
         if (in_array($this->shipment['service_id'], [25,26,27,56,57,58])) {
-            if ($today >= '2020-04-01') {
+            if ($this->shipment['ship_date'] >= '2020-04-01') {
                 $this->dhlESS();
             }
         }
         // Fedex
         if (in_array($this->shipment['service_id'], [10,46])) {
-            if ($today >= '2020-04-06') {
+            if ($this->shipment['ship_date'] >= '2020-04-06') {
                 $this->fedexESS();
             }
         }
         // TNT
         if (in_array($this->shipment['service_id'], [21,36])) {
-            if ($today >= '2020-04-06') {
+            if ($this->shipment['ship_date'] >= '2020-04-06') {
                 $this->fedexESS();
             }
         }
