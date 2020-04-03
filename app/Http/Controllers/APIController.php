@@ -962,10 +962,7 @@ class APIController extends Controller
 
         $company = Company::where('company_code', $request->get('company_code'))->where('enabled', 1)->first();
 
-        if ($company) {
-
-            // Ensure user has permissions to this company record
-            $this->authorize('view', $company);
+        if ($company && $request->user()->getAllowedCompanyIds()->contains($company->id)) {
 
             $user = $request->user();
 
