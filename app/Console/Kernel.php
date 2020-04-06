@@ -120,7 +120,7 @@ class Kernel extends ConsoleKernel
         /*
          * Primary Logistics
          */
-        //$schedule->command('primary-logistics:create-orders')->hourly();
+        $schedule->command('primary-logistics:create-orders')->hourly();
         //$schedule->command('primary-logistics:cancel-orders')->hourly();
         $schedule->command('primary-logistics:get-tracking-numbers')->hourly();
         $schedule->command('primary-logistics:get-inventory')->weekdays()->dailyAt('09:30');
