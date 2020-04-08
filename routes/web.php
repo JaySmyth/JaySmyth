@@ -335,6 +335,7 @@ Route::get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm
 Route::get('help', 'HelpController@index');
 Route::get('feedback', 'HelpController@feedback');
 Route::post('feedback', 'HelpController@sendFeedback');
+Route::get('covid', 'HelpController@covid');
 
 /*
   |--------------------------------------------------------------------------
