@@ -51,5 +51,15 @@ class DatabaseSeeder extends Seeder
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         Eloquent::reguard();
+        $this->call(PermissionsTableSeeder::class);
+        $this->call(RolesTableSeeder::class);
+        $this->call(RoleUserTableSeeder::class);
+        $this->call(CarrierPackagingTypesTableSeeder::class);
+        $this->call(PackagingTypesTableSeeder::class);
+        $this->call(PermissionRoleTableSeeder::class);
+        $this->call(ShipReasonsTableSeeder::class);
+        $this->call(SurchargesTableSeeder::class);
+        $this->call(TransendCodesTableSeeder::class);
+        $this->call(VehiclesTableSeeder::class);
     }
 }

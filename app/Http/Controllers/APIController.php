@@ -56,6 +56,11 @@ class APIController extends Controller
         $this->transactionHeader = bin2hex(openssl_random_pseudo_bytes(14));
     }
 
+    public function notSupported()
+    {
+        return APIResponse::respondNotSupported('Method/ URI not supported');
+    }
+    
     /**
      * Accepts a POST object, validates it
      * and creates a shipment and documentation.
@@ -420,7 +425,9 @@ class APIController extends Controller
             $timeZone = Company::find($this->input['data']['company_id'])->localisation->time_zone;
             $pickUpTimes = new Postcode();
             $this->input['data']['collection_date'] = $pickUpTimes->getPickUpDate(
-                $this->input['data']['sender_country_code'], $this->input['data']['sender_postcode'], $timeZone
+                $this->input['data']['sender_country_code'],
+                $this->input['data']['sender_postcode'],
+                $timeZone
             );
         }
 

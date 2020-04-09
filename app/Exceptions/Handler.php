@@ -37,9 +37,11 @@ class Handler extends ExceptionHandler
      */
     public function report(Throwable $exception)
     {
+        /*
         if ($this->shouldReport($exception)) {
             $this->sendEmail($exception); // sends an email
         }
+        */
 
         return parent::report($exception);
     }
@@ -78,6 +80,7 @@ class Handler extends ExceptionHandler
      * @param  \Throwable  $exception
      * @return void
      */
+     /*
     public function sendEmail(Throwable $exception)
     {
         try {
@@ -86,11 +89,13 @@ class Handler extends ExceptionHandler
             // $handler = new SymfonyExceptionHandler();
 
             // $html = $handler->getHtml($e);
-            $html = $exception->getMessage();
+            // $html = $exception->getMessage();
 
-            Mail::to(['gmcbroom@antrim.ifsgroup.com', 'dshannon@antrim.ifsgroup.com'])->send(new ErrorException($html));
+            //Mail::to(['gmcbroom@antrim.ifsgroup.com', 'dshannon@antrim.ifsgroup.com'])->send(new ErrorException($html));
+            dd($ex);
         } catch (Exception $ex) {
             dd($ex);
         }
     }
+    */
 }
