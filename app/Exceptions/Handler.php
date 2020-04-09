@@ -75,7 +75,7 @@ class Handler extends ExceptionHandler
     }
 
     /**
-     * Sends an email to the developer about the exception.
+     * Sends an email to the developer about the exception
      *
      * @param  \Throwable  $exception
      * @return void
