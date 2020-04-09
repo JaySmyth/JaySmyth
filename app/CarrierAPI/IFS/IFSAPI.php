@@ -4,7 +4,7 @@ namespace App\Models\CarrierAPI\IFS;
 
 use App\Models\Carrier;
 //
-use App\Models\CarrierAPI\IFS\IFSLabel;
+use App\CarrierAPI\IFS\IFSLabel;
 use App\Models\CarrierPackagingType;
 use App\Models\Company;
 use App\Models\Country;

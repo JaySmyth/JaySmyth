@@ -7,27 +7,27 @@
  * function getServiceByDest($shipment, $possibleServices);
  */
 
-namespace App\Models;\CarrierAPI;
+namespace App\CarrierAPI;
 
 use App;
 use App\Jobs\CreateEasypostTracker;
 use App\Models\Mode;
-use App\Models;\CarrierAPI\APIShipment;
-use App\Models;\CarrierAPI\CWide\CWideAPI;
-use App\Models;\CarrierAPI\DHL\DHLAPI;
-use App\Models;\CarrierAPI\DHLGlobalMail\DHLGlobalMailAPI;
-use App\Models;\CarrierAPI\ExpressFreight\ExpressFreightAPI;
-use App\Models;\CarrierAPI\ExpressFreightNI\ExpressFreightNIAPI;
-use App\Models;\CarrierAPI\Fedex\FedexAPI;
-use App\Models;\CarrierAPI\IFS\IFSAPI;
-use App\Models;\CarrierAPI\Pdf;
-use App\Models;\CarrierAPI\PrimaryFreight\PrimaryFreightAPI;
-use App\Models;\CarrierAPI\ServiceRules;
-use App\Models;\CarrierAPI\TNT\TNTAPI;
-use App\Models;\CarrierAPI\UPS\UPSAPI;
-use App\Models;\Company;
-use App\Models;\Country;
-use App\Models;\Department;
+use App\CarrierAPI\APIShipment;
+use App\CarrierAPI\CWide\CWideAPI;
+use App\CarrierAPI\DHL\DHLAPI;
+use App\CarrierAPI\DHLGlobalMail\DHLGlobalMailAPI;
+use App\CarrierAPI\ExpressFreight\ExpressFreightAPI;
+use App\CarrierAPI\ExpressFreightNI\ExpressFreightNIAPI;
+use App\CarrierAPI\Fedex\FedexAPI;
+use App\CarrierAPI\IFS\IFSAPI;
+use App\CarrierAPI\Pdf;
+use App\CarrierAPI\PrimaryFreight\PrimaryFreightAPI;
+use App\CarrierAPI\ServiceRules;
+use App\CarrierAPI\TNT\TNTAPI;
+use App\CarrierAPI\UPS\UPSAPI;
+use App\Models\Company;
+use App\Models\Country;
+use App\Models\Department;
 use App\Models\Service;
 use App\Models\Shipment;
 use App\Models\State;
@@ -677,7 +677,7 @@ class CarrierAPI
             $to = config('mail.error');
             $subject = 'WebClient DB Error - '.$to;
             $message = 'Web Client failed to insert shipment '."\r\n\r\n".
-                    'App\Models;\CarrierAPI\CarrierAPI.php : '."\r\n\r\n".
+                    'App\Models\CarrierAPI\CarrierAPI.php : '."\r\n\r\n".
                     'Function addShipment() : '."\r\n\r\n".
                     'IFS Consignment Number : '.$data['consignment_number']."\r\n\r\n".
                     'Carrier Consignment Number : '.$data['carrier_consignment_number']."\r\n\r\n".

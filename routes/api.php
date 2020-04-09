@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\CarrierAPI\Facades\APIResponse;
+use App\CarrierAPI\Facades\APIResponse;
 
 /*
   |--------------------------------------------------------------------------

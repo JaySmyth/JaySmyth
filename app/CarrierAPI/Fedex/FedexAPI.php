@@ -3,8 +3,8 @@
 namespace app\CarrierAPI\Fedex;
 
 use App\Models\Carrier;
-use App\Models\CarrierAPI\Fedex\FedexLabel;
-use App\Models\CarrierAPI\Fedex\FedexSettings;
+use App\CarrierAPI\Fedex\FedexLabel;
+use App\CarrierAPI\Fedex\FedexSettings;
 use App\Models\CarrierPackagingType;
 use App\Models\Company;
 use App\Models\Sequence;

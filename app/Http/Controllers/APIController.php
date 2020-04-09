@@ -17,9 +17,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Carrier;
-use App\Models\CarrierAPI\APIShipment;
-use App\Models\CarrierAPI\Facades\APIResponse;
-use App\Models\CarrierAPI\Facades\CarrierAPI;
+use App\CarrierAPI\APIShipment;
+use App\CarrierAPI\Facades\APIResponse;
+use App\CarrierAPI\Facades\CarrierAPI;
 use App\Models\CarrierService;
 use App\Models\Company;
 use App\Models\CompanyPackagingType;

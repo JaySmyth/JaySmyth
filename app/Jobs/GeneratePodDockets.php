@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\CarrierAPI\Pdf;
+use App\CarrierAPI\Pdf;
 use App\Models\TransportJob;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;

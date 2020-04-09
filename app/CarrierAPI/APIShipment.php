@@ -6,12 +6,12 @@
  * and open the template in the editor.
  */
 
-namespace App\Models\Models\CarrierAPI;
+namespace App\CarrierAPI;
 
-use App\Models\Models\Company;
-use App\Models\Models\CompanyPackagingType;
-use App\Models\Models\Country;
-use App\Models\Models\Currency;
+use App\Models\Company;
+use App\Models\CompanyPackagingType;
+use App\Models\Country;
+use App\Models\Currency;
 use App\Models\Postcode;
 use App\Models\Service;
 use Carbon\Carbon;

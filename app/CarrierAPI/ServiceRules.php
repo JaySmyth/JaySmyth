@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace App\Models\CarrierAPI;
+namespace App\CarrierAPI;
 
 use App\Models\Carrier;
 use App\Models\CompanyPackagingType;

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CarrierAPI\Pdf;
+use App\CarrierAPI\Pdf;
 use App\Models\Manifest;
 use App\Models\Shipment;
 use Illuminate\Http\Request;

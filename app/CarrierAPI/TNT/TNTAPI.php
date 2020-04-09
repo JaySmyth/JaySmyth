@@ -2,7 +2,7 @@
 
 namespace App\Models\CarrierAPI\TNT;
 
-use App\Models\CarrierAPI\TNT\TNT;
+use App\CarrierAPI\TNT\TNT;
 use App\Models\Service;
 
 /**

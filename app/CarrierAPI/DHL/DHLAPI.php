@@ -2,7 +2,7 @@
 
 namespace App\Models\CarrierAPI\DHL;
 
-use App\Models\CarrierAPI\DHL\DHLLabel;
+use App\CarrierAPI\DHL\DHLLabel;
 use App\Models\Service;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;

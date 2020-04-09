@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\CarrierAPI;
+namespace App\CarrierAPI;
 
 use App\Models\Company;
 use App\Models\PrintFormat;

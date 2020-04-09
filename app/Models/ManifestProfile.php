@@ -2,7 +2,7 @@
 
  namespace App\Models;
 
-use App\Models\CarrierAPI\TNT\TNTManifest;
+use App\CarrierAPI\TNT\TNTManifest;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 /*

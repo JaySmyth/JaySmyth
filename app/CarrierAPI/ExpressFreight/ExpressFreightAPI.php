@@ -2,7 +2,7 @@
 
 namespace App\Models\CarrierAPI\ExpressFreight;
 
-use App\Models\CarrierAPI\ExpressFreight\ExpressFreightLabel;
+use App\CarrierAPI\ExpressFreight\ExpressFreightLabel;
 use App\Models\TransactionLog;
 
 /**

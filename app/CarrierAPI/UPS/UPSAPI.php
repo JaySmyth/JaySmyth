@@ -3,7 +3,7 @@
 namespace App\Models\CarrierAPI\UPS;
 
 use App\Models\Carrier;
-use App\Models\CarrierAPI\UPS\UPSLabel;
+use App\CarrierAPI\UPS\UPSLabel;
 use App\Models\PackagingType;
 use App\Models\Service;
 use App\Models\TransactionLog;

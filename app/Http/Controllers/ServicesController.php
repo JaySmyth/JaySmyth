@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests;
 use App\Http\Requests\ServiceRequest;
-use App\Models\CarrierAPI\Facades\CarrierAPI;
+use App\CarrierAPI\Facades\CarrierAPI;
 use App\Models\Company;
 use App\Models\Country;
 use App\Models\Service;

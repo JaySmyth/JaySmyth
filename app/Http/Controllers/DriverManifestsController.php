@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\CarrierAPI\Pdf;
+use App\CarrierAPI\Pdf;
 use App\Models\Driver;
 use App\Models\DriverManifest;
 use Carbon\Carbon;
