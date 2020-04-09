@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Traits;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -26,7 +26,7 @@ trait HasRoles
     public function assignRole($role)
     {
         return $this->roles()->save(
-                        Role::whereName($role)->firstOrFail()
+            Role::whereName($role)->firstOrFail()
         );
     }
 
