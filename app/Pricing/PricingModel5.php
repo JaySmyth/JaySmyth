@@ -9,9 +9,9 @@
 
 namespace App\Pricing;
 
-use App\Models\Models\CarrierPackagingType;
-use App\Models\Models\Company;
-use App\Models\Models\DhlEas;
+use App\Models\CarrierPackagingType;
+use App\Models\Company;
+use App\Models\DhlEas;
 
 class PricingModel5 extends PricingModel
 {

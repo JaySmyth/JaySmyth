@@ -261,7 +261,7 @@ class User extends Authenticatable
     public function getMessages()
     {
         // Company exclusions (NEEDS ADJUSTMENT - CURRENTLY A MESSAGE IS EXCLUDED IF ** ANY ** OF THE USERS COMPANY IDS ARE PRESENT - IDEALLY SHOULD ONLY EXCLUDE IF ALL OF THE USERS COMPANY IDS ARE PRESENT)
-        $messages = \App\Models\Models\Message::active()
+        $messages = \App\Models\Message::active()
                 ->whereHas('depots', function ($query) {
                     $query->whereIn('depot_id', $this->getDepotIds());
                 })

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Models;
+ namespace App\Models;
 
 use App\Models\Service;
 use Carbon\Carbon;
@@ -59,7 +59,7 @@ class Manifest extends Model
      */
     public function depot()
     {
-        return $this->belongsTo(\App\Models\Models\Depot::class);
+        return $this->belongsTo(\App\Models\Depot::class);
     }
 
     /**
@@ -69,7 +69,7 @@ class Manifest extends Model
      */
     public function carrier()
     {
-        return $this->belongsTo(\App\Models\Models\Carrier::class);
+        return $this->belongsTo(\App\Models\Carrier::class);
     }
 
     /**

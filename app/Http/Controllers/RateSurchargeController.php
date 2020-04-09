@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Models\Company;
+use App\Models\Company;
 use App\Models\RateSurcharge;
 use Illuminate\Http\Request;
 

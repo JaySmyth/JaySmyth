@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Models\Models\CustomsEntry;
+use App\Models\CustomsEntry;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 

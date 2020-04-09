@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Models\CarrierAPI\TNT;
+namespace App\Models\CarrierAPI\TNT;
 
 use TCPDI;
 

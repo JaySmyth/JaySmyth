@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Models\CarrierAPI\Facades\CarrierAPI;
+use App\Models\CarrierAPI\Facades\CarrierAPI;
 use App\Models\User;
 use Tests\TestCase;
 

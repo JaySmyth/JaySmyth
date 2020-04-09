@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace App\Models\Models\CarrierAPI\Facades;
+namespace App\Models\CarrierAPI\Facades;
 
 use Illuminate\Support\Facades\Facade;
 

@@ -40,7 +40,7 @@ class VvOrders extends Model
         $vvCompany = \App\Vmi\Company::find($this->buyer_id);
 
         if ($vvCompany && is_numeric($vvCompany->laravel_company_id)) {
-            return \App\Models\Models\Company::find($vvCompany->laravel_company_id);
+            return \App\Models\Company::find($vvCompany->laravel_company_id);
         }
 
         return false;

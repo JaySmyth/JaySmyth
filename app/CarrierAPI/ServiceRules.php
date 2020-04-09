@@ -6,12 +6,12 @@
  * and open the template in the editor.
  */
 
-namespace App\Models\Models\CarrierAPI;
+namespace App\Models\CarrierAPI;
 
-use App\Models\Models\Carrier;
-use App\Models\Models\CompanyPackagingType;
-use App\Models\Models\Country;
-use App\Models\Models\IfsNdPostcode;
+use App\Models\Carrier;
+use App\Models\CompanyPackagingType;
+use App\Models\Country;
+use App\Models\IfsNdPostcode;
 use App\Models\PackagingType;
 
 /**

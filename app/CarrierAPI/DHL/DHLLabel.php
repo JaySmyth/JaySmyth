@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Models\Models\CarrierAPI\DHL;
+namespace App\Models\CarrierAPI\DHL;
 
-class DHLLabel extends \App\Models\Models\CarrierAPI\CarrierLabel
+class DHLLabel extends \App\Models\CarrierAPI\CarrierLabel
 {
     /**
      * Accepts Shipment and Carrier Response data

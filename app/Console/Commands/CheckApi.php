@@ -3,9 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Http\Controllers\APIController;
-use App\Models\Models\CarrierAPI\APIShipment;
-use App\Models\Models\CarrierAPI\CarrierAPI;
-use App\Models\Models\Company;
+use App\Models\CarrierAPI\APIShipment;
+use App\Models\CarrierAPI\CarrierAPI;
+use App\Models\Company;
 use App\Models\TransactionLog;
 use App\Models\User;
 use Illuminate\Console\Command;

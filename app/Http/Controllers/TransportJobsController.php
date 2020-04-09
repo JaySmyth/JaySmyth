@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TransportJobRequest;
-use App\Models\Models\CarrierAPI\Pdf;
+use App\Models\CarrierAPI\Pdf;
 use App\Models\TransportJob;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -77,7 +77,7 @@ class TransportJobsController extends Controller
 
         $address = 'to';
 
-        $depot = \App\Models\Models\Depot::find($request->depot_id);
+        $depot = \App\Models\Depot::find($request->depot_id);
 
         $values = [
             'number' => \App\Models\Sequence::whereCode('JOB')->lockForUpdate()->first()->getNextAvailable(),
@@ -305,7 +305,7 @@ class TransportJobsController extends Controller
             $transportJobs['deliveries'][$job->transend_route][] = $job;
         }
 
-        $driverManifest = new \App\Models\Models\DriverManifest();
+        $driverManifest = new \App\Models\DriverManifest();
         $driverManifests = $driverManifest->getOpenManifests();
 
         return view('transport_jobs.unmanifested', compact('transportJobs', 'driverManifests', 'totalJobs'));
@@ -338,7 +338,7 @@ class TransportJobsController extends Controller
             $count = count($jobIds).' jobs';
         }
 
-        $driverManifest = \App\Models\Models\DriverManifest::find($request->driver_manifest_id);
+        $driverManifest = \App\Models\DriverManifest::find($request->driver_manifest_id);
 
         flash()->success('Jobs Manifested!', $count.' manifested to '.$driverManifest->driver->name.' successfully.', true);
 

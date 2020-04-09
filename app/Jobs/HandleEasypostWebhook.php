@@ -219,7 +219,7 @@ class HandleEasypostWebhook implements ShouldQueue
         $countryCode = getCountryCode($country);
 
         if (! $countryCode) {
-            $countries = \App\Models\Models\Country::all();
+            $countries = \App\Models\Country::all();
 
             foreach ($countries as $country) :
 

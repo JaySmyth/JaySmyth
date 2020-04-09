@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Models\Models;
+ namespace App\Models;
 
-use App\Models\Models\DomesticRateDiscount;
+use App\Models\DomesticRateDiscount;
 use App\Models\Rate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;

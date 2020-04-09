@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CustomsEntryCommodityRequest;
 use App\Http\Requests\CustomsEntryRequest;
-use App\Models\Models\Company;
-use App\Models\Models\CustomsEntry;
-use App\Models\Models\Document;
+use App\Models\Company;
+use App\Models\CustomsEntry;
+use App\Models\Document;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;

@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\Models\InvoiceRun;
+use App\Models\InvoiceRun;
 use App\Models\Shipment;
 use App\Models\User;
 use App\ScsXml\ISLEDI;

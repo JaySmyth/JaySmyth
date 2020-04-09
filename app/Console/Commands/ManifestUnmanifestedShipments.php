@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Models\Manifest;
-use App\Models\Models\ManifestProfile;
+use App\Models\Manifest;
+use App\Models\ManifestProfile;
 use Illuminate\Console\Command;
 
 class ManifestUnmanifestedShipments extends Command

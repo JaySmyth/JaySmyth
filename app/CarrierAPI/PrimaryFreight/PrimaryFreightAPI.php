@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Models\Models\CarrierAPI\PrimaryFreight;
+namespace App\Models\CarrierAPI\PrimaryFreight;
 
 /**
  * @author gmcbroom
  */
-class PrimaryFreightAPI extends \App\Models\Models\CarrierAPI\CarrierBase
+class PrimaryFreightAPI extends \App\Models\CarrierAPI\CarrierBase
 {
     /**
      * @param type $shipment

@@ -58,7 +58,7 @@ class UploadFiles extends Command
     {
         $queue = [];
 
-        $fileUploads = \App\Models\Models\FileUpload::whereEnabled(1)->get();
+        $fileUploads = \App\Models\FileUpload::whereEnabled(1)->get();
 
         /*
          * Build a queue of uploads that are scheduled for processing now.
@@ -264,7 +264,7 @@ class UploadFiles extends Command
             Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('File Upload Failed', $this->log, $tempFile));
         }
 
-        $log = \App\Models\Models\FileUploadLog::create([
+        $log = \App\Models\FileUploadLog::create([
             'output' => implode('<br>', $this->log),
             'uploaded' => $uploaded,
             'file_upload_id' => $fileUpload->id,

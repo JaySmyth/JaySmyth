@@ -6,10 +6,10 @@
  * and open the template in the editor.
  */
 
-namespace App\Models\Models\CarrierAPI\Fedex;
+namespace App\Models\CarrierAPI\Fedex;
 
-use App\Models\Models\Carrier;
-use App\Models\Models\CarrierPackagingType;
+use App\Models\Carrier;
+use App\Models\CarrierPackagingType;
 
 /**
  * Description of FedexFields.

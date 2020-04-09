@@ -3,9 +3,9 @@
 namespace App\Pricing;
 
 use App\Countries;
-use App\Models\Models\CarrierPackagingType;
-use App\Models\Models\Company;
-use App\Models\Models\FuelSurcharge;
+use App\Models\CarrierPackagingType;
+use App\Models\Company;
+use App\Models\FuelSurcharge;
 use App\Models\PricingZones;
 use App\Models\Rate;
 use App\Models\RateDetail;

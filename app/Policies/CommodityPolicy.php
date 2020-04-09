@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Models\Models\Commodity;
+use App\Models\Commodity;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 

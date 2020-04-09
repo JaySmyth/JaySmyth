@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Models\Models\CarrierAPI\TNT;
+namespace App\Models\CarrierAPI\TNT;
 
-class TNTLabel extends \App\Models\Models\CarrierAPI\CarrierLabel
+class TNTLabel extends \App\Models\CarrierAPI\CarrierLabel
 {
     public function __construct($shipment = null, $serviceCode = null, $data = null)
     {

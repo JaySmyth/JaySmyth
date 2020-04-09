@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Models\Models;
+ namespace App\Models;
 
-use App\Models\Models\Carrier;
-use App\Models\Models\CompanyPackagingType;
+use App\Models\Carrier;
+use App\Models\CompanyPackagingType;
 use App\Models\Rate;
 use App\Models\Service;
 use App\Models\Shipment;

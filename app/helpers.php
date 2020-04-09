@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Models\Company;
-use App\Models\Models\Country;
+use App\Models\Company;
+use App\Models\Country;
 use App\Models\Postcode;
 use App\Models\State;
 use App\Models\User;
@@ -123,7 +123,7 @@ function getRouting($postcode, $day = false)
 
 function getCountry($countryCode)
 {
-    $country = App\Models\Models\Country::where('country_code', $countryCode)->first();
+    $country = App\Models\Country::where('country_code', $countryCode)->first();
 
     if ($country) {
         return $country->country;
@@ -140,7 +140,7 @@ function getCountry($countryCode)
  */
 function getCountryCode($string)
 {
-    $country = new App\Models\Models\Country();
+    $country = new App\Models\Country();
 
     return $country->getCode($string);
 }
@@ -223,7 +223,7 @@ function verboseCollectionDelivery($value)
 
 function getVolumetricDivisor($carrierCode, $serviceCode)
 {
-    $carrier = App\Models\Models\Carrier::where('code', $carrierCode)->first();
+    $carrier = App\Models\Carrier::where('code', $carrierCode)->first();
 
     if ($carrier) {
         return $divisor = $carrier->services->where('code', $serviceCode)->first()->volumetric_divisor;
@@ -238,7 +238,7 @@ function getVolumetricDivisor($carrierCode, $serviceCode)
 
 function getCarrierName($carrierId)
 {
-    $carrier = App\Models\Models\Carrier::find($carrierId);
+    $carrier = App\Models\Carrier::find($carrierId);
 
     if ($carrier) {
         return $carrier->name;
@@ -275,10 +275,10 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
 {
     switch ($dropDown) {
         case 'companies':
-            $result = App\Models\Models\Company::select('id', 'company_name')->orderBy('company_name')->pluck('company_name', 'id');
+            $result = App\Models\Company::select('id', 'company_name')->orderBy('company_name')->pluck('company_name', 'id');
             break;
         case 'invoiceable':
-            $result = App\Models\Models\Company::where('legacy_pricing', false)->pluck('company_name', 'id')->toArray();
+            $result = App\Models\Company::where('legacy_pricing', false)->pluck('company_name', 'id')->toArray();
             break;
         case 'sites':
             $result = Auth::user()->sites();
@@ -293,16 +293,16 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             $result = Auth::user()->depots()->pluck('name', 'id');
             break;
         case 'countries':
-            $result = App\Models\Models\Country::select('country', 'country_code')->orderBy('country')->pluck('country', 'country_code');
+            $result = App\Models\Country::select('country', 'country_code')->orderBy('country')->pluck('country', 'country_code');
             break;
         case 'senderCountries':
             $result = ['GB' => 'UNITED KINGDOM', 'IE' => 'IRELAND', 'US' => 'UNITED STATES', 'CA' => 'CANADA'];
             break;
         case 'currencies':
-            $result = App\Models\Models\Currency::select('code')->orderBy('display_order')->pluck('code', 'code');
+            $result = App\Models\Currency::select('code')->orderBy('display_order')->pluck('code', 'code');
             break;
         case 'hazards':
-            $result = App\Models\Models\Hazard::where('mode_id', $modeId)->pluck('description', 'code');
+            $result = App\Models\Hazard::where('mode_id', $modeId)->pluck('description', 'code');
             break;
         case 'terms':
             $result = App\Models\Term::where('mode_id', $modeId)->pluck('description', 'code');
@@ -323,13 +323,13 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             $result = App\Models\PrintFormat::select('name', 'id')->pluck('name', 'id');
             break;
         case 'depots':
-            $result = App\Models\Models\Depot::select('name', 'id')->pluck('name', 'id');
+            $result = App\Models\Depot::select('name', 'id')->pluck('name', 'id');
             break;
         case 'manifestProfiles':
-            $result = App\Models\Models\ManifestProfile::select('name', 'id')->pluck('name', 'id');
+            $result = App\Models\ManifestProfile::select('name', 'id')->pluck('name', 'id');
             break;
         case 'departments':
-            $result = App\Models\Models\Department::select('id', DB::raw('CONCAT(name, " (", code, ")") AS department'))
+            $result = App\Models\Department::select('id', DB::raw('CONCAT(name, " (", code, ")") AS department'))
                     ->orderBy('department')->pluck('department', 'id');
             break;
         case 'surchargeCategories':
@@ -342,7 +342,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             $result = App\Models\Sale::select('name', 'id')->pluck('name', 'id');
             break;
         case 'localisations':
-            $result = App\Models\Models\Localisation::select('time_zone', 'id')->pluck('time_zone', 'id');
+            $result = App\Models\Localisation::select('time_zone', 'id')->pluck('time_zone', 'id');
             break;
         case 'statuses':
             $result = App\Models\Status::select('name', 'id')->where('id', '>', 1)
@@ -360,7 +360,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             }
             break;
         case 'carriers':
-            $result = App\Models\Models\Carrier::select('name', 'id')->pluck('name', 'id');
+            $result = App\Models\Carrier::select('name', 'id')->pluck('name', 'id');
             break;
         case 'shippingLines':
             $result = App\Models\ShippingLine::select('name', 'id')->pluck('name', 'id');
@@ -391,14 +391,14 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             $result = App\Models\ShipReason::orderBy('id')->pluck('description', 'code');
             break;
         case 'cpc':
-            $result = App\Models\Models\CustomsProcedureCode::select('code', 'id')->orderBy('code')->pluck('code', 'id');
+            $result = App\Models\CustomsProcedureCode::select('code', 'id')->orderBy('code')->pluck('code', 'id');
             break;
         case 'vehicles':
             $result = App\Models\Vehicle::select('id', DB::raw('CONCAT(registration, " (", type, ")") AS vehicle'))
                     ->orderBy('vehicle')->pluck('vehicle', 'id');
             break;
         case 'drivers':
-            $result = App\Models\Models\Driver::select('name', 'id')->whereEnabled(1)->orderBy('name')->pluck('name', 'id');
+            $result = App\Models\Driver::select('name', 'id')->whereEnabled(1)->orderBy('name')->pluck('name', 'id');
             break;
         case 'vehicleTypes':
             $result = ['17 Tonne' => '17 Tonne', '40ft' => '40ft', 'Transit' => 'Transit'];
@@ -482,7 +482,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             $result = array_combine($result, $result);
             break;
         case 'importConfigFields':
-            $result = App\Models\Models\ImportConfigFields::orderBy('display_order')->pluck('description', 'name');
+            $result = App\Models\ImportConfigFields::orderBy('display_order')->pluck('description', 'name');
             break;
         case 'importConfigs':
             $result = Auth::user()->getImportConfigs()->pluck('company_name', 'id');
@@ -534,7 +534,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             ];
             break;
         case 'ifsChargeCodes':
-            $result = App\Models\Models\ChargeCodes::orderBy('code')->orderBy('description')->pluck('description', 'code');
+            $result = App\Models\ChargeCodes::orderBy('code')->orderBy('description')->pluck('description', 'code');
             break;
         case 'surchargeCodes':
             $codes = App\Models\Surcharge::select('code', 'name')->distinct()->get();
@@ -1027,12 +1027,12 @@ function customsEntryRequired($senderCountryCode, $recipientCountryCode)
     // Check if Both Countries in the EU
     $fromEU = false;
     $toEU = false;
-    $country = App\Models\Models\Country::where('country_code', $senderCountryCode)->first();
+    $country = App\Models\Country::where('country_code', $senderCountryCode)->first();
     if ($country) {
         $fromEU = $country->eu;
     }
 
-    $country = App\Models\Models\Country::where('country_code', $recipientCountryCode)->first();
+    $country = App\Models\Country::where('country_code', $recipientCountryCode)->first();
     if ($country) {
         $toEU = $country->eu;
     }
@@ -1687,16 +1687,16 @@ function legacyGatewayToCarrierId($gateway)
 function convertLegacyManifestNumber($manifestNumber, $domestic)
 {
     if (stristr($manifestNumber, 'AIR')) {
-        $manifest = App\Models\Models\Manifest::whereNumber($manifestNumber)->first();
+        $manifest = App\Models\Manifest::whereNumber($manifestNumber)->first();
     }
 
     if ($domestic) {
-        $manifest = App\Models\Models\Manifest::whereNumber($manifestNumber)->whereIn(
+        $manifest = App\Models\Manifest::whereNumber($manifestNumber)->whereIn(
             'manifest_profile_id',
             [3, 7, 9, 8, 11, 5, 6]
         )->first();
     } else {
-        $manifest = App\Models\Models\Manifest::whereNumber($manifestNumber)->whereIn('manifest_profile_id', [1, 2, 12, 4])->first();
+        $manifest = App\Models\Manifest::whereNumber($manifestNumber)->whereIn('manifest_profile_id', [1, 2, 12, 4])->first();
     }
 
     if ($manifest) {

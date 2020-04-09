@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Models\Models\CarrierAPI\IFS;
+namespace App\Models\CarrierAPI\IFS;
 
-use App\Models\Models\Carrier;
+use App\Models\Carrier;
 //
-use App\Models\Models\CarrierAPI\IFS\IFSLabel;
-use App\Models\Models\CarrierPackagingType;
-use App\Models\Models\Company;
-use App\Models\Models\Country;
+use App\Models\CarrierAPI\IFS\IFSLabel;
+use App\Models\CarrierPackagingType;
+use App\Models\Company;
+use App\Models\Country;
 use App\Models\PackagingType;
 use App\Models\Service;
 use App\Models\TransactionLog;
@@ -20,7 +20,7 @@ use TCPDI;
  *
  * @author gmcbroom
  */
-class IFSAPI extends \App\Models\Models\CarrierAPI\CarrierBase
+class IFSAPI extends \App\Models\CarrierAPI\CarrierBase
 {
     /*
      *  Carrier Specific Variable declarations

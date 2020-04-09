@@ -45,7 +45,7 @@ class Tracking extends Model
      */
     public function getMessageAttribute($value)
     {
-        return str_ireplace(\App\Models\Models\Carrier::where('code', '<>', 'ifs')->pluck('name')->toArray(), 'carrier', $value);
+        return str_ireplace(\App\Models\Carrier::where('code', '<>', 'ifs')->pluck('name')->toArray(), 'carrier', $value);
     }
 
     /**

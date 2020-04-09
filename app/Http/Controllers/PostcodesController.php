@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PostcodeRequest;
-use App\Models\Models\IfsNdPostcode;
+use App\Models\IfsNdPostcode;
 use App\Models\Postcode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;

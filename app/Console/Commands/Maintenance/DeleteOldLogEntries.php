@@ -47,7 +47,7 @@ class DeleteOldLogEntries extends Command
 
         $this->info('Deleting transport job log entries before '.$cutOff->toDateTimeString());
 
-        \App\Models\Models\Log::where('logable_type', \App\Models\TransportJob::class)
+        \App\Models\Log::where('logable_type', \App\Models\TransportJob::class)
                 ->where('created_at', '<=', $cutOff)
                 ->delete();
 
@@ -69,7 +69,7 @@ class DeleteOldLogEntries extends Command
 
         $this->info('Deleting log entries before '.$cutOff->toDateTimeString());
 
-        \App\Models\Models\Log::where('created_at', '<=', $cutOff)->delete();
+        \App\Models\Log::where('created_at', '<=', $cutOff)->delete();
 
         /*
          * Truncate the RF sessions table

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Models\Models\CarrierAPI\ExpressFreightNI;
+namespace App\Models\CarrierAPI\ExpressFreightNI;
 
-use App\Models\Models\CarrierAPI\ExpressFreightNI\ExpressFreightNILabel;
+use App\Models\CarrierAPI\ExpressFreightNI\ExpressFreightNILabel;
 use App\Models\TransactionLog;
 use Illuminate\Support\Facades\Validator;
 use TCPDI;
@@ -12,7 +12,7 @@ use TCPDI;
  *
  * @author gmcbroom
  */
-class ExpressFreightNIAPI extends \App\Models\Models\CarrierAPI\CarrierBase
+class ExpressFreightNIAPI extends \App\Models\CarrierAPI\CarrierBase
 {
     /*
      *  Carrier Specific Variable declarations

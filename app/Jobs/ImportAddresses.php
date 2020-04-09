@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\Models\Address;
+use App\Models\Address;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

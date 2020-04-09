@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests;
 use App\Http\Requests\ServiceRequest;
-use App\Models\Models\CarrierAPI\Facades\CarrierAPI;
-use App\Models\Models\Company;
-use App\Models\Models\Country;
+use App\Models\CarrierAPI\Facades\CarrierAPI;
+use App\Models\Company;
+use App\Models\Country;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Response;

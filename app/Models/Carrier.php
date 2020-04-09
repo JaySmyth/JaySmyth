@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Models\Models;
+ namespace App\Models;
 
-use App\Models\Models\CarrierService;
+use App\Models\CarrierService;
 use Illuminate\Database\Eloquent\Model;
 
 class Carrier extends Model
@@ -46,6 +46,6 @@ class Carrier extends Model
      */
     public function packagingTypes()
     {
-        return $this->hasMany(\App\Models\Models\CarrierPackagingType::class);
+        return $this->hasMany(\App\Models\CarrierPackagingType::class);
     }
 }

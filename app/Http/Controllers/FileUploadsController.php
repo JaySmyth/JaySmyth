@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Models\FileUpload;
+use App\Models\FileUpload;
 use Illuminate\Http\Request;
 
 class FileUploadsController extends Controller

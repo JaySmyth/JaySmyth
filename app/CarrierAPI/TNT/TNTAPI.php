@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Models\Models\CarrierAPI\TNT;
+namespace App\Models\CarrierAPI\TNT;
 
-use App\Models\Models\CarrierAPI\TNT\TNT;
+use App\Models\CarrierAPI\TNT\TNT;
 use App\Models\Service;
 
 /**
@@ -10,7 +10,7 @@ use App\Models\Service;
  *
  * @author gmcbroom
  */
-class TNTAPI extends \App\Models\Models\CarrierAPI\CarrierBase
+class TNTAPI extends \App\Models\CarrierAPI\CarrierBase
 {
     /**
      * @param type $shipment

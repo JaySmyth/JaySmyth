@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Models\Models\CarrierAPI;
+namespace App\Models\CarrierAPI;
 
-use App\Models\Models\Company;
+use App\Models\Company;
 use App\Models\PrintFormat;
 use App\Models\Shipment;
 use Illuminate\Support\Facades\Auth;

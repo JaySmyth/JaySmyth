@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Models\DomesticRate;
+use App\Models\DomesticRate;
 use App\Models\RateDetail;
 use DB;
 use Illuminate\Console\Command;

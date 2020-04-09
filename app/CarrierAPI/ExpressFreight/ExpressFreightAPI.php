@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Models\Models\CarrierAPI\ExpressFreight;
+namespace App\Models\CarrierAPI\ExpressFreight;
 
-use App\Models\Models\CarrierAPI\ExpressFreight\ExpressFreightLabel;
+use App\Models\CarrierAPI\ExpressFreight\ExpressFreightLabel;
 use App\Models\TransactionLog;
 
 /**
@@ -10,7 +10,7 @@ use App\Models\TransactionLog;
  *
  * @author gmcbroom
  */
-class ExpressFreightAPI extends \App\Models\Models\CarrierAPI\CarrierBase
+class ExpressFreightAPI extends \App\Models\CarrierAPI\CarrierBase
 {
     /*
      *  Carrier Specific Variable declarations

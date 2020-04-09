@@ -26,7 +26,7 @@ class Service extends Model
      */
     public function carrier()
     {
-        return $this->belongsTo(\App\Models\Models\Carrier::class);
+        return $this->belongsTo(\App\Models\Carrier::class);
     }
 
     /*
@@ -35,7 +35,7 @@ class Service extends Model
 
     public function companies()
     {
-        return $this->belongsToMany(\App\Models\Models\Company::class)->withTimestamps();
+        return $this->belongsToMany(\App\Models\Company::class)->withTimestamps();
     }
 
     /**

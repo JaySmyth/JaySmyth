@@ -106,7 +106,7 @@ class ProcessScsCollectionRequests extends Command
             return false;
         }
 
-        $department = \App\Models\Models\Department::whereCode($jobCol->header->job_dept)->first();
+        $department = \App\Models\Department::whereCode($jobCol->header->job_dept)->first();
 
         if (! $department) {
             Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Failed to create transport job:'.$jobCol->scs_job_number, 'Department not recognised: '.$jobCol->header->job_dept));
@@ -211,7 +211,7 @@ class ProcessScsCollectionRequests extends Command
             'to_email' => $jobDel->email,
             'visible' => '1',
             'date_requested' => (stristr('IFS Global', $jobDel->name)) ? $jobCol->col_date.' '.$jobCol->col_time : $jobDel->del_date.' '.$jobDel->del_time,
-            'department_id' => \App\Models\Models\Department::whereCode($jobCol->header->job_dept)->first()->id,
+            'department_id' => \App\Models\Department::whereCode($jobCol->header->job_dept)->first()->id,
             'depot_id' => 1,
         ];
     }

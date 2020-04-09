@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Models\Models\CarrierAPI\IFS;
+namespace App\Models\CarrierAPI\IFS;
 
 use App\Models\Mode;
-use App\Models\Models\Depot;
+use App\Models\Depot;
 use App\Models\Route;
 use App\Models\Service;
 
-class IFSLabel extends \App\Models\Models\CarrierAPI\CarrierLabel
+class IFSLabel extends \App\Models\CarrierAPI\CarrierLabel
 {
     /**
      * Accepts Shipment and Carrier Response data

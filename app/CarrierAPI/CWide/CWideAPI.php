@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Models\Models\CarrierAPI\CWide;
+namespace App\Models\CarrierAPI\CWide;
 
-use App\Models\Models\Carrier;
-use App\Models\Models\CarrierPackagingType;
-use App\Models\Models\Company;
-use App\Models\Models\Country;
+use App\Models\Carrier;
+use App\Models\CarrierPackagingType;
+use App\Models\Company;
+use App\Models\Country;
 use App\Models\PackagingType;
 use App\Models\Service;
 use App\Models\TransactionLog;
@@ -18,7 +18,7 @@ use TCPDI;
  *
  * @author gmcbroom
  */
-class CWideAPI extends \App\Models\Models\CarrierAPI\CarrierBase
+class CWideAPI extends \App\Models\CarrierAPI\CarrierBase
 {
     /*
      *  Carrier Specific Variable declarations

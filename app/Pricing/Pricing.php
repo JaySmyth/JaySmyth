@@ -19,9 +19,9 @@
 
 namespace app\Pricing;
 
-use App\Models\Models\Carrier;
-use App\Models\Models\Company;
-use App\Models\Models\CompanyRate;
+use App\Models\Carrier;
+use App\Models\Company;
+use App\Models\CompanyRate;
 use App\Models\Package;
 use App\Models\Service;
 use App\Models\Shipment;

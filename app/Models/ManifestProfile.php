@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Models\Models;
+ namespace App\Models;
 
-use App\Models\Models\CarrierAPI\TNT\TNTManifest;
+use App\Models\CarrierAPI\TNT\TNTManifest;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 /*

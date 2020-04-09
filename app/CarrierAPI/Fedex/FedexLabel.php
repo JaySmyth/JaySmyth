@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Models\Models\CarrierAPI\Fedex;
+namespace App\Models\CarrierAPI\Fedex;
 
-class FedexLabel extends \App\Models\Models\CarrierAPI\CarrierLabel
+class FedexLabel extends \App\Models\CarrierAPI\CarrierLabel
 {
     /**
      * Accepts Shipment and Carrier Response data

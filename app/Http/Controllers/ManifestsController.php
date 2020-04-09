@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Models\CarrierAPI\Pdf;
-use App\Models\Models\Manifest;
+use App\Models\CarrierAPI\Pdf;
+use App\Models\Manifest;
 use App\Models\Shipment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

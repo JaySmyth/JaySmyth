@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Models\CarrierChargeCode;
+use App\Models\CarrierChargeCode;
 use Illuminate\Http\Request;
 
 class CarrierChargeCodesController extends Controller

@@ -25,7 +25,7 @@ class ShipmentImportExampleExport implements FromCollection, ShouldAutoSize
         $rowNumber = 1;
         $columns = $this->importConfig->getColumns();
 
-        $productCode = \App\Models\Models\Commodity::select('product_code')->whereCompanyId($this->importConfig->company_id)->where('product_code', '>', '')->orderBy('id', 'DESC')->first();
+        $productCode = \App\Models\Commodity::select('product_code')->whereCompanyId($this->importConfig->company_id)->where('product_code', '>', '')->orderBy('id', 'DESC')->first();
 
         $previousShipments = \App\Models\Shipment::whereCompanyId($this->importConfig->company_id)->whereStatusId(6)->inRandomOrder()->limit($this->limit)->get();
 

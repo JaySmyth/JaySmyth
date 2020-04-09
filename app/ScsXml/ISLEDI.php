@@ -2,10 +2,10 @@
 
 namespace App\ScsXml;
 
-use App\Models\Models\Carrier;
-use App\Models\Models\ChargeCodes;
-use App\Models\Models\Company;
-use App\Models\Models\Department;
+use App\Models\Carrier;
+use App\Models\ChargeCodes;
+use App\Models\Company;
+use App\Models\Department;
 use App\Models\Package;
 use App\Models\Service;
 use App\Models\Shipment;

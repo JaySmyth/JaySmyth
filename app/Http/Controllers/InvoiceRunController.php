@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Models\InvoiceRun;
+use App\Models\InvoiceRun;
 use App\Models\Shipment;
 use Auth;
 use Carbon\Carbon;

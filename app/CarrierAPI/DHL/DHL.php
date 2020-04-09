@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Models\Models\CarrierAPI\DHL;
+namespace App\Models\CarrierAPI\DHL;
 
-use App\Models\Models\Company;
+use App\Models\Company;
 use App\Models\Service;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;

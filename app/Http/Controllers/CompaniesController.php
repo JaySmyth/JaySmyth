@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CompanyRequest;
-use App\Models\Models\Company;
-use App\Models\Models\CompanyRates;
+use App\Models\Company;
+use App\Models\CompanyRates;
 use App\Models\Rate;
 use App\Models\Service;
 use Illuminate\Http\Request;
@@ -398,7 +398,7 @@ class CompaniesController extends Controller
         $this->authorize('collectionSettings', $company);
 
         if ($request->use_default) {
-            \App\Models\Models\CollectionSetting::whereCompanyId($id)->delete();
+            \App\Models\CollectionSetting::whereCompanyId($id)->delete();
         } else {
             $rules = [
                 'collection_time' => 'required',
@@ -424,7 +424,7 @@ class CompaniesController extends Controller
 
             // Save the records
             foreach ($request->settings as $key => $value) {
-                \App\Models\Models\CollectionSetting::firstOrCreate(['company_id' => $id, 'day' => $key])->update($value);
+                \App\Models\CollectionSetting::firstOrCreate(['company_id' => $id, 'day' => $key])->update($value);
             }
         }
 

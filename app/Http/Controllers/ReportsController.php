@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Models\Company;
-use App\Models\Models\Log;
-use App\Models\Models\Manifest;
+use App\Models\Company;
+use App\Models\Log;
+use App\Models\Manifest;
 use App\Models\Report;
 use App\Models\Service;
 use App\Models\Shipment;
@@ -735,7 +735,7 @@ class ReportsController extends Controller
         foreach ($companies as $company) {
             $settings = $company->getCollectionSettingsForDay($day);
 
-            if ($settings instanceof \App\Models\Models\CollectionSetting) {
+            if ($settings instanceof \App\Models\CollectionSetting) {
                 $settings = $settings->toArray();
             }
 

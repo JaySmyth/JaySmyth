@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Models\Models\CarrierAPI\UPS;
+namespace App\Models\CarrierAPI\UPS;
 
-class UPSLabel extends \App\Models\Models\CarrierAPI\CarrierLabel
+class UPSLabel extends \App\Models\CarrierAPI\CarrierLabel
 {
     /**
      * Accepts Shipment and Carrier Response data

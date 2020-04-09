@@ -8,6 +8,6 @@ class PackagingType extends Model
 {
     public function getRateCode()
     {
-        return $this->belongsToMany('App\Models\Models\CarrierPackaging');
+        return $this->belongsToMany('App\Models\CarrierPackaging');
     }
 }

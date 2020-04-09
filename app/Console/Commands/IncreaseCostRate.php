@@ -126,7 +126,7 @@ class IncreaseCostRate extends Command
      */
     protected function checkAbleToIncrease()
     {
-        $rates = \App\Models\Models\DomesticRate::where('rate_id', $this->rate->id)
+        $rates = \App\Models\DomesticRate::where('rate_id', $this->rate->id)
                 ->where('from_date', '>=', $this->fromDate)
                 ->first();
         if ($rates) {
@@ -199,7 +199,7 @@ class IncreaseCostRate extends Command
 
     public function increaseDomesticRates()
     {
-        $rates = \App\Models\Models\DomesticRate::where('rate_id', $this->rate->id)
+        $rates = \App\Models\DomesticRate::where('rate_id', $this->rate->id)
                         ->where('to_date', '>', date('Y-m-d'))
                         ->orderBy('service')
                         ->orderBy('packaging_code')
@@ -208,7 +208,7 @@ class IncreaseCostRate extends Command
 
         // Cycle through rates selected and increase values
         foreach ($rates as $rate) {
-            \App\Models\Models\DomesticRate::create([
+            \App\Models\DomesticRate::create([
                 'rate_id' => $rate->rate_id,
                 'service' => $rate->service,
                 'packaging_code' => $rate->packaging_code,

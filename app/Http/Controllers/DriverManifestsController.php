@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Models\CarrierAPI\Pdf;
-use App\Models\Models\Driver;
-use App\Models\Models\DriverManifest;
+use App\Models\CarrierAPI\Pdf;
+use App\Models\Driver;
+use App\Models\DriverManifest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 

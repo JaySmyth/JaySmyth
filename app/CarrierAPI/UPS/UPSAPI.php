@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Models\Models\CarrierAPI\UPS;
+namespace App\Models\CarrierAPI\UPS;
 
-use App\Models\Models\Carrier;
-use App\Models\Models\CarrierAPI\UPS\UPSLabel;
+use App\Models\Carrier;
+use App\Models\CarrierAPI\UPS\UPSLabel;
 use App\Models\PackagingType;
 use App\Models\Service;
 use App\Models\TransactionLog;
@@ -14,7 +14,7 @@ use Ups\Entity\Shipment;
  *
  * @author gmcbroom
  */
-class UPSAPI extends \App\Models\Models\CarrierAPI\CarrierBase
+class UPSAPI extends \App\Models\CarrierAPI\CarrierBase
 {
     /*
      *  Carrier Specific Variable declarations

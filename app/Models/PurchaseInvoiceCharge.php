@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Models\CarrierChargeCode;
+use App\Models\CarrierChargeCode;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
 

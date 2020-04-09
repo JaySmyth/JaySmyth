@@ -23,7 +23,7 @@
             <div class="col-sm-6">
                 @if($submitButtonText == "Update Surcharge")
                     @if($surcharge->company_id > 0)
-                        {{App\Models\Models\Company::find($surcharge->company_id)->company_name}}
+                        {{App\Models\Company::find($surcharge->company_id)->company_name}}
                     @else
                         All Companies
                     @endif

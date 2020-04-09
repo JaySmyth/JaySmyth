@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Models\Company;
+use App\Models\Company;
 use App\Models\Service;
 use App\Models\Shipment;
 use DateTime;

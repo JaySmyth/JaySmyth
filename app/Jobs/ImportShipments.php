@@ -2,10 +2,10 @@
 
 namespace App\Jobs;
 
-use App\Models\Models\Carrier;
-use App\Models\Models\CarrierAPI\Facades\CarrierAPI;
-use App\Models\Models\Country;
-use App\Models\Models\Department;
+use App\Models\Carrier;
+use App\Models\CarrierAPI\Facades\CarrierAPI;
+use App\Models\Country;
+use App\Models\Department;
 use App\Models\Postcode;
 use App\Models\Service;
 use App\Models\User;
@@ -48,7 +48,7 @@ class ImportShipments implements ShouldQueue
     public function __construct($path, $importConfigId, User $user)
     {
         $this->path = $path;
-        $this->importConfig = \App\Models\Models\ImportConfig::find($importConfigId);
+        $this->importConfig = \App\Models\ImportConfig::find($importConfigId);
         $this->user = $user;
         $this->company = $this->importConfig->company;
         $this->userPreferences = $user->getPreferences($this->company->id, $this->importConfig->mode_id, true);
@@ -591,7 +591,7 @@ class ImportShipments implements ShouldQueue
         }
 
         if (! empty($this->row['product_code'])) {
-            $commodity = \App\Models\Models\Commodity::whereProductCode($this->row['product_code'])->whereCompanyId($this->company->id)->first();
+            $commodity = \App\Models\Commodity::whereProductCode($this->row['product_code'])->whereCompanyId($this->company->id)->first();
         }
 
         if ($commodity) {
