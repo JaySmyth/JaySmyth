@@ -33,7 +33,9 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->SetLineWidth(0.3);
             $this->pdf->Cell(96, 123, '', 1);
 
+            $this->pdf->Image(storage_path('app/images/ifs_logo_bw.png'), 4, 14, 24, 18, 'png');
             // Express Freight logo
+            /*
             $this->pdf->Image(storage_path('app/images/express_freight_logo.png'), 4, 14, 24, 18, 'png');
             $this->pdf->SetFont($this->font, 'B', 14);
             $this->pdf->Text(28, 14, 'Express Freight');
@@ -41,6 +43,7 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->Text(22, 14, '.................');
             $this->pdf->SetFont($this->font, 'BI', 10);
             $this->pdf->Text(20, 27, 'Quality in distribution');
+            */
 
             // Verticle text
             $x = 66;
@@ -160,8 +163,8 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
 
             $y = 131;
             $this->pdf->SetFont($this->font, 'B', 9);
-            $this->pdf->Text(6, $y, 'Tel - 028 38322100');
-            $this->pdf->Text($x, $y, 'Fax - 028 38323005');
+            $this->pdf->Text(6, $y, 'Tel - 028 9446 4211');
+            //$this->pdf->Text($x, $y, 'Fax - 028 38323005');
 
             $x = 7;
             $y = 141;
