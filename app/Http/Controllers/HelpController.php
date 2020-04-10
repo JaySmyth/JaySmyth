@@ -37,6 +37,14 @@ class HelpController extends Controller
     /**
      * @return type
      */
+    public function covid()
+    {
+        return view('help.covid-19');
+    }
+
+    /**
+     * @return type
+     */
     public function sendFeedback(Request $request)
     {
         $this->validate($request, [
