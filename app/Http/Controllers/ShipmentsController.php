@@ -101,6 +101,10 @@ class ShipmentsController extends Controller
             ->restrictMode($request->user()->getAllowedModeIds())
             ->with('service', 'status', 'department', 'mode', 'company', 'depot');
 
+        if($request->has('received')){
+            $query->where('received', $request->received);
+        }
+
         if ($limit) {
             $query->limit($limit);
         }

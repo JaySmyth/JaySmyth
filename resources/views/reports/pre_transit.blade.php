@@ -37,6 +37,12 @@
 
     <main class="col-sm-10 ml-sm-auto" role="main">
 
+        @if(Request::get('date_from'))
+        @section('toolbar')
+                <a href="/shipments/download?status=2&received=0&{{Request::getQueryString()}}" title="Download Results"><span class="fas fa-cloud-download-alt fa-lg" aria-hidden="true"></span></a>
+        @endsection
+        @endif
+
         @include('partials.title', ['title' => $report->name, 'results'=> $shipments])
 
         <table class="table table-striped">
