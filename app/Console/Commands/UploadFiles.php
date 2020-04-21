@@ -223,6 +223,7 @@ class UploadFiles extends Command
                 'Ship Date' => $tracking->shipment->ship_date->timezone($timezone)->format('d-m-Y'),
                 'Service' => $tracking->shipment->service->code,
                 'Status' => $tracking->status,
+                'Status Detail' => $tracking->status_detail,
                 'Message' => $tracking->message,
                 'Date/Time' => $tracking->datetime->timezone($timezone)->format('d-m-Y H:i')
             ];
