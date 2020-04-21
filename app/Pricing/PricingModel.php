@@ -550,7 +550,7 @@ class PricingModel
             }
         }
         // TNT
-        if (in_array($this->shipment['service_id'], [21,36])) {
+        if (in_array($this->shipment['service_id'], [21,36,37,54,55])) {
             if ($shipmentDate >= '2020-04-06') {
                 $this->fedexESS();
             }

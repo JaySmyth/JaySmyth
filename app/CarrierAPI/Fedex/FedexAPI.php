@@ -383,9 +383,8 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
 
     private function preProcess($shipment)
     {
-
         // Find Senders Fedex Account
-        $service = Company::find($shipment['company_id'])->services()->where('code', $shipment['service_code'])->where('carrier_id', '2')->first();
+        $service = Company::find($shipment['company_id'])->services()->where('service_id', $shipment['service_id'])->where('carrier_id', '2')->first();
 
         if (! empty($service)) {
             if ($service->pivot->account > '') {
