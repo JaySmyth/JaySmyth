@@ -506,4 +506,24 @@ class UploadFiles extends Command
             ->join('shipments', 'tracking.shipment_id', '=', 'shipments.id')
             ->orderBy('shipment_id')->orderBy('id')->get();
     }
+
+    /**
+     * Exceptions that have not been sent.
+     *
+     * @param $companyId
+     * @return mixed
+     */
+    protected function getException($companyId)
+    {
+        $this->model = new Tracking();
+
+        return Tracking::select('tracking.*')
+            ->where('datetime', '>=', now()->subWeek())
+            ->whereExceptionSent(0)
+            ->whereStatusDetail('delivery_exception')
+            ->where('shipments.company_id', $companyId)
+            ->join('shipments', 'tracking.shipment_id', '=', 'shipments.id')
+            ->orderBy('shipment_id')->orderBy('id')->get();
+    }
+
 }
