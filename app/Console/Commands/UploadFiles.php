@@ -192,7 +192,7 @@ class UploadFiles extends Command
      */
     protected function getExportArray($method, $records, $timezone = 'Europe/London', $verbose = true)
     {
-        if ($method == 'getTracking') {
+        if ($method == 'getTracking' || $method == 'getException') {
             return $this->getTrackingExportArray($records, $timezone);
         }
 
