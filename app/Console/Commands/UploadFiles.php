@@ -225,7 +225,7 @@ class UploadFiles extends Command
                 'Status' => $tracking->status,
                 'Status Detail' => $tracking->status_detail,
                 'Message' => $tracking->message,
-                'Date/Time' => $tracking->datetime->timezone($timezone)->format('d-m-Y H:i')
+                'Date/Time' => ($tracking->datetime) ? $tracking->datetime->timezone($timezone)->format('d-m-Y H:i') : null
             ];
 
         endforeach;
