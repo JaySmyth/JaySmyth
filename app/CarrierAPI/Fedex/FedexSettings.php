@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace App\Models\CarrierAPI\Fedex;
+namespace App\CarrierAPI\Fedex;
 
 use App\Models\Carrier;
 use App\Models\CarrierPackagingType;
