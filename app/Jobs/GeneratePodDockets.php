@@ -53,7 +53,7 @@ class GeneratePodDockets implements ShouldQueue
         if ($dayOfWeek == 5) {
             $transportJobs = $transportJobs->whereBetween('date_requested', [Carbon::parse('next monday')->startOfDay(), Carbon::parse('next monday')->endOfDay()]);
         } else {
-            $transportJobs = $transportJobs->whereBetween('date_requested', [Carbon::tomorrow()->startOfDay(), Carbon::tomorrow()->endOfDay()]);
+            $transportJobs = $transportJobs->whereBetween('date_requested', [Carbon::today()->startOfDay(), Carbon::today()->endOfDay()]);
         }
 
         $transportJobs = $transportJobs->orderBy('from_state')
