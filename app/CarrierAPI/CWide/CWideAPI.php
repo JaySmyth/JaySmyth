@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\CarrierAPI\CWide;
+namespace App\CarrierAPI\CWide;
 
 use App\Models\Carrier;
 use App\Models\CarrierPackagingType;

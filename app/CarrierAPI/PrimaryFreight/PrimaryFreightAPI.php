@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\CarrierAPI\PrimaryFreight;
+namespace App\CarrierAPI\PrimaryFreight;
 
 /**
  * @author gmcbroom

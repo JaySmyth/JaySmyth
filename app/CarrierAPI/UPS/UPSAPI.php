@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\CarrierAPI\UPS;
+namespace App\CarrierAPI\UPS;
 
 use App\Models\Carrier;
 use App\CarrierAPI\UPS\UPSLabel;
@@ -216,7 +216,8 @@ class UPSAPI extends \App\Models\CarrierAPI\CarrierBase
 
         // Set payment information
         $upsShipment->setPaymentInformation(new \Ups\Entity\PaymentInformation(
-            $this->billTo[$shipment['bill_shipping']], (object) ['AccountNumber' => $shipment['bill_shipping_account']]
+            $this->billTo[$shipment['bill_shipping']],
+            (object) ['AccountNumber' => $shipment['bill_shipping_account']]
         ));
 
         /*
@@ -291,7 +292,9 @@ class UPSAPI extends \App\Models\CarrierAPI\CarrierBase
 
         try {
             $api = new \Ups\Shipping(
-                $this->account[strtoupper($this->mode)]['key'], $this->account[strtoupper($this->mode)]['id'], $this->account[strtoupper($this->mode)]['pass']
+                $this->account[strtoupper($this->mode)]['key'],
+                $this->account[strtoupper($this->mode)]['id'],
+                $this->account[strtoupper($this->mode)]['pass']
             );
 
             $confirm = $api->confirm(\Ups\Shipping::REQ_VALIDATE, $upsShipment, $labelSpecification);

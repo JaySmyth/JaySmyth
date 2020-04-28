@@ -12,11 +12,11 @@ trait Logable
      */
     public function logs()
     {
-        return $this->morphMany(Log::class, 'logable')->orderBy('id', 'DESC');
+        return $this->morphMany(\App\Models\Log::class, 'logable')->orderBy('id', 'DESC');
     }
 
     /**
-     * Add a log entry.
+     * Add a log entry.\App\Models\
      *
      * @return Model
      */

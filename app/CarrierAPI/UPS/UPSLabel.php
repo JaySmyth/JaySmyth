@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\CarrierAPI\UPS;
+namespace App\CarrierAPI\UPS;
 
 class UPSLabel extends \App\Models\CarrierAPI\CarrierLabel
 {

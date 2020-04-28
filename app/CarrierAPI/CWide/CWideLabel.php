@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\CarrierAPI\CWide;
+namespace App\CarrierAPI\CWide;
 
 use App\Models\Mode;
 use App\Models\Depot;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\CarrierAPI\IFS;
+namespace App\CarrierAPI\IFS;
 
 use App\Models\Mode;
 use App\Models\Depot;

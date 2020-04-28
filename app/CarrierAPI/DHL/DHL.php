@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\CarrierAPI\DHL;
+namespace App\CarrierAPI\DHL;
 
 use App\Models\Company;
 use App\Models\Service;

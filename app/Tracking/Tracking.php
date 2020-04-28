@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Tracking;
+namespace App\Tracking;
 
 use App\Models\ProblemEvent;
 use Illuminate\Support\Arr;

@@ -16,50 +16,67 @@ class DatabaseSeeder extends Seeder
         //disable foreign key check for this connection before running seeders
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-        $this->call(PermissionsRolesSeeder::class);
-        $this->call(LocalisationsTableSeeder::class);
-        $this->call(SalesTableSeeder::class);
-        $this->call(SequencesTableSeeder::class);
-        $this->call(CurrenciesTableSeeder::class);
-        $this->call(CountriesTableSeeder::class);
-        $this->call(PrintFormatsTableSeeder::class);
-        $this->call(RoutesTableSeeder::class);
-        $this->call(DepotsTableSeeder::class);
-        $this->call(StatusesTableSeeder::class);
-        $this->call(DepartmentsTableSeeder::class);
-        $this->call(ModesTableSeeder::class);
-        $this->call(TermsTableSeeder::class);
-        $this->call(VatCodesTableSeeder::class);
-        $this->call(CarriersTableSeeder::class);
-        $this->call(PackagingTableSeeder::class);
-        $this->call(CarrierAccountsTableSeeder::class);
-        $this->call(ServicesTableSeeder::class);
-        $this->call(HazardsTableSeeder::class);
-        $this->call(StatesTableSeeder::class);
-        $this->call(UomsTableSeeder::class);
-        $this->call(ManifestProfilesTableSeeder::class);
-        $this->call(ReportsTableSeeder::class);
-        $this->call(ProblemEventsTableSeeder::class);
-        $this->call(CPCTableSeeder::class);
-        $this->call(CarrierChargeCodesTableSeeder::class);
-        $this->call(MailReportsTableSeeder::class);
-
-        // *** Seed from legacy data *** //
-        $this->call(CompaniesTableSeeder::class);
+        $this->call([
+            AddChargesTableSeeder::class,
+            CarriersTableSeeder::class,
+            ChargeCodesTableSeeder::class,
+            CommoditiesTableSeeder::class,
+            CompaniesTableSeeder::class,
+            CountriesTableSeeder::class,
+            CPCTableSeeder::class,
+            CurrenciesTableSeeder::class,
+            DepartmentsTableSeeder::class,
+            DepotsTableSeeder::class,
+            // DomesticPurchaseInvoicesTableSeeder::class,
+            DomesticZonesTableSeeder::class,
+            DriversTableSeeder::class,
+            FuelSurchargesTableSeeder::class,
+            HazardsTableSeeder::class,
+            IfsNdPostcodesTableSeeder::class,
+            ImportConfigFieldsTableSeeder::class,
+            ImportConfigsTableSeeder::class,
+            LocalisationsTableSeeder::class,
+            MailReportsTableSeeder::class,
+            ManifestProfilesTableSeeder::class,
+            ModesTableSeeder::class,
+            PackagingTableSeeder::class,
+            PermissionsTableSeeder::class,
+            PrintFormatsTableSeeder::class,
+            ProblemEventsTableSeeder::class,
+            ReportsTableSeeder::class,
+            RolesTableSeeder::class,
+            RoutesTableSeeder::class,
+            SalesTableSeeder::class,
+            SequencesTableSeeder::class,
+            ShipReasonsTableSeeder::class,
+            StatesTableSeeder::class,
+            StatusesTableSeeder::class,
+            SurchargesTableSeeder::class,
+            TermsTableSeeder::class,
+            TransendCodesTableSeeder::class,
+            UomsTableSeeder::class,
+            UsersTableSeeder::class,
+            VatCodesTableSeeder::class,
+            VehiclesTableSeeder::class
+        ]);
 
         // Unnecessary but explicitly reset Foreign Key checks
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         Eloquent::reguard();
-        $this->call(PermissionsTableSeeder::class);
-        $this->call(RolesTableSeeder::class);
-        $this->call(RoleUserTableSeeder::class);
-        $this->call(CarrierPackagingTypesTableSeeder::class);
-        $this->call(PackagingTypesTableSeeder::class);
-        $this->call(PermissionRoleTableSeeder::class);
-        $this->call(ShipReasonsTableSeeder::class);
-        $this->call(SurchargesTableSeeder::class);
-        $this->call(TransendCodesTableSeeder::class);
-        $this->call(VehiclesTableSeeder::class);
+
+        $this->call([
+            AddChargeDetailsTableSeeder::class,
+            AddressesTableSeeder::class,
+            CarrierAccountsTableSeeder::class,
+            CarrierChargeCodesTableSeeder::class,
+            CarrierPackagingTypesTableSeeder::class,
+            DomesticRatesTableSeeder::class,
+            ServicesTableSeeder::class,
+            // PermissionsRolesSeeder::class,
+            // RoleUserTableSeeder::class,
+            PermissionRoleTableSeeder::class,
+            // SpecialServicesTableSeeder::class,
+        ]);
     }
 }

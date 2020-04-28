@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\CarrierAPI\ExpressFreightNI;
+namespace App\CarrierAPI\ExpressFreightNI;
 
 use App\Models\ExpressFreightGazetteer;
 

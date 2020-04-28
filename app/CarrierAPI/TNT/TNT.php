@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\CarrierAPI\TNT;
+namespace App\CarrierAPI\TNT;
 
 use App\Models\Service;
 use Illuminate\Support\Str;

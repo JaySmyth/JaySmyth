@@ -5,6 +5,7 @@ namespace App\Traits;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
+;
 trait HasRoles
 {
     /**
@@ -14,7 +15,7 @@ trait HasRoles
      */
     public function roles()
     {
-        return $this->belongsToMany(Role::class);
+        return $this->belongsToMany(\App\Models\Role::class);
     }
 
     /**
@@ -26,7 +27,7 @@ trait HasRoles
     public function assignRole($role)
     {
         return $this->roles()->save(
-            Role::whereName($role)->firstOrFail()
+            \App\Models\Role::whereName($role)->firstOrFail()
         );
     }
 
@@ -82,7 +83,7 @@ trait HasRoles
         }
 
         if (is_string($permission)) {
-            $permission = Permission::whereName($permission)->firstOrFail();
+            $permission = \App\Models\Permission::whereName($permission)->firstOrFail();
         }
 
         return $this->hasRole($permission->roles);
@@ -121,7 +122,7 @@ trait HasRoles
             return true;
         }
 
-        $modes = Mode::all();
+        $modes = \App\Models\Mode::all();
 
         $count = 0;
 
@@ -230,13 +231,13 @@ trait HasRoles
     {
         // IFS Admin - return all modes
         if ($this->hasRole('ifsa')) {
-            return Mode::all();
+            return \App\Models\Mode::all();
         }
 
         // Get the user's transport "mode" roles
         $roles = $this->roles->where('primary', 0)->pluck('name');
 
-        return Mode::whereIn('name', $roles);
+        return \App\Models\Mode::whereIn('name', $roles);
     }
 
     /*
@@ -269,11 +270,11 @@ trait HasRoles
             case 'all':
 
                 if ($this->hasRole('ifsa')) {
-                    return Company::all();
+                    return \App\Models\Company::all();
                 }
 
                 if ($this->hasIfsRole()) {
-                    return Company::whereIn('depot_id', $this->getDepotIds())->get();
+                    return \App\Models\Company::whereIn('depot_id', $this->getDepotIds())->get();
                 }
 
                 return $this->companies;
@@ -283,11 +284,11 @@ trait HasRoles
             default:
 
                 if ($this->hasRole('ifsa')) {
-                    return Company::whereEnabled($enabled)->get();
+                    return \App\Models\Company::whereEnabled($enabled)->get();
                 }
 
                 if ($this->hasIfsRole()) {
-                    return Company::whereIn('depot_id', $this->getDepotIds())->whereEnabled($enabled)->get();
+                    return \App\Models\Company::whereIn('depot_id', $this->getDepotIds())->whereEnabled($enabled)->get();
                 }
 
                 return $this->companies->where('enabled', $enabled);

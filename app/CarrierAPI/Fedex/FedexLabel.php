@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\CarrierAPI\Fedex;
+namespace App\CarrierAPI\Fedex;
 
 class FedexLabel extends \App\Models\CarrierAPI\CarrierLabel
 {

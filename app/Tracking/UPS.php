@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Tracking;
+namespace App\Tracking;
 
 use Carbon\Carbon;
 use GuzzleHttp\Client;

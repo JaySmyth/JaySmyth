@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\CarrierAPI\DHL;
+namespace App\CarrierAPI\DHL;
 
 class DHLLabel extends \App\Models\CarrierAPI\CarrierLabel
 {

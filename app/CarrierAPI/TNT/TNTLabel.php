@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\CarrierAPI\TNT;
+namespace App\CarrierAPI\TNT;
 
 class TNTLabel extends \App\Models\CarrierAPI\CarrierLabel
 {

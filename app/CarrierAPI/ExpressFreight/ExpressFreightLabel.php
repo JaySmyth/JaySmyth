@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\CarrierAPI\ExpressFreight;
+namespace App\CarrierAPI\ExpressFreight;
 
 use App\Models\Route;
 use App\Models\Service;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\CarrierAPI\ExpressFreightNI;
+namespace App\CarrierAPI\ExpressFreightNI;
 
 use App\CarrierAPI\ExpressFreightNI\ExpressFreightNILabel;
 use App\Models\TransactionLog;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\CarrierAPI\TNT;
+namespace App\CarrierAPI\TNT;
 
 use App\CarrierAPI\TNT\TNT;
 use App\Models\Service;
