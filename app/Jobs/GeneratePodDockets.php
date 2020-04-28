@@ -55,6 +55,7 @@ class GeneratePodDockets implements ShouldQueue
         } else {
             $transportJobs = $transportJobs->whereBetween('date_requested', [Carbon::tomorrow()->startOfDay(), Carbon::tomorrow()->endOfDay()]);
         }
+        $transportJobs = $transportJobs->whereBetween('date_requested', [Carbon::today()->startOfDay(), Carbon::today()->endOfDay()]);
 
         $transportJobs = $transportJobs->orderBy('from_state')
                 ->orderBy('from_city')
