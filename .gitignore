@@ -11,3 +11,4 @@ Thumbs.db
 /.ftpconfig
 /.remote-sync.json
 .phpunit.result.cache
+.env
