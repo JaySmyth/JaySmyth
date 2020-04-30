@@ -677,7 +677,7 @@ class CarrierAPI
             $to = config('mail.error');
             $subject = 'WebClient DB Error - '.$to;
             $message = 'Web Client failed to insert shipment '."\r\n\r\n".
-                    'App\Models\CarrierAPI\CarrierAPI.php : '."\r\n\r\n".
+                    'App\CarrierAPI\CarrierAPI.php : '."\r\n\r\n".
                     'Function addShipment() : '."\r\n\r\n".
                     'IFS Consignment Number : '.$data['consignment_number']."\r\n\r\n".
                     'Carrier Consignment Number : '.$data['carrier_consignment_number']."\r\n\r\n".

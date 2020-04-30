@@ -20,7 +20,7 @@ use TCPDI;
  *
  * @author gmcbroom
  */
-class IFSAPI extends \App\Models\CarrierAPI\CarrierBase
+class IFSAPI extends \App\CarrierAPI\CarrierBase
 {
     /*
      *  Carrier Specific Variable declarations

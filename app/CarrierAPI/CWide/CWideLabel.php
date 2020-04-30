@@ -7,7 +7,7 @@ use App\Models\Depot;
 use App\Models\Route;
 use App\Models\Service;
 
-class CWideLabel extends \App\Models\CarrierAPI\CarrierLabel
+class CWideLabel extends \App\CarrierAPI\CarrierLabel
 {
     /**
      * Accepts Shipment and Carrier Response data

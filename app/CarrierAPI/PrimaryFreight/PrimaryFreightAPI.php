@@ -5,7 +5,7 @@ namespace App\CarrierAPI\PrimaryFreight;
 /**
  * @author gmcbroom
  */
-class PrimaryFreightAPI extends \App\Models\CarrierAPI\CarrierBase
+class PrimaryFreightAPI extends \App\CarrierAPI\CarrierBase
 {
     /**
      * @param type $shipment

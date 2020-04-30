@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Validator;
  *
  * @author gmcbroom
  */
-class FedexAPI extends \App\Models\CarrierAPI\CarrierBase
+class FedexAPI extends \App\CarrierAPI\CarrierBase
 {
     /*
      *  Carrier Specific Variable declarations

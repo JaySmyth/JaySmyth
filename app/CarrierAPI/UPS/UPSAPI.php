@@ -14,7 +14,7 @@ use Ups\Entity\Shipment;
  *
  * @author gmcbroom
  */
-class UPSAPI extends \App\Models\CarrierAPI\CarrierBase
+class UPSAPI extends \App\CarrierAPI\CarrierBase
 {
     /*
      *  Carrier Specific Variable declarations

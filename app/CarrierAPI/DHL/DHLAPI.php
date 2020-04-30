@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Validator;
  *
  * @author gmcbroom
  */
-class DHLAPI extends \App\Models\CarrierAPI\CarrierBase
+class DHLAPI extends \App\CarrierAPI\CarrierBase
 {
     /**
      * @param type $shipment

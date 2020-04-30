@@ -10,7 +10,7 @@ use App\Models\Service;
  *
  * @author gmcbroom
  */
-class TNTAPI extends \App\Models\CarrierAPI\CarrierBase
+class TNTAPI extends \App\CarrierAPI\CarrierBase
 {
     /**
      * @param type $shipment

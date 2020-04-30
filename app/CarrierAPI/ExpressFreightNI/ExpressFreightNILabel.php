@@ -4,7 +4,7 @@ namespace App\CarrierAPI\ExpressFreightNI;
 
 use App\Models\ExpressFreightGazetteer;
 
-class ExpressFreightNILabel extends \App\Models\CarrierAPI\CarrierLabel
+class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
 {
     /**
      * Accepts Shipment and Carrier Response data

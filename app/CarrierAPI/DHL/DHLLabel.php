@@ -2,7 +2,7 @@
 
 namespace App\CarrierAPI\DHL;
 
-class DHLLabel extends \App\Models\CarrierAPI\CarrierLabel
+class DHLLabel extends \App\CarrierAPI\CarrierLabel
 {
     /**
      * Accepts Shipment and Carrier Response data

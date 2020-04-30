@@ -2,7 +2,7 @@
 
 namespace App\CarrierAPI\TNT;
 
-class TNTLabel extends \App\Models\CarrierAPI\CarrierLabel
+class TNTLabel extends \App\CarrierAPI\CarrierLabel
 {
     public function __construct($shipment = null, $serviceCode = null, $data = null)
     {

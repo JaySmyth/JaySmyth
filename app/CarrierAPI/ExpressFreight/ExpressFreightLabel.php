@@ -5,7 +5,7 @@ namespace App\CarrierAPI\ExpressFreight;
 use App\Models\Route;
 use App\Models\Service;
 
-class ExpressFreightLabel extends \App\Models\CarrierAPI\CarrierLabel
+class ExpressFreightLabel extends \App\CarrierAPI\CarrierLabel
 {
     /**
      * Accepts Shipment and Carrier Response data

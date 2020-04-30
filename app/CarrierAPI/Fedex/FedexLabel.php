@@ -2,7 +2,7 @@
 
 namespace App\CarrierAPI\Fedex;
 
-class FedexLabel extends \App\Models\CarrierAPI\CarrierLabel
+class FedexLabel extends \App\CarrierAPI\CarrierLabel
 {
     /**
      * Accepts Shipment and Carrier Response data

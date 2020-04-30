@@ -10,7 +10,7 @@ use App\Models\TransactionLog;
  *
  * @author gmcbroom
  */
-class ExpressFreightAPI extends \App\Models\CarrierAPI\CarrierBase
+class ExpressFreightAPI extends \App\CarrierAPI\CarrierBase
 {
     /*
      *  Carrier Specific Variable declarations

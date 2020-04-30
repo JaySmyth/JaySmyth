@@ -12,7 +12,7 @@ use TCPDI;
  *
  * @author gmcbroom
  */
-class ExpressFreightNIAPI extends \App\Models\CarrierAPI\CarrierBase
+class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
 {
     /*
      *  Carrier Specific Variable declarations

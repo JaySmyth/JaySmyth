@@ -60,7 +60,7 @@ class APIController extends Controller
     {
         return APIResponse::respondNotSupported('Method/ URI not supported');
     }
-    
+
     /**
      * Accepts a POST object, validates it
      * and creates a shipment and documentation.
@@ -824,7 +824,7 @@ class APIController extends Controller
         $json = TransactionLog::find($id)->msg;
         $data = json_decode($json, true);
 
-        $upsLabel = new \App\Models\CarrierAPI\UPS\UPSLabel('', $data);
+        $upsLabel = new \App\CarrierAPI\UPS\UPSLabel('', $data);
         $response = $upsLabel->create();
 
         return response(base64_decode($response))->header('Content-Type', 'application/pdf');

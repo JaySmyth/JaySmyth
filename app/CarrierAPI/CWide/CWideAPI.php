@@ -18,7 +18,7 @@ use TCPDI;
  *
  * @author gmcbroom
  */
-class CWideAPI extends \App\Models\CarrierAPI\CarrierBase
+class CWideAPI extends \App\CarrierAPI\CarrierBase
 {
     /*
      *  Carrier Specific Variable declarations

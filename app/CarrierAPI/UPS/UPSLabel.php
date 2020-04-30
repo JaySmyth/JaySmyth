@@ -2,7 +2,7 @@
 
 namespace App\CarrierAPI\UPS;
 
-class UPSLabel extends \App\Models\CarrierAPI\CarrierLabel
+class UPSLabel extends \App\CarrierAPI\CarrierLabel
 {
     /**
      * Accepts Shipment and Carrier Response data
