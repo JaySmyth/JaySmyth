@@ -77,7 +77,7 @@ trait HasPreferences
 
         // User has no preferences defined, so prepopulate with system defaults
         if ($preferences->count() <= 0) {
-            $company = App\Models\Company::findOrFail($companyId);
+            $company = \App\Models\Company::findOrFail($companyId);
 
             $values = [
                 'sender_name' => $this->name,
