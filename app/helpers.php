@@ -1879,3 +1879,54 @@ function intToDay($day)
 
     return 'Unknown';
 }
+
+/**
+ **************************************************************************
+ **************************************************************************
+ *                          Unit Test Helpers.
+ **************************************************************************
+ **************************************************************************
+ */
+
+/**
+ * ************************************************************************
+ * Build/ Allocate user with a specified role/ company.
+ * ************************************************************************
+ *
+ * @param  $userId
+ * @param  $roleId
+ * @param  $companyId
+ *
+ * @return null
+ * ************************************************************************
+ */
+function buildTestUser($userId = '', $roleName = '', $companyId = '')
+{
+    $user = null;
+
+    // If no user defined - fake one
+    if ($userId == '') {
+        $user = factory(\App\Models\User::class)->create();
+    } else {
+        $user = \App\Models\User::findOrFail($userId);
+    }
+
+    // Identify supplied role or die with error
+    $role = \App\Models\Role::where('name', $roleName)->first();
+    if ($role) {
+
+        // Add default company and links
+        if ($companyId > '') {
+            $user->companies()->detach();
+            $user->companies()->attach($companyId);
+        }
+
+        // Create Pivots with Parameters
+        $user->roles()->detach();
+        $user->roles()->attach($role->id);
+    } else {
+        dd("buildTestUser - Invalid roleName : $roleName when building User");
+    }
+
+    return $user;
+}

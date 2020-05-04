@@ -27,6 +27,8 @@ class CreateTrackingTable extends Migration
             $table->string('postcode', 10)->nullable();
             $table->string('tracker_id', 100)->nullable();
             $table->string('source', 30)->nullable()->comment('Where the tracking event originated from - e.g. easypost or IFS depot');
+            $table->boolean('exception_sent')->default('0');
+            $table->boolean('tracking_sent')->default('0');
             $table->timestamp('estimated_delivery_date')->nullable();
             $table->timestamp('local_estimated_delivery_date')->nullable()->comment('Unaltered timestamp');
             $table->integer('user_id')->unsigned()->comment('Link to the users table - populated with a user ID if a manual tracking event added by IFS operator');
