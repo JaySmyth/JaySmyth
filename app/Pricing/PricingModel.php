@@ -561,6 +561,7 @@ class PricingModel
 
     public function dhlESS()
     {
+        $shipmentDate = date('Y-m-d');
         if ($shipmentDate >= '2020-05-24') {
             $value = $this->chargeableWeight * .18;
         } else {
