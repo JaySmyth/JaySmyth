@@ -46,7 +46,8 @@ class SendJobs extends Command
     public function handle()
     {
         // Today's shippers
-        $this->companyIds = \App\Shipment::orderBy('company_id')->whereNotIn('status_id', [7])->shipDateBetween(Carbon::today(), Carbon::today())->pluck('company_id')->toArray();
+        $this->companyIds = \App\Shipment::orderBy('company_id')->whereNotIn('status_id',
+            [7])->shipDateBetween(Carbon::today(), Carbon::today())->pluck('company_id')->toArray();
 
         // Set routes on the transport jobs before trying to send them
         $this->setRoutes();
@@ -56,61 +57,15 @@ class SendJobs extends Command
 
         foreach ($jobs as $job) :
             if ($this->sendToTransend($job)) {
-                $this->info('Sending '.$job->number.' to transend');
+                $this->info('Sending ' . $job->number . ' to transend');
 
                 dispatch(new \App\Jobs\TransendOrderImport($job));
 
-                $message = ($job->is_resend) ? 'Re-sent to transend ('.$job->transend_route.')' : 'Sent to transend ('.$job->transend_route.')';
+                $message = ($job->is_resend) ? 'Re-sent to transend (' . $job->transend_route . ')' : 'Sent to transend (' . $job->transend_route . ')';
 
                 $job->log($message);
             }
         endforeach;
-    }
-
-    /**
-     * Determine if a job should be sent to Transend.
-     *
-     * @return bool
-     */
-    protected function sendToTransend($job)
-    {
-        if (Carbon::now()->isWeekend()) {
-            $this->error('No jobs processed over the weekend');
-
-            return false;
-        }
-
-        // If it's a resend, only send on date resend defined
-        if ($job->is_resend && $job->resend_date) {
-            $this->info('Resend identified for '.$job->number);
-
-            if ($job->resend_date->startOfDay()->gt(Carbon::today()->startOfDay())) {
-                $this->error('Ignoring resend: '.$job->resend_date->startOfDay().' > '.Carbon::today()->startOfDay());
-
-                return false;
-            }
-        }
-
-        // Courier job
-        if ($job->shipment) {
-
-            // If we already have a job for this customer then add this one to the list too (regardless of collection day)
-            if (in_array($job->shipment->company->id, $this->companyIds) && $job->type == 'c') {
-                return true;
-            }
-
-            // No previous jobs - company allows collection on this day of the week
-            if ($job->shipment->company->getCollectionSettingsForDay(Carbon::now()->dayOfWeekIso) && $job->date_requested->startOfDay()->lte(Carbon::today()->startOfDay())) {
-                return true;
-            }
-        } elseif ($job->date_requested->startOfDay()->lte(Carbon::today()->startOfDay())) {
-            // Non courier - anything where date requested is for today or previous
-            return true;
-        }
-
-        $this->error($job->number.' rejected. Date requested '.$job->date_requested->startOfDay().' is not equal to '.Carbon::today()->startOfDay());
-
-        return false;
     }
 
     /**
@@ -128,5 +83,50 @@ class SendJobs extends Command
             $this->info('Routes set');
             exit;
         }
+    }
+
+    /**
+     * Determine if a job should be sent to Transend.
+     *
+     * @return bool
+     */
+    protected function sendToTransend($job)
+    {
+        if (Carbon::now()->isWeekend()) {
+            $this->error('No jobs processed over the weekend');
+
+            return false;
+        }
+
+        // If it's a resend, only send on date resend defined
+        if ($job->is_resend && $job->resend_date) {
+            $this->info('Resend identified for ' . $job->number);
+
+            if ($job->resend_date->startOfDay()->gt(Carbon::today()->startOfDay())) {
+                $this->error('Ignoring resend: ' . $job->resend_date->startOfDay() . ' > ' . Carbon::today()->startOfDay());
+
+                return false;
+            }
+        }
+
+        // Courier job
+        if ($job->shipment) {
+            // If we already have a job for this customer then add this one to the list too (regardless of collection day)
+            //if (in_array($job->shipment->company->id, $this->companyIds) && $job->type == 'c') {
+            //     return true;
+            //  }
+
+            // No previous jobs - company allows collection on this day of the week
+            if ($job->shipment->company->getCollectionSettingsForDay(Carbon::now()->dayOfWeekIso) && $job->date_requested->startOfDay()->lte(Carbon::today()->startOfDay())) {
+                return true;
+            }
+        } elseif ($job->date_requested->startOfDay()->lte(Carbon::today()->startOfDay())) {
+            // Non courier - anything where date requested is for today or previous
+            return true;
+        }
+
+        $this->error($job->number . ' rejected. Date requested ' . $job->date_requested->startOfDay() . ' is not equal to ' . Carbon::today()->startOfDay());
+
+        return false;
     }
 }
