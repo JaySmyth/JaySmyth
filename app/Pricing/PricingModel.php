@@ -561,15 +561,19 @@ class PricingModel
 
     public function dhlESS()
     {
-        $value = 180.00;
-        if ($this->chargeableWeight <= 2.50) {
-            return false;
-        } elseif ($this->chargeableWeight <= 30) {
-            $value = 2.25;
-        } elseif ($this->chargeableWeight <= 70) {
-            $value = 13.50;
-        } elseif ($this->chargeableWeight <= 300) {
-            $value = 45.00;
+        if ($shipmentDate >= '2020-05-24') {
+            $value = $this->chargeableWeight * .18;
+        } else {
+            $value = 180.00;
+            if ($this->chargeableWeight <= 2.50) {
+                return false;
+            } elseif ($this->chargeableWeight <= 30) {
+                $value = 2.25;
+            } elseif ($this->chargeableWeight <= 70) {
+                $value = 13.50;
+            } elseif ($this->chargeableWeight <= 300) {
+                $value = 45.00;
+            }
         }
 
         $this->addSurcharge(['code' => 'ADH', 'description' => "Emergency Situation Surcharge", 'value' => $value]);
