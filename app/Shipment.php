@@ -1248,7 +1248,7 @@ class Shipment extends Model
             'weight' => $this->weight,
             'goods_description' => $this->goods_description,
             'volumetric_weight' => $this->volumetric_weight,
-            'instructions' => 'Collect from customer premises and bring back to '.$this->depot->name,
+            'instructions' => null,
             'scs_job_number' => $this->scs_job_number,
             'scs_company_code' => ($this->company->group_account) ? $this->company->group_account : $this->company->scs_code,
             'cash_on_delivery' => 0,

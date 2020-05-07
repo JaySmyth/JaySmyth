@@ -67,7 +67,7 @@ class ImportExpressFreightPurchaseInvoices extends Command
 
         $this->sftpDirectory = '/home/expressfreight/invoices/';
         $this->archiveDirectory = 'archive';
-        $this->fields = ['Consignment Number', 'Return', 'Dispatch Date', 'City', 'Type', 'No.', 'Description', 'Quantity', 'Consignee', 'Unit of Measure Code', 'Fuel Surcharge Amount', 'Line Amount Excl. VAT', 'Deferral Code', 'Consignment2', 'Post Code'];
+        $this->fields = ['Invoice Number', 'Invoice Date', 'Consignment Number', 'Return', 'Dispatch Date', 'City', 'Type', 'No.', 'Description', 'Quantity', 'Consignee', 'Unit of Measure Code', 'Fuel Surcharge Amount', 'Line Amount Excl. VAT', 'Deferral Code', 'Consignment2', 'Post Code'];
     }
 
     /**
@@ -175,14 +175,15 @@ class ImportExpressFreightPurchaseInvoices extends Command
         }
     }
 
+
     /**
      * Save and set the purchase invoice.
      *
      * @param type $line
      */
-    private function createPurchaseInvoice($file)
+    private function createPurchaseInvoice($row)
     {
-        $invoiceNumber = str_replace(['.csv', ''], '', $file);
+        $invoiceNumber = $row['Invoice Number'];
 
         $this->purchaseInvoice = PurchaseInvoice::whereInvoiceNumber($invoiceNumber)->whereCarrierId(14)->first();
 
@@ -202,7 +203,7 @@ class ImportExpressFreightPurchaseInvoices extends Command
             'currency_code' => 'GBP',
             'type' => 'F',
             'carrier_id' => 14,
-            'date' => time(),
+            'date' => strtotime(str_replace('/', '.', $row['Invoice Date'])),
         ]);
 
         $this->invoices[] = $invoiceNumber;
