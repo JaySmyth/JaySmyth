@@ -53,7 +53,7 @@ class SendJobs extends Command
         $this->setRoutes();
 
         // Load the jobs
-        $jobs = \App\TransportJob::whereSent(0)->whereCompleted(0)->limit(2500)->get();
+        $jobs = \App\TransportJob::whereSent(0)->whereCompleted(0)->get();
 
         foreach ($jobs as $job) :
             if ($this->sendToTransend($job)) {
