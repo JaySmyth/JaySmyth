@@ -61,10 +61,10 @@ class PerformRateIncrease extends Command
     {
         parent::__construct();
 
-        if ($this->fromDate == '') {
+        if (empty($this->fromDate)) {
             $this->fromDate = date('Y-m-d', strtotime('first day of january next year'));
         }
-        if ($this->toDate == '') {
+        if (empty($this->toDate)) {
             $this->toDate = date('Y-m-d', strtotime('last day of december next year'));
         }
     }

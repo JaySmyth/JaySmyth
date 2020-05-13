@@ -202,7 +202,7 @@ class RateDetail extends Model
      */
     public function getRateTable($companyId, $rateId, $serviceId, $shipDate = '', $precision = 4)
     {
-        if ($shipDate == '') {
+        if (empty($shipDate)) {
             $shipDate = date('Y-m-d');
         }
 
@@ -258,7 +258,7 @@ class RateDetail extends Model
     {
 
         // If No effective date set then use today
-        if ($effectiveDate == '') {
+        if (empty($effectiveDate)) {
             $effectiveDate = date('Y-m-d');
         }
 
@@ -286,7 +286,7 @@ class RateDetail extends Model
     {
         $rateDiscounts = [];
 
-        if ($effectiveDate == '') {
+        if (empty($effectiveDate)) {
             $effectiveDate = date('Y-m-d');
         }
 
@@ -413,7 +413,7 @@ class RateDetail extends Model
     public function buildDiscounts($currentKeys, $uploadedKeys, $companyId, $serviceId, $effectiveDate = '')
     {
         $discounts = [];
-        if ($effectiveDate == '') {
+        if (empty($effectiveDate)) {
             $effectiveDate = date('Y-m-d');                                     // If not specified then effective today
         }
         foreach ($currentKeys as $key => $current) {

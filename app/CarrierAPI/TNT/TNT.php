@@ -456,7 +456,7 @@ class TNT
         curl_setopt($ch, CURLOPT_URL, $this->express_connect_url);                // set url to post to
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        if ($header != '') {
+        if (!empty($header)) {
             curl_setopt($ch, CURLOPT_HEADER, 1);            // CURL to output header
             curl_setopt($ch, CURLOPT_HTTPHEADER, $header);  // Header for CURL to output
         } else {
@@ -654,7 +654,7 @@ class TNT
         curl_setopt($ch, CURLOPT_URL, $this->express_label_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-        if ((trim($this->username) != '') && (trim($this->password) != '')) {
+        if ((!empty(trim($this->username))) && (!empty(trim($this->password)))) {
             curl_setopt($ch, CURLOPT_USERPWD, $this->username.':'.$this->password);
         }
 

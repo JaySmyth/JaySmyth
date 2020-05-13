@@ -193,18 +193,18 @@ class ImportShipments implements ShouldQueue
             'recipient_name' => 'required_without:recipient_company_name|min:1|max:35',
             'recipient_company_name' => 'required_without:recipient_name|min:1|max:35',
             'recipient_address1' => 'required|min:1|max:35',
-            'recipient_address2' => 'sometimes|min:1|max:35',
-            'recipient_address3' => 'sometimes|min:1|max:35',
+            'recipient_address2' => 'nu|min:1|max:35',
+            'recipient_address3' => 'nu|min:1|max:35',
             'recipient_city' => 'required|min:1|max:30',
-            'recipient_state' => 'sometimes|min:1|max:30',
+            'recipient_state' => 'nu|min:1|max:30',
             'recipient_telephone' => 'required|string|min:8|max:18',
             'recipient_country_code' => 'required|exists:countries,country_code',
             'pieces' => 'required|min:1|max:99',
             'weight' => 'required|min:0.1|max:19999',
             'shipment_reference' => 'required|string',
-            'service_code' => 'sometimes|exists:services,code',
-            'product_quantity' => 'sometimes|min:1|max:999999',
-            'customs_value' => 'sometimes|min:1|max:9999999',
+            'service_code' => 'nu|exists:services,code',
+            'product_quantity' => 'nu|min:1|max:999999',
+            'customs_value' => 'nu|min:1|max:9999999',
         ];
 
         $validator = Validator::make($this->row, $rules);
@@ -811,7 +811,7 @@ class ImportShipments implements ShouldQueue
      */
     protected function getCustomsValue()
     {
-        $customsValue = (empty($this->row['customs_value']) || $this->row['customs_value'] < 1 || $this->row['customs_value'] == '') ? $this->importConfig->default_customs_value : trim($this->row['customs_value']);
+        $customsValue = (empty($this->row['customs_value']) || $this->row['customs_value'] < 1 || empty($this->row['customs_value'])) ? $this->importConfig->default_customs_value : trim($this->row['customs_value']);
 
         if (! is_numeric($customsValue)) {
             return (float) str_replace(' ', '.', $customsValue);

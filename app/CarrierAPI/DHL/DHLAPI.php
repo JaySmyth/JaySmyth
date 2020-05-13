@@ -97,7 +97,7 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
          * Standard validation resumes
          */
         $rules['bill_shipping_account'] = 'required|digits:9';
-        $rules['bill_tax_duty_account'] = 'sometimes|digits:9';
+        $rules['bill_tax_duty_account'] = 'nullable|digits:9';
         $rules['dry_ice'] = 'not_supported';
         $rules['hazardous'] = 'not_supported';
         $rules['insurance_value'] = 'not_supported';

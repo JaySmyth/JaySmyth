@@ -385,7 +385,7 @@ class APIController extends Controller
             $carrierChoice = strtolower(Company::find($this->input['data']['company_id'])->carrier_choice);
 
             // If no carrier defined or company not set to user - set to auto
-            if ($carrierChoice == 'cost' || ! isset($this->input['data']['carrier_code']) || $this->input['data']['carrier_code'] == '') {
+            if ($carrierChoice == 'cost' || ! isset($this->input['data']['carrier_code']) || empty($this->input['data']['carrier_code'])) {
                 $this->input['data']['carrier_choice'] = 'cost';
             }
         } else {
@@ -408,7 +408,7 @@ class APIController extends Controller
         $this->input['data']['mode_id'] = 1;
 
         // Identify Carrier
-        if ($mode == 'create' || $this->input['data']['carrier_code'] == '') {
+        if ($mode == 'create' || empty($this->input['data']['carrier_code'])) {
             $this->chooseCarrier();
         }
 
@@ -421,7 +421,7 @@ class APIController extends Controller
         }
 
         // Set Collection Date if not supplied or set to today
-        if (! isset($this->input['data']['collection_date']) || $this->input['data']['collection_date'] == '' || $this->input['data']['collection_date'] <= date('Y-m-d')) {
+        if (! isset($this->input['data']['collection_date']) || empty($this->input['data']['collection_date']) || $this->input['data']['collection_date'] <= date('Y-m-d')) {
             $timeZone = Company::find($this->input['data']['company_id'])->localisation->time_zone;
             $pickUpTimes = new Postcode();
             $this->input['data']['collection_date'] = $pickUpTimes->getPickUpDate(
@@ -466,17 +466,17 @@ class APIController extends Controller
 
         // Add any Alerts based on user preferences
         $preferences = json_decode(Auth::guard('api')->user()->getPreferences($this->input['data']['company_id'], '1'), true);
-        if (! isset($this->input['data']['alerts']) || $this->input['data']['alerts'] == '') {
+        if (! isset($this->input['data']['alerts']) || empty($this->input['data']['alerts'])) {
 
             // Get sender_email if not specified
-            if (! isset($this->input['data']['sender_email']) || $this->input['data']['sender_email'] == '') {
+            if (! isset($this->input['data']['sender_email']) || empty($this->input['data']['sender_email'])) {
                 if (isset($preferences['sender_email']) && $preferences['sender_email'] > '') {
                     $this->input['data']['sender_email'] = $preferences['sender_email'];
                 }
             }
 
             // Get other_email if not specified
-            if (! isset($this->input['data']['other_email']) || $this->input['data']['other_email'] == '') {
+            if (! isset($this->input['data']['other_email']) || empty($this->input['data']['other_email'])) {
                 if (isset($preferences['other_email']) && $preferences['other_email'] > '') {
                     $this->input['data']['other_email'] = $preferences['other_email'];
                 }
@@ -554,7 +554,7 @@ class APIController extends Controller
         if (isset($this->input['data']['company_id']) && $this->input['data']['company_id'] > 0) {
 
             // If not set identify customers default setting
-            if (! isset($this->input['data']['carrier_choice']) || $this->input['data']['carrier_choice'] == '') {
+            if (! isset($this->input['data']['carrier_choice']) || empty($this->input['data']['carrier_choice'])) {
                 $company = Company::find($this->input['data']['company_id']);
                 if ($company) {
                     $this->input['data']['carrier_choice'] = $company->carrier_choice;
@@ -590,14 +590,14 @@ class APIController extends Controller
             }
 
             // If first service or this is the cheapest provisionally choose this Carrier\ Service
-            if ($defaultService == '' || $thisValue < $cheapestValue) {
+            if (empty($defaultService) || $thisValue < $cheapestValue) {
                 $defaultService = $possibleCarrier['code'];
                 $cheapestValue = $thisValue;
             }
         }
 
         // If User has not specified a service then use the default service just calculated
-        if (! isset($this->input['data']['service_code']) || $this->input['data']['service_code'] == '') {
+        if (! isset($this->input['data']['service_code']) || empty($this->input['data']['service_code'])) {
             if ($carrierChoice != 'user') {
                 $this->input['data']['service_code'] = $defaultService;
             }

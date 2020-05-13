@@ -110,7 +110,7 @@ class ImportFuelSurcharges implements ShouldQueue
         $this->buildRow($data);
 
         // Ignore blank lines (or lines with no fuel %)
-        if ($this->row['fuel_percent'] == '') {
+        if (empty($this->row['fuel_percent'])) {
             return;
         }
 

@@ -578,11 +578,11 @@ class PricingModel
     public function isBRO()
     {
         $broker = false;
-        if (isset($this->shipment['broker_name']) && $this->shipment['broker_name'] != '') {
+        if (isset($this->shipment['broker_name']) && !empty($this->shipment['broker_name'])) {
             $broker = true;
         }
 
-        if (isset($this->shipment['broker_company_name']) && $this->shipment['broker_company_name'] != '') {
+        if (isset($this->shipment['broker_company_name']) && !empty($this->shipment['broker_company_name'])) {
             $broker = true;
         }
 
@@ -803,7 +803,7 @@ class PricingModel
 
         // Get Package Type
         $this->getPackagingType();
-        $packagingType = ($this->packagingType == '') ? 'Unknown' : $this->packagingType.'(s)';
+        $packagingType = (empty($this->packagingType)) ? 'Unknown' : $this->packagingType.'(s)';
         $this->log("Using Packaging type of $packagingType");
 
         // Get Rate Details for this Packaging Type/zone/pieces/weight

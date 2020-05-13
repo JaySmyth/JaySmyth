@@ -675,6 +675,8 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
         $('#commodity_currency_code').val($('#currency_code').val());
         $('#commodity_weight_uom').val($('#weight_uom').val());
         $('#commodity_country_of_manufacture').val($('#sender_country_code').val());
+        $('#commodity_unit_value').val('0.00');
+        $('#commodity_unit_weight').val('0.00');
         $('#commodity_uom').val('EA');
 
     });
@@ -1390,6 +1392,9 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
             cache: false,
             success: function (response) {
 
+                if (!response.product_code) {
+                    response.product_code = '';
+                }
                 if (!unitWeight) {
                     unitWeight = response.unit_weight;
                 }

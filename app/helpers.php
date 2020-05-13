@@ -69,7 +69,7 @@ function array_undot($array)
 
 function trimData($data)
 {
-    if ($data == '') {
+    if (empty($data)) {
         return '';
     }
 
@@ -1905,7 +1905,7 @@ function buildTestUser($userId = '', $roleName = '', $companyId = '')
     $user = null;
 
     // If no user defined - fake one
-    if ($userId == '') {
+    if (empty($userId)) {
         $user = factory(\App\Models\User::class)->create();
     } else {
         $user = \App\Models\User::findOrFail($userId);

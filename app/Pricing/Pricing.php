@@ -115,7 +115,7 @@ class Pricing
      */
     public function preProcess()
     {
-        if ($this->serviceId != '') {
+        if (!empty($this->serviceId)) {
 
             // Use specified Service/ Carrier
             $this->service = Service::find($this->serviceId);
@@ -130,7 +130,7 @@ class Pricing
         $this->shipment['carrier_code'] = $this->carrier->code;
 
         // If no Shipment date set use today
-        if (! isset($this->shipment['ship_date']) || $this->shipment['ship_date'] == '') {
+        if (! isset($this->shipment['ship_date']) || empty($this->shipment['ship_date'])) {
             $this->shipment['ship_date'] = date('Y-m-d');
         }
 
@@ -172,7 +172,7 @@ class Pricing
         $total = 0;
         if (is_array($charges)) {
             foreach ($charges as $charge) {
-                if ($chargeCode == '') {
+                if (empty($chargeCode)) {
                     $total += $charge['value'];
                 } else {
                     if ($chargeCode == $charge['code']) {

@@ -411,24 +411,24 @@ class APIShipment
         $rules['company_id'] = 'required|exists:companies,id';
         $rules['department_id'] = 'required|exists:departments,id';
         $rules['mode_id'] = 'required|exists:modes,id';
-        $rules['transaction_id'] = 'sometimes|string';
+        $rules['transaction_id'] = 'nullable|string';
         $rules['collection_date'] = 'required|date|after:yesterday';
         $rules['carrier_code'] = 'required|exists:carriers,code';
-        $rules['carrier_pickup_required'] = 'sometimes|in:0,1';
+        $rules['carrier_pickup_required'] = 'nullable|in:0,1';
         $rules['service_code'] = 'required|exists:services,code';
         $rules['pieces'] = 'required|integer|min:1|max:99';
         $rules['weight'] = 'required|numeric|min:0.1|max:19999';
-        // $rules['volumetric_weight'] = 'sometimes|numeric|min:0.1|max:19999';
+        // $rules['volumetric_weight'] = 'nullable|numeric|min:0.1|max:19999';
         $rules['weight_uom'] = 'required|in:kg,lb';
         $rules['dims_uom'] = 'required|in:cm,in';
         $rules['country_of_destination'] = 'required|exists:countries,country_code';
         $rules['shipment_reference'] = 'required|string';
         $rules['ship_reason'] = 'required|exists:ship_reasons,code';
-        $rules['special_instructions'] = 'sometimes|string';
-        $rules['bill_shipping'] = 'sometimes|in:sender,recipient,other';
-        $rules['bill_tax_duty'] = 'sometimes|in:sender,recipient,other';
-        $rules['bill_shipping_account'] = 'sometimes|string';
-        $rules['bill_tax_duty_account'] = 'sometimes|string';
+        $rules['special_instructions'] = 'nullable|string';
+        $rules['bill_shipping'] = 'nullable|in:sender,recipient,other';
+        $rules['bill_tax_duty'] = 'nullable|in:sender,recipient,other';
+        $rules['bill_shipping_account'] = 'nullable|string';
+        $rules['bill_tax_duty_account'] = 'nullable|string';
 
         $rules = $this->addContactRules('sender', $rules);
         $rules = $this->addAddressRules('sender', $rules);
@@ -445,12 +445,12 @@ class APIShipment
             $rules = $this->addContactRules('broker', $rules);
             $rules = $this->addAddressRules('broker', $rules);
         }
-        $rules['fragile_goods_flag'] = 'sometimes|in:1,0';
-        $rules['liquid_flag'] = 'sometimes|in:1,0';
+        $rules['fragile_goods_flag'] = 'nullable|in:1,0';
+        $rules['liquid_flag'] = 'nullable|in:1,0';
 
         // Check that Terms of Sale are valid incoterms
         if ($shipment['sender_country_code'] == $shipment['recipient_country_code']) {
-            $rules['terms_of_sale'] = 'sometimes|exists:terms,code';
+            $rules['terms_of_sale'] = 'nullable|exists:terms,code';
         } else {
             $rules['terms_of_sale'] = 'required|exists:terms,code';
         }
@@ -464,9 +464,9 @@ class APIShipment
         }
 
         $rules['customs_value'] = 'required|numeric';
-        $rules['customs_value_currency_code'] = 'sometimes|exists:currencies,code';
-        $rules['insurance_value'] = 'sometimes|integer';
-        $rules['lithium_batteries'] = 'sometimes|integer';
+        $rules['customs_value_currency_code'] = 'nullable|exists:currencies,code';
+        $rules['insurance_value'] = 'nullable|integer';
+        $rules['lithium_batteries'] = 'nullable|integer';
 
         $rules = $this->addPackagingRules($shipment['company_id'], $shipment['mode_id'], $rules);
 
@@ -475,48 +475,48 @@ class APIShipment
         $rules['packages.*.width'] = 'required|integer|min:.5|max:999';
         $rules['packages.*.height'] = 'required|integer|min:.5|max:999';
 
-        $rules['special_services'] = 'sometimes|exists:special_services,code,company_id';
+        $rules['special_services'] = 'nullable|exists:special_services,code,company_id';
 
         if (isset($shipment['alerts']) && $shipment['alerts'] > 0) {
-            $rules['alerts.*.despatched'] = 'sometimes|in:0,1';
-            $rules['alerts.*.collected'] = 'sometimes|in:0,1';
-            $rules['alerts.*.out_for_delivery'] = 'sometimes|in:0,1';
-            $rules['alerts.*.delivered'] = 'sometimes|in:0,1';
-            $rules['alerts.*.cancelled'] = 'sometimes|in:0,1';
-            $rules['alerts.*.problems'] = 'sometimes|in:0,1';
+            $rules['alerts.*.despatched'] = 'nullable|in:0,1';
+            $rules['alerts.*.collected'] = 'nullable|in:0,1';
+            $rules['alerts.*.out_for_delivery'] = 'nullable|in:0,1';
+            $rules['alerts.*.delivered'] = 'nullable|in:0,1';
+            $rules['alerts.*.cancelled'] = 'nullable|in:0,1';
+            $rules['alerts.*.problems'] = 'nullable|in:0,1';
             $rules['other_email'] = 'email';
         }
 
-        $rules['documents_description'] = 'sometimes:|string';
-        $rules['goods_description'] = 'sometimes:|string';
+        $rules['documents_description'] = 'nullable:|string';
+        $rules['goods_description'] = 'nullable:|string';
 
         // Set Dry Ice rules
         switch ($shipment['weight_uom']) {
             case 'KG':
-                $rules['dry_ice_weight'] = 'sometimes|numeric|min:1|max:200';
+                $rules['dry_ice_weight'] = 'nullable|numeric|min:1|max:200';
                 break;
 
             case 'LB':
-                $rules['dry_ice_weight'] = 'sometimes|numeric|min:1|max:440';
+                $rules['dry_ice_weight'] = 'nullable|numeric|min:1|max:440';
                 break;
 
             default:
-                $rules['dry_ice_weight'] = 'sometimes|numeric|min:1|max:200';
+                $rules['dry_ice_weight'] = 'nullable|numeric|min:1|max:200';
                 break;
         }
 
         // Set Hazardous rules
-        $rules['hazard.commodity_count'] = 'sometimes|integer';
-        $rules['hazardous'] = 'sometimes|exists:hazards,code';
+        $rules['hazard.commodity_count'] = 'nullable|integer';
+        $rules['hazardous'] = 'nullable|exists:hazards,code';
 
         if (isset($shipment['alcohol'])) {
-            $rules['alcohol.type'] = 'sometimes|in:A,B,L,S,W';
+            $rules['alcohol.type'] = 'nullable|in:A,B,L,S,W';
             $rules['alcohol.packaging'] = 'required_with:alcohol.type|string';
             $rules['alcohol.volume'] = 'required_with:alcohol.type|numeric';
             $rules['alcohol.quantity'] = 'required_with:alcohol.type|numeric';
         }
 
-        $rules['commercial_invoice_comments'] = 'sometimes|string';
+        $rules['commercial_invoice_comments'] = 'nullable|string';
         if (isset($shipment['commodity_count']) && $shipment['commodity_count'] > 0) {
             $rules['contents.*.description'] = 'required|string';
             $rules['contents.*.quantity'] = 'required|integer|greater_than_value:0';
@@ -531,8 +531,8 @@ class APIShipment
             }
         }
 
-        $rules['label_specification.label_size'] = 'sometimes|in:6X4,A4';
-        $rules['label_specification.label_type'] = 'sometimes|in:PDF';
+        $rules['label_specification.label_size'] = 'nullable|in:6X4,A4';
+        $rules['label_specification.label_type'] = 'nullable|in:PDF';
 
         return $rules;
     }
@@ -551,7 +551,7 @@ class APIShipment
         $rules[$contactType.'_name'] = 'required_without:'.$contactType.'_company_name'.'|string|max:35';
         $rules[$contactType.'_company_name'] = 'required_without:'.$contactType.'_name'.'|string|max:35';
         $rules[$contactType.'_telephone'] = $required.'string|min:8';
-        $rules[$contactType.'_email'] = 'sometimes|email';
+        $rules[$contactType.'_email'] = 'nullable|email';
         // $rules[$contact_type . "_account"] = "string|max:12";
         // $rules[$contact_type . "_account_id"] = "string";
 
@@ -594,11 +594,11 @@ class APIShipment
         $required = $this->detailsRequired($addressType);
 
         $rules[$addressType.'_address1'] = $required.'string|max:35';
-        $rules[$addressType.'_address2'] = 'sometimes|string|max:35';
-        $rules[$addressType.'_address3'] = 'sometimes|string|max:35';
+        $rules[$addressType.'_address2'] = 'nullable|string|max:35';
+        $rules[$addressType.'_address3'] = 'nullable|string|max:35';
         $rules[$addressType.'_city'] = $required.'string|max:35';
-        $rules[$addressType.'_state'] = 'sometimes|string|max:35';
-        $rules[$addressType.'_postcode'] = 'sometimes|string|max:10';
+        $rules[$addressType.'_state'] = 'nullable|string|max:35';
+        $rules[$addressType.'_postcode'] = 'nullable|string|max:10';
         $rules[$addressType.'_country_code'] = $required.'exists:countries,country_code';
         $rules[$addressType.'_type'] = $required.'in:r,c';
 
@@ -618,7 +618,7 @@ class APIShipment
         // Check for Company specific packaging (returns a string)
         $packagingTypes = $this->getPackagingTypes($companyId, $modeId);
 
-        if ($packagingTypes == '') {
+        if (empty($packagingTypes)) {
 
             // No Customer Specific rates defined use defaults
             $packagingTypes = $this->getPackagingTypes(0, $modeId);

@@ -33,12 +33,12 @@ class ServiceRules
         }
 
         // Check Sender country code present
-        if (! isset($shipment['sender_country_code']) || $shipment['sender_country_code'] == '') {
+        if (! isset($shipment['sender_country_code']) || empty($shipment['sender_country_code'])) {
             return false;
         }
 
         // Check Recipient country code present
-        if (! isset($shipment['recipient_country_code']) || $shipment['recipient_country_code'] == '') {
+        if (! isset($shipment['recipient_country_code']) || empty($shipment['recipient_country_code'])) {
             return false;
         }
 
@@ -772,7 +772,7 @@ class ServiceRules
 
     private function hazardous($shipment, $serviceDetails)
     {
-        if (! isset($shipment['hazardous']) || $shipment['hazardous'] == '' || strcasecmp($shipment['hazardous'], 'n') == 0) {
+        if (! isset($shipment['hazardous']) || empty($shipment['hazardous']) || strcasecmp($shipment['hazardous'], 'n') == 0) {
 
             // Non Hazardous goods so does not matter
             return true;
@@ -798,7 +798,7 @@ class ServiceRules
 
     private function alcohol($shipment, $serviceDetails)
     {
-        if (! isset($shipment['alcohol_type']) || $shipment['alcohol_type'] == '' || strcasecmp($shipment['alcohol_type'], 'n') == 0) {
+        if (! isset($shipment['alcohol_type']) || empty($shipment['alcohol_type']) || strcasecmp($shipment['alcohol_type'], 'n') == 0) {
 
             // No alcohol
             return true;
@@ -811,7 +811,7 @@ class ServiceRules
 
     private function broker($shipment, $serviceDetails)
     {
-        if (! isset($shipment['broker_name']) || $shipment['broker_name'] == '' && $shipment['broker_company_name'] == '') {
+        if (! isset($shipment['broker_name']) || empty($shipment['broker_name']) && empty($shipment['broker_company_name'])) {
 
             // Not a Broker select shipment
             return true;
@@ -889,7 +889,7 @@ class ServiceRules
                     }
                 }
             } else {
-                if ($shipment['options'] == '') {
+                if (empty($shipment['options'])) {
                     $supported = true;
                 }
             }

@@ -35,7 +35,7 @@ class DhlEas extends Model
 
     public function checkForMatch($countryCode, $city = '', $postcode = '')
     {
-        if ($postcode == '') {
+        if (empty($postcode)) {
             $eas = $this->where('recipient_country_code', $countryCode)
                     ->where('recipient_town', $city)
                     ->where('recipient_postcode', $postcode)

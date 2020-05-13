@@ -58,8 +58,10 @@ class Rate extends Model
                     $rate = $this;
                     $charges = $this->getSurcharges($company->id);
 
-                    return view('rates.show_'.$tableFormat,
-                        compact('tableFormat', 'rate', 'table', 'zones', 'charges'));
+                    return view(
+                        'rates.show_'.$tableFormat,
+                        compact('tableFormat', 'rate', 'table', 'zones', 'charges')
+                    );
                     break;
             }
         }
@@ -158,8 +160,10 @@ class Rate extends Model
 
             if (! empty($data)) {
                 if ($download) {
-                    return Excel::download(new RatesExport($data),
-                        $company->company_name.'-'.strtoupper($service->code).'.csv');
+                    return Excel::download(
+                        new RatesExport($data),
+                        $company->company_name.'-'.strtoupper($service->code).'.csv'
+                    );
                 } else {
                     return $data;
                 }
@@ -177,7 +181,7 @@ class Rate extends Model
     {
 
         // If No effective date set then use today
-        if ($effectiveDate == '') {
+        if (empty($effectiveDate)) {
             $effectiveDate = date('Y-m-d');
         }
 

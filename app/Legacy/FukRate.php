@@ -41,7 +41,7 @@ class FukRate extends Model
 
     public function readLegacyRate($company, $service)
     {
-        if ($company->UKRate == '') {
+        if (empty($company->UKRate)) {
             $rateTable = 'undefined';
         } else {
             $rateTable = $company->UKRate;

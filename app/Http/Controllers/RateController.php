@@ -34,7 +34,7 @@ class RateController extends Controller
     public function showRate(Rate $rate, $rateDate = '')
     {
         $charges = [];
-        if ($rateDate == '') {
+        if (empty($rateDate)) {
             $rateDate = date('Y-m-d');
         }
         if ($rate) {
@@ -508,7 +508,7 @@ class RateController extends Controller
     public function getDefaultDate($dateType, $myDate)
     {
         // If rateDate suppplied then use it
-        if ($myDate != '') {
+        if (!empty($myDate)) {
             return $myDate;
         }
 

@@ -115,7 +115,7 @@ class FxRateH extends Model
          */
         $rate_id = '';
         $rate_id = $this->getRateTable($company, $app, $service, 'Cost', $ship_date);
-        if ($rate_id == '') {
+        if (empty($rate_id)) {
 
             // If no Customer specific costs then use "IFS" generic cost table
             $rate_id = $this->getRateTable('4', $app, $service, $table, $ship_date);
@@ -156,7 +156,7 @@ class FxRateH extends Model
                 display($rateHeader, 'Rate Header');
             }
 
-            if (isset($rateHeader->id) && $rateHeader->id != '') {
+            if (isset($rateHeader->id) && !empty($rateHeader->id)) {
                 $rateId = $rateHeader->id;
             }
         }

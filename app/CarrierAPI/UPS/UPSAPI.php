@@ -265,9 +265,9 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
         $errors = [];
 
         // $rules['bill_shipping'] = 'required|in:sender';
-        // $rules['bill_tax_duty'] = 'sometimes|in:sender';
+        // $rules['bill_tax_duty'] = 'nullable|in:sender';
         $rules['bill_shipping_account'] = 'required|alpha_num:6';
-        $rules['bill_tax_duty_account'] = 'sometimes|alpha_num:6';
+        $rules['bill_tax_duty_account'] = 'nullable|alpha_num:6';
         $rules['alcohol'] = 'not_supported';
         $rules['dry_ice'] = 'not_supported';
         $rules['hazardous'] = 'not_supported';

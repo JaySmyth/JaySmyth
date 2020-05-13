@@ -151,7 +151,7 @@ class SurchargeDetailsController extends Controller
         $this->authorize('viewAny', new Surcharge);
 
         // If no Company specified assume all - 0
-        $companyId = ($request->company_id == '') ? 0 : $request->company_id;
+        $companyId = (empty($request->company_id)) ? 0 : $request->company_id;
 
         // Get charge name from default charge (company 0)
         $surcharge = SurchargeDetail::where('code', $request->code)
