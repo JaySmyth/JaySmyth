@@ -2,6 +2,7 @@
 
  namespace App\Models;
 
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Model;
 
 class FedexRoute extends Model
@@ -110,12 +111,12 @@ class FedexRoute extends Model
     protected function zipMatch($zip, $route)
     {
         // Zips not defined
-        if ($route->zip == '' && $route->zip_from == '' && $route->zip_to == '') {
+        if (empty($route->zip) && empty($route->zip_from) && empty($route->zip_to)) {
             return true;
         }
 
         // Zips match
-        if ($zip != '' && $zip == $route->zip) {
+        if (!empty($zip) && $zip == $route->zip) {
             return true;
         }
 

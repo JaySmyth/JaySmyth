@@ -3,6 +3,7 @@
  namespace App\Models;
 
 use App\Models\Rate;
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -28,7 +29,7 @@ class CompanyRates extends Model
      */
     public function getRateTable($companyId, $rate, $service = '', $shipDate = '')
     {
-        if ($service == '') {
+        if (empty($service)) {
             $serviceId = '';
             $serviceCode = '';
         } else {
@@ -36,7 +37,7 @@ class CompanyRates extends Model
             $serviceCode = $service->code;
         }
 
-        if ($shipDate == '') {
+        if (empty($shipDate)) {
             $shipDate = date('Y-m-d');
         }
 
@@ -188,7 +189,7 @@ class CompanyRates extends Model
         $serviceCode = $this->getServiceCode($serviceId);
 
         // If date not defined, use today
-        if ($effectiveDate == '') {
+        if (empty($effectiveDate)) {
             $effectiveDate = date('Y-m-d');
         }
 

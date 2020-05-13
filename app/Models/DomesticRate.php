@@ -4,6 +4,7 @@
 
 use App\Models\DomesticRateDiscount;
 use App\Models\Rate;
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -143,7 +144,7 @@ class DomesticRate extends Model
      */
     public function getRateTable($companyId, $rateId, $serviceCode, $shipDate = '')
     {
-        if ($shipDate == '') {
+        if (empty($shipDate)) {
             $shipDate = date('Y-m-d');
         }
 
@@ -169,7 +170,7 @@ class DomesticRate extends Model
     {
         $rateDiscounts = [];
 
-        if ($effectiveDate == '') {
+        if (empty($effectiveDate)) {
             $effectiveDate = date('Y-m-d');
         }
 
@@ -213,7 +214,7 @@ class DomesticRate extends Model
     {
 
         // If No effective date set then use today
-        if ($effectiveDate == '') {
+        if (empty($effectiveDate)) {
             $effectiveDate = date('Y-m-d');
         }
 
@@ -310,7 +311,7 @@ class DomesticRate extends Model
     public function buildDiscounts($currentKeys, $uploadedKeys, $companyId, $effectiveDate = '')
     {
         $discounts = [];
-        if ($effectiveDate == '') {
+        if (empty($effectiveDate)) {
             $effectiveDate = date('Y-m-d');                                     // If not specified then effective today
         }
         foreach ($currentKeys as $key => $current) {
