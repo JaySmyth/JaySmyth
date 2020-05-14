@@ -183,7 +183,12 @@ class ImportExpressFreightPurchaseInvoices extends Command
      */
     private function createPurchaseInvoice($row)
     {
-        $invoiceNumber = $row['Invoice Number'];
+        $invoiceNumber = (!empty($row['Invoice Number'])) ? $row['Invoice Number'] : false;
+
+        if (!$invoiceNumber) {
+            $this->error("Invoice number not found - check file format.");
+            return false;
+        }
 
         $this->purchaseInvoice = PurchaseInvoice::whereInvoiceNumber($invoiceNumber)->whereCarrierId(14)->first();
 
