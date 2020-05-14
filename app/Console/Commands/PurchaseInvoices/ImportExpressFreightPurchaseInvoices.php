@@ -102,15 +102,18 @@ class ImportExpressFreightPurchaseInvoices extends Command
     {
         $this->info("Processing file $file");
 
-        $this->createPurchaseInvoice($file);
-
         $rowNumber = 1;
         $totalTaxable = 0;
 
         if (($handle = fopen($this->sftpDirectory.$file, 'r')) !== false) {
             while (($data = fgetcsv($handle, 2000, ',')) !== false) {
+
                 if ($rowNumber >= 2) {
                     $row = $this->assignFieldNames($data);
+
+                    if ($rowNumber == 2) {
+                        $this->createPurchaseInvoice($row);
+                    }
 
                     // Lookup shipment
                     $shipment = \App\Shipment::whereConsignmentNumber($row['Consignment Number'])->whereIn('carrier_id', [14, 15])->first();
