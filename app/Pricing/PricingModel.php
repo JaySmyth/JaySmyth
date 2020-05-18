@@ -563,7 +563,11 @@ class PricingModel
     {
         $shipmentDate = date('Y-m-d');
         if ($shipmentDate >= '2020-05-24') {
-            $value = $this->chargeableWeight * .18;
+            if ($this->priceType == 'costs') {
+                $value = $this->chargeableWeight * .18; // Costs
+            } else {
+                $value = $this->chargeableWeight * .22; // Sales
+            }
         } else {
             $value = 180.00;
             if ($this->chargeableWeight <= 2.50) {
@@ -582,9 +586,10 @@ class PricingModel
 
     public function fedexESS()
     {
-        $value = $this->chargeableWeight * 0.18;
-        if ($value < .8) {
-            $value = .8;
+        if ($this->priceType == 'costs') {
+            $value = ($this->chargeableWeight * 0.18 < .8) ? .8 : round($this->chargeableWeight * 0.18,2);
+        } else {
+            $value = ($this->chargeableWeight * 0.22 < 1) ? 1 : round($this->chargeableWeight * 0.22,2);
         }
         $this->addSurcharge(['code' => 'ADH', 'description' => "Emergency Situation Surcharge", 'value' => $value]);
     }
