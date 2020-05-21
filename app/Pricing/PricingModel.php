@@ -555,6 +555,12 @@ class PricingModel
                 $this->fedexESS();
             }
         }
+        // UPS
+        if (in_array($this->shipment['service_id'], [17,11,16,48,49,50,30,14,15])) {
+            if ($shipmentDate >= '2020-04-12') {
+                $this->upsESS();
+            }
+        }
 
         return false;
     }
@@ -562,21 +568,22 @@ class PricingModel
     public function dhlESS()
     {
         $shipmentDate = date('Y-m-d');
+        $chargeableWeight = round($this->chargeableWeight * 2)/2;
         if ($shipmentDate >= '2020-05-24') {
-            if ($this->priceType == 'costs') {
-                $value = $this->chargeableWeight * .18; // Costs
+            if ($this->priceType == 'Costs') {
+                $value = $chargeableWeight * .18; // Costs
             } else {
-                $value = $this->chargeableWeight * .22; // Sales
+                $value = $chargeableWeight * .22; // Sales
             }
         } else {
             $value = 180.00;
-            if ($this->chargeableWeight <= 2.50) {
+            if ($chargeableWeight <= 2.50) {
                 return false;
-            } elseif ($this->chargeableWeight <= 30) {
+            } elseif ($chargeableWeight <= 30) {
                 $value = 2.25;
-            } elseif ($this->chargeableWeight <= 70) {
+            } elseif ($chargeableWeight <= 70) {
                 $value = 13.50;
-            } elseif ($this->chargeableWeight <= 300) {
+            } elseif ($chargeableWeight <= 300) {
                 $value = 45.00;
             }
         }
@@ -586,10 +593,22 @@ class PricingModel
 
     public function fedexESS()
     {
-        if ($this->priceType == 'costs') {
-            $value = ($this->chargeableWeight * 0.18 < .8) ? .8 : round($this->chargeableWeight * 0.18,2);
+        $chargeableWeight = round($this->chargeableWeight * 2)/2;
+        if ($this->priceType == 'Costs') {
+            $value = ($chargeableWeight * 0.18 < .8) ? .8 : round($chargeableWeight * 0.18, 2);
         } else {
-            $value = ($this->chargeableWeight * 0.22 < 1) ? 1 : round($this->chargeableWeight * 0.22,2);
+            $value = ($chargeableWeight * 0.22 < 1) ? 1 : round($chargeableWeight * 0.22, 2);
+        }
+        $this->addSurcharge(['code' => 'ADH', 'description' => "Emergency Situation Surcharge", 'value' => $value]);
+    }
+
+    public function upsESS()
+    {
+        $chargeableWeight = round($this->chargeableWeight * 2)/2;
+        if ($this->priceType == 'Costs') {
+            $value = ($this->shipment['service_id']==17) ? $chargeableWeight * 0.61 : $chargeableWeight * 0.20;
+        } else {
+            $value = ($this->shipment['service_id']==17) ? $chargeableWeight * 0.75 : $chargeableWeight * 0.24;
         }
         $this->addSurcharge(['code' => 'ADH', 'description' => "Emergency Situation Surcharge", 'value' => $value]);
     }
@@ -853,7 +872,7 @@ class PricingModel
          */
 
         // If we do not require costs
-        if ($this->priceType == 'costs' && $this->costsRequired == 'N') {
+        if ($this->priceType == 'Costs' && $this->costsRequired == 'N') {
             $this->log('Costs not required');
 
             return;
