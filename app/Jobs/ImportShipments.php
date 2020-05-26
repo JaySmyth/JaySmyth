@@ -205,6 +205,7 @@ class ImportShipments implements ShouldQueue
             'service_code' => 'sometimes|exists:services,code',
             'product_quantity' => 'sometimes|min:1|max:999999',
             'customs_value' => 'sometimes|min:1|max:9999999',
+            'collection_date' => 'sometimes|date_format:d-m-Y'
         ];
 
         $validator = Validator::make($this->row, $rules);
