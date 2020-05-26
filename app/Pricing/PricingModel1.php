@@ -52,6 +52,7 @@ class PricingModel1 extends PricingModel
             case 'uk24':
             case 'uk24r':
             case 'uk48':
+            case 'uk48s':
             case 'uk48r':
             case 'uk48p':
                 $this->zone = $domesticZones->getZone($this->shipment);

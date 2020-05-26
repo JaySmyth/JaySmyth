@@ -505,7 +505,7 @@ class TransportJob extends Model
                 }
 
                 // Override Fedex UK delivery route (bulk collection customers)
-                if (strtoupper($this->shipment->service->code) == 'UK48' && $this->shipment->company->bulk_collections) {
+                if (in_array(strtoupper($this->shipment->service->code), ['UK48', 'UK48S']) && $this->shipment->company->bulk_collections) {
                     return 'UK2';
                 }
 
