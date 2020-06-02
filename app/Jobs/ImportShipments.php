@@ -35,6 +35,8 @@ class ImportShipments implements ShouldQueue
     protected $source;
     protected $errors;
     protected $userPreferences;
+    protected $maxRows = 250;
+    protected $failedMaxRows = false;
 
     /**
      * Create a new job instance.
@@ -66,6 +68,8 @@ class ImportShipments implements ShouldQueue
      */
     public function handle()
     {
+        $this->checkNumberOfRows();
+
         $this->setFields();
 
         $this->setResultsArray();
@@ -81,6 +85,19 @@ class ImportShipments implements ShouldQueue
         $this->setSubject();
 
         Mail::to($this->user->email)->cc($this->importConfig->cc_import_results_email ?: [])->bcc('it@antrim.ifsgroup.com')->send(new \App\Mail\ShipmentUploadResults($this->results));
+    }
+
+
+    /**
+     * Check if max no. of rows has been exceeded and set flag.
+     */
+    private function checkNumberOfRows()
+    {
+        $rowCount = count(file($this->path, FILE_SKIP_EMPTY_LINES));
+
+        if ($rowCount > $this->maxRows) {
+            $this->failedMaxRows = true;
+        }
     }
 
     /**
@@ -161,10 +178,15 @@ class ImportShipments implements ShouldQueue
         // Pass the data back to the results summary
         $this->results['rows'][$rowNumber]['data'] = $this->row;
 
+        // Too many lines in the CSV file
+        if ($this->failedMaxRows) {
+            $this->setRowFailed($rowNumber, [0 => 'Too many lines in CSV file. Max permitted: ' . $this->maxRows . ' lines']);
+            return false;
+        }
+
         // Invalid number of fields, return false
         if (count($data) != count($this->fields)) {
             $this->setRowFailed($rowNumber, [0 => 'Invalid number of fields detected. Detected '.count($data).' fields. '.count($this->fields).' required']);
-
             return false;
         }
 
@@ -205,6 +227,7 @@ class ImportShipments implements ShouldQueue
             'service_code' => 'nullable|exists:services,code',
             'product_quantity' => 'nullable|min:1|max:999999',
             'customs_value' => 'nullable|min:1|max:9999999',
+            'collection_date' => 'nullable|date_format:d-m-Y'
         ];
 
         $validator = Validator::make($this->row, $rules);

@@ -78,6 +78,7 @@
         <a class="dropdown-item" href="{{url('/ifs-nd-postcodes')}}">Non Del Postcodes</a>
         @can('update_dims')<a class="dropdown-item" href="{{url('/shipments/update-dims')}}">Update Dims</a>@endcan
         @can('create_transport_job')<a class="dropdown-item" href="{{url('/transport-jobs/create')}}">Collection Request</a>@endcan
+        @can('create_transport_job')<a class="dropdown-item" href="{{url('/transport-jobs/create?type=delivery')}}">Delivery Request</a>@endcan
     </div>
 </li>
 

@@ -149,8 +149,10 @@ class ProcessFiles extends Command
                             unlink($this->directory.$file);
                         }
 
-                        Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('File already exists in archive directory',
-                            "$file already processed"));
+                        Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError(
+                            'File already exists in archive directory',
+                            "$file already processed"
+                        ));
                     } else {
                         $this->processFile($file);
                     }
@@ -279,8 +281,11 @@ class ProcessFiles extends Command
                     $this->shipment = ($this->transportJob->shipment) ? $this->transportJob->shipment : false;
 
                     // Log the transaction
-                    $this->transportJob->log('Transend transaction received',
-                        ($this->transendCode) ? $this->transendCode->description : null, $row);
+                    $this->transportJob->log(
+                        'Transend transaction received',
+                        ($this->transendCode) ? $this->transendCode->description : null,
+                        $row
+                    );
                 }
 
                 $datetime = $this->parseDateTime($row['CompletedTime']);
@@ -370,12 +375,18 @@ class ProcessFiles extends Command
                         $package->setLoaded($datetime);
 
                         // Insert a tracking event to show package loaded
-                        $this->shipment->addTracking($this->shipment->status->code, $datetime, 0,
-                            'Package '.$package->index.' loaded onto vehicle');
+                        $this->shipment->addTracking(
+                            $this->shipment->status->code,
+                            $datetime,
+                            0,
+                            'Package '.$package->index.' loaded onto vehicle'
+                        );
 
                         // NI delivery loaded - set the shipment status to "out for delivery"
-                        if (in_array(strtoupper($this->shipment->service->carrier_code),
-                                ['NI24', 'NI48']) && $this->shipment->isActive()) {
+                        if (in_array(
+                            strtoupper($this->shipment->service->carrier_code),
+                            ['NI24', 'NI48']
+                        ) && $this->shipment->isActive()) {
                             $this->shipment->setStatus('out_for_delivery', 0, $datetime->addMinutes(5));
                         }
 
@@ -397,13 +408,12 @@ class ProcessFiles extends Command
                         if ($row['ExceptionReasonCode'] != 'UNLODSHORT') {
                             // Mark the package as received
                             $package->setReceived($datetime);
+
+                            $this->info($this->shipment->consignment_number.': '.'Package '.$package->index.' received');
+
+                            $package->shipment->log('Package '.$package->index.' marked as received by TranSend UNLOADJOB: '.$datetime->toDateTimeString());
                         }
                     }
-
-                    $this->info($this->shipment->consignment_number.': '.'Package '.$package->index.' received');
-
-                    $package->shipment->log('Package '.$package->index.' marked as received by TranSend UNLOADJOB: '.$datetime->toDateTimeString());
-
                     break;
 
                 default:
@@ -412,8 +422,13 @@ class ProcessFiles extends Command
                         // Mark the package as collected
                         $package->setCollected($datetime);
 
-                        $this->shipment->addTracking($this->shipment->status->code, $datetime, 0,
-                            'Package '.$package->index.' collected', 'shipper');
+                        $this->shipment->addTracking(
+                            $this->shipment->status->code,
+                            $datetime,
+                            0,
+                            'Package '.$package->index.' collected',
+                            'shipper'
+                        );
 
                         $this->info($this->shipment->consignment_number.': '.'Package '.$package->index.' collected');
 
@@ -427,8 +442,12 @@ class ProcessFiles extends Command
         if ($this->transportJob) {
             // We have a signature, job not completed, not a loadjob, not a shortage, not package collected
             if ($this->canBeClosedOff($row)) {
-                $this->transportJob->close($datetime, $row['TypedName'], 0,
-                    $this->getSignatureImageUrl($row['Signature']));
+                $this->transportJob->close(
+                    $datetime,
+                    $row['TypedName'],
+                    0,
+                    $this->getSignatureImageUrl($row['Signature'])
+                );
 
                 $this->info($this->transportJob->number.' CLOSED!');
             }
@@ -544,8 +563,10 @@ class ProcessFiles extends Command
             if ($this->transendCode->notify_department) {
                 // Notify relevant department that an exception has been received
                 $subject = 'Possible issue with '.verboseCollectionDelivery($this->transportJob->type).' '.$this->transportJob->number.' / '.$this->transportJob->scs_job_number.' ('.$this->transportJob->from_company_name.' > '.$this->transportJob->to_company_name.')';
-                Mail::to($this->transportJob->department->email)->send(new \App\Mail\GenericError($subject,
-                    'The IFS driver allocated job '.$this->transportJob->number.' / '.$this->transportJob->scs_job_number.' has reported: '.$this->transendCode->description.'. Please investigate further.'));
+                Mail::to($this->transportJob->department->email)->send(new \App\Mail\GenericError(
+                    $subject,
+                    'The IFS driver allocated job '.$this->transportJob->number.' / '.$this->transportJob->scs_job_number.' has reported: '.$this->transendCode->description.'. Please investigate further.'
+                ));
             }
 
             // Update the transport job to "not sent"
@@ -570,8 +591,13 @@ class ProcessFiles extends Command
                 $scanLocation = ($this->transportJob->type == 'c') ? 'shipper' : 'destination';
 
                 if (! $this->testMode) {
-                    $this->shipment->addTracking($this->shipment->status->code, $datetime, 0,
-                        $this->transendCode->description, $scanLocation);
+                    $this->shipment->addTracking(
+                        $this->shipment->status->code,
+                        $datetime,
+                        0,
+                        $this->transendCode->description,
+                        $scanLocation
+                    );
                 }
 
                 $this->line('Tracking event added to shipment '.$this->shipment->consignment_number.': '.$this->transendCode->description);
@@ -579,8 +605,10 @@ class ProcessFiles extends Command
 
             return;
         } else {
-            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Unknown transend exception code - '.$code,
-                $code.' not defined in transend_codes table'));
+            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError(
+                'Unknown transend exception code - '.$code,
+                $code.' not defined in transend_codes table'
+            ));
         }
 
         $this->error('Unable to find transend code: '.$code);
@@ -612,8 +640,10 @@ class ProcessFiles extends Command
             }
         } else {
             $this->error("Problem archiving $archiveFile  - already exists");
-            Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Error archiving transend export file',
-                "Problem archiving $archiveFile  - already exists"));
+            Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError(
+                'Error archiving transend export file',
+                "Problem archiving $archiveFile  - already exists"
+            ));
         }
     }
 }

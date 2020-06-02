@@ -436,7 +436,7 @@ class CarrierAPI
      */
     private function setBillToAcct($shipment, $account_type)
     {
-        if (isset($shipment[$account_type.'_account'])) {
+        if (isset($shipment[$account_type.'_account']) && $shipment[$account_type.'_account'] > '') {
             $account = $shipment[$account_type.'_account'];
         } else {
             $account = '';
@@ -445,11 +445,25 @@ class CarrierAPI
         // If account not defined or blank and payment is "Bill to Sender" - use service default
         if (! isset($account) || empty($account)) {
             if (! isset($shipment[$account_type]) || $shipment[$account_type] == 'sender') {
-                $service = $this->company
+                // If Service is known use the default values for that service
+                if (isset($shipment['service_id']) && $shipment['service_id'] > "") {
+                    $service = Service::find($shipment['service_id']);
+                } else {
+                    // If Service not know yet use the first service defined for that Carrier - Review as not safe.
+                    Mail::to('it@antrim.ifsgroup.com')->send(
+                        new \App\Mail\GenericError(
+                            'Warning - Please review code/shipment',
+                            'CarrierApi->setBillToAcct mode_id: ' . $shipment['mode_id']
+                            . ' company_id: ' . $shipment['company_id']
+                            . ' carrier_id: ' . $shipment['carrier_id']
+                        )
+                    );
+                    $service = $this->company
                         ->getServicesForMode($shipment['mode_id'])
                         ->where('code', $shipment['service_code'])
                         ->where('carrier_id', (string) $shipment['carrier_id']) // Carrier_id needs to be typecast to string
                         ->first();
+                }
 
                 if (! empty($service)) {
                     if (! empty($service->pivot->account)) {
@@ -825,8 +839,10 @@ class CarrierAPI
             }
 
             // Set Bill to accounts
-            $shipment['bill_shipping_account'] = $this->setBillToAcct($shipment, 'bill_shipping');
-            $shipment['bill_tax_duty_account'] = $this->setBillToAcct($shipment, 'bill_tax_duty');
+            if (isset($shipment['service_id'])) {
+                $shipment['bill_shipping_account'] = $this->setBillToAcct($shipment, 'bill_shipping');
+                $shipment['bill_tax_duty_account'] = $this->setBillToAcct($shipment, 'bill_tax_duty');
+            }
 
             // Sort out Description of contents
             if (isset($shipment['ship_reason']) && $shipment['ship_reason'] == 'documents') {

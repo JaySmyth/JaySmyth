@@ -519,6 +519,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
                 'DVF' => 'DVF - Declared Value Fee',
                 'EAS' => 'EAS - Extended Area Surcharge',
                 'ERF' => 'ERF - Elevated Risk Fee',
+                'ESS' => 'ESS - Emergency Shipment Surcharge',
                 'EVF' => 'EVF - Exporter Validation Fee',
                 'FRT' => 'FRT - Freight',
                 'FSC' => 'FSC - Fuel Surcharge',
@@ -916,8 +917,8 @@ function gmtToCarbonUtc($datetime)
 {
     $datetime = toCarbon($datetime);
 
-    //return $datetime->subHour(1);
-    return $datetime;
+    return $datetime->subHour(1);
+    //return $datetime;
 }
 
 /**

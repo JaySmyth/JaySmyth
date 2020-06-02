@@ -45,15 +45,22 @@ class CheckForMissingPrimaryFreightDetails extends Command
         $shipDate = $date->format('Y-m-d');
 
         $shipments = Shipment::where('company_id', '=', '874')
-                        ->whereRaw('carrier_consignment_number = consignment_number')
-                        ->where('source', 'cartrover')
-                        ->where('status_id', '!=', '7')
-                        ->where('id', '>', '756170')
-                        ->where('ship_date', '<', $shipDate)
-                        ->orderBy('consignment_number')->get();
+            ->whereRaw('carrier_consignment_number = consignment_number')
+            ->where('source', 'cartrover')
+            ->where('status_id', '!=', '7')
+            ->where('id', '>', '756170')
+            ->where('ship_date', '<', $shipDate)
+            ->whereDelivered(0)
+            ->orderBy('consignment_number')->get();
 
         if ($shipments->count() > 0) {
-            Mail::to(['ryepez@primaryfreight.com', 'chenderson@primarylogistics.net'])->cc(['aplatt@antrim.ifsgroup.com', 'babocushenquiry@antrim.ifsgroup.com'])->bcc(['gmcbroom@antrim.ifsgroup.com'])->send(new \App\Mail\MissingPrimaryFreightDetails($shipments));
+            Mail::to([
+                'ryepez@primaryfreight.com',
+                'chenderson@primarylogistics.net'
+            ])->cc([
+                'aplatt@antrim.ifsgroup.com',
+                'babocushenquiry@antrim.ifsgroup.com'
+            ])->bcc(['gmcbroom@antrim.ifsgroup.com'])->send(new \App\Mail\MissingPrimaryFreightDetails($shipments));
         }
     }
 }

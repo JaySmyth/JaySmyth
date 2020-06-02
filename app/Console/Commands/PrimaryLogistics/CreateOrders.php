@@ -96,7 +96,8 @@ class CreateOrders extends Command
         foreach ($shipment->contents as $item) {
             $items[] = [
                 //'item' => $item->product_code,
-                'item' => 'revision00',
+                //'item' => 'revision00',
+                'item' => 'Babocush LA Revision01',
                 'quantity' => $item->quantity,
                 'description' => $item->description,
             ];

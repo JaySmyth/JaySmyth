@@ -46,25 +46,45 @@ class SendJobs extends Command
     public function handle()
     {
         // Today's shippers
-        $this->companyIds = \App\Models\Shipment::orderBy('company_id')->whereNotIn('status_id', [7])->shipDateBetween(Carbon::today(), Carbon::today())->pluck('company_id')->toArray();
+        $this->companyIds = \App\Models\Shipment::orderBy('company_id')->whereNotIn(
+            'status_id',
+            [7]
+        )->shipDateBetween(Carbon::today(), Carbon::today())->pluck('company_id')->toArray();
 
         // Set routes on the transport jobs before trying to send them
         $this->setRoutes();
 
         // Load the jobs
-        $jobs = \App\Models\TransportJob::whereSent(0)->whereCompleted(0)->limit(500)->get();
+        $jobs = \App\Models\TransportJob::whereSent(0)->whereCompleted(0)->get();
 
         foreach ($jobs as $job) :
             if ($this->sendToTransend($job)) {
-                $this->info('Sending '.$job->number.' to transend');
+                $this->info('Sending ' . $job->number . ' to transend');
 
                 dispatch(new \App\Jobs\TransendOrderImport($job));
 
-                $message = ($job->is_resend) ? 'Re-sent to transend ('.$job->transend_route.')' : 'Sent to transend ('.$job->transend_route.')';
+                $message = ($job->is_resend) ? 'Re-sent to transend (' . $job->transend_route . ')' : 'Sent to transend (' . $job->transend_route . ')';
 
                 $job->log($message);
             }
         endforeach;
+    }
+
+    /**
+     * Set the routes before sending.
+     */
+    protected function setRoutes()
+    {
+        $jobs = \App\TransportJob::whereSent(0)->whereNull('transend_route')->get();
+
+        foreach ($jobs as $job) {
+            $job->setTransendRoute();
+        }
+
+        if ($this->option('setRoutesOnly')) {
+            $this->info('Routes set');
+            exit;
+        }
     }
 
     /**
@@ -82,10 +102,10 @@ class SendJobs extends Command
 
         // If it's a resend, only send on date resend defined
         if ($job->is_resend && $job->resend_date) {
-            $this->info('Resend identified for '.$job->number);
+            $this->info('Resend identified for ' . $job->number);
 
             if ($job->resend_date->startOfDay()->gt(Carbon::today()->startOfDay())) {
-                $this->error('Ignoring resend: '.$job->resend_date->startOfDay().' > '.Carbon::today()->startOfDay());
+                $this->error('Ignoring resend: ' . $job->resend_date->startOfDay() . ' > ' . Carbon::today()->startOfDay());
 
                 return false;
             }
@@ -93,11 +113,10 @@ class SendJobs extends Command
 
         // Courier job
         if ($job->shipment) {
-
             // If we already have a job for this customer then add this one to the list too (regardless of collection day)
-            if (in_array($job->shipment->company->id, $this->companyIds) && $job->type == 'c') {
-                return true;
-            }
+            //if (in_array($job->shipment->company->id, $this->companyIds) && $job->type == 'c') {
+            //     return true;
+            //  }
 
             // No previous jobs - company allows collection on this day of the week
             if ($job->shipment->company->getCollectionSettingsForDay(Carbon::now()->dayOfWeekIso) && $job->date_requested->startOfDay()->lte(Carbon::today()->startOfDay())) {
@@ -108,25 +127,8 @@ class SendJobs extends Command
             return true;
         }
 
-        $this->error($job->number.' rejected. Date requested '.$job->date_requested->startOfDay().' is not equal to '.Carbon::today()->startOfDay());
+        $this->error($job->number . ' rejected. Date requested ' . $job->date_requested->startOfDay() . ' is not equal to ' . Carbon::today()->startOfDay());
 
         return false;
-    }
-
-    /**
-     * Set the routes before sending.
-     */
-    protected function setRoutes()
-    {
-        $jobs = \App\Models\TransportJob::whereSent(0)->whereNull('transend_route')->get();
-
-        foreach ($jobs as $job) {
-            $job->setTransendRoute();
-        }
-
-        if ($this->option('setRoutesOnly')) {
-            $this->info('Routes set');
-            exit;
-        }
     }
 }

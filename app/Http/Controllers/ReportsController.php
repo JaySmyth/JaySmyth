@@ -629,6 +629,12 @@ class ReportsController extends Controller
 
         $this->authorize(new Report);
 
+        // Default results to "today"
+        if (! $request->date_from && ! $request->date_to) {
+            $request->date_from = Carbon::today()->startOfDay();
+            $request->date_to = Carbon::today()->endOfDay();
+        }
+
         $shipments = Shipment::orderBy('id', 'DESC')
             ->filter($request->filter)
             ->hasCompany($request->company)

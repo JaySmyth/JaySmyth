@@ -1186,6 +1186,7 @@ class Shipment extends Model
 
         // Reinstate transport jobs
         if ($this->transportJobs) {
+
             $collection = $this->transportJobs->where('type', 'c')->first();
 
             if ($collection) {
@@ -1195,15 +1196,16 @@ class Shipment extends Model
                 } else {
                     $collection->setStatus('completed');
                 }
-            }
 
-            // Notify transport
-            Mail::to('transport@antrim.ifsgroup.com')->cc('it@antrim.ifsgroup.com')->queue(new TransportJobReinstated($collection));
+                // Notify transport
+                Mail::to('transport@antrim.ifsgroup.com')->cc('it@antrim.ifsgroup.com')->queue(new TransportJobReinstated($collection));
+            }
 
             // Reinstate delivery request if exists
             $delivery = $this->transportJobs->where('type', 'd')->first();
 
             if ($delivery) {
+
                 $delivery->unmanifest();
 
                 // Notify transport
@@ -1249,7 +1251,7 @@ class Shipment extends Model
             'weight' => $this->weight,
             'goods_description' => $this->goods_description,
             'volumetric_weight' => $this->volumetric_weight,
-            'instructions' => 'Collect from customer premises and bring back to '.$this->depot->name,
+            'instructions' => null,
             'scs_job_number' => $this->scs_job_number,
             'scs_company_code' => ($this->company->group_account) ? $this->company->group_account : $this->company->scs_code,
             'cash_on_delivery' => 0,

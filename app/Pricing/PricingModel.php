@@ -2,7 +2,7 @@
 
 namespace App\Pricing;
 
-use App\Countries;
+use App\Models\Countries;
 use App\Models\CarrierPackagingType;
 use App\Models\Company;
 use App\Models\FuelSurcharge;
@@ -497,7 +497,7 @@ class PricingModel
 
         // If Intl shipment add additional Intl only Surcharge codes
         if (! isDomestic($this->shipment['sender_country_code'], $this->shipment['recipient_country_code'])) {
-            $surchargeCodes .= ',ADG,EQT,IDG,ICE,DTP,BRO';
+            $surchargeCodes .= ',ADG,EQT,IDG,ICE,DTP,BRO,ESS';
         }
 
         $surcharges = explode(',', $surchargeCodes);
@@ -523,6 +523,93 @@ class PricingModel
     public function isCOR()
     {
         return false;
+    }
+
+    // Emergency situation surcharge
+    public function isESS()
+    {
+        // Convert Collection date into a known format
+        // $localisation = Company::find($this->shipment['company_id'])->localisation;
+
+        // $date_format = getDateFormat($this->shipment['date_format']);
+        // $collectionDate = Carbon::createFromformat($date_format, $this->shipment['collection_date'], $localisation->time_zone)->format('Y-m-d');
+
+        $shipmentDate = date('Y-m-d');
+
+        // DHL
+        if (in_array($this->shipment['service_id'], [25,26,27])) {
+            if ($shipmentDate >= '2020-04-01') {
+                $this->dhlESS();
+            }
+        }
+        // Fedex
+        if (in_array($this->shipment['service_id'], [10,46])) {
+            if ($shipmentDate >= '2020-04-06') {
+                $this->fedexESS();
+            }
+        }
+        // TNT
+        if (in_array($this->shipment['service_id'], [21,36,37,54,55])) {
+            if ($shipmentDate >= '2020-04-06') {
+                $this->fedexESS();
+            }
+        }
+        // UPS
+        if (in_array($this->shipment['service_id'], [17,11,16,48,49,50,30,14,15])) {
+            if ($shipmentDate >= '2020-04-12') {
+                $this->upsESS();
+            }
+        }
+
+        return false;
+    }
+
+    public function dhlESS()
+    {
+        $shipmentDate = date('Y-m-d');
+        $chargeableWeight = round($this->chargeableWeight * 2)/2;
+        if ($shipmentDate >= '2020-05-24') {
+            if ($this->priceType == 'Costs') {
+                $value = $chargeableWeight * .18; // Costs
+            } else {
+                $value = $chargeableWeight * .22; // Sales
+            }
+        } else {
+            $value = 180.00;
+            if ($chargeableWeight <= 2.50) {
+                return false;
+            } elseif ($chargeableWeight <= 30) {
+                $value = 2.25;
+            } elseif ($chargeableWeight <= 70) {
+                $value = 13.50;
+            } elseif ($chargeableWeight <= 300) {
+                $value = 45.00;
+            }
+        }
+
+        $this->addSurcharge(['code' => 'ADH', 'description' => "Emergency Situation Surcharge", 'value' => $value]);
+    }
+
+    public function fedexESS()
+    {
+        $chargeableWeight = round($this->chargeableWeight * 2)/2;
+        if ($this->priceType == 'Costs') {
+            $value = ($chargeableWeight * 0.18 < .8) ? .8 : round($chargeableWeight * 0.18, 2);
+        } else {
+            $value = ($chargeableWeight * 0.22 < 1) ? 1 : round($chargeableWeight * 0.22, 2);
+        }
+        $this->addSurcharge(['code' => 'ADH', 'description' => "Emergency Situation Surcharge", 'value' => $value]);
+    }
+
+    public function upsESS()
+    {
+        $chargeableWeight = round($this->chargeableWeight * 2)/2;
+        if ($this->priceType == 'Costs') {
+            $value = ($this->shipment['service_id']==17) ? $chargeableWeight * 0.61 : $chargeableWeight * 0.20;
+        } else {
+            $value = ($this->shipment['service_id']==17) ? $chargeableWeight * 0.75 : $chargeableWeight * 0.24;
+        }
+        $this->addSurcharge(['code' => 'ADH', 'description' => "Emergency Situation Surcharge", 'value' => $value]);
     }
 
     // Accessible DG
@@ -784,7 +871,7 @@ class PricingModel
          */
 
         // If we do not require costs
-        if ($this->priceType == 'costs' && $this->costsRequired == 'N') {
+        if ($this->priceType == 'Costs' && $this->costsRequired == 'N') {
             $this->log('Costs not required');
 
             return;

@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Shipment;
+use App\Models\Tracking;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
@@ -33,11 +35,18 @@ class UploadFiles extends Command
     protected $log;
 
     /**
-     * An array of shipment IDs that were sent to the host.
+     * An array of IDs that were sent to the host.
      *
      * @var type
      */
     protected $idsSent;
+
+    /**
+     * The model that we are working with.
+     * `
+     * @var string
+     */
+    protected $model;
 
     /**
      * Create a new command instance.
@@ -84,8 +93,7 @@ class UploadFiles extends Command
 
         // Write the data to be uploaded to a temp file
         if (! $tempFile = $this->writeFile($fileUpload)) {
-
-                // If no data then skip gracefully to next upload
+            // If no data then skip gracefully to next upload
             if (is_null($tempFile)) {
                 $fileUpload->setNextUpload();
                 continue;
@@ -96,7 +104,7 @@ class UploadFiles extends Command
             continue;
         }
 
-        $this->log('Created temp file: '.$tempFile);
+        $this->log('Created temp file: ' . $tempFile);
 
         // Connect to the remote host
         if (! $connection = $this->connect($fileUpload->fileUploadHost)) {
@@ -126,28 +134,27 @@ class UploadFiles extends Command
     protected function writeFile($fileUpload)
     {
         $data = false;
-        $method = 'get'.ucfirst($fileUpload->type).'Shipments';
+        $method = 'get' . ucfirst($fileUpload->type);
 
         if (! method_exists($this, $method)) {
-            $this->log('Invalid type - '.$fileUpload->type, 'error');
+            $this->log('Invalid type - ' . $fileUpload->type, 'error');
 
             return false;
         }
 
-        // Retreive the shipment records
-        $shipments = $this->$method($fileUpload->company_id);
+        // Retreive the records
+        $records = $this->$method($fileUpload->company_id);
 
-        if (! $shipments->isEmpty()) {
-
+        if (! $records->isEmpty()) {
             // Build a list of ids we are going to send
-            $this->idsSent = $shipments->pluck('id')->toArray();
+            $this->idsSent = $records->pluck('id')->toArray();
 
             // The results as export array
-            $data = $this->getShipmentExportArray($shipments, 'Europe/London', $fileUpload->verbose);
+            $data = $this->getExportArray($method, $records, 'Europe/London', $fileUpload->verbose);
         }
 
         if (is_array($data) && count($data) > 0) {
-            $this->log(count($data).' records to upload');
+            $this->log(count($data) . ' records to upload');
 
             // Add a heading row if required
             if ($fileUpload->fileUploadHost->heading_row) {
@@ -155,7 +162,12 @@ class UploadFiles extends Command
                 array_unshift($data, $headings);
             }
 
-            return writeCsv(storage_path().'/app/temp/'.time().Str::random(3).'.csv', $data, 'w', $fileUpload->fileUploadHost->csv_delimiter);
+            return writeCsv(
+                storage_path() . '/app/temp/' . time() . Str::random(3) . '.csv',
+                $data,
+                'w',
+                $fileUpload->fileUploadHost->csv_delimiter
+            );
         }
 
         $this->log('No data to transfer', 'error');
@@ -171,6 +183,58 @@ class UploadFiles extends Command
     {
         $this->log[] = $message;
         $this->$method($message);
+    }
+
+    /**
+     * Get a formatted array of results.
+     *
+     * @param $method
+     * @param $records
+     * @param string $timezone
+     * @param bool $verbose
+     * @return array
+     */
+    protected function getExportArray($method, $records, $timezone = 'Europe/London', $verbose = true)
+    {
+        if ($method == 'getTracking' || $method == 'getException') {
+            return $this->getTrackingExportArray($records, $timezone);
+        }
+
+        return $this->getShipmentExportArray($records, $timezone, $verbose);
+    }
+
+    /**
+     * Get a shipment array for excel export.
+     *
+     * @param type $shipments
+     * @return type
+     */
+    protected function getTrackingExportArray($trackingEvents, $timezone = 'Europe/London')
+    {
+        $data = [];
+
+        foreach ($trackingEvents as $tracking) :
+
+            $data[] = [
+                'Consignment Number' => $tracking->shipment->consignment_number,
+                'Carrier Consignment Number' => $tracking->shipment->carrier_consignment_number,
+                'Shipment Reference' => $tracking->shipment->shipment_reference,
+                'Recipient' => ($tracking->shipment->company_name) ? $tracking->shipment->company_name . ', ' . $tracking->shipment->recipient_name : $tracking->shipment->recipient_name,
+                'City' => $tracking->shipment->recipient_city,
+                'Pieces' => $tracking->shipment->pieces,
+                'Weight' => $tracking->shipment->weight . strtoupper($tracking->shipment->weight_uom),
+                'Volume' => $tracking->shipment->volumetric_weight,
+                'Ship Date' => $tracking->shipment->ship_date->timezone($timezone)->format('d-m-Y'),
+                'Service' => $tracking->shipment->service->code,
+                'Status' => $tracking->status,
+                'Status Detail' => $tracking->status_detail,
+                'Message' => $tracking->message,
+                'Date/Time' => ($tracking->datetime) ? $tracking->datetime->timezone($timezone)->format('d-m-Y H:i') : null
+            ];
+
+        endforeach;
+
+        return $data;
     }
 
     /**
@@ -191,7 +255,7 @@ class UploadFiles extends Command
                     'Carrier Consignment Number' => $shipment->carrier_consignment_number,
                     'Shipment Reference' => $shipment->shipment_reference,
                     'Pieces' => $shipment->pieces,
-                    'Weight' => $shipment->weight.strtoupper($shipment->weight_uom),
+                    'Weight' => $shipment->weight . strtoupper($shipment->weight_uom),
                     'Volume' => $shipment->volumetric_weight,
                     'Sender Name' => $shipment->sender_name,
                     'Sender Company Name' => $shipment->sender_company_name,
@@ -222,7 +286,7 @@ class UploadFiles extends Command
                     'Status' => $shipment->status->name,
                     'POD Signature' => $shipment->pod_signature,
                     'Delivery Date' => $shipment->getDeliveryDate('d-m-Y H:i'),
-                    'Tracking' => url('/tracking/'.$shipment->token),
+                    'Tracking' => url('/tracking/' . $shipment->token),
                 ];
             } else {
                 $data[] = [
@@ -230,7 +294,7 @@ class UploadFiles extends Command
                     'Carrier Consignment Number' => $shipment->carrier_consignment_number,
                     'Shipment Reference' => $shipment->shipment_reference,
                     'Pieces' => $shipment->pieces,
-                    'Weight' => $shipment->weight.strtoupper($shipment->weight_uom),
+                    'Weight' => $shipment->weight . strtoupper($shipment->weight_uom),
                     'Volume' => $shipment->volumetric_weight,
                     'Date Created' => $shipment->created_at->timezone($timezone)->format('d-m-Y'),
                     'Ship Date' => $shipment->ship_date->timezone($timezone)->format('d-m-Y'),
@@ -239,7 +303,7 @@ class UploadFiles extends Command
                     'Status' => $shipment->status->name,
                     'POD Signature' => $shipment->pod_signature,
                     'Delivery Date' => $shipment->getDeliveryDate('d-m-Y H:i'),
-                    'Tracking' => url('/tracking/'.$shipment->token),
+                    'Tracking' => url('/tracking/' . $shipment->token),
                 ];
             }
 
@@ -261,7 +325,11 @@ class UploadFiles extends Command
         if (! $uploaded) {
             $fileUpload->retry(10);
             $this->log('*** Upload will be attempted again in 10 minutes ***');
-            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('File Upload Failed', $this->log, $tempFile));
+            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError(
+                'File Upload Failed',
+                $this->log,
+                $tempFile
+            ));
         }
 
         $log = \App\Models\FileUploadLog::create([
@@ -275,7 +343,7 @@ class UploadFiles extends Command
             $fileUpload->setNextUpload();
 
             // Update "sent" flag on records after successful transfer
-            \App\Models\Shipment::whereIn('id', $this->idsSent)->update([$fileUpload->type.'_sent' => 1]);
+            $this->model->whereIn('id', $this->idsSent)->update([$fileUpload->type . '_sent' => 1]);
         }
     }
 
@@ -288,10 +356,9 @@ class UploadFiles extends Command
      */
     protected function connect($host)
     {
-        $this->log('Connecting to remote host: '.$host->host.':'.$host->port);
+        $this->log('Connecting to remote host: ' . $host->host . ':' . $host->port);
 
         switch ($host->sftp) {
-
             case 1:
                 $adapter = new SftpAdapter([
                     'host' => $host->host,
@@ -326,7 +393,7 @@ class UploadFiles extends Command
 
                 // Check connection was made
                 if ((! $connection) || (! $loginResult)) {
-                    $this->log('Unable to connect to FTP host -> '.$host->host, 'error');
+                    $this->log('Unable to connect to FTP host -> ' . $host->host, 'error');
 
                     return false;
                 }
@@ -343,10 +410,10 @@ class UploadFiles extends Command
      */
     protected function getFilename($fileUpload)
     {
-        $fileName = $fileUpload->type.'_'.date('d_m_y', time()).'_'.time().$fileUpload->id.'.csv';
+        $fileName = $fileUpload->type . '_' . date('d_m_y', time()) . '_' . time() . $fileUpload->id . '.csv';
 
         if ($fileUpload->upload_directory) {
-            $fileName = $fileUpload->upload_directory.'/'.$fileName;
+            $fileName = $fileUpload->upload_directory . '/' . $fileName;
         }
 
         return $fileName;
@@ -393,9 +460,11 @@ class UploadFiles extends Command
      * @param type $criteria
      * @return array
      */
-    protected function getPodShipments($companyId)
+    protected function getPod($companyId)
     {
-        return \App\Models\Shipment::whereDelivered(1)->wherePodSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
+        $this->model = new Shipment();
+
+        return Shipment::whereDelivered(1)->wherePodSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
     }
 
     /**
@@ -404,9 +473,14 @@ class UploadFiles extends Command
      * @param type $criteria
      * @return array
      */
-    protected function getReceivedShipments($companyId)
+    protected function getReceived($companyId)
     {
-        return \App\Models\Shipment::whereReceived(1)->whereReceivedSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
+        $this->model = new Shipment();
+
+        return Shipment::whereReceived(1)->whereReceivedSent(0)->whereCompanyId($companyId)->orderBy(
+            'ship_date',
+            'desc'
+        )->get();
     }
 
     /**
@@ -415,8 +489,50 @@ class UploadFiles extends Command
      * @param type $criteria
      * @return array
      */
-    protected function getCreatedShipments($companyId)
+    protected function getCreated($companyId)
     {
-        return \App\Models\Shipment::whereNotIn('status_id', [1, 7])->whereCreatedSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
+        $this->model = new Shipment();
+
+        return Shipment::whereNotIn(
+            'status_id',
+            [1, 7]
+        )->whereCreatedSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
+    }
+
+    /**
+     * Tracking events that have not been sent.
+     *
+     * @param $companyId
+     * @return mixed
+     */
+    protected function getTracking($companyId)
+    {
+        $this->model = new Tracking();
+
+        return Tracking::select('tracking.*')
+            ->where('datetime', '>=', now()->subWeek())
+            ->whereTrackingSent(0)
+            ->where('shipments.company_id', $companyId)
+            ->join('shipments', 'tracking.shipment_id', '=', 'shipments.id')
+            ->orderBy('shipment_id')->orderBy('id')->get();
+    }
+
+    /**
+     * Exceptions that have not been sent.
+     *
+     * @param $companyId
+     * @return mixed
+     */
+    protected function getException($companyId)
+    {
+        $this->model = new Tracking();
+
+        return Tracking::select('tracking.*')
+            ->where('datetime', '>=', now()->subWeek())
+            ->whereExceptionSent(0)
+            ->whereStatusDetail('delivery_exception')
+            ->where('shipments.company_id', $companyId)
+            ->join('shipments', 'tracking.shipment_id', '=', 'shipments.id')
+            ->orderBy('shipment_id')->orderBy('id')->get();
     }
 }

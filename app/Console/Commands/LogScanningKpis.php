@@ -86,6 +86,7 @@ class LogScanningKpis extends Command
             ->where('shipments.depot_id', 1)
             ->whereNotIn('shipments.status_id', [1, 7])
             ->whereNotIn('shipments.service_id', [7, 18, 20, 39, 44, 45, 48, 50])
+            ->whereNotIn('shipments.company_id', [965]) // ignore electrical world
             ->where('sender_postcode', 'LIKE', 'BT%')
             ->with('shipment')
             ->orderBy('sender_company_name')

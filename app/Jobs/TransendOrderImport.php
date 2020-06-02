@@ -125,7 +125,7 @@ class TransendOrderImport implements ShouldQueue
                     'DeliveryDate' => $this->transportJob->date_requested->format('Y-m-d\TH:i:s'),
                     'PlannedArriveTime' => $this->getPlannedTime(),
                     'PlannedDepartTime' => $this->getPlannedTime(15),
-                    'SpecialInstructions' => $this->transportJob->instructions.' - FINAL DESTINATION: '.$this->transportJob->final_destination.' - PREMISES CLOSES: '.$this->transportJob->closing_time,
+                    'SpecialInstructions' => $this->transportJob->instructions,
                     'TextField1' => $this->transportJob->transend_route,
                     'TextField2' => ($this->shipment) ? strtoupper($this->shipment->service->code) : $this->transportJob->transend_route,
                     'OrderJobs' => [
