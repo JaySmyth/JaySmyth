@@ -39,8 +39,7 @@ trait ShipmentScopes
 
             return $query->where('consignment_number', $filter)
                 ->orWhere('carrier_consignment_number', $filter)
-                ->orWhere('carrier_tracking_number', $filter)
-                ->orWhere('shipment_reference', 'LIKE', '%'.$filter.'%');
+                ->orWhere('shipment_reference', $filter);
         }
     }
 
