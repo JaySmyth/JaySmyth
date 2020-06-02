@@ -623,14 +623,29 @@ class ShipmentsController extends Controller
         // Upload the file to the temp directory
         $path = $request->file('file')->storeAs('temp', 'original_'.Str::random(12).'.csv');
 
-        // Check that the file was uploaded successfully
-        if (! Storage::disk('local')->exists($path)) {
-            flash()->error('Problem Uploading!', 'Unable to upload file. Please try again.');
+        // Generate a filename (hash generated from file contents)
+        $filename = 'temp/' . md5_file(storage_path('app/' . $path)) . '.csv';
 
+        // Check that this file has not already been uploaded
+        if(Storage::exists($filename)){
+
+            // Delete the duplicate
+            Storage::delete($path);
+
+            flash()->error('File already uploaded!');
             return back();
         }
 
-        dispatch(new ImportShipments(storage_path('app/'.$path), $request->import_config_id, $request->user()))->onQueue('import');
+        // Rename the temp upload to the hashed filename
+        Storage::move($path, $filename);
+
+        // Check that the file was uploaded successfully
+        if (! Storage::disk('local')->exists($filename)) {
+            flash()->error('Problem Uploading!', 'Unable to upload file. Please try again.');
+            return back();
+        }
+
+        dispatch(new ImportShipments(storage_path('app/'.$filename), $request->import_config_id, $request->user()))->onQueue('import');
 
         // Notify user and redirect
         flash()->info('File Uploaded!', 'Please check your email for results.', true);
