@@ -2,10 +2,10 @@
 
 namespace App\Traits;
 
+use App\Models\Company;
+use App\Models\User;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
 
-;
 trait HasRoles
 {
     /**
