@@ -75,7 +75,7 @@ class SendJobs extends Command
      */
     protected function setRoutes()
     {
-        $jobs = \App\TransportJob::whereSent(0)->whereNull('transend_route')->get();
+        $jobs = \App\Models\TransportJob::whereSent(0)->whereNull('transend_route')->get();
 
         foreach ($jobs as $job) {
             $job->setTransendRoute();

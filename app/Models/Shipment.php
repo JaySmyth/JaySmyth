@@ -1116,7 +1116,7 @@ class Shipment extends Model
      */
     public function tracking()
     {
-        return $this->hasMany(\App\Models\Tracking::class)->orderBy('local_datetime', 'DESC')->orderBy('id', 'DESC');
+        return $this->hasMany(\App\Tracking::class)->orderBy('local_datetime', 'DESC')->orderBy('id', 'DESC');
     }
 
     /**
@@ -1186,7 +1186,6 @@ class Shipment extends Model
 
         // Reinstate transport jobs
         if ($this->transportJobs) {
-
             $collection = $this->transportJobs->where('type', 'c')->first();
 
             if ($collection) {
@@ -1205,7 +1204,6 @@ class Shipment extends Model
             $delivery = $this->transportJobs->where('type', 'd')->first();
 
             if ($delivery) {
-
                 $delivery->unmanifest();
 
                 // Notify transport
@@ -1504,7 +1502,7 @@ class Shipment extends Model
      */
     public function updateTracking()
     {
-        $className = \App\Models\Tracking::class.$this->carrier->name;
+        $className = \App\Tracking::class.$this->carrier->name;
 
         $tracking = new $className($this);
 
