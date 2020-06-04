@@ -2,7 +2,7 @@
 
 namespace App\CarrierAPI\TNT;
 
-use App\Service;
+use App\Models\Service;
 use Illuminate\Support\Str;
 use SimpleXMLElement;
 
@@ -327,7 +327,7 @@ class TNT
      */
     protected function getTntPostcode()
     {
-        $tntPostcode = new \App\TntPostcode();
+        $tntPostcode = new \App\Models\TntPostcode();
 
         $postcode = $tntPostcode->getPostcode($this->shipment['recipient_country_code'], $this->shipment['recipient_city']);
 
@@ -425,7 +425,7 @@ class TNT
      */
     protected function log($type, $direction, $msg)
     {
-        \App\TransactionLog::create([
+        \App\Models\TransactionLog::create([
             'type' => $type,
             'carrier' => 'tnt',
             'direction' => $direction,
@@ -456,7 +456,7 @@ class TNT
         curl_setopt($ch, CURLOPT_URL, $this->express_connect_url);                // set url to post to
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        if ($header != '') {
+        if (!empty($header)) {
             curl_setopt($ch, CURLOPT_HEADER, 1);            // CURL to output header
             curl_setopt($ch, CURLOPT_HTTPHEADER, $header);  // Header for CURL to output
         } else {
@@ -654,7 +654,7 @@ class TNT
         curl_setopt($ch, CURLOPT_URL, $this->express_label_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-        if ((trim($this->username) != '') && (trim($this->password) != '')) {
+        if ((!empty(trim($this->username))) && (!empty(trim($this->password)))) {
             curl_setopt($ch, CURLOPT_USERPWD, $this->username.':'.$this->password);
         }
 

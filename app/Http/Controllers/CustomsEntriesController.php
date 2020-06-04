@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Company;
-use App\CustomsEntry;
-use App\Document;
 use App\Http\Requests\CustomsEntryCommodityRequest;
 use App\Http\Requests\CustomsEntryRequest;
+use App\Models\Company;
+use App\Models\CustomsEntry;
+use App\Models\Document;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;

@@ -19,10 +19,12 @@
 
 namespace app\Pricing;
 
-use App\Carrier;
-use App\Company;
-use App\CompanyRate;
-use App\Package;
+use App\Models\Carrier;
+use App\Models\Company;
+use App\Models\CompanyRate;
+use App\Models\Package;
+use App\Models\Service;
+use App\Models\Shipment;
 use App\Pricing\PricingModel0;
 use App\Pricing\PricingModel1;
 use App\Pricing\PricingModel2;
@@ -30,8 +32,6 @@ use App\Pricing\PricingModel3;
 use App\Pricing\PricingModel4;
 use App\Pricing\PricingModel5;
 use App\Pricing\PricingModel6;
-use App\Service;
-use App\Shipment;
 
 /**
  * ********************************
@@ -115,7 +115,7 @@ class Pricing
      */
     public function preProcess()
     {
-        if ($this->serviceId != '') {
+        if (!empty($this->serviceId)) {
 
             // Use specified Service/ Carrier
             $this->service = Service::find($this->serviceId);
@@ -130,7 +130,7 @@ class Pricing
         $this->shipment['carrier_code'] = $this->carrier->code;
 
         // If no Shipment date set use today
-        if (! isset($this->shipment['ship_date']) || $this->shipment['ship_date'] == '') {
+        if (! isset($this->shipment['ship_date']) || empty($this->shipment['ship_date'])) {
             $this->shipment['ship_date'] = date('Y-m-d');
         }
 
@@ -172,7 +172,7 @@ class Pricing
         $total = 0;
         if (is_array($charges)) {
             foreach ($charges as $charge) {
-                if ($chargeCode == '') {
+                if (empty($chargeCode)) {
                     $total += $charge['value'];
                 } else {
                     if ($chargeCode == $charge['code']) {

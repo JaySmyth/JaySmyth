@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MessageRequest;
-use App\Message;
+use App\Models\Message;
 use Auth;
 use Carbon\Carbon;
 

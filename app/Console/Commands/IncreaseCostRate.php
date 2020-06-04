@@ -55,7 +55,7 @@ class IncreaseCostRate extends Command
         $this->setDates($this->argument('fromDate'));
         if ($this->checkInput()) {
             $this->multiplier = 1 + $this->increasePercentage / 100;
-            $this->rate = \App\Rate::find($this->rateId);
+            $this->rate = \App\Models\Rate::find($this->rateId);
             if ($this->rate) {
                 $this->checkAbleToIncrease();
                 $this->info('');
@@ -126,14 +126,14 @@ class IncreaseCostRate extends Command
      */
     protected function checkAbleToIncrease()
     {
-        $rates = \App\DomesticRate::where('rate_id', $this->rate->id)
+        $rates = \App\Models\DomesticRate::where('rate_id', $this->rate->id)
                 ->where('from_date', '>=', $this->fromDate)
                 ->first();
         if ($rates) {
             $this->unableToApplyIncrease('domestic_rates');
         }
 
-        $rates = \App\RateDetail::where('rate_id', $this->rate->id)
+        $rates = \App\Models\RateDetail::where('rate_id', $this->rate->id)
                 ->where('from_date', '>=', $this->fromDate)
                 ->first();
         if ($rates) {
@@ -199,7 +199,7 @@ class IncreaseCostRate extends Command
 
     public function increaseDomesticRates()
     {
-        $rates = \App\DomesticRate::where('rate_id', $this->rate->id)
+        $rates = \App\Models\DomesticRate::where('rate_id', $this->rate->id)
                         ->where('to_date', '>', date('Y-m-d'))
                         ->orderBy('service')
                         ->orderBy('packaging_code')
@@ -208,7 +208,7 @@ class IncreaseCostRate extends Command
 
         // Cycle through rates selected and increase values
         foreach ($rates as $rate) {
-            \App\DomesticRate::create([
+            \App\Models\DomesticRate::create([
                 'rate_id' => $rate->rate_id,
                 'service' => $rate->service,
                 'packaging_code' => $rate->packaging_code,
@@ -227,7 +227,7 @@ class IncreaseCostRate extends Command
 
     public function increaseIntlRates()
     {
-        $rates = \App\RateDetail::where('rate_id', $this->rate->id)
+        $rates = \App\Models\RateDetail::where('rate_id', $this->rate->id)
                 ->where('to_date', '>', date('Y-m-d'))
                 ->orderBy('residential')
                 ->orderBy('piece_limit')
@@ -238,7 +238,7 @@ class IncreaseCostRate extends Command
 
         // Cycle through rates selected and increase values
         foreach ($rates as $rate) {
-            \App\RateDetail::create([
+            \App\Models\RateDetail::create([
                 'rate_id' => $rate->rate_id,
                 'residential' => $rate->residential,
                 'piece_limit' => $rate->piece_limit,

@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Shipment;
-use App\Tracking;
+use App\Models\Shipment;
+use App\Models\Tracking;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
@@ -67,7 +67,7 @@ class UploadFiles extends Command
     {
         $queue = [];
 
-        $fileUploads = \App\FileUpload::whereEnabled(1)->get();
+        $fileUploads = \App\Models\FileUpload::whereEnabled(1)->get();
 
         /*
          * Build a queue of uploads that are scheduled for processing now.
@@ -88,39 +88,39 @@ class UploadFiles extends Command
             // Clear the log
             $this->log = [];
 
-            // Clear the IDs
-            $this->idsSent = [];
+        // Clear the IDs
+        $this->idsSent = [];
 
-            // Write the data to be uploaded to a temp file
-            if (! $tempFile = $this->writeFile($fileUpload)) {
-                // If no data then skip gracefully to next upload
-                if (is_null($tempFile)) {
-                    $fileUpload->setNextUpload();
-                    continue;
-                }
-
-                // Update logs, timestamps and send error email if required
-                $this->finishJob($fileUpload);
+        // Write the data to be uploaded to a temp file
+        if (! $tempFile = $this->writeFile($fileUpload)) {
+            // If no data then skip gracefully to next upload
+            if (is_null($tempFile)) {
+                $fileUpload->setNextUpload();
                 continue;
             }
 
-            $this->log('Created temp file: ' . $tempFile);
+            // Update logs, timestamps and send error email if required
+            $this->finishJob($fileUpload);
+            continue;
+        }
 
-            // Connect to the remote host
-            if (! $connection = $this->connect($fileUpload->fileUploadHost)) {
-                $this->log('Failed to connect', 'error');
-                $this->finishJob($fileUpload);
-                continue;
-            }
+        $this->log('Created temp file: ' . $tempFile);
 
-            // Generate a filename for the file to be uploaded
-            $filename = $this->getFilename($fileUpload);
+        // Connect to the remote host
+        if (! $connection = $this->connect($fileUpload->fileUploadHost)) {
+            $this->log('Failed to connect', 'error');
+            $this->finishJob($fileUpload);
+            continue;
+        }
 
-            // Upload the file to the remote host
-            $result = $this->upload($filename, $tempFile, $connection);
+        // Generate a filename for the file to be uploaded
+        $filename = $this->getFilename($fileUpload);
 
-            // Log the results to database and set next upload time
-            $this->finishJob($fileUpload, $result, $tempFile);
+        // Upload the file to the remote host
+        $result = $this->upload($filename, $tempFile, $connection);
+
+        // Log the results to database and set next upload time
+        $this->finishJob($fileUpload, $result, $tempFile);
 
         endforeach;
     }
@@ -162,8 +162,12 @@ class UploadFiles extends Command
                 array_unshift($data, $headings);
             }
 
-            return writeCsv(storage_path() . '/app/temp/' . time() . Str::random(3) . '.csv', $data, 'w',
-                $fileUpload->fileUploadHost->csv_delimiter);
+            return writeCsv(
+                storage_path() . '/app/temp/' . time() . Str::random(3) . '.csv',
+                $data,
+                'w',
+                $fileUpload->fileUploadHost->csv_delimiter
+            );
         }
 
         $this->log('No data to transfer', 'error');
@@ -321,11 +325,14 @@ class UploadFiles extends Command
         if (! $uploaded) {
             $fileUpload->retry(10);
             $this->log('*** Upload will be attempted again in 10 minutes ***');
-            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('File Upload Failed', $this->log,
-                $tempFile));
+            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError(
+                'File Upload Failed',
+                $this->log,
+                $tempFile
+            ));
         }
 
-        $log = \App\FileUploadLog::create([
+        $log = \App\Models\FileUploadLog::create([
             'output' => implode('<br>', $this->log),
             'uploaded' => $uploaded,
             'file_upload_id' => $fileUpload->id,
@@ -457,8 +464,7 @@ class UploadFiles extends Command
     {
         $this->model = new Shipment();
 
-        return Shipment::whereDelivered(1)->wherePodSent(0)->whereCompanyId($companyId)->orderBy('ship_date',
-            'desc')->get();
+        return Shipment::whereDelivered(1)->wherePodSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
     }
 
     /**
@@ -471,8 +477,10 @@ class UploadFiles extends Command
     {
         $this->model = new Shipment();
 
-        return Shipment::whereReceived(1)->whereReceivedSent(0)->whereCompanyId($companyId)->orderBy('ship_date',
-            'desc')->get();
+        return Shipment::whereReceived(1)->whereReceivedSent(0)->whereCompanyId($companyId)->orderBy(
+            'ship_date',
+            'desc'
+        )->get();
     }
 
     /**
@@ -485,8 +493,10 @@ class UploadFiles extends Command
     {
         $this->model = new Shipment();
 
-        return Shipment::whereNotIn('status_id',
-            [1, 7])->whereCreatedSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
+        return Shipment::whereNotIn(
+            'status_id',
+            [1, 7]
+        )->whereCreatedSent(0)->whereCompanyId($companyId)->orderBy('ship_date', 'desc')->get();
     }
 
     /**
@@ -525,5 +535,4 @@ class UploadFiles extends Command
             ->join('shipments', 'tracking.shipment_id', '=', 'shipments.id')
             ->orderBy('shipment_id')->orderBy('id')->get();
     }
-
 }

@@ -2,13 +2,13 @@
 
 namespace App\Jobs;
 
-use App\Carrier;
+use App\Models\Carrier;
 use App\CarrierAPI\Facades\CarrierAPI;
-use App\Country;
-use App\Department;
-use App\Postcode;
-use App\Service;
-use App\User;
+use App\Models\Country;
+use App\Models\Department;
+use App\Models\Postcode;
+use App\Models\Service;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -50,7 +50,7 @@ class ImportShipments implements ShouldQueue
     public function __construct($path, $importConfigId, User $user)
     {
         $this->path = $path;
-        $this->importConfig = \App\ImportConfig::find($importConfigId);
+        $this->importConfig = \App\Models\ImportConfig::find($importConfigId);
         $this->user = $user;
         $this->company = $this->importConfig->company;
         $this->userPreferences = $user->getPreferences($this->company->id, $this->importConfig->mode_id, true);
@@ -91,14 +91,13 @@ class ImportShipments implements ShouldQueue
     /**
      * Check if max no. of rows has been exceeded and set flag.
      */
-    private function checkNumberOfRows(){
-
+    private function checkNumberOfRows()
+    {
         $rowCount = count(file($this->path, FILE_SKIP_EMPTY_LINES));
 
-        if($rowCount > $this->maxRows){
+        if ($rowCount > $this->maxRows) {
             $this->failedMaxRows = true;
         }
-
     }
 
     /**
@@ -171,7 +170,6 @@ class ImportShipments implements ShouldQueue
      */
     private function processRow($rowNumber, $data)
     {
-
         $this->row = [];
 
         // Assign field names to the data array
@@ -181,7 +179,7 @@ class ImportShipments implements ShouldQueue
         $this->results['rows'][$rowNumber]['data'] = $this->row;
 
         // Too many lines in the CSV file
-        if($this->failedMaxRows){
+        if ($this->failedMaxRows) {
             $this->setRowFailed($rowNumber, [0 => 'Too many lines in CSV file. Max permitted: ' . $this->maxRows . ' lines']);
             return false;
         }
@@ -203,7 +201,7 @@ class ImportShipments implements ShouldQueue
 
         // Count the number of shipments raised this month for kukoon economy
         if ($this->company->id == 808) {
-            $count = \App\Shipment::whereCompanyId(808)->whereBetween('ship_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->whereNotIn('status_id', [1, 7])->count();
+            $count = \App\Models\Shipment::whereCompanyId(808)->whereBetween('ship_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->whereNotIn('status_id', [1, 7])->count();
 
             if ($count >= 500) {
                 $this->setRowFailed($rowNumber, [0 => 'Exceeded monthly shipment allowance for '.$this->company->company_name]);
@@ -217,19 +215,19 @@ class ImportShipments implements ShouldQueue
             'recipient_name' => 'required_without:recipient_company_name|min:1|max:35',
             'recipient_company_name' => 'required_without:recipient_name|min:1|max:35',
             'recipient_address1' => 'required|min:1|max:35',
-            'recipient_address2' => 'sometimes|min:1|max:35',
-            'recipient_address3' => 'sometimes|min:1|max:35',
+            'recipient_address2' => 'nullable|min:1|max:35',
+            'recipient_address3' => 'nullable|min:1|max:35',
             'recipient_city' => 'required|min:1|max:30',
-            'recipient_state' => 'sometimes|min:1|max:30',
+            'recipient_state' => 'nullable|min:1|max:30',
             'recipient_telephone' => 'required|string|min:8|max:18',
             'recipient_country_code' => 'required|exists:countries,country_code',
             'pieces' => 'required|min:1|max:99',
             'weight' => 'required|min:0.1|max:19999',
             'shipment_reference' => 'required|string',
-            'service_code' => 'sometimes|exists:services,code',
-            'product_quantity' => 'sometimes|min:1|max:999999',
-            'customs_value' => 'sometimes|min:1|max:9999999',
-            'collection_date' => 'sometimes|date_format:d-m-Y'
+            'service_code' => 'nullable|exists:services,code',
+            'product_quantity' => 'nullable|min:1|max:999999',
+            'customs_value' => 'nullable|min:1|max:9999999',
+            'collection_date' => 'nullable|date_format:d-m-Y'
         ];
 
         $validator = Validator::make($this->row, $rules);
@@ -616,7 +614,7 @@ class ImportShipments implements ShouldQueue
         }
 
         if (! empty($this->row['product_code'])) {
-            $commodity = \App\Commodity::whereProductCode($this->row['product_code'])->whereCompanyId($this->company->id)->first();
+            $commodity = \App\Models\Commodity::whereProductCode($this->row['product_code'])->whereCompanyId($this->company->id)->first();
         }
 
         if ($commodity) {
@@ -703,7 +701,7 @@ class ImportShipments implements ShouldQueue
      */
     private function shipmentExists()
     {
-        $shipment = \App\Shipment::whereShipmentReference(strtoupper($this->row['shipment_reference']))
+        $shipment = \App\Models\Shipment::whereShipmentReference(strtoupper($this->row['shipment_reference']))
             ->whereRecipientPostcode($this->row['recipient_postcode'])
             ->wherePieces($this->row['pieces'])
             ->whereCompanyId($this->company->id)
@@ -800,7 +798,7 @@ class ImportShipments implements ShouldQueue
      */
     private function getCommercialInvoiceCount()
     {
-        return \App\Shipment::whereSource($this->source)->notEu()->notDomestic()->notUkDomestic()->where('service_id', '!=', 29)->count();
+        return \App\Models\Shipment::whereSource($this->source)->notEu()->notDomestic()->notUkDomestic()->where('service_id', '!=', 29)->count();
     }
 
     /**
@@ -836,7 +834,7 @@ class ImportShipments implements ShouldQueue
      */
     protected function getCustomsValue()
     {
-        $customsValue = (empty($this->row['customs_value']) || $this->row['customs_value'] < 1 || $this->row['customs_value'] == '') ? $this->importConfig->default_customs_value : trim($this->row['customs_value']);
+        $customsValue = (empty($this->row['customs_value']) || $this->row['customs_value'] < 1 || empty($this->row['customs_value'])) ? $this->importConfig->default_customs_value : trim($this->row['customs_value']);
 
         if (! is_numeric($customsValue)) {
             return (float) str_replace(' ', '.', $customsValue);

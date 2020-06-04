@@ -39,7 +39,7 @@ class CancelJobs extends Command
     public function handle()
     {
         // Load the cancelled jobs
-        $jobs = \App\TransportJob::whereSent(0)->whereCompleted(1)->whereStatusId(7)->get();
+        $jobs = \App\Models\TransportJob::whereSent(0)->whereCompleted(1)->whereStatusId(7)->get();
 
         foreach ($jobs as $job) :
             if (! Carbon::now()->isWeekend()) {

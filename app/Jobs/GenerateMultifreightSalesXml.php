@@ -2,10 +2,10 @@
 
 namespace App\Jobs;
 
-use App\InvoiceRun;
+use App\Models\InvoiceRun;
+use App\Models\Shipment;
+use App\Models\User;
 use App\ScsXml\ISLEDI;
-use App\Shipment;
-use App\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;

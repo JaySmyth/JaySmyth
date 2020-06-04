@@ -2,12 +2,12 @@
 
 namespace App\Console\Commands;
 
+use App\Http\Controllers\APIController;
 use App\CarrierAPI\APIShipment;
 use App\CarrierAPI\CarrierAPI;
-use App\Company;
-use App\Http\Controllers\APIController;
-use App\TransactionLog;
-use App\User;
+use App\Models\Company;
+use App\Models\TransactionLog;
+use App\Models\User;
 use Illuminate\Console\Command;
 
 class CheckApi extends Command

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SurchargeRequest;
-use App\Surcharge;
+use App\Models\Surcharge;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 

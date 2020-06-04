@@ -4,19 +4,45 @@ use Illuminate\Database\Seeder;
 
 class ModesTableSeeder extends Seeder
 {
+
     /**
-     * Run the database seeds.
+     * Auto generated seed file
      *
      * @return void
      */
     public function run()
     {
-        // Modify a few records
-        DB::table('modes')->insert([
-            ['name' => 'courier', 'label' => 'Courier'],
-            ['name' => 'air', 'label' => 'Air Freight'],
-            ['name' => 'road', 'label' => 'Road Freight'],
-            ['name' => 'sea', 'label' => 'Sea Freight'],
-        ]);
+        
+
+        \DB::table('modes')->delete();
+        
+        \DB::table('modes')->insert(array (
+            0 => 
+            array (
+                'id' => 1,
+                'name' => 'courier',
+                'label' => 'Courier',
+            ),
+            1 => 
+            array (
+                'id' => 2,
+                'name' => 'air',
+                'label' => 'Air Freight',
+            ),
+            2 => 
+            array (
+                'id' => 3,
+                'name' => 'road',
+                'label' => 'Road Freight',
+            ),
+            3 => 
+            array (
+                'id' => 4,
+                'name' => 'sea',
+                'label' => 'Sea Freight',
+            ),
+        ));
+        
+        
     }
 }

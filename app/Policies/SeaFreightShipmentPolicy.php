@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\SeaFreightShipment;
-use App\User;
+use App\Models\SeaFreightShipment;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class SeaFreightShipmentPolicy

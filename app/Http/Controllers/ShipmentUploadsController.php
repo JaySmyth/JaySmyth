@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\ShipmentUpload;
+use App\Models\ShipmentUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 

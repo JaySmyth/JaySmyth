@@ -103,7 +103,7 @@ class PrimaryFreightAPI extends \App\CarrierAPI\CarrierBase
      */
     protected function log($type, $direction, $msg)
     {
-        \App\TransactionLog::create([
+        \App\Models\TransactionLog::create([
             'type' => $type,
             'carrier' => 'pri',
             'direction' => $direction,

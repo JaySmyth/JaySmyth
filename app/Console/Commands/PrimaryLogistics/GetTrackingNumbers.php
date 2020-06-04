@@ -53,7 +53,7 @@ class GetTrackingNumbers extends Command
         $client = new Client(['auth' => [$this->user, $this->key]]);
 
         // Retreive the shipments that require updated
-        $shipments = \App\Shipment::where('carrier_consignment_number', '=', DB::raw('consignment_number'))->whereSource('cartrover')->whereCarrierId(12)->whereCompanyId(874)->whereReceivedSent(1)->whereNotIn('status_id', [1, 7])->whereIn('recipient_country_code', ['US', 'CA'])->get();
+        $shipments = \App\Models\Shipment::where('carrier_consignment_number', '=', DB::raw('consignment_number'))->whereSource('cartrover')->whereCarrierId(12)->whereCompanyId(874)->whereReceivedSent(1)->whereNotIn('status_id', [1, 7])->whereIn('recipient_country_code', ['US', 'CA'])->get();
 
         $this->info($shipments->count().' shipments found');
 

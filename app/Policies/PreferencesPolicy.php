@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Preference;
-use App\User;
+use App\Models\Preference;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PreferencesPolicy

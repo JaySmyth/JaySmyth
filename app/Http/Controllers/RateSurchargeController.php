@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Company;
-use App\RateSurcharge;
+use App\Models\Company;
+use App\Models\RateSurcharge;
 use Illuminate\Http\Request;
 
 class RateSurchargeController extends Controller
@@ -76,7 +76,7 @@ class RateSurchargeController extends Controller
      */
     public function edit(RateSurcharge $rateSurcharge, Company $company)
     {
-        $rateSurcharge = \App\RateSurcharge::find(1);
+        $rateSurcharge = \App\Models\RateSurcharge::find(1);
 
         echo $rateSurcharge->name;
         //dd($rateSurcharge);

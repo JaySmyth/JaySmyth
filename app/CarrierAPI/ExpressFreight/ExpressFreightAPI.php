@@ -3,7 +3,7 @@
 namespace App\CarrierAPI\ExpressFreight;
 
 use App\CarrierAPI\ExpressFreight\ExpressFreightLabel;
-use App\TransactionLog;
+use App\Models\TransactionLog;
 
 /**
  * Description of IFSWebAPI.

@@ -26,7 +26,7 @@ class UserRequest extends Request
         $rules = [
             'name' => 'required|min:4',
             'email' => 'email|required|unique:users,email,'.$this->id,
-            'role_id' => 'required|sometimes|integer',
+            'role_id' => 'required|nullable|integer',
             'telephone' => 'required|min:3|max:17',
         ];
 

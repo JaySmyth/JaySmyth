@@ -2,11 +2,11 @@
 
 namespace App\CarrierAPI\UPS;
 
-use App\Carrier;
+use App\Models\Carrier;
 use App\CarrierAPI\UPS\UPSLabel;
-use App\PackagingType;
-use App\Service;
-use App\TransactionLog;
+use App\Models\PackagingType;
+use App\Models\Service;
+use App\Models\TransactionLog;
 use Ups\Entity\Shipment;
 
 /**
@@ -216,7 +216,8 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
 
         // Set payment information
         $upsShipment->setPaymentInformation(new \Ups\Entity\PaymentInformation(
-            $this->billTo[$shipment['bill_shipping']], (object) ['AccountNumber' => $shipment['bill_shipping_account']]
+            $this->billTo[$shipment['bill_shipping']],
+            (object) ['AccountNumber' => $shipment['bill_shipping_account']]
         ));
 
         /*
@@ -264,9 +265,9 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
         $errors = [];
 
         // $rules['bill_shipping'] = 'required|in:sender';
-        // $rules['bill_tax_duty'] = 'sometimes|in:sender';
+        // $rules['bill_tax_duty'] = 'nullable|in:sender';
         $rules['bill_shipping_account'] = 'required|alpha_num:6';
-        $rules['bill_tax_duty_account'] = 'sometimes|alpha_num:6';
+        $rules['bill_tax_duty_account'] = 'nullable|alpha_num:6';
         $rules['alcohol'] = 'not_supported';
         $rules['dry_ice'] = 'not_supported';
         $rules['hazardous'] = 'not_supported';
@@ -291,7 +292,9 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
 
         try {
             $api = new \Ups\Shipping(
-                $this->account[strtoupper($this->mode)]['key'], $this->account[strtoupper($this->mode)]['id'], $this->account[strtoupper($this->mode)]['pass']
+                $this->account[strtoupper($this->mode)]['key'],
+                $this->account[strtoupper($this->mode)]['id'],
+                $this->account[strtoupper($this->mode)]['pass']
             );
 
             $confirm = $api->confirm(\Ups\Shipping::REQ_VALIDATE, $upsShipment, $labelSpecification);

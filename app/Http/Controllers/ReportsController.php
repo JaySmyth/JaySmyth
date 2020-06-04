@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Company;
-use App\Log;
-use App\Manifest;
-use App\Report;
-use App\Service;
-use App\Shipment;
+use App\Models\Company;
+use App\Models\Log;
+use App\Models\Manifest;
+use App\Models\Report;
+use App\Models\Service;
+use App\Models\Shipment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -150,7 +150,7 @@ class ReportsController extends Controller
 
         // Restrict salespersons to their allocated companies
         if ($request->user()->hasRole('ifss')) {
-            $saleId = \App\Sale::whereName($request->user()->name)->firstOrFail()->id;
+            $saleId = \App\Models\Sale::whereName($request->user()->name)->firstOrFail()->id;
             $shipments = $shipments->whereSaleId($saleId);
         }
 
@@ -193,7 +193,7 @@ class ReportsController extends Controller
 
         // Restrict salespersons to their allocated companies
         if ($request->user()->hasRole('ifss')) {
-            $saleId = \App\Sale::whereName($request->user()->name)->firstOrFail()->id;
+            $saleId = \App\Models\Sale::whereName($request->user()->name)->firstOrFail()->id;
             $companies = $companies->whereSaleId($saleId);
         }
 
@@ -219,7 +219,7 @@ class ReportsController extends Controller
             $date = new Carbon($request->date);
         }
 
-        $packages = \App\Package::orderBy('shipments.sender_company_name')
+        $packages = \App\Models\Package::orderBy('shipments.sender_company_name')
             ->orderBy('packages.id')
             ->select('packages.*')
             ->join('shipments', 'packages.shipment_id', '=', 'shipments.id')
@@ -408,7 +408,7 @@ class ReportsController extends Controller
 
         $this->authorize(new Report);
 
-        $purchaseInvoiceLines = \App\PurchaseInvoiceLine::select('purchase_invoice_lines.*')
+        $purchaseInvoiceLines = \App\Models\PurchaseInvoiceLine::select('purchase_invoice_lines.*')
             ->where('purchase_invoices.status', 0)
             ->whereNull('scs_job_number')
             ->join('purchase_invoices', 'purchase_invoice_lines.purchase_invoice_id', '=', 'purchase_invoices.id')
@@ -500,7 +500,7 @@ class ReportsController extends Controller
 
         $this->authorize(new Report);
 
-        $users = \App\User::whereEnabled(1)
+        $users = \App\Models\User::whereEnabled(1)
             ->whereNotNull('browser')
             ->orderBy('last_login', 'DESC')
             ->orderBy('browser')
@@ -524,7 +524,7 @@ class ReportsController extends Controller
 
         $this->authorize(new Report);
 
-        $shipments = \App\Shipment::whereCarrierId(2)
+        $shipments = \App\Models\Shipment::whereCarrierId(2)
             ->availableForManifesting()
             ->isInternational()
             ->whereStatusId(3)
@@ -583,7 +583,7 @@ class ReportsController extends Controller
 
         $this->authorize(new Report);
 
-        $tracking = \App\Tracking::orderBy('id', 'desc')
+        $tracking = \App\Models\Tracking::orderBy('id', 'desc')
             ->where('tracking.message', 'LIKE', '%(carrier scan)%')
             ->with('shipment', 'shipment.service', 'shipment.company', 'shipment.depot')
             ->paginate(50);
@@ -604,7 +604,7 @@ class ReportsController extends Controller
 
         $this->authorize(new Report);
 
-        $purchaseInvoiceLines = \App\PurchaseInvoiceLine::orderBy('purchase_invoice_lines.ship_date', 'DESC')
+        $purchaseInvoiceLines = \App\Models\PurchaseInvoiceLine::orderBy('purchase_invoice_lines.ship_date', 'DESC')
             ->filter($request->filter)
             ->shipDateBetween($request->date_from, $request->date_to)
             ->invoiceDateBetween($request->invoice_date_from, $request->invoice_date_to)
@@ -741,7 +741,7 @@ class ReportsController extends Controller
         foreach ($companies as $company) {
             $settings = $company->getCollectionSettingsForDay($day);
 
-            if ($settings instanceof \App\CollectionSetting) {
+            if ($settings instanceof \App\Models\CollectionSetting) {
                 $settings = $settings->toArray();
             }
 
@@ -782,7 +782,7 @@ class ReportsController extends Controller
         $averageReceiptMissed = 0;
         $averageRouteMissed = 0;
 
-        $kpis = \App\ScanningKpi::whereBetween('date', [$start, $finish])->get();
+        $kpis = \App\Models\ScanningKpi::whereBetween('date', [$start, $finish])->get();
 
         if ($kpis->count() > 0) {
             $collectionPercentageForMonth = ($kpis->sum('expected') > 0 && $kpis->sum('collection') > 0) ? round((100 / $kpis->sum('expected')) * $kpis->sum('collection'), 1) : 0;
@@ -798,7 +798,6 @@ class ReportsController extends Controller
 
         return view('reports.scanning_kpis', compact('report', 'kpis', 'collectionPercentageForMonth', 'receiptPercentageForMonth', 'routePercentageForMonth', 'totalReceiptMissed', 'totalRouteMissed', 'averageReceiptMissed', 'averageRouteMissed'));
     }
-
 
     /**
      * Label downloads.
@@ -823,5 +822,4 @@ class ReportsController extends Controller
 
         return view('reports.label_downloads', compact('report', 'logs'));
     }
-
 }

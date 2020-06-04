@@ -25,7 +25,7 @@ class ImportConfigRequest extends Request
     {
         return [
             'company_id' => 'required|integer',
-            'user_id' => 'sometimes|integer',
+            'user_id' => 'nullable|integer',
             //'company_name' => 'required|min:2|max:50|unique:import_configs,company_name,' . $this->id . ',id',
             'company_name' => 'required|min:2|max:50',
             'start_row' => 'required|integer',

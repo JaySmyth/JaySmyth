@@ -41,7 +41,7 @@ class FukRate extends Model
 
     public function readLegacyRate($company, $service)
     {
-        if ($company->UKRate == '') {
+        if (empty($company->UKRate)) {
             $rateTable = 'undefined';
         } else {
             $rateTable = $company->UKRate;
@@ -86,7 +86,7 @@ class FukRate extends Model
      */
     public function migrate($company, $legacyRate, $newRateId, $newService)
     {
-        $newRate = \App\DomesticRate::where('rate_id', $newRateId)
+        $newRate = \App\Models\DomesticRate::where('rate_id', $newRateId)
                 ->where('from_date', '<=', date('Y-m-d'))
                 ->where('to_date', '>=', date('Y-m-d'))
                 ->orderBy('service', 'packaging_code', 'area')
@@ -115,7 +115,7 @@ class FukRate extends Model
     {
 
         // Clear any existing discounts
-        $rate = \App\DomesticRateDiscount::where('company_id', $companyId)
+        $rate = \App\Models\DomesticRateDiscount::where('company_id', $companyId)
                 ->where('rate_id', $newRateId)
                 ->delete();
     }
@@ -129,7 +129,7 @@ class FukRate extends Model
         }
 
         // Read Standard Rate on new system
-        $newRate = \App\DomesticRate::where('rate_id', $newRateId)
+        $newRate = \App\Models\DomesticRate::where('rate_id', $newRateId)
                 ->where('service', $newService)
                 ->where('packaging_code', $packagingCode)
                 ->where('area', $row->area)
@@ -154,7 +154,7 @@ class FukRate extends Model
             if ($firstDiscount != 0 || $othersDiscount != 0 || $notionalDiscount != 0) {
 
                 // If Service already defined then reset it, else create it.
-                $rowDiscount = \App\DomesticRateDiscount::create([
+                $rowDiscount = \App\Models\DomesticRateDiscount::create([
                             'company_id' => $companyId,
                             'rate_id' => $newRateId,
                             'service' => $newService,

@@ -2,8 +2,8 @@
 
 namespace App\CarrierAPI\ExpressFreight;
 
-use App\Route;
-use App\Service;
+use App\Models\Route;
+use App\Models\Service;
 
 class ExpressFreightLabel extends \App\CarrierAPI\CarrierLabel
 {

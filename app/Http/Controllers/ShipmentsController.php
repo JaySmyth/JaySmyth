@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\CarrierAPI\Facades\CarrierAPI;
-use App\CarrierAPI\Pdf;
-use App\Company;
 use App\Exports\DimsExport;
 use App\Exports\ShipmentsExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
 use App\Jobs\ImportShipments;
 use App\Jobs\LogScanningKpis;
-use App\Mode;
+use App\Models\Mode;
+use App\CarrierAPI\Facades\CarrierAPI;
+use App\CarrierAPI\Pdf;
+use App\Models\Company;
+use App\Models\Shipment;
+use App\Models\TransactionLog;
+use App\Models\User;
 use App\Pricing\Pricing;
-use App\Shipment;
-use App\TransactionLog;
-use App\User;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -498,6 +498,7 @@ class ShipmentsController extends Controller
             // warehouse login
             if (in_array(Auth::user()->id, [3026, 283, 2534])) {
                 flash()->error('Warning', 'Not authorised to print label.', true);
+
                 return back();
             }
 

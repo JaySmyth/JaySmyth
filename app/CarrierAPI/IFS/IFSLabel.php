@@ -2,10 +2,10 @@
 
 namespace App\CarrierAPI\IFS;
 
-use App\Depot;
-use App\Mode;
-use App\Route;
-use App\Service;
+use App\Models\Mode;
+use App\Models\Depot;
+use App\Models\Route;
+use App\Models\Service;
 
 class IFSLabel extends \App\CarrierAPI\CarrierLabel
 {

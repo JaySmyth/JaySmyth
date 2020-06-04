@@ -10,6 +10,8 @@
 namespace App\CarrierAPI;
 
 use App;
+use App\Jobs\CreateEasypostTracker;
+use App\Models\Mode;
 use App\CarrierAPI\APIShipment;
 use App\CarrierAPI\CWide\CWideAPI;
 use App\CarrierAPI\DHL\DHLAPI;
@@ -23,15 +25,13 @@ use App\CarrierAPI\PrimaryFreight\PrimaryFreightAPI;
 use App\CarrierAPI\ServiceRules;
 use App\CarrierAPI\TNT\TNTAPI;
 use App\CarrierAPI\UPS\UPSAPI;
-use App\Company;
-use App\Country;
-use App\Department;
-use App\Jobs\CreateEasypostTracker;
-use App\Mode;
+use App\Models\Company;
+use App\Models\Country;
+use App\Models\Department;
+use App\Models\Service;
+use App\Models\Shipment;
+use App\Models\State;
 use App\Pricing\Facades\Pricing;
-use App\Service;
-use App\Shipment;
-use App\State;
 use Carbon\Carbon;
 use DB;
 use Exception;
@@ -249,7 +249,7 @@ class CarrierAPI
         if (isset($serviceDetails['pivot']['monthly_limit']) && $serviceDetails['pivot']['monthly_limit'] > 0) {
 
             // Count the shipments for the month
-            $count = \App\Shipment::whereCompanyId($this->company->id)->whereBetween('ship_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->whereNotIn('status_id', [1, 7])->count();
+            $count = \App\Models\Shipment::whereCompanyId($this->company->id)->whereBetween('ship_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->whereNotIn('status_id', [1, 7])->count();
 
             // Limit has been exceeded, remove from array
             if ($count >= $serviceDetails['pivot']['monthly_limit']) {
@@ -443,7 +443,7 @@ class CarrierAPI
         }
 
         // If account not defined or blank and payment is "Bill to Sender" - use service default
-        if (! isset($account) || $account == '') {
+        if (! isset($account) || empty($account)) {
             if (! isset($shipment[$account_type]) || $shipment[$account_type] == 'sender') {
                 // If Service is known use the default values for that service
                 if (isset($shipment['service_id']) && $shipment['service_id'] > "") {
@@ -529,7 +529,7 @@ class CarrierAPI
             $data['dry_ice_total_weight'] = (isset($data['dry_ice']['total_weight'])) ? $data['dry_ice']['total_weight'] : '';
         }
 
-        if (! isset($data['collection_route']) || $data['collection_route'] == '') {
+        if (! isset($data['collection_route']) || empty($data['collection_route'])) {
             $data['collection_route'] = 'ADHOC';
         }
 
@@ -566,7 +566,7 @@ class CarrierAPI
          * Transaction bracket updates so that all complete or none complete
          * ******************************************************************
          */
-        DB::beginTransaction();
+        // DB::beginTransaction();
 
         try {
             if (isset($data['shipment_id']) && is_numeric($data['shipment_id'])) {
@@ -677,7 +677,7 @@ class CarrierAPI
              * Successful so commit all updates
              * ******************************************
              */
-            DB::Commit();
+            // DB::Commit();
         } catch (Exception $e) {
 
             /*
@@ -685,7 +685,9 @@ class CarrierAPI
              * Encountered error so rollback transactions
              * ******************************************
              */
-            DB::rollBack();
+            // DB::rollBack();
+
+            dd('Error : '.$e->getMessage().' on line '.$e->getLine());
 
             // Build email
             $to = config('mail.error');
@@ -823,7 +825,7 @@ class CarrierAPI
             }
 
             // Set IncoTerms if possible
-            if (! isset($shipment['terms_of_sale']) || $shipment['terms_of_sale'] == '') {
+            if (! isset($shipment['terms_of_sale']) || empty($shipment['terms_of_sale'])) {
                 if ($shipment['bill_tax_duty'] == 'sender') {
                     $shipment['terms_of_sale'] = 'ddp';
                 }
@@ -863,7 +865,7 @@ class CarrierAPI
                 // If Commodity set then use first commodity description
                 if (isset($shipment['contents'][0]['description']) && $shipment['contents'][0]['description'] > '') {
                     $shipment['goods_description'] = $shipment['contents'][0]['description'];
-                } elseif (! isset($shipment['goods_description']) || $shipment['goods_description'] == '') {
+                } elseif (! isset($shipment['goods_description']) || empty($shipment['goods_description'])) {
                     $shipment['goods_description'] = 'Miscellaneous Goods';
                 }
             }
@@ -879,16 +881,16 @@ class CarrierAPI
              * Get Ansi code for sender and recipient
              * States for any carriers that need it
              */
-            if (! isset($shipment['sender_state']) || $shipment['sender_state'] == '') {
+            if (! isset($shipment['sender_state']) || empty($shipment['sender_state'])) {
                 $shipment['sender_state'] = null;
             }
 
-            if (! isset($shipment['sender_telephone']) || $shipment['sender_telephone'] == '') {
+            if (! isset($shipment['sender_telephone']) || empty($shipment['sender_telephone'])) {
                 $shipment['sender_telephone'] = $this->company->telephone;
             }
 
             $shipment['sender_state_ansi_code'] = State::getAnsiStateCode($shipment['sender_country_code'], $shipment['sender_state']);
-            if ($shipment['sender_state_ansi_code'] == '') {
+            if (empty($shipment['sender_state_ansi_code'])) {
                 $shipment['sender_state_code'] = $shipment['sender_state'];
             } else {
                 $shipment['sender_state_code'] = $shipment['sender_state_ansi_code'];
@@ -899,7 +901,7 @@ class CarrierAPI
             }
 
             $shipment['recipient_state_ansi_code'] = State::getAnsiStateCode($shipment['recipient_country_code'], $shipment['recipient_state']);
-            if ($shipment['recipient_state_ansi_code'] == '') {
+            if (empty($shipment['recipient_state_ansi_code'])) {
                 $shipment['recipient_state_code'] = $shipment['recipient_state'];
             } else {
                 $shipment['recipient_state_code'] = $shipment['recipient_state_ansi_code'];
@@ -912,7 +914,7 @@ class CarrierAPI
             $shipment['route_id'] = 1;
 
             // If Currency not set then default to Currency for Senders Country
-            if (! isset($shipment['customs_value_currency_code']) || $shipment['customs_value_currency_code'] == '') {
+            if (! isset($shipment['customs_value_currency_code']) || empty($shipment['customs_value_currency_code'])) {
                 $shipment['customs_value_currency_code'] = Country::where('country_code', $shipment['sender_country_code'])->first()->currency_code;
             }
 
@@ -958,6 +960,8 @@ class CarrierAPI
                 if (isset($package['dry_ice_weight']) && $package['dry_ice_weight'] > 0) {
                     $shipment['dry_ice_flag'] = true;
                     $dryIceTotalWeight += $package['dry_ice_weight'];
+                } else {
+                    $shipment['packages'][$cnt]['dry_ice_weight'] = 0;
                 }
 
                 // Ensure all dims are integers
@@ -1102,7 +1106,6 @@ class CarrierAPI
      */
     public function createShipment($data, $mode = '')
     {
-
         /*
          * ************************************
          * Set Environment, fixCase, preprocess
@@ -1111,9 +1114,12 @@ class CarrierAPI
          */
         $response = [];
         $this->setEnvironment($mode);
-        //$data = trimData($data);                                                 // Remove any leading/ trailing spaces etc.
+        //$data = trimData($data);                                              // Remove any leading/ trailing spaces etc.
         $data = fixShipmentCase($data);                                         // Ensure all fields use correct case and Flags are boolean
-        $data = $this->preProcess($data);                                       // Complete any missing fields where possible
+        $data = $this->preProcess($data);
+
+        // Complete any missing fields where possible
+
         $apiShipment = new APIShipment();                                       // Shipment object with validation rules etc.
 
         $errors = $apiShipment->validateShipment($data);

@@ -3,7 +3,7 @@
 namespace App\CarrierAPI\ExpressFreightNI;
 
 use App\CarrierAPI\ExpressFreightNI\ExpressFreightNILabel;
-use App\TransactionLog;
+use App\Models\TransactionLog;
 use Illuminate\Support\Facades\Validator;
 use TCPDI;
 

@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Quotation;
-use App\User;
+use App\Models\Quotation;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class QuotationPolicy

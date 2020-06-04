@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\ManifestProfile;
+use App\Models\ManifestProfile;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 

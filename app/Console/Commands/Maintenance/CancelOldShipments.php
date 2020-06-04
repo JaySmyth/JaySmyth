@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands\Maintenance;
 
-use App\Shipment;
+use App\Models\Shipment;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 

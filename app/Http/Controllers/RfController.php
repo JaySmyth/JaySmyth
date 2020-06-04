@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Package;
+use App\Models\Package;
 use Illuminate\Http\Request;
 
 class RfController extends Controller
@@ -29,7 +29,7 @@ class RfController extends Controller
      */
     public function server(Request $request)
     {
-        $this->session = \App\RfSession::firstOrCreate(['session_id' => $request->id]);
+        $this->session = \App\Models\RfSession::firstOrCreate(['session_id' => $request->id]);
         $this->data = substr(preg_replace('/[^\w]/', '', $request->data), 0, 50);
         $this->route = $this->getRoute();
         $this->scanPackage();
@@ -150,7 +150,7 @@ class RfController extends Controller
 
         $scanCount = $package->shipment->getPackageScanCount();
 
-        $package->shipment->log('Package ' . $this->data . ' scanned in IFS Antrim Warehouse');
+        $package->shipment->log('Package '.$this->data.' scanned in IFS Antrim Warehouse');
 
         // Successful scan
         return $this->getDisplay("Pkg $scanCount scanned!", 'Scan Package');

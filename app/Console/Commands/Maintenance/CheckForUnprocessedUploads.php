@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands\Maintenance;
 
-use App\ShipmentUpload;
+use App\Models\ShipmentUpload;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;

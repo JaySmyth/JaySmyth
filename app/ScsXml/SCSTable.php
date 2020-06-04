@@ -50,7 +50,7 @@ class SCSTable
                 $value = $this->cleanAttribute($value);
 
                 // Only output attribute if it has a value
-                if ($this->attributes[$attribute] == '') {
+                if (empty($this->attributes[$attribute])) {
 
                     // No Validation necessary
                     $this->table[$attribute] = $value;
@@ -86,7 +86,7 @@ class SCSTable
             $blank = '<'.$this->tableName.'>'.'</'.$this->tableName.">$term";
 
             foreach ($this->attributes as $attribute => $value) {
-                if (isset($this->table[$attribute]) && $this->table[$attribute] != '') {
+                if (isset($this->table[$attribute]) && !empty($this->table[$attribute])) {
 
                     // Only set if it contains a value
                     $xml .= "<$attribute>".$this->table[$attribute]."</$attribute>$term";

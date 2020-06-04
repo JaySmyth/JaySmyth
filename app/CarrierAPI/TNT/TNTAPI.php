@@ -3,7 +3,7 @@
 namespace App\CarrierAPI\TNT;
 
 use App\CarrierAPI\TNT\TNT;
-use App\Service;
+use App\Models\Service;
 
 /**
  * Description of TNTAPI.

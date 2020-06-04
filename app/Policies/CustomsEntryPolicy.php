@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\CustomsEntry;
-use App\User;
+use App\Models\CustomsEntry;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CustomsEntryPolicy

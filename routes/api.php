@@ -52,12 +52,6 @@ Route::post('rf', 'RfController@server');
   | Catch any invalid routes
   |--------------------------------------------
  */
-Route::get('{all}', function ($all) {
-    return APIResponse::respondNotSupported('Method/ URI not supported');
-})->where(['all' => '.*']);
-Route::post('{all}', function ($all) {
-    return APIResponse::respondNotSupported('Method/ URI not supported');
-})->where(['all' => '.*']);
-Route::delete('{all}', function ($all) {
-    return APIResponse::respondNotSupported('Method/ URI not supported');
-})->where(['all' => '.*']);
+Route::get('{all}', 'ApiController@notSupported');
+Route::post('{all}', 'ApiController@notSupported');
+Route::delete('{all}', 'ApiController@notSupported');

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Log;
+use App\Models\Log;
 use Illuminate\Http\Request;
 
 class LogsController extends Controller
@@ -25,7 +25,7 @@ class LogsController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize(new \App\Log);
+        $this->authorize(new \App\Models\Log);
 
         $logs = $this->search($request);
 

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\CarrierAPI\Pdf;
 use App\Http\Requests\QuotationRequest;
-use App\Quotation;
+use App\CarrierAPI\Pdf;
+use App\Models\Quotation;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -29,7 +29,7 @@ class QuotationsController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize(new \App\Quotation);
+        $this->authorize(new \App\Models\Quotation);
 
         $quotations = $this->search($request);
 

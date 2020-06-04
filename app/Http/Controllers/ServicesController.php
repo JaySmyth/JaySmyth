@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\CarrierAPI\Facades\CarrierAPI;
-use App\Company;
-use App\Country;
 use App\Http\Requests;
 use App\Http\Requests\ServiceRequest;
-use App\Service;
+use App\CarrierAPI\Facades\CarrierAPI;
+use App\Models\Company;
+use App\Models\Country;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Response;
 

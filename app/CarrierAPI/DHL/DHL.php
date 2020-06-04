@@ -2,8 +2,8 @@
 
 namespace App\CarrierAPI\DHL;
 
-use App\Company;
-use App\Service;
+use App\Models\Company;
+use App\Models\Service;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use function GuzzleHttp\Psr7\str;
@@ -228,7 +228,7 @@ class DHL
      */
     protected function log($type, $direction, $msg)
     {
-        \App\TransactionLog::create([
+        \App\Models\TransactionLog::create([
             'type' => $type,
             'carrier' => 'DHL',
             'direction' => $direction,

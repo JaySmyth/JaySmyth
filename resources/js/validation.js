@@ -160,11 +160,12 @@ $("#commodity-form").validate({
         country_of_manufacture: {
             required: true
         },
-        /*
-         unit_value: {
-         required: true
-         },
-         */
+        unit_value: {
+        required: true
+        },
+            unit_weight: {
+            required: true
+        },
         commodity_code: {
             minlength: 8,
             digits: true

@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Company;
-use App\Service;
-use App\Shipment;
+use App\Models\Company;
+use App\Models\Service;
+use App\Models\Shipment;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Console\Command;
@@ -226,7 +226,7 @@ class CheckPricing extends Command
 
     public function displayResult($msg)
     {
-        if ($msg == '') {
+        if (empty($msg)) {
             $this->correct++;
             echo '.';
         } else {
@@ -260,10 +260,10 @@ class CheckPricing extends Command
 
         // Check Sales
         if ($prices['shipping_charge'] != $orig_quote['shipping_charge']) {
-            $msg = ($msg == '') ? 'Sales' : 'Both';
+            $msg = (empty($msg)) ? 'Sales' : 'Both';
         }
 
-        if ($msg != '') {
+        if (!empty($msg)) {
             $this->buildErrorMessage($shipment, $msg, $orig_quote, $prices);
         }
 
@@ -315,7 +315,7 @@ class CheckPricing extends Command
                 $msg .= sprintf('[%-5s] [%-25s] [%7.2f]', $priced[$i]['code'], $priced[$i]['description'], $priced[$i]['value']);
             }
 
-            if ($msg != '') {
+            if (!empty($msg)) {
                 $msg .= "\n";
                 $this->errorMessages[] = $msg;
             }

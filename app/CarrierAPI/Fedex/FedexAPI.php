@@ -2,13 +2,13 @@
 
 namespace app\CarrierAPI\Fedex;
 
-use App\Carrier;
+use App\Models\Carrier;
 use App\CarrierAPI\Fedex\FedexLabel;
 use App\CarrierAPI\Fedex\FedexSettings;
-use App\CarrierPackagingType;
-use App\Company;
-use App\Sequence;
-use App\TransactionLog;
+use App\Models\CarrierPackagingType;
+use App\Models\Company;
+use App\Models\Sequence;
+use App\Models\TransactionLog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 
@@ -364,7 +364,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
                 // Request unsuccessful - return errors
                 return $this->generateErrorResponse($response, $reply[3]);
             } else {
-                $fedexRoute = new \App\FedexRoute();
+                $fedexRoute = new \App\Models\FedexRoute();
                 $route_id = $fedexRoute->getRouteId($shipment);
 
                 // Set splitServiceBox if Rughouse Economy UK48
@@ -437,7 +437,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
          * Don't allow DG shipments to CW & VN.
          */
         $v = Validator::make($shipment, [], [
-            'hazardous.not_supported' => 'Hazardous shipments not supported to recipient country'
+            'hazardous.not_supported' => 'Hazardous shipments not supported to recipient country',
         ]);
 
         $v->sometimes('hazardous', 'not_supported', function ($input) {
@@ -502,7 +502,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
     {
         $cnt = 1;
         $options = $this->getData($shipment, 'options');
-        if ($options != '') {
+        if (!empty($options)) {
             foreach ($options as $option) {
                 $errors = $this->validateOption($errors, $option, $shipment);
             }
@@ -560,7 +560,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
         $msgGroups[] = 'OPTION';   // Always output OPTION
         $msgGroups[] = 'PRINTER';  // Output Package level details
 
-        if ($this->getData($data, 'broker.city') != '') {
+        if (!empty($this->getData($data, 'broker.city'))) {
             $msgGroups[] = 'BROKER'; // Broker Select Option enabled
             $data = $this->setElement($data, 'broker_select', 'Y');
         }
@@ -572,7 +572,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
             $msgGroups[] = 'COMMODITY'; // Commodity details
         }
 
-        if ($this->getData($data, 'hazardous') != 'N' && $this->getData($data, 'hazardous') != '') {
+        if ($this->getData($data, 'hazardous') != 'N' && !empty($this->getData($data, 'hazardous'))) {
             $msgGroups[] = 'DGOODS'; // Dangerous Goods Flag Set
             $data = $this->setElement($data, 'hazard_flag', 'Y');
         }
@@ -632,7 +632,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
                                 $msgData[$this->fedex->fldno['documents_description']] = '0';
                             }
 
-                            if (! isset($msgData['79-1']) || $msgData['79-1'] == '') {
+                            if (! isset($msgData['79-1']) || empty($msgData['79-1'])) {
                                 $msgData['79-1'] = 'Documentation/ No Commercial Value';
                             }
                             break;
@@ -843,7 +843,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
         }
 
         // Finally add any options
-        if ($this->getData($data, 'options') != '') {
+        if (!empty($this->getData($data, 'options'))) {
             $msgData = $this->addOptions($msgData, $this->getData($data, 'options'));
         }
 
@@ -911,7 +911,7 @@ class FedexAPI extends \App\CarrierAPI\CarrierBase
         $finished = false;
         $msg = '';
         foreach ($arrData as $arrKey => $arrValue) {
-            if ($arrValue != '' && $arrValue != '!') {
+            if (!empty($arrValue) && $arrValue != '!') {
                 $fldNoAbs = $this->getFldNo($arrKey);
                 $value = $this->multiplier($fldNoAbs, $arrValue, 'encode');
                 $msg = $msg.$arrKey.',"'.$value.'"';

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\SeaFreightTracking;
+use App\Models\SeaFreightTracking;
 use Auth;
 use Illuminate\Http\Request;
 

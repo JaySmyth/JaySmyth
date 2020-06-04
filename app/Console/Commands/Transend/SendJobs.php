@@ -46,14 +46,16 @@ class SendJobs extends Command
     public function handle()
     {
         // Today's shippers
-        $this->companyIds = \App\Shipment::orderBy('company_id')->whereNotIn('status_id',
-            [7])->shipDateBetween(Carbon::today(), Carbon::today())->pluck('company_id')->toArray();
+        $this->companyIds = \App\Models\Shipment::orderBy('company_id')->whereNotIn(
+            'status_id',
+            [7]
+        )->shipDateBetween(Carbon::today(), Carbon::today())->pluck('company_id')->toArray();
 
         // Set routes on the transport jobs before trying to send them
         $this->setRoutes();
 
         // Load the jobs
-        $jobs = \App\TransportJob::whereSent(0)->whereCompleted(0)->get();
+        $jobs = \App\Models\TransportJob::whereSent(0)->whereCompleted(0)->get();
 
         foreach ($jobs as $job) :
             if ($this->sendToTransend($job)) {

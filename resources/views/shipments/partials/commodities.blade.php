@@ -5,19 +5,19 @@
             <div class="modal-body">
 
                 <div id="commodity-list">
-                    <div class="row mb-3">          
-                        <div class="col-sm-3"> 
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
                             <h4>Commodities</h4>
-                        </div>        
-                        <div class="col-sm-4"> 
+                        </div>
+                        <div class="col-sm-4">
                             <input id="commodity_filter" type="text" class="form-control form-control-sm" placeholder="Description or commodity code...">
-                        </div>   
-                        <div class="col-sm-2"> 
+                        </div>
+                        <div class="col-sm-2">
                             {!! Form::select('commodity_filter_currency', dropDown('currencies', 'All Currencies'), null, array('id' => 'commodity_filter_currency', 'class' => 'form-control form-control-sm')) !!}
-                        </div> 
-                        <div class="col-sm-3"> 
+                        </div>
+                        <div class="col-sm-3">
                             <button id="button-new-commodity" class="btn btn-success btn-sm float-right" type="button">Create Commodity</button>
-                        </div>  
+                        </div>
                     </div>
 
                     <div class="modal-loading"><i class="fas fa-spinner fa-pulse fa-2x fa-fw"></i><span class="sr-only">Loading...</span></div>
@@ -25,13 +25,13 @@
                     <div class="modal-overflow text-medium">
                         <table class="table table-sm table-striped">
                             <thead>
-                                <tr>                            
+                                <tr>
                                     <th>Description</th>
                                     <th>Commodity</th>
                                     <th>Harmonized</th>
                                     <th>Ctry</th>
-                                    <th>Unit Value</th>                                                                                 
-                                    <th>&nbsp;</th>                          
+                                    <th>Unit Value</th>
+                                    <th>&nbsp;</th>
                                 </tr>
                             </thead>
                             <tbody id="commodities_body" class="cursor-pointer"></tbody>
@@ -58,7 +58,7 @@
                             </label>
                             <div class="col-sm-7">
                                 {!! Form::Text('description', null, ['id' => 'commodity_description','class' => 'form-control form-control-sm', 'maxlength' => '100']) !!}
-                            </div>   
+                            </div>
                         </div>
 
                         <div class="form-group row">
@@ -67,7 +67,7 @@
                             </label>
                             <div class="col-sm-7">
                                 {!! Form::Text('product_code', null, ['id' => 'commodity_product_code', 'class' => 'form-control form-control-sm', 'maxlength' => '30']) !!}
-                            </div> 
+                            </div>
                         </div>
 
                         <div class="form-group row">
@@ -76,7 +76,7 @@
                             </label>
                             <div class="col-sm-7">
                                 {!! Form::Text('manufacturer', null, ['id' => 'commodity_manufacturer','class' => 'form-control form-control-sm', 'maxlength' => '100']) !!}
-                            </div>                        
+                            </div>
                         </div>
 
                         <div class="form-group row">
@@ -85,18 +85,18 @@
                             </label>
                             <div class="col-sm-7">
                                 {!! Form::select('country_of_manufacture', dropDown('countries', 'Please select'), 'GB', array('id' => 'commodity_country_of_manufacture', 'class' => 'form-control form-control-sm')) !!}
-                            </div>                        
+                            </div>
                         </div>
 
                         <div class="form-group row">
                             <label class="col-sm-5  col-form-label">
-                                Unit Value:
+                                Unit Value*:
                             </label>
                             <div class="col-sm-4">
                                 {!! Form::Text('unit_value', null, ['id' => 'commodity_unit_value','class' => 'form-control  form-control-sm decimal-only', 'maxlength' => '8']) !!}
                             </div>
-                            <div class="col-sm-3">                
-                                {!! Form::select('currency_code', dropDown('currencies'), null, array('id' => 'commodity_currency_code', 'class' => 'form-control form-control-sm')) !!}                
+                            <div class="col-sm-3">
+                                {!! Form::select('currency_code', dropDown('currencies'), null, array('id' => 'commodity_currency_code', 'class' => 'form-control form-control-sm')) !!}
                             </div>
                         </div>
                     </div>
@@ -109,7 +109,7 @@
                             </label>
                             <div class="col-sm-6">
                                 {!! Form::Text('commodity_code', null, ['id' => 'commodity_commodity_code','class' => 'form-control form-control-sm numeric-only', 'maxlength' => '12']) !!}
-                            </div> 
+                            </div>
                         </div>
 
                         <div class="form-group row">
@@ -118,7 +118,7 @@
                             </label>
                             <div class="col-sm-6">
                                 {!! Form::Text('harmonized_code', null, ['id' => 'commodity_harmonized_code','class' => 'form-control form-control-sm numeric-only', 'maxlength' => '10']) !!}
-                            </div>                        
+                            </div>
                         </div>
 
                         <div class="form-group row">

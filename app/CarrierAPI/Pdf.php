@@ -2,9 +2,9 @@
 
 namespace App\CarrierAPI;
 
-use App\Company;
-use App\PrintFormat;
-use App\Shipment;
+use App\Models\Company;
+use App\Models\PrintFormat;
+use App\Models\Shipment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -281,12 +281,12 @@ class Pdf
 
                     if ($commercial_invoice_required || $labelType == 'INVOICE' || $labelType == 'CUSTOMS') {
                         if ($shipment->hasUploadedDocument('invoice')) {
-                            $this->importUploadedDocuments($shipment, 'invoice', ($labelType == '') ? 4 : 1);
+                            $this->importUploadedDocuments($shipment, 'invoice', (empty($labelType)) ? 4 : 1);
                         } else {
                             $this->createCommercialInvoice($shipment->token, [], false);
 
                             // Unless a request for Specific Documentation Set print 4 copies
-                            if ($labelType == '') {
+                            if (empty($labelType)) {
                                 $this->createCommercialInvoice($shipment->token, [], false);
                                 $this->createCommercialInvoice($shipment->token, [], false);
                                 $this->createCommercialInvoice($shipment->token, [], false);
@@ -809,7 +809,7 @@ class Pdf
         // If available get description of ship reason else use the code
         $shipReason = $shipment->ship_reason;
         if (isset($shipment->ship_reason)) {
-            $reason = \App\ShipReason::where('code', $shipment->ship_reason)->first();
+            $reason = \App\Models\ShipReason::where('code', $shipment->ship_reason)->first();
             if ($reason) {
                 $shipReason = $reason->description;
             }

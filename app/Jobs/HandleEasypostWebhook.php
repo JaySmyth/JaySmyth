@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
-use App\ProblemEvent;
-use App\Tracking;
+use App\Models\ProblemEvent;
+use App\Models\Tracking;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -219,7 +219,7 @@ class HandleEasypostWebhook implements ShouldQueue
         $countryCode = getCountryCode($country);
 
         if (! $countryCode) {
-            $countries = \App\Country::all();
+            $countries = \App\Models\Country::all();
 
             foreach ($countries as $country) :
 

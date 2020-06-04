@@ -8,8 +8,8 @@
 
 namespace App\CarrierAPI\Fedex;
 
-use App\Carrier;
-use App\CarrierPackagingType;
+use App\Models\Carrier;
+use App\Models\CarrierPackagingType;
 
 /**
  * Description of FedexFields.

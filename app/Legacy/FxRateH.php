@@ -115,7 +115,7 @@ class FxRateH extends Model
          */
         $rate_id = '';
         $rate_id = $this->getRateTable($company, $app, $service, 'Cost', $ship_date);
-        if ($rate_id == '') {
+        if (empty($rate_id)) {
 
             // If no Customer specific costs then use "IFS" generic cost table
             $rate_id = $this->getRateTable('4', $app, $service, $table, $ship_date);
@@ -156,7 +156,7 @@ class FxRateH extends Model
                 display($rateHeader, 'Rate Header');
             }
 
-            if (isset($rateHeader->id) && $rateHeader->id != '') {
+            if (isset($rateHeader->id) && !empty($rateHeader->id)) {
                 $rateId = $rateHeader->id;
             }
         }
@@ -178,7 +178,7 @@ class FxRateH extends Model
     public function migrate($company, $legacyRate, $newRateId, $newService)
     {
         if ($legacyRate) {
-            $newRate = \App\RateDetail::where('rate_id', $newRateId)
+            $newRate = \App\Models\RateDetail::where('rate_id', $newRateId)
                     ->where('from_date', '<=', date('Y-m-d'))
                     ->where('to_date', '>=', date('Y-m-d'))
                     ->orderBy('residential', 'piece_limit', 'package_type', 'zone', 'break_point')
@@ -208,7 +208,7 @@ class FxRateH extends Model
     {
 
         // Clear any existing discounts
-        $rate = \App\RateDiscount::where('company_id', $companyId)->where('service_id', $service)->delete();
+        $rate = \App\Models\RateDiscount::where('company_id', $companyId)->where('service_id', $service)->delete();
     }
 
     public function addDiscount($row, $companyId, $newRateId, $newService)
@@ -216,7 +216,7 @@ class FxRateH extends Model
         $flag = ['Y' => true, 'N' => false, 'y' => true, 'n' => false];
 
         // Read Standard Rate on new system
-        $newRate = \App\RateDetail::where('rate_id', $newRateId)
+        $newRate = \App\Models\RateDetail::where('rate_id', $newRateId)
                 ->where('residential', $flag[$row->residential])
                 ->where('piece_limit', $row->piece_limit)
                 ->where('package_type', $row->p_type)
@@ -241,7 +241,7 @@ class FxRateH extends Model
 
             // If a discounted rate then insert discount
             if ($newRate->weight_rate != 0 || $newRate->consignment_rate != 0) {
-                $rowDiscount = \App\RateDiscount::create([
+                $rowDiscount = \App\Models\RateDiscount::create([
                             'company_id' => $companyId,
                             'rate_id' => $newRateId,
                             'service_id' => $newService->id,

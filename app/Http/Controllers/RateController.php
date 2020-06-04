@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Carrier;
-use App\Company;
-use App\CompanyRates;
-use App\DomesticRate;
-use App\DomesticRateDiscount;
 use App\Legacy\Fuk_RateH;
 use App\Legacy\FukCustService;
 use App\Legacy\FukRate;
 use App\Legacy\FxRateH;
 use App\Legacy\OldCompany;
-use App\Rate;
-use App\RateChangeLogs;
-use App\RateDetail;
-use App\RateDiscount;
-use App\Service;
+use App\Models\Carrier;
+use App\Models\Company;
+use App\Models\CompanyRates;
+use App\Models\DomesticRate;
+use App\Models\DomesticRateDiscount;
+use App\Models\Rate;
+use App\Models\RateChangeLogs;
+use App\Models\RateDetail;
+use App\Models\RateDiscount;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -34,7 +34,7 @@ class RateController extends Controller
     public function showRate(Rate $rate, $rateDate = '')
     {
         $charges = [];
-        if ($rateDate == '') {
+        if (empty($rateDate)) {
             $rateDate = date('Y-m-d');
         }
         if ($rate) {
@@ -508,7 +508,7 @@ class RateController extends Controller
     public function getDefaultDate($dateType, $myDate)
     {
         // If rateDate suppplied then use it
-        if ($myDate != '') {
+        if (!empty($myDate)) {
             return $myDate;
         }
 

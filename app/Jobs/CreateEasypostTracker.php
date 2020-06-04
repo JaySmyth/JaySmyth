@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Shipment;
+use App\Models\Shipment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;

@@ -37,8 +37,8 @@ return [
 
         'sqlite' => [
             'driver' => 'sqlite',
-            'url' => env('DATABASE_URL'),
-            'database' => env('DB_DATABASE', database_path('database.sqlite')),
+            'url' => env('DB_DATABASE_URL_SQ'),
+            'database' => env('DB_DATABASE_SQ', database_path('database.sqlite')),
             'prefix' => '',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
@@ -55,7 +55,22 @@ return [
             'prefix' => '',
             'strict' => false,
             'engine' => null,
-            'options' => (env('DB_AWS_CA_PEM')) ? [PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_PEM')] : null
+            'options' => (env('DB_AWS_CA_PEM')) ? [PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_PEM')] : null,
+        ],
+
+        'unittest' => [
+            'driver' => 'mysql',
+            'host' => env('DB_HOST_UT', 'localhost'),
+            'port' => env('DB_PORT_UT', '3306'),
+            'database' => env('DB_DATABASE_UT', 'forge'),
+            'username' => env('DB_USERNAME_UT', 'forge'),
+            'password' => env('DB_PASSWORD_UT', ''),
+            'charset' => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix' => '',
+            'strict' => false,
+            'engine' => null,
+            'options' => (env('DB_AWS_CA_PEM')) ? [PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_PEM')] : null,
         ],
 
         'apitest' => [
@@ -70,7 +85,7 @@ return [
             'prefix' => '',
             'strict' => false,
             'engine' => null,
-            'options' => (env('DB_AWS_CA_PEM')) ? [PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_PEM')] : null
+            'options' => (env('DB_AWS_CA_PEM')) ? [PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_PEM')] : null,
         ],
 
         'legacy' => [
@@ -113,8 +128,8 @@ return [
             'prefix' => '',
             'strict' => false,
             'engine' => null,
-            'options' => (env('DB_AWS_CA_PEM')) ? [PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_PEM')] : null
-        ]
+            'options' => (env('DB_AWS_CA_PEM')) ? [PDO::MYSQL_ATTR_SSL_CA => env('DB_AWS_CA_PEM')] : null,
+        ],
 
     ],
     /*
@@ -147,7 +162,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
         ],
 
         'default' => [

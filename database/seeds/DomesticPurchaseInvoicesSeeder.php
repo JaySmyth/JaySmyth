@@ -25,7 +25,7 @@ class DomesticPurchaseInvoicesSeeder extends Seeder
 
         // Loop through each of the results
         foreach ($invoices as $invoice) {
-            $checkExists = App\PurchaseInvoice::where('invoice_number', $invoice->inv_no)->where('carrier_id', 2)->first();
+            $checkExists = App\Models\PurchaseInvoice::where('invoice_number', $invoice->inv_no)->where('carrier_id', 2)->first();
 
             if (! $checkExists) {
 
@@ -55,7 +55,7 @@ class DomesticPurchaseInvoicesSeeder extends Seeder
                 ];
 
                 // Save the  record
-                $invoice = App\PurchaseInvoice::create($array);
+                $invoice = App\Models\PurchaseInvoice::create($array);
 
                 // Create the invoice lines
                 $lines = DB::connection('legacy')->select('SELECT * FROM FUKSuppInvD WHERE inv_no= :inv_no', ['inv_no' => $invoice->invoice_number]);
@@ -63,7 +63,7 @@ class DomesticPurchaseInvoicesSeeder extends Seeder
                 foreach ($lines as $line) {
                     $carrierConsignmentNumber = '489'.$line->docketno;
 
-                    $shipment = App\Shipment::whereCarrierConsignmentNumber($carrierConsignmentNumber)->whereCarrierId(2)->first();
+                    $shipment = App\Models\Shipment::whereCarrierConsignmentNumber($carrierConsignmentNumber)->whereCarrierId(2)->first();
 
                     $array = [
                         'shipment_reference' => ($shipment) ? $shipment->shipment_reference : null,
@@ -116,7 +116,7 @@ class DomesticPurchaseInvoicesSeeder extends Seeder
                     ];
 
                     // Save the  record
-                    $line = App\PurchaseInvoiceLine::create($array);
+                    $line = App\Models\PurchaseInvoiceLine::create($array);
 
                     // Create the invoice charges
                     $charges = DB::connection('legacy')->select('SELECT * FROM FUKSuppInvC WHERE inv_no = :inv_no AND docketno = :docketno', ['inv_no' => $invoice->invoice_number, 'docketno' => substr($line->carrier_consignment_number, 3)]);
@@ -136,7 +136,7 @@ class DomesticPurchaseInvoicesSeeder extends Seeder
                         ];
 
                         // Save the  record
-                        $charge = App\PurchaseInvoiceCharge::create($array);
+                        $charge = App\Models\PurchaseInvoiceCharge::create($array);
                     }
                 }
             }

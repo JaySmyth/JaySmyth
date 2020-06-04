@@ -2,10 +2,10 @@
 
 namespace App\Jobs;
 
-use App\Carrier;
-use App\FuelSurcharge;
-use App\Service;
-use App\User;
+use App\Models\Carrier;
+use App\Models\FuelSurcharge;
+use App\Models\Service;
+use App\Models\User;
 use DB;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -110,7 +110,7 @@ class ImportFuelSurcharges implements ShouldQueue
         $this->buildRow($data);
 
         // Ignore blank lines (or lines with no fuel %)
-        if ($this->row['fuel_percent'] == '') {
+        if (empty($this->row['fuel_percent'])) {
             return;
         }
 
@@ -228,7 +228,7 @@ class ImportFuelSurcharges implements ShouldQueue
 
         // Check to see if an existing rate overlaps
         /*
-          $fuelSurcharges = \App\FuelSurcharge::where('carrier_id', $this->row['carrier_id'])
+          $fuelSurcharges = \App\Models\FuelSurcharge::where('carrier_id', $this->row['carrier_id'])
           ->where('service_code', strtolower($this->row['service_code']))
           ->where('to_date', '>=', $this->row['from_date'])
           ->first();
@@ -344,7 +344,7 @@ class ImportFuelSurcharges implements ShouldQueue
      */
     private function hasFutureRate()
     {
-        $fuelSurcharges = \App\FuelSurcharge::where('carrier_id', $this->row['carrier_id'])
+        $fuelSurcharges = \App\Models\FuelSurcharge::where('carrier_id', $this->row['carrier_id'])
                 ->where('service_code', strtolower($this->row['service_code']))
                 ->where('from_date', '>', $this->row['from_date'])
                 ->get();
@@ -363,7 +363,7 @@ class ImportFuelSurcharges implements ShouldQueue
      */
     private function isDuplicate()
     {
-        $fuelSurcharges = \App\FuelSurcharge::where('carrier_id', $this->row['carrier_id'])
+        $fuelSurcharges = \App\Models\FuelSurcharge::where('carrier_id', $this->row['carrier_id'])
                 ->where('service_code', strtolower($this->row['service_code']))
                 ->where('from_date', '=', $this->row['from_date'])
                 ->where('to_date', '=', $this->row['to_date'])
@@ -382,7 +382,7 @@ class ImportFuelSurcharges implements ShouldQueue
         DB::enableQueryLog();
 
         // Check to see if an existing rate overlaps
-        $fuelSurcharges = \App\FuelSurcharge::where('carrier_id', $this->row['carrier_id'])
+        $fuelSurcharges = \App\Models\FuelSurcharge::where('carrier_id', $this->row['carrier_id'])
                 ->where('service_code', strtolower($this->row['service_code']))
                 ->where('from_date', '<=', $this->row['from_date'])
                 ->where('to_date', '>=', $this->row['to_date'])
@@ -397,7 +397,7 @@ class ImportFuelSurcharges implements ShouldQueue
                 } else {
 
                     // If Existing record starts prior, then close
-                    $surcharge = \App\FuelSurcharge::where('id', $fuelSurcharge['id'])
+                    $surcharge = \App\Models\FuelSurcharge::where('id', $fuelSurcharge['id'])
                             ->update(['to_date' => date('Y-m-d', strtotime($this->row['from_date'].' -1 day'))]);
                 }
             }

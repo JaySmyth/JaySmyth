@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands\PurchaseInvoices;
 
-use App\PurchaseInvoice;
-use App\PurchaseInvoiceCharge;
-use App\PurchaseInvoiceLine;
+use App\Models\PurchaseInvoice;
+use App\Models\PurchaseInvoiceCharge;
+use App\Models\PurchaseInvoiceLine;
 use Illuminate\Console\Command;
 
 class ImportFedexPurchaseInvoices extends Command

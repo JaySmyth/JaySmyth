@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Carrier;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TrackingRequest;
-use App\Shipment;
-use App\Tracking;
+use App\Models\Carrier;
+use App\Models\Shipment;
+use App\Models\Tracking;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -229,7 +229,7 @@ class TrackingController extends Controller
      */
     public function createEasypostTracker()
     {
-        $carriers = \App\Carrier::whereIn('id', [2, 3, 4, 5, 6, 7, 11])->pluck('name', 'easypost');
+        $carriers = \App\Models\Carrier::whereIn('id', [2, 3, 4, 5, 6, 7, 11])->pluck('name', 'easypost');
 
         return view('tracking.create_tracker', compact('carriers'));
     }
@@ -292,7 +292,7 @@ class TrackingController extends Controller
         echo $shipments->count().' shipments loaded<br>';
 
         foreach ($shipments as $shipment) {
-            $tracking = \App\Tracking::whereShipmentId($shipment->id)->whereSource('easypost')->first();
+            $tracking = \App\Models\Tracking::whereShipmentId($shipment->id)->whereSource('easypost')->first();
 
             if ($tracking) {
                 echo $shipment->consignment_number.' / '.$tracking->tracker_id.'<br>';

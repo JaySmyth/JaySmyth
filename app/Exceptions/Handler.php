@@ -9,6 +9,7 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Mail;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
+use Throwable;
 
 class Handler extends ExceptionHandler
 {
@@ -31,14 +32,16 @@ class Handler extends ExceptionHandler
      *
      * This is a great spot to send exceptions to Sentry, Bugsnag, etc.
      *
-     * @param  \Exception  $exception
+     * @param  \Throwable  $exception
      * @return void
      */
-    public function report(Exception $exception)
+    public function report(Throwable $exception)
     {
+        /*
         if ($this->shouldReport($exception)) {
             $this->sendEmail($exception); // sends an email
         }
+        */
 
         return parent::report($exception);
     }
@@ -47,10 +50,10 @@ class Handler extends ExceptionHandler
      * Render an exception into an HTTP response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $exception
+     * @param  \Throwable  $exception
      * @return \Illuminate\Http\Response
      */
-    public function render($request, Exception $exception)
+    public function render($request, Throwable $exception)
     {
         return parent::render($request, $exception);
     }
@@ -72,23 +75,27 @@ class Handler extends ExceptionHandler
     }
 
     /**
-     * Sends an email to the developer about the exception.
+     * Sends an email to the developer about the exception
      *
-     * @param  \Exception  $exception
+     * @param  \Throwable  $exception
      * @return void
      */
-    public function sendEmail(Exception $exception)
+     /*
+    public function sendEmail(Throwable $exception)
     {
         try {
-            $e = FlattenException::create($exception);
+            // $e = FlattenException::create($exception);
 
-            $handler = new SymfonyExceptionHandler();
+            // $handler = new SymfonyExceptionHandler();
 
-            $html = $handler->getHtml($e);
+            // $html = $handler->getHtml($e);
+            // $html = $exception->getMessage();
 
-            Mail::to(['gmcbroom@antrim.ifsgroup.com', 'dshannon@antrim.ifsgroup.com'])->send(new ErrorException($html));
+            //Mail::to(['gmcbroom@antrim.ifsgroup.com', 'dshannon@antrim.ifsgroup.com'])->send(new ErrorException($html));
+            dd($ex);
         } catch (Exception $ex) {
             dd($ex);
         }
     }
+    */
 }

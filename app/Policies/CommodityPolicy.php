@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Commodity;
-use App\User;
+use App\Models\Commodity;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CommodityPolicy

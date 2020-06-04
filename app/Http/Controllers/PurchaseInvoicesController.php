@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\PurchaseInvoicesExport;
 use App\Http\Controllers\Controller;
-use App\PurchaseInvoice;
+use App\Models\PurchaseInvoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;

@@ -9,7 +9,7 @@
 
 namespace App\Pricing;
 
-use App\TntEas;
+use App\Models\TntEas;
 
 class PricingModel4 extends PricingModel
 {

@@ -2,7 +2,7 @@
 
 namespace App\CarrierAPI\ExpressFreightNI;
 
-use App\ExpressFreightGazetteer;
+use App\Models\ExpressFreightGazetteer;
 
 class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
 {

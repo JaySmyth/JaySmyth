@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Shipment;
+use App\Models\Shipment;
 use App\Vmi\VvOrders;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
@@ -75,7 +75,7 @@ class UpdateShopify extends Command
         if (count($ids) > 0) {
 
             // Set the source field on all shipments to that of the filename
-            \App\Shipment::whereIn('id', $ids)->update([
+            \App\Models\Shipment::whereIn('id', $ids)->update([
                 'received_sent' => 1,
             ]);
 

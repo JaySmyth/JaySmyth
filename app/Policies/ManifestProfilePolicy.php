@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\ManifestProfile;
-use App\User;
+use App\Models\ManifestProfile;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ManifestProfilePolicy

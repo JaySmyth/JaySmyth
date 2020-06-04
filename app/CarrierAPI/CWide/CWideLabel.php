@@ -2,10 +2,10 @@
 
 namespace App\CarrierAPI\CWide;
 
-use App\Depot;
-use App\Mode;
-use App\Route;
-use App\Service;
+use App\Models\Mode;
+use App\Models\Depot;
+use App\Models\Route;
+use App\Models\Service;
 
 class CWideLabel extends \App\CarrierAPI\CarrierLabel
 {

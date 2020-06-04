@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Exports\SurchargesExport;
 use App\Http\Requests\SurchargeDetailRequest;
-use App\Surcharge;
-use App\SurchargeDetail;
+use App\Models\Surcharge;
+use App\Models\SurchargeDetail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -151,7 +151,7 @@ class SurchargeDetailsController extends Controller
         $this->authorize('viewAny', new Surcharge);
 
         // If no Company specified assume all - 0
-        $companyId = ($request->company_id == '') ? 0 : $request->company_id;
+        $companyId = (empty($request->company_id)) ? 0 : $request->company_id;
 
         // Get charge name from default charge (company 0)
         $surcharge = SurchargeDetail::where('code', $request->code)

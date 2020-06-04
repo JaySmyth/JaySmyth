@@ -2,7 +2,7 @@
 
 namespace app\CarrierAPI;
 
-use App\Carrier;
+use App\Models\Carrier;
 use Illuminate\Support\Facades\Validator;
 
 /**
@@ -277,7 +277,7 @@ class CarrierBase
     public function applyRules($rules, $shipment, $messages = [])
     {
         $errors = [];
-        if ($rules != '') {
+        if (!empty($rules)) {
             $shipmentValidation = Validator::make($shipment, $rules, $messages);
 
             if ($shipmentValidation->fails()) {
