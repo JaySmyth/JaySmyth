@@ -1116,7 +1116,7 @@ class Shipment extends Model
      */
     public function tracking()
     {
-        return $this->hasMany(\App\Tracking::class)->orderBy('local_datetime', 'DESC')->orderBy('id', 'DESC');
+        return $this->hasMany(\App\Models\Tracking::class)->orderBy('local_datetime', 'DESC')->orderBy('id', 'DESC');
     }
 
     /**
