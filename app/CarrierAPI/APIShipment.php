@@ -484,7 +484,7 @@ class APIShipment
             $rules['alerts.*.delivered'] = 'nullable|in:0,1';
             $rules['alerts.*.cancelled'] = 'nullable|in:0,1';
             $rules['alerts.*.problems'] = 'nullable|in:0,1';
-            $rules['other_email'] = 'email';
+            $rules['other_email'] = 'nullable|email';
         }
 
         $rules['documents_description'] = 'nullable:|string';
