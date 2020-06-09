@@ -4,7 +4,7 @@
 
 <div class="clearfix">
     <h2 class="float-left">
-        {{$company->company_name}}           
+        {{$company->company_name}}
     </h2>
     <h2 class="float-right">
         @if($company->enabled)
@@ -35,7 +35,7 @@
                         {{$company->country}}<br><br>
                     </div>
 
-                    <div class="col-sm-7">                        
+                    <div class="col-sm-7">
                         <div class="row mb-2">
                             <div class="col-sm-5 text-truncate"><span class="fas fa-fw fa-tag" aria-hidden="true"></span> <strong class="ml-sm-3">Site Name</strong></div>
                             <div class="col-sm-7">{{$company->site_name}}</div>
@@ -62,8 +62,8 @@
         <div class="card">
             <div class="card-header">Account Details
                 <div class="float-right">
-                    @include('companies.partials.actions', ['company' => $company])                    
-                </div>              
+                    @include('companies.partials.actions', ['company' => $company])
+                </div>
             </div>
             <div class="card-body text-large">
                 <div class="row mb-2">
@@ -89,10 +89,10 @@
                 <div class="row mb-2">
                     <div class="col-sm-6 text-truncate"><span class="fas fa-fw fa-folder-open" aria-hidden="true"></span> <strong class="ml-sm-3">SCS Code</strong></div>
                     <div class="col-sm-6">
-                        {{$company->scs_code}}                        
+                        {{$company->scs_code}}
                         @if($company->group_account)
                             <span class="badge badge-warning ml-2 text-uppercase">{{$company->group_account}}</span>
-                        @endif                        
+                        @endif
                     </div>
                 </div>
 
@@ -171,15 +171,21 @@
             @if(!$company->legacy_pricing || Auth::user()->hasRole('ifsa'))
 
             <td @if($company->legacy_pricing) class="bg-warning" @endif>
-                 <a href="{{ url('/company-rate/' . $company->id . '/'. $service->id) . "/" . $company->salesRateForService($service->id)['discount'] }}">{{$company->salesRateForService($service->id)['description']}}</a>
+                <?php
+                    $salesRate = $company->salesRateForService($service->id);
+                    $discount = $salesRate['discount'] ?? 0;
+                    $fuelCap = $salesRate['fuel_cap'] ?? 0;
+                    $url = url('/company-rate/' . $company->id . '/'. $service->id) . "/" . $discount;
+                ?>
+                 <a href="{{ $url }}">{{$salesRate['description'] ?? ''}}</a>
             </td>
 
-            @if($company->salesRateForService($service->id)['special_discount'])
+            @if($discount > 0)
             <td class="text-right">Special</td>
             @else
-            <td class="text-right">{{number_format($company->salesRateForService($service->id)['discount'],2)}}</td>
+            <td class="text-right">0.00</td>
             @endif
-            <td class="text-right">{{number_format($company->salesRateForService($service->id)['fuel_cap'],2)}}</td>
+            <td class="text-right">{{number_format($fuelCap,2)}}</td>
             @else
             <td class="text-left">See Legacy System</td>
             <td class="text-right">See Legacy System</td>
@@ -188,9 +194,9 @@
             @can('set_company_rates')
             <td class="text-center text-nowrap">
                 <a href="{{ url('/company-service-rate/' . $company->id . '/'.$service->id) }}" title="Set Rate"><span class="fas fa-fw fa-edit" aria-hidden="true"></span></a>
-                <a href="{{ url('/company-rate/' . $company->id . '/'.$service->id) . '/download' }}" title="Download Rate"><span class="fas fa-cloud-download-alt ml-sm-2" aria-hidden="true"></span></a>                
+                <a href="{{ url('/company-rate/' . $company->id . '/'.$service->id) . '/download' }}" title="Download Rate"><span class="fas fa-cloud-download-alt ml-sm-2" aria-hidden="true"></span></a>
                 <a href="{{ url('/company-rate/' . $company->id . '/'.$service->id) . '/upload' }}" title="Upload Rate"><span class="fas fa-cloud-upload-alt ml-sm-2" aria-hidden="true"></span></a>
-                <a href="{{ url('/company-service-rate/' . $company->id . '/'.$service->id) . "/delete" }}" title="Reset to Service Default Rate"><span class="fas fa-fw fa-times ml-sm-2" aria-hidden="true"></span></a>                    
+                <a href="{{ url('/company-service-rate/' . $company->id . '/'.$service->id) . "/delete" }}" title="Reset to Service Default Rate"><span class="fas fa-fw fa-times ml-sm-2" aria-hidden="true"></span></a>
             </td>
             @endcan
         </tr>
