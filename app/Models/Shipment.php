@@ -1502,7 +1502,7 @@ class Shipment extends Model
      */
     public function updateTracking()
     {
-        $className = \App\Tracking::class.$this->carrier->name;
+        $className = \App\Models\Tracking::class.$this->carrier->name;
 
         $tracking = new $className($this);
 
