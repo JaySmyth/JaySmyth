@@ -548,8 +548,8 @@ class APIShipment
     {
         $required = $this->detailsRequired($contactType);
 
-        $rules[$contactType.'_name'] = 'required_without:'.$contactType.'_company_name'.'|string|max:35';
-        $rules[$contactType.'_company_name'] = 'required_without:'.$contactType.'_name'.'|string|max:35';
+        $rules[$contactType.'_name'] = 'nullable|required_without:'.$contactType.'_company_name'.'|string|max:35';
+        $rules[$contactType.'_company_name'] = 'nullable|required_without:'.$contactType.'_name'.'|string|max:35';
         $rules[$contactType.'_telephone'] = $required.'string|min:8';
         $rules[$contactType.'_email'] = 'nullable|email';
         // $rules[$contact_type . "_account"] = "string|max:12";
