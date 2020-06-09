@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Models\Shipment;
 use Carbon\Carbon;
+use App\Multifreight\JobHdr;
 use Illuminate\Database\Eloquent\Model;
 
 class PurchaseInvoiceLine extends Model
@@ -62,7 +62,7 @@ class PurchaseInvoiceLine extends Model
      */
     public function scsJob()
     {
-        return $this->hasOne(Multifreight\JobHdr::class, 'job_disp', 'scs_job_number')->select('job_id', 'job_disp')->with('costs');
+        return $this->hasOne(JobHdr::class, 'job_disp', 'scs_job_number')->select('job_id', 'job_disp')->with('costs');
     }
 
     /**
