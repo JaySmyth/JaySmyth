@@ -385,9 +385,11 @@ class PricingModel1 extends PricingModel
 
     public function isEAS()
     {
-        $surcharge = new \App\Models\FedexEas();
-        if (strtoupper($surcharge->getSurcharge($this->shipment['recipient_postcode'])) == 'EAS') {
-            return true;
+        if (isset($this->shipment['recipient_postcode'])) {
+            $surcharge = new \App\Models\FedexEas();
+            if (strtoupper($surcharge->getSurcharge($this->shipment['recipient_postcode'])) == 'EAS') {
+                return true;
+            }
         }
 
         return false;
@@ -395,9 +397,11 @@ class PricingModel1 extends PricingModel
 
     public function isRAS()
     {
-        $surcharge = new \App\Models\FedexEas();
-        if (strtoupper($surcharge->getSurcharge($this->shipment['recipient_postcode'])) == 'RAS') {
-            return true;
+        if (isset($this->shipment['recipient_country_code'])) {
+            $surcharge = new \App\Models\FedexEas();
+            if (strtoupper($surcharge->getSurcharge($this->shipment['recipient_postcode'])) == 'RAS') {
+                return true;
+            }
         }
 
         return false;
