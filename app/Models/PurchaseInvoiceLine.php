@@ -62,8 +62,7 @@ class PurchaseInvoiceLine extends Model
      */
     public function scsJob()
     {
-        return $this->hasOne(Legacy\MfJobHdr::class, 'job_disp', 'scs_job_number')->select('job_id', 'job_disp')->with('costs');
-        //return $this->hasOne(Multifreight\JobHdr::class, 'job_disp', 'scs_job_number')->select('job_id', 'job_disp')->with('costs');
+        return $this->hasOne(Multifreight\JobHdr::class, 'job_disp', 'scs_job_number')->select('job_id', 'job_disp')->with('costs');
     }
 
     /**
