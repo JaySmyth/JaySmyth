@@ -68,7 +68,6 @@ class InvoiceRunController extends Controller
             ->orderBy('sender_company_name')
             ->orderBy('consignment_number')
             ->with(['company', 'service'])
-            ->limit(900)
             ->get();
 
         // Attempt to price unpriced shipments
