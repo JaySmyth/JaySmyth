@@ -23,6 +23,7 @@ class GenerateMultifreightSalesXml implements ShouldQueue
     protected $department_id;
     protected $user;
     protected $invoiceRun;
+    public $timeout = 1200;
 
     /**
      * Create a new job instance.
