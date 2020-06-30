@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\DimsExport;
 use App\Exports\ShipmentsExport;
+use App\Exports\ExceptionsExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
 use App\Jobs\ImportShipments;
@@ -682,6 +683,39 @@ class ShipmentsController extends Controller
         $shipments = $this->search($request, false, 2000);
 
         return Excel::download(new DimsExport($shipments), 'dims.xlsx');
+    }
+
+    /**
+     * Download the result set to an Excel Document.
+     *
+     * @param Request
+     * @return Excel document
+     */
+    public function downloadExceptions(Request $request)
+    {
+        $this->authorize('viewAny', new Shipment);
+
+        if ($request->status) {
+            $status = [$request->status];
+        } else {
+            $status = [8, 9, 10, 11, 12, 17];
+        }
+
+        $shipments = Shipment::orderBy('ship_date', 'DESC')
+            ->filter($request->filter)
+            ->hasCompany($request->company)
+            ->shipDateBetween($request->date_from, $request->date_to)
+            ->hasMode(1)
+            ->where('service_id', '<>', 4)
+            ->whereReceived(1)
+            ->whereIn('status_id', $status)
+            ->traffic($request->traffic)
+            ->hasService($request->service)
+            ->restrictCompany($request->user()->getAllowedCompanyIds())
+            ->with('service')
+            ->paginate(250);
+
+        return Excel::download(new ExceptionsExport($shipments), 'exceptions.xlsx');
     }
 
     /**

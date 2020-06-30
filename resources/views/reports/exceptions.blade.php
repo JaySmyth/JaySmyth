@@ -45,6 +45,15 @@
 
     <main class="col-sm-10 ml-sm-auto" role="main">
 
+
+        @section('toolbar')
+            @if(Request::get('date_from'))
+                <a href="{{ url('/shipments/download-exceptions?' . Request::getQueryString()) }}" title="Download Results"><span class="fas fa-cloud-download-alt fa-lg" aria-hidden="true"></span></a>
+            @else
+                <a href="{{ url('/shipments/download-exceptions?date_from=' . date(Auth::user()->date_format) . '&date_to=' . date(Auth::user()->date_format)) }}" title="Download Results"><span class="fas fa-cloud-download-alt fa-lg" aria-hidden="true"></span></a>
+            @endif
+        @endsection
+
         @include('partials.title', ['title' => $report->name, 'results'=> $shipments])
 
         <table class="table table-striped">
@@ -56,7 +65,7 @@
                     @if(Auth::user()->hasIfsRole() && Auth::user()->hasMultipleDepots())<th class="text-center">Depot</th>@endif
 
                     @if(Auth::user()->hasIfsRole())
-                    <th>Destination</th>    
+                    <th>Destination</th>
                     <th>Shipper</th>
 
                     @else
@@ -99,7 +108,7 @@
                     @else
                     <td>
                         @if($shipment->recipient_company_name || $shipment->recipient_name)
-                        {{$shipment->recipient_company_name ?: $shipment->recipient_name}},     
+                        {{$shipment->recipient_company_name ?: $shipment->recipient_name}},
                         @else
                         <span class="text-muted"><i>Unknown</i></span>
                         @endif
@@ -115,23 +124,23 @@
                         <span class="text-muted"><i>Unknown</i></span>
                         @endif
                     </td>
-                    @endif                
+                    @endif
 
                     <td>{{$shipment->ship_date->timezone(Auth::user()->time_zone)->format(Auth::user()->date_format)}}</td>
-                    <td class="text-center">                    
-                        @if($shipment->status->code == 'saved')                        
+                    <td class="text-center">
+                        @if($shipment->status->code == 'saved')
                         <span class="text-muted"><i>Unknown</i></span>
                         @else
                         <span class="text-uppercase badge badge-secondary" data-placement="bottom" data-toggle="tooltip" data-original-title="{{$shipment->service->name ?? 'Unknown'}}">{{$shipment->service->code ?? ''}}</span>
-                        @endif                    
+                        @endif
                     </td>
                     <td class="text-center">{{$shipment->pieces}}</td>
-                    <td class="text-center">                    
+                    <td class="text-center">
                         @if($shipment->timeInTransit == 0 && $shipment->delivered)
                         <span class="text-muted">n/a</span>
                         @else
                         {{$shipment->timeInTransit}}<span class="hours">hrs</span>
-                        @endif                                        
+                        @endif
                     </td>
                     <td class="text-center"><span class="status {{$shipment->status->code}}" data-placement="bottom" data-toggle="tooltip" data-original-title="{{$shipment->status->description}}">{{$shipment->status->name}}</span></td>
 
@@ -142,7 +151,7 @@
             </tbody>
         </table>
 
-        @include('partials.no_results', ['title' => 'shipments', 'results'=> $shipments]) 
+        @include('partials.no_results', ['title' => 'shipments', 'results'=> $shipments])
         @include('partials.pagination', ['results'=> $shipments])
 
     </main>

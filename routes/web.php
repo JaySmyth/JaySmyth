@@ -48,6 +48,7 @@ Route::get('shipments/get', 'ShipmentsController@getSaved');
 
 Route::get('shipments/download', 'ShipmentsController@download');
 Route::get('shipments/download-dims', 'ShipmentsController@downloadDims');
+Route::get('shipments/download-exceptions', 'ShipmentsController@downloadExceptions');
 Route::get('shipments/upload', 'ShipmentsController@upload');
 Route::post('shipments/upload', 'ShipmentsController@storeupload');
 Route::get('label/{token}', 'ShipmentsController@label');
