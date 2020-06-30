@@ -25,9 +25,9 @@ class CommodityRequest extends Request
     {
         return [
             'company_id' => 'required',
-            'description' => 'required|min:2|max:100',
+            'description' => 'required|string|min:3|max:100|not_regex:/^[0-9]+$/',
             'product_code' => 'nullable|min:1',
-            'manufacturer' => 'nullable|min:2',
+            'manufacturer' => 'nullable|min:3',
             'country_of_manufacture' => 'required|alpha|size:2',
             'commodity_code' => 'nullable|numeric',
             'harmonized_code' => 'nullable|digits:10',

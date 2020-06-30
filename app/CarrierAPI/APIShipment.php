@@ -367,7 +367,13 @@ class APIShipment
     public function buildValidationErrors($messages)
     {
         foreach ($messages->all() as $message) {
-            $errors[] = ucfirst($message);
+
+            if($message == 'validation.not_regex'){
+                $errors[] = 'Please provide a valid commodity description';
+            } else {
+                $errors[] = ucfirst($message);
+            }
+
         }
 
         return $errors;
@@ -518,7 +524,7 @@ class APIShipment
 
         $rules['commercial_invoice_comments'] = 'nullable|string';
         if (isset($shipment['commodity_count']) && $shipment['commodity_count'] > 0) {
-            $rules['contents.*.description'] = 'required|string';
+            $rules['contents.*.description'] = 'required|string|min:3|max:100|not_regex:/^[0-9]+$/';
             $rules['contents.*.quantity'] = 'required|integer|greater_than_value:0';
             $rules['contents.*.uom'] = 'required|exists:uoms,code';
             $rules['contents.*.unit_value'] = 'required|numeric|greater_than_value:0';
