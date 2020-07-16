@@ -102,7 +102,7 @@ class ShipmentsController extends Controller
             ->restrictMode($request->user()->getAllowedModeIds())
             ->with('service', 'status', 'department', 'mode', 'company', 'depot');
 
-        if($request->has('received')){
+        if ($request->has('received')) {
             $query->where('received', $request->received);
         }
 
@@ -629,7 +629,7 @@ class ShipmentsController extends Controller
         $filename = 'temp/' . md5_file(storage_path('app/' . $path)) . '.csv';
 
         // Check that this file has not already been uploaded
-        if(Storage::exists($filename)){
+        if (Storage::exists($filename)) {
 
             // Delete the duplicate
             Storage::delete($path);

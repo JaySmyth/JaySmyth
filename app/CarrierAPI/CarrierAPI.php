@@ -14,6 +14,7 @@ use App\Jobs\CreateEasypostTracker;
 use App\Models\Mode;
 use App\CarrierAPI\APIShipment;
 use App\CarrierAPI\CWide\CWideAPI;
+use App\CarrierAPI\XDP\XDPAPI;
 use App\CarrierAPI\DHL\DHLAPI;
 use App\CarrierAPI\DHLGlobalMail\DHLGlobalMailAPI;
 use App\CarrierAPI\ExpressFreight\ExpressFreightAPI;
@@ -71,6 +72,10 @@ class CarrierAPI
 
             case 'cwide':
                 $this->carrier = new CWideAPI($this->mode);
+                break;
+
+            case 'xdp':
+                $this->carrier = new XDPAPI($this->mode);
                 break;
 
             case 'ups':

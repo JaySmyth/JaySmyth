@@ -60,7 +60,7 @@ abstract class CarrierLabel
      *
      * @param type $pageNumber
      */
-    protected function importPageFromTemplate($pageNumber)
+    protected function importPageFromTemplate($pageNumber, $x=1, $y=1)
     {
         $tpl = $this->pdf->importPage($pageNumber);
         $originalPdfSize = $this->pdf->getTemplateSize($tpl);
@@ -68,7 +68,7 @@ abstract class CarrierLabel
         // Add a blank page
         $this->addPage();
 
-        $this->pdf->useTemplate($tpl, 1, 1, $originalPdfSize['w'], $originalPdfSize['h'], false);
+        $this->pdf->useTemplate($tpl, $x, $y, $originalPdfSize['w'], $originalPdfSize['h'], false);
     }
 
     /**
