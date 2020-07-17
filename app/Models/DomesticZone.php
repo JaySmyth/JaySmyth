@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class DomesticZone extends Model
 {
-    public function getZone($shipment)
+    public function getZone($shipment, $model="fedex")
     {
         $zone = '';
         $postcode = '';
@@ -28,7 +28,9 @@ class DomesticZone extends Model
             while ($l > 0) {
 
                 // Must have at least 1 Char
-                $zone = self::where('postcode', '=', substr($newPostCode, 0, $l))->first();
+                $zone = self::where('postcode', '=', substr($newPostCode, 0, $l))
+                              ->where('model', $model)
+                              ->first();
                 if (! empty($zone)) {
                     $postCodeFound = true;
 

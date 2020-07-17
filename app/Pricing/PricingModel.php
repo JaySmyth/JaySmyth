@@ -108,6 +108,7 @@ class PricingModel
             'tnt' => '4',
             'dhl' => '5',
             'cwide' => '6',
+            'xdp' => '7'
         ];
 
         // Calculate Fuel Surcharge on the following charge codes
