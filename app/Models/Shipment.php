@@ -12,6 +12,7 @@ use App\Traits\ShipmentScopes;
 use App\Traits\ShipmentAlerting;
 use App\Traits\Logable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Spatie\PdfToImage\Pdf;
@@ -1358,6 +1359,157 @@ class Shipment extends Model
         }
 
         return false;
+    }
+
+    /**
+     * Read shipment details and save as form values. Then remove carrier related details
+     * So that the shipment may be raised against a different carrier and new labels
+     * created.
+     *
+     * @return bool
+     */
+    public function reset()
+    {
+
+        // If shipment is in transit or delivered - do nothing
+        if (in_array($this->status_id, [1,2,3,7,8])) {
+            $this->setCancelled();
+            $this->convertToFormValues();
+            $this->clearCarrierDetails();
+            $this->clearPackageCarrierDetails();
+            $this->clearPackageLabels();
+            $this->collection_date=date('Y-m-d');
+            $this->status_id=1;
+            $this->save();
+        }
+    }
+
+    public function convertToFormValues()
+    {
+        $alerts=$this->alerts;
+        $packages=$this->packages;
+        $contents=$this->contents;
+        $value["commodity_count"]=count($contents);
+        $value["sender_name"] = $this->sender_name;
+        $value["sender_company_name"]=$this->sender_company_name;
+        $value["sender_type"]=$this->sender_type;
+        $value["sender_address1"]=$this->sender_address1;
+        $value["sender_address2"]=$this->sender_address2;
+        $value["sender_address3"]=$this->sender_address3;
+        $value["sender_city"]=$this->sender_city;
+        $value["sender_country_code"]=$this->sender_country_code;
+        $value["sender_state"]=$this->sender_state;
+        $value["sender_postcode"]=$this->sender_postcode;
+        $value["sender_telephone"]=$this->sender_telephone;
+        $value["sender_email"]=$this->sender_email;
+        $value["company_id"]=$this->company_id;
+        $value["recipient_name"]=$this->recipient_name;
+        $value["recipient_company_name"]=$this->recipient_company_name;
+        $value["recipient_type"]=$this->recipient_type;
+        $value["recipient_address1"]=$this->recipient_address1;
+        $value["recipient_address2"]=$this->recipient_address2;
+        $value["recipient_city"]=$this->recipient_city;
+        $value["recipient_country_code"]=$this->recipient_country_code;
+        $value["recipient_state"]=$this->recipient_state;
+        $value["recipient_postcode"]=$this->recipient_postcode;
+        $value["recipient_telephone"]=$this->recipient_telephone;
+        $value["recipient_email"]=$this->recipient_email;
+        $value["recipient_account_number"]=$this->recipient_account_number;
+        $value["pieces"]=$this->pieces;
+        $value["shipment_reference"]=$this->shipment_reference;
+        $value["ship_reason"]=$this->ship_reason;
+        $value["collection_date"]=$this->collection_date;                       // Format as dd-mm-yyyy
+        $value["hazardous"]=$this->hazardous;
+        $value["special_instructions"]=$this->special_instructions;
+
+        foreach ($alerts as $alert) {
+            if (substr($alert->email, 0, 7)!="alerts.") {
+                if ($alert->email==$this->sender_email) {
+                    $alertType="sender";
+                } elseif ($alert->email==$this->recipient_email) {
+                    $alertType="recipient";
+                } elseif ($alert->email==$this->broker_email) {
+                    $alertType="broker";
+                } else {
+                    $alertType="other";
+                }
+                $value["display_".$alertType."_email"]=$alert->email;
+                $milestones = ['despatched','collected','out_for_delivery','delivered','cancelled','problems'];
+                foreach ($milestones as $milestone) {
+                    if ($alert->$milestone) {
+                        $value["alerts"][$alertType][$milestone]=$alert->$milestone;
+                    }
+                }
+            }
+        }
+        $value["display_recipient_email"]=$this->recipient_email;
+        $value["display_broker_email"]=$this->broker_email;
+        $value["other_email"]=$this->other_email;
+        $value["bill_shipping"]=$this->bill_shipping;
+        $value["bill_tax_duty"]=$this->bill_tax_duty;
+        $value["bill_shipping_account"]=$this->bill_shipping_account;
+        $value["bill_tax_duty_account"]=$this->bill_tax_duty_account;
+        $value["invoice_type"]=$this->invoice_type;
+        $value["terms_of_sale"]=$this->terms_of_sale;
+        $value["eori"]=$this->eori;
+        $value["ultimate_destination_country_code"]=$this->ultimate_destination_country_code;
+        $value["commercial_invoice_comments"]=$this->commercial_invoice_comments;
+        $value["insurance_value"]=$this->insurance_value;
+        $value["lithium_batteries"]=$this->lithium_batteries;
+        foreach ($packages as $package) {
+            $temp=[];
+            $temp["dry_ice_weight"]=$package->dry_ice_weight;
+            $temp["packaging_code"]=$package->packaging_code;
+            $temp["weight"]=$package->weight;
+            $temp["length"]=$package->length;
+            $temp["width"]=$package->width;
+            $temp["height"]=$package->height;
+            $value['packages'][] = $temp;
+        }
+        if (!empty($contents)) {
+            foreach ($contents as $content) {
+                $temp=[];
+                $temp["description"]=$content->description;
+                $temp["id"]=$content->id;
+                $temp["product_code"]=$content->product_code;
+                $temp["currency_code"]=$content->currency_code;
+                $temp["country_of_manufacture"]=$content->country_of_manufacture;
+                $temp["manufacturer"]=$content->manufacturer;
+                $temp["uom"]=$content->uom;
+                $temp["commodity_code"]=$content->commodity_code;
+                $temp["harmonized_code"]=$content->harmonized_code;
+                $temp["shipping_cost"]=$content->shipping_cost;
+                $temp["package_index"]=$content->package_index;
+                $temp["quantity"]=$content->quantity;
+                $temp["unit_weight"]=$content->unit_weight;
+                $temp["unit_value"]=$content->unit_value;
+                $value['contents'][]=$temp;
+            }
+        }
+
+        return json_encode(Arr::dot($value));
+    }
+
+    public function clearCarrierDetails()
+    {
+        $this->carrier_consignment_number = null;
+        $this->carrier_tracking_number = null;
+        $this->bill_shipping_account = null;
+        $this->bill_tax_duty_account = null;
+    }
+
+    public function clearPackageCarrierDetails()
+    {
+        \App\Models\Package::where('shipment_id', $this->id)->update([
+            'carrier_tracking_number'=>null,
+            'carrier_packaging_code'=>null,
+            'barcode'=>null
+        ]);
+    }
+
+    public function clearPackageLabels()
+    {
+        \App\Models\Label::where('shipment_id', $this->id)->delete();
     }
 
     /**
