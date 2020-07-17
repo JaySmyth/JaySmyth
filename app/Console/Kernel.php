@@ -51,6 +51,7 @@ class Kernel extends ConsoleKernel
         Commands\ExpressFreight\UploadShipmentsToExpressFreight::class,
         Commands\ExpressFreight\UploadNIShipmentsToExpressFreight::class,
         Commands\ExpressFreight\ProcessExpressFreightTracking::class,
+        Commands\XDP\ProcessXDPTracking::class,
         Commands\CheckForDuplicateShipments::class,
         Commands\ProcessScsCollectionRequests::class,
         Commands\SendTrackingNumbers::class,
@@ -154,6 +155,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:upload-shipments-to-express-freight')->weekdays()->dailyAt('16:45');
         $schedule->command('ifs:upload-ni-shipments-to-express-freight')->weekdays()->dailyAt('16:45');
         $schedule->command('ifs:process-express-freight-tracking')->weekdays()->hourly()->between('07:00', '19:00');
+
+        /*
+         * XDP
+         */
+        //$schedule->command('ifs:process-xdp-tracking')->hourly();
 
         /*
          * Multifreight
