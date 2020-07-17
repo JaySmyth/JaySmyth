@@ -34,8 +34,8 @@ class XDP
                 break;
 
             default:
-                $this->username = 'ifsglobal';
-                $this->password = 'November12';
+                $this->username = '0D933A';
+                $this->password = 'VQW58U9H';
                 break;
         }
 
