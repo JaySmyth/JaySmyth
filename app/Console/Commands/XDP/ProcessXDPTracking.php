@@ -113,18 +113,16 @@ class ProcessXDPTracking extends Command
 
         if (! $loginResult) {
             $this->error('Unable to login to FTP host -> ' . $this->ftpHost);
-
             return false;
         }
 
         $this->info('Connection established to FTP host -> ' . $this->ftpHost);
 
+        // Set passive connection
         ftp_pasv($connection, true);
 
         // Get the file list for /
         $fileList = ftp_rawlist($connection, $this->ftpWorkingDirectory);
-
-        dd($fileList);
 
         $this->line(count($fileList) . ' files on remote server');
 
