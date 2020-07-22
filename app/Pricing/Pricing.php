@@ -32,6 +32,7 @@ use App\Pricing\PricingModel3;
 use App\Pricing\PricingModel4;
 use App\Pricing\PricingModel5;
 use App\Pricing\PricingModel6;
+use App\Pricing\PricingModel7;
 
 /**
  * ********************************
@@ -282,6 +283,10 @@ class Pricing
 
             case 'cwide':
                 $this->model = new PricingModel6($this->debug);
+                break;
+
+            case 'xdp':
+                $this->model = new PricingModel7($this->debug);
                 break;
 
             default:

@@ -345,7 +345,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             $result = App\Models\Localisation::select('time_zone', 'id')->pluck('time_zone', 'id');
             break;
         case 'statuses':
-            $result = App\Models\Status::select('name', 'id')->where('id', '>', 1)
+            $result = App\Models\Status::select('name', 'id')->where('id', '>', 0)
                 ->where('id', '<', 13)->pluck('name', 'id')->toArray();
             $result = Arr::add($result, 'S', 'Shipped (All except cancelled)');
             break;
