@@ -21,7 +21,7 @@ class ProcessXDPTracking extends Command
      *
      * @var string
      */
-    protected $description = 'Downloads and processes CSV files containing XPD tracking events';
+    protected $description = 'Downloads and processes CSV files containing XDP tracking events';
 
     /**
      * Full path to be processed.
@@ -223,14 +223,16 @@ class ProcessXDPTracking extends Command
             if ($shipment) {
                 $event = $this->getEvent($row, $shipment);
 
-                $tracking = \App\Models\Tracking::firstOrCreate([
-                    'message' => $event['message'],
-                    'status' => $event['status'],
-                    'shipment_id' => $shipment->id
-                ])->update($event);
+                if (! in_array($event['status'], ['pre_transit'])) {
+                    $tracking = \App\Models\Tracking::firstOrCreate([
+                        'message' => $event['message'],
+                        'status' => $event['status'],
+                        'shipment_id' => $shipment->id
+                    ])->update($event);
 
-                if ($tracking) {
-                    $this->processEvent($event, $shipment);
+                    if ($tracking) {
+                        $this->processEvent($event, $shipment);
+                    }
                 }
             }
         }
@@ -284,8 +286,8 @@ class ProcessXDPTracking extends Command
             'postcode' => null,
             'local_datetime' => $datetime,
             'datetime' => $datetime,
-            'carrier' => 'XPD',
-            'source' => 'XPD',
+            'carrier' => 'XDP',
+            'source' => 'XDP',
             'message' => $row['Status Data'],
             'signed_by' => null,
         ];
@@ -363,8 +365,8 @@ class ProcessXDPTracking extends Command
         }
 
         switch ($event['status']) {
-            case 'in_transit':
             case 'pre_transit':
+            case 'in_transit':
             case 'out_for_delivery':
                 // do nothing
                 break;
