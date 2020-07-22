@@ -56,7 +56,7 @@ class ProcessXDPTracking extends Command
     protected $ftpWorkingDirectory = 'statuses/';
 
 
-    protected $testMode = true;
+    protected $testMode = false;
 
     /**
      * Create a new command instance.
@@ -300,6 +300,8 @@ class ProcessXDPTracking extends Command
     {
         switch ($row['Status Type']) {
             case 'CREATE':
+                return 'pre_transit';
+
             case 'COLLECT':
             case 'EDIT':
                 return 'in_transit';
