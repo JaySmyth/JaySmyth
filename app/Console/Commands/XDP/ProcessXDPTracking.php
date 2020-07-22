@@ -119,6 +119,7 @@ class ProcessXDPTracking extends Command
 
         $this->info('Connection established to FTP host -> ' . $this->ftpHost);
 
+        ftp_pasv($connection, true);
 
         // Get the file list for /
         $fileList = ftp_rawlist($connection, $this->ftpWorkingDirectory);
