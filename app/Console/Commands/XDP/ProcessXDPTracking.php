@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\XDP;
 
+use App\Models\ProblemEvent;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
@@ -393,7 +394,7 @@ class ProcessXDPTracking extends Command
         }
 
         if (! $sentProblem) {
-            $this->alertProblem($event['message']);
+            $this->alertProblem($event['message'], $shipment);
         }
     }
 
@@ -417,6 +418,24 @@ class ProcessXDPTracking extends Command
             if ($shipment->on_hold) {
                 $shipment->on_hold = false;
                 $shipment->save();
+            }
+        }
+    }
+
+    /**
+     * Check if we have received a "problem" event that we need to send email for.
+     *
+     * @param type $message
+     */
+    private function alertProblem($message, $shipment)
+    {
+        $problemEvents = ProblemEvent::all();
+
+        foreach ($problemEvents as $problemEvent) {
+            $relevance = explode(',', $problemEvent->relevance);
+
+            if (stristr($message, $problemEvent->event)) {
+                $shipment->alertProblem($problemEvent->event, $relevance);
             }
         }
     }
