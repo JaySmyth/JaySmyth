@@ -123,6 +123,8 @@ class ProcessXDPTracking extends Command
         // Get the file list for /
         $fileList = ftp_rawlist($connection, $this->ftpWorkingDirectory);
 
+        dd($fileList);
+
         $this->line(count($fileList) . ' files on remote server');
 
         foreach ($fileList as $file):
