@@ -32,8 +32,8 @@
         "rap2hpoutre/laravel-log-viewer": "^1.0",
         "spatie/pdf-to-image": "^1.8",
         "laravel/ui": "^2.0",
-        "fruitcake/laravel-cors": "^1.0"
-        "fzaninotto/faker": "^1.4",
+        "fruitcake/laravel-cors": "^1.0",
+        "fzaninotto/faker": "^1.4"
     },
     "require-dev": {
         "facade/ignition": "^2.0",
