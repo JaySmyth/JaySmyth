@@ -86,9 +86,13 @@
         <td class="error-summary">
             @if(isset($results['failed'][$key]['errors']))
             @foreach($results['failed'][$key]['errors'] as $error)
-                    @if(is_string($error))
-                       * {{ ucfirst($error) }}<br>
+
+                    @if(is_array($error))
+                        {{ implode(", ", $error) }}<br>
+                    @else
+                        * {{ ucfirst($error) }}<br>
                     @endif
+
             @endforeach
             @endif
         </td>
