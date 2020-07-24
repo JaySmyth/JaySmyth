@@ -234,8 +234,6 @@ class ShipmentsController extends Controller
             return redirect('shipments/create');
         }
 
-        dd($request->all());
-
         $response = CarrierAPI::createShipment($request->all());
 
         if (isset($response['errors']) && $response['errors'] != []) {
