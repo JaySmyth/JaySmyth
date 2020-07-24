@@ -42,6 +42,8 @@ Route::get('shipments/{shipments}/undo-cancel', 'ShipmentsController@undoCancel'
 Route::get('shipments/{shipments}/form-view', 'ShipmentsController@formView');
 Route::get('shipments/{shipments}/price', 'ShipmentsController@price');
 Route::get('shipments/{shipments}/test', 'ShipmentsController@test');
+Route::get('shipments/{shipment}/reset', 'ShipmentsController@reset');
+Route::post('shipments/{shipment}/reset', 'ShipmentsController@resetShipment');
 
 Route::put('shipments/save', 'ShipmentsController@save');
 Route::get('shipments/get', 'ShipmentsController@getSaved');

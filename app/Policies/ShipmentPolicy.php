@@ -171,4 +171,11 @@ class ShipmentPolicy
             return true;
         }
     }
+
+    public function reset(User $user, Shipment $shipment)
+    {
+        if ($user->hasIfsRole()) {
+            return true;
+        }
+    }
 }

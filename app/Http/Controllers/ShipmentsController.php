@@ -170,7 +170,15 @@ class ShipmentsController extends Controller
     private function prepareForm($mode, $companyId = null)
     {
         // Use previous form submission values or default values
-        $packages = null !== old('packages') ? old('packages') : [0 => ['packaging_code' => '', 'weight' => '', 'length' => '', 'width' => '', 'height' => '']];
+        $packages = null !== old('packages') ? old('packages') : [
+            0 => [
+                'packaging_code' => '',
+                'weight' => '',
+                'length' => '',
+                'width' => '',
+                'height' => ''
+            ]
+        ];
         $contents = null !== old('contents') ? old('contents') : [];
 
         if (! $companyId) {
@@ -229,7 +237,7 @@ class ShipmentsController extends Controller
         $response = CarrierAPI::createShipment($request->all());
 
         if (isset($response['errors']) && $response['errors'] != []) {
-            $route = ($request->shipment_id) ? 'shipments/'.$request->shipment_id.'/edit' : 'shipments/create';
+            $route = ($request->shipment_id) ? 'shipments/' . $request->shipment_id . '/edit' : 'shipments/create';
             flash()->error('Errors found!', $response['errors'], true);
 
             return redirect($route)->withInput();
@@ -392,7 +400,8 @@ class ShipmentsController extends Controller
                 $package->width = $array['packages'][$package->index]['width'];
                 $package->height = $array['packages'][$package->index]['height'];
                 $package->weight = $array['packages'][$package->index]['weight'];
-                $package->volumetric_weight = calcVolume($package->length, $package->width, $package->height, $shipment->volumetric_divisor);
+                $package->volumetric_weight = calcVolume($package->length, $package->width, $package->height,
+                    $shipment->volumetric_divisor);
 
                 $weight += $package->weight;
                 $volumetricWeight += $package->volumetric_weight;
@@ -495,7 +504,6 @@ class ShipmentsController extends Controller
     {
         // user authenticated so use their preferred label size
         if (! Auth::guest()) {
-
             // warehouse login
             if (in_array(Auth::user()->id, [3026, 283, 2534])) {
                 flash()->error('Warning', 'Not authorised to print label.', true);
@@ -534,7 +542,6 @@ class ShipmentsController extends Controller
     public function docResponse($labels)
     {
         if ($labels == 'not found') {
-
             // 404 for guests
             if (Auth::guest()) {
                 abort(404);
@@ -560,7 +567,6 @@ class ShipmentsController extends Controller
         $user = Auth::user();
 
         if (empty($user)) {
-
             // Load User that generated the labels
             $user = User::findOrFail($userId);
         }
@@ -591,7 +597,8 @@ class ShipmentsController extends Controller
         ];
 
         // Call the API for invoice
-        if (! $commercialInvoice = CarrierAPI::getCommercialInvoice($token, $parameters, Auth::user()->localisation->document_size, 'D')) {
+        if (! $commercialInvoice = CarrierAPI::getCommercialInvoice($token, $parameters,
+            Auth::user()->localisation->document_size, 'D')) {
             abort(404);
         }
     }
@@ -620,17 +627,20 @@ class ShipmentsController extends Controller
         $this->authorize('upload', new Shipment);
 
         // Validate the request
-        $this->validate($request, ['import_config_id' => 'required|numeric', 'file' => 'required'], ['import_config_id.required' => 'Please select an upload profile.', 'file.mimes' => 'Not a valid CSV file - please check for unsupported characters', 'file.required' => 'Please select a file to upload.']);
+        $this->validate($request, ['import_config_id' => 'required|numeric', 'file' => 'required'], [
+            'import_config_id.required' => 'Please select an upload profile.',
+            'file.mimes' => 'Not a valid CSV file - please check for unsupported characters',
+            'file.required' => 'Please select a file to upload.'
+        ]);
 
         // Upload the file to the temp directory
-        $path = $request->file('file')->storeAs('temp', 'original_'.Str::random(12).'.csv');
+        $path = $request->file('file')->storeAs('temp', 'original_' . Str::random(12) . '.csv');
 
         // Generate a filename (hash generated from file contents)
         $filename = 'temp/' . md5_file(storage_path('app/' . $path)) . '.csv';
 
         // Check that this file has not already been uploaded
         if (Storage::exists($filename)) {
-
             // Delete the duplicate
             Storage::delete($path);
 
@@ -647,7 +657,8 @@ class ShipmentsController extends Controller
             return back();
         }
 
-        dispatch(new ImportShipments(storage_path('app/'.$filename), $request->import_config_id, $request->user()))->onQueue('import');
+        dispatch(new ImportShipments(storage_path('app/' . $filename), $request->import_config_id,
+            $request->user()))->onQueue('import');
 
         // Notify user and redirect
         flash()->info('File Uploaded!', 'Please check your email for results.', true);
@@ -760,7 +771,8 @@ class ShipmentsController extends Controller
 
         $shipments = $this->search($request, false, false);
 
-        $shipments = $shipments->whereNotIn('status_id', [1, 7])->whereNotIn('carrier_id', [9, 10, 11, 12, 13])->where('legacy', '!=', 1)->where('on_hold', 0)->sortBy('route_id');
+        $shipments = $shipments->whereNotIn('status_id', [1, 7])->whereNotIn('carrier_id',
+            [9, 10, 11, 12, 13])->where('legacy', '!=', 1)->where('on_hold', 0)->sortBy('route_id');
 
         $printFormatCode = 'A4';
 
@@ -893,7 +905,8 @@ class ShipmentsController extends Controller
     {
         $shipment = Shipment::findOrFail($id);
         $this->authorize('rawData', $shipment);
-        $transactionLog = TransactionLog::where('msg', 'like', '%'.$shipment->carrier_consignment_number.'%')->get();
+        $transactionLog = TransactionLog::where('msg', 'like',
+            '%' . $shipment->carrier_consignment_number . '%')->get();
         dd($transactionLog);
     }
 
@@ -914,7 +927,8 @@ class ShipmentsController extends Controller
             if ($shipment) {
                 $shipment->consignment_number = nextAvailable('CONSIGNMENT');
                 $shipment->sender_state = getStateCode($shipment->sender_country_code, $shipment->sender_state);
-                $shipment->recipient_state = getStateCode($shipment->recipient_country_code, $shipment->recipient_state);
+                $shipment->recipient_state = getStateCode($shipment->recipient_country_code,
+                    $shipment->recipient_state);
                 $shipment->save();
 
                 return response()->json($shipment, 201);
@@ -982,8 +996,44 @@ class ShipmentsController extends Controller
      */
     public function test(Request $request)
     {
-        $ssl = DB::select("SHOW STATUS LIKE 'Ssl_version'", [1]);
+    }
 
-        dd($ssl);
+
+    /**
+     * Display reset shipment form.
+     */
+    public function reset(Shipment $shipment)
+    {
+        $this->authorize('reset', $shipment);
+
+        return view('shipments.reset', ['shipment' => $shipment]);
+    }
+
+
+    /**
+     * Handle reset shipment form.
+     *
+     * @param Shipment $shipment
+     * @param Request $request
+     * @return \Illuminate\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function resetShipment(Shipment $shipment, Request $request)
+    {
+        $this->authorize('reset', $shipment);
+
+        $request->validate([
+            'service' => 'required|string',
+            'pricing' => 'required|boolean'
+        ]);
+
+        $shipment->reset($request->service, $request->pricing);
+
+        $shipment->log('Shipment reset');
+
+        // Notify user and redirect
+        flash()->info('Shipment Reset!', 'Please resubmit the shipment.', true);
+
+        return redirect('shipments');
     }
 }

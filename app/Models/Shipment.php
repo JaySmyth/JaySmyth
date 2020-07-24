@@ -1368,7 +1368,7 @@ class Shipment extends Model
      *
      * @return bool
      */
-    public function reset()
+    public function reset(string $serviceCode, bool $reprice)
     {
 
         // If shipment is in transit or delivered - do nothing
