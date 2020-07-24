@@ -1123,6 +1123,7 @@ class ShipmentsController extends Controller
 
         // Reinstate original if we do not want to reprice the shipment
         if (! $request->reprice) {
+
             // Set the json quote field
             $shipment->quoted = $originalQuoted;
 
@@ -1131,9 +1132,10 @@ class ShipmentsController extends Controller
 
             $shipment->shipping_charge = $originalQuoted['shipping_charge'];
             $shipment->fuel_charge = $originalQuoted['fuel_charge'];
-            $shipment->sales_vat_amount = $originalQuoted['sales_vat_amount'];
-            $shipment->sales_vat_code = $originalQuoted['sales_vat_code'];
             $shipment->sales_currency = $originalQuoted['sales_currency'];
+            $shipment->shipping_cost = $originalQuoted['shipping_cost'];
+            $shipment->fuel_cost = $originalQuoted['fuel_cost'];
+            $shipment->cost_currency = $originalQuoted['cost_currency'];
             $shipment->save();
         }
 
