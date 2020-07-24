@@ -1144,16 +1144,16 @@ class ShipmentsController extends Controller
             // Update newQuoted array with previous values
             $newQuoted['shipping_charge'] = $originalQuoted['shipping_charge'];
             $newQuoted['fuel_charge'] = $originalQuoted['fuel_charge'];
-            $newQuoted['sales_vat_amount'] = $originalQuoted['sales_currency'];
-            $newQuoted['sales_vat_code'] = ['shipping_cost'];
-            $newQuoted['sales_currency'] = ['shipping_cost'];
-            $newQuoted['sales'] = $originalQuoted['cost_currency'];
-            $newQuoted['sales_debug'] = $originalQuoted['cost_currency'];
-            $newQuoted['sales_detail'] = $originalQuoted['cost_currency'];
-            $newQuoted['sales_zone'] = $originalQuoted['cost_currency'];
-            $newQuoted['sales_model'] = $originalQuoted['cost_currency'];
-            $newQuoted['sales_rate_id'] = $originalQuoted['cost_currency'];
-            $newQuoted['sales_packaging'] = $originalQuoted['cost_currency'];
+            $newQuoted['sales_vat_amount'] = $originalQuoted['sales_vat_amount'];
+            $newQuoted['sales_vat_code'] = $originalQuoted['sales_vat_code'];
+            $newQuoted['sales_currency'] = $originalQuoted['sales_currency'];
+            $newQuoted['sales'] = $originalQuoted['sales'];
+            $newQuoted['sales_debug'] = $originalQuoted['sales_debug'];
+            $newQuoted['sales_detail'] = $originalQuoted['sales_detail'];
+            $newQuoted['sales_zone'] = $originalQuoted['sales_zone'];
+            $newQuoted['sales_model'] = $originalQuoted['sales_model'];
+            $newQuoted['sales_rate_id'] = $originalQuoted['sales_rate_id'];
+            $newQuoted['sales_packaging'] = $originalQuoted['sales_packaging'];
 
             // Update Shipment record
             $shipment->shipping_charge = $newQuoted['shipping_charge'];
