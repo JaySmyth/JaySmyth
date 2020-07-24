@@ -402,8 +402,12 @@ class ShipmentsController extends Controller
                 $package->width = $array['packages'][$package->index]['width'];
                 $package->height = $array['packages'][$package->index]['height'];
                 $package->weight = $array['packages'][$package->index]['weight'];
-                $package->volumetric_weight = calcVolume($package->length, $package->width, $package->height,
-                    $shipment->volumetric_divisor);
+                $package->volumetric_weight = calcVolume(
+                    $package->length,
+                    $package->width,
+                    $package->height,
+                    $shipment->volumetric_divisor
+                );
 
                 $weight += $package->weight;
                 $volumetricWeight += $package->volumetric_weight;
@@ -599,8 +603,12 @@ class ShipmentsController extends Controller
         ];
 
         // Call the API for invoice
-        if (! $commercialInvoice = CarrierAPI::getCommercialInvoice($token, $parameters,
-            Auth::user()->localisation->document_size, 'D')) {
+        if (! $commercialInvoice = CarrierAPI::getCommercialInvoice(
+            $token,
+            $parameters,
+            Auth::user()->localisation->document_size,
+            'D'
+        )) {
             abort(404);
         }
     }
@@ -659,8 +667,11 @@ class ShipmentsController extends Controller
             return back();
         }
 
-        dispatch(new ImportShipments(storage_path('app/' . $filename), $request->import_config_id,
-            $request->user()))->onQueue('import');
+        dispatch(new ImportShipments(
+            storage_path('app/' . $filename),
+            $request->import_config_id,
+            $request->user()
+        ))->onQueue('import');
 
         // Notify user and redirect
         flash()->info('File Uploaded!', 'Please check your email for results.', true);
@@ -773,8 +784,10 @@ class ShipmentsController extends Controller
 
         $shipments = $this->search($request, false, false);
 
-        $shipments = $shipments->whereNotIn('status_id', [1, 7])->whereNotIn('carrier_id',
-            [9, 10, 11, 12, 13])->where('legacy', '!=', 1)->where('on_hold', 0)->sortBy('route_id');
+        $shipments = $shipments->whereNotIn('status_id', [1, 7])->whereNotIn(
+            'carrier_id',
+            [9, 10, 11, 12, 13]
+        )->where('legacy', '!=', 1)->where('on_hold', 0)->sortBy('route_id');
 
         $printFormatCode = 'A4';
 
@@ -907,8 +920,11 @@ class ShipmentsController extends Controller
     {
         $shipment = Shipment::findOrFail($id);
         $this->authorize('rawData', $shipment);
-        $transactionLog = TransactionLog::where('msg', 'like',
-            '%' . $shipment->carrier_consignment_number . '%')->get();
+        $transactionLog = TransactionLog::where(
+            'msg',
+            'like',
+            '%' . $shipment->carrier_consignment_number . '%'
+        )->get();
         dd($transactionLog);
     }
 
@@ -929,8 +945,10 @@ class ShipmentsController extends Controller
             if ($shipment) {
                 $shipment->consignment_number = nextAvailable('CONSIGNMENT');
                 $shipment->sender_state = getStateCode($shipment->sender_country_code, $shipment->sender_state);
-                $shipment->recipient_state = getStateCode($shipment->recipient_country_code,
-                    $shipment->recipient_state);
+                $shipment->recipient_state = getStateCode(
+                    $shipment->recipient_country_code,
+                    $shipment->recipient_state
+                );
                 $shipment->save();
 
                 return response()->json($shipment, 201);
@@ -1030,7 +1048,7 @@ class ShipmentsController extends Controller
         ]);
 
         // Original pricing
-        $originalQuoted = $shipment->quoted;
+        $originalQuoted = json_decode($shipment->quoted, true);
 
         $shipment->reset();
 
@@ -1124,18 +1142,31 @@ class ShipmentsController extends Controller
         // Reinstate original if we do not want to reprice the shipment
         if (! $request->reprice) {
 
+            // Get the Repriced details
+            $newQuoted=json_decode($shipment->quoted, true);
+
+            // Update newQuoted array with previous values
+            $newQuoted['shipping_charge'] = $originalQuoted['shipping_charge'];
+            $newQuoted['fuel_charge'] = $originalQuoted['fuel_charge'];
+            $newQuoted['sales_vat_amount'] = $originalQuoted['sales_currency'];
+            $newQuoted['sales_vat_code'] = ['shipping_cost'];
+            $newQuoted['sales_currency'] = ['shipping_cost'];
+            $newQuoted['sales'] = $originalQuoted['cost_currency'];
+            $newQuoted['sales_debug'] = $originalQuoted['cost_currency'];
+            $newQuoted['sales_detail'] = $originalQuoted['cost_currency'];
+            $newQuoted['sales_zone'] = $originalQuoted['cost_currency'];
+            $newQuoted['sales_model'] = $originalQuoted['cost_currency'];
+            $newQuoted['sales_rate_id'] = $originalQuoted['cost_currency'];
+            $newQuoted['sales_packaging'] = $originalQuoted['cost_currency'];
+
+            // Update Shipment record
+            $shipment->shipping_charge = $newQuoted['shipping_charge'];
+            $shipment->fuel_charge = $newQuoted['fuel_charge'];
+            $shipment->sales_currency = $newQuoted['sales_currency'];
+
             // Set the json quote field
-            $shipment->quoted = $originalQuoted;
+            $shipment->quoted = json_encode($newQuoted);
 
-            // Decode JSON to array
-            $originalQuoted = json_decode($originalQuoted, true);
-
-            $shipment->shipping_charge = $originalQuoted['shipping_charge'];
-            $shipment->fuel_charge = $originalQuoted['fuel_charge'];
-            $shipment->sales_currency = $originalQuoted['sales_currency'];
-            $shipment->shipping_cost = $originalQuoted['shipping_cost'];
-            $shipment->fuel_cost = $originalQuoted['fuel_cost'];
-            $shipment->cost_currency = $originalQuoted['cost_currency'];
             $shipment->save();
         }
 
