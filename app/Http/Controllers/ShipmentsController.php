@@ -1034,8 +1034,6 @@ class ShipmentsController extends Controller
 
         $shipment->reset();
 
-        $shipment->log('Shipment reset');
-
         /*
          * Build a data array and submit a new shipment.
          */
@@ -1122,8 +1120,9 @@ class ShipmentsController extends Controller
         }
 
         // Reinstate original if we do not want to reprice the shipment
-        if (! $request->reprice) {
-
+        if ($request->reprice) {
+            $shipment->log('Shipment reset (repriced)');
+        } else {
             // Set the json quote field
             $shipment->quoted = $originalQuoted;
 
@@ -1137,6 +1136,8 @@ class ShipmentsController extends Controller
             $shipment->fuel_cost = $originalQuoted['fuel_cost'];
             $shipment->cost_currency = $originalQuoted['cost_currency'];
             $shipment->save();
+
+            $shipment->log('Shipment reset (not repriced)');
         }
 
         // Notify user and redirect
