@@ -295,10 +295,12 @@
                         <span class="fas fa-times ml-sm-2 faded" aria-hidden="true" title="Cancel Shipment (unavailable)"></span>
                     @endif
 
-                    @if($shipment->isCancellable() && Auth::user()->hasIfsRole())
-                        <a href="{{ url('/shipments/' . $shipment->id . '/reset') }}" title="Reset Shipment"><span class="fas fa-backspace ml-sm-2" aria-hidden="true"></span></a>
-                    @else
-                        <span class="fas fa-backspace ml-sm-2 faded" aria-hidden="true" title="Reset Shipment (unavailable)"></span>
+                    @if(Auth::user()->hasIfsRole())
+                        @if($shipment->isCancellable())
+                            <a href="{{ url('/shipments/' . $shipment->id . '/reset') }}" title="Reset Shipment"><span class="fas fa-backspace ml-sm-2" aria-hidden="true"></span></a>
+                        @else
+                            <span class="fas fa-backspace ml-sm-2 faded" aria-hidden="true" title="Reset Shipment (unavailable)"></span>
+                        @endif
                     @endif
 
                 <!-- Supporting documents - only enable if active shipment -->
