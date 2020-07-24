@@ -44,7 +44,7 @@
                     </label>
 
                     <div class="col-sm-6">
-                        {!! Form::select('reprice',  ['' => 'Please select', 0 => 'No, do not recalculate costs and sales', 1 => 'Yes, recalculate costs and sales'], old('reprice'), array('class' => 'form-control')) !!}
+                        {!! Form::select('reprice',  ['' => 'Please select', 0 => 'Keep original sales', 1 => 'Recalculate sales'], old('reprice'), array('class' => 'form-control')) !!}
 
                         @if ($errors->has('reprice'))
                             <span class="form-text"><strong>{{ $errors->first('reprice') }}</strong></span>
