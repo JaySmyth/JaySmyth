@@ -159,7 +159,7 @@ class Kernel extends ConsoleKernel
         /*
          * XDP
          */
-        //$schedule->command('ifs:process-xdp-tracking')->hourly();
+        $schedule->command('ifs:process-xdp-tracking')->hourly();
 
         /*
          * Multifreight
