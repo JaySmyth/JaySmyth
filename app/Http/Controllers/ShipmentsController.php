@@ -234,8 +234,6 @@ class ShipmentsController extends Controller
             return redirect('shipments/create');
         }
 
-        dd($request->all());
-
         $response = CarrierAPI::createShipment($request->all());
 
         if (isset($response['errors']) && $response['errors'] != []) {
@@ -1052,8 +1050,6 @@ class ShipmentsController extends Controller
 
         $shipment->reset();
 
-        $shipment->log('Shipment reset');
-
         /*
          * Build a data array and submit a new shipment.
          */
@@ -1168,6 +1164,8 @@ class ShipmentsController extends Controller
             $shipment->quoted = json_encode($newQuoted);
 
             $shipment->save();
+
+            $shipment->log('Shipment reset (not repriced)');
         }
 
         // Notify user and redirect
