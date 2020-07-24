@@ -1026,8 +1026,11 @@ class ShipmentsController extends Controller
 
         $request->validate([
             'service' => 'required|integer',
-            'pricing' => 'required|boolean'
+            'reprice' => 'required|boolean'
         ]);
+
+        // Original pricing
+        $originalQuoted = $shipment->quoted;
 
         $shipment->reset();
 
@@ -1116,6 +1119,22 @@ class ShipmentsController extends Controller
         if (isset($response['errors']) && $response['errors'] != []) {
             flash()->error('Errors found!', $response['errors'], true);
             return redirect('shipments/' . $shipment->id . '/edit')->withInput();
+        }
+
+        // Reinstate original if we do not want to reprice the shipment
+        if (! $request->reprice) {
+            // Set the json quote field
+            $shipment->quoted = $originalQuoted;
+
+            // Decode JSON to array
+            $originalQuoted = json_decode($originalQuoted, true);
+
+            $shipment->shipping_charge = $originalQuoted['shipping_charge'];
+            $shipment->fuel_charge = $originalQuoted['fuel_charge'];
+            $shipment->sales_vat_amount = $originalQuoted['sales_vat_amount'];
+            $shipment->sales_vat_code = $originalQuoted['sales_vat_code'];
+            $shipment->sales_currency = $originalQuoted['sales_currency'];
+            $shipment->save();
         }
 
         // Notify user and redirect

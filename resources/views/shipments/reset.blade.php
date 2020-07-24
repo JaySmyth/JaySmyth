@@ -37,17 +37,17 @@
                     </div>
                 </div>
 
-                <div class="form-group row{{ $errors->has('pricing') ? ' has-danger' : '' }} mb-4">
+                <div class="form-group row{{ $errors->has('reprice') ? ' has-danger' : '' }} mb-4">
 
                     <label class="col-sm-4  col-form-label">
-                        Pricing: <abbr title="This information is required.">*</abbr>
+                        Reprice Shipment: <abbr title="This information is required.">*</abbr>
                     </label>
 
                     <div class="col-sm-6">
-                        {!! Form::select('pricing',  ['' => 'Please select', 0 => 'Do NOT recalculate costs and sales', 1 => 'Recalculate costs and sales'], old('pricing'), array('class' => 'form-control')) !!}
+                        {!! Form::select('reprice',  ['' => 'Please select', 0 => 'No, do not recalculate costs and sales', 1 => 'Yes, recalculate costs and sales'], old('reprice'), array('class' => 'form-control')) !!}
 
-                        @if ($errors->has('pricing'))
-                            <span class="form-text"><strong>{{ $errors->first('pricing') }}</strong></span>
+                        @if ($errors->has('reprice'))
+                            <span class="form-text"><strong>{{ $errors->first('reprice') }}</strong></span>
                         @endif
                     </div>
                 </div>
