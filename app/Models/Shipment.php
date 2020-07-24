@@ -1373,12 +1373,18 @@ class Shipment extends Model
         // If shipment is in transit or delivered - do nothing
         if (in_array($this->status_id, [1,2,3,7,8])) {
             $this->setCancelled();
-            $this->convertToFormValues();
+            $this->form_values = $this->convertToFormValues();
             $this->clearCarrierDetails();
-            $this->clearPackageCarrierDetails();
-            $this->clearPackageLabels();
             $this->status_id=1;
             $this->save();
+
+            // Remove related records
+            \App\Models\Package::where('shipment_id', $this->id)->delete();
+            \App\Models\ShipmentContent::where('shipment_id', $this->id)->delete();
+            \App\Models\Label::where('shipment_id', $this->id)->delete();
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -1494,20 +1500,6 @@ class Shipment extends Model
         $this->carrier_tracking_number = null;
         $this->bill_shipping_account = null;
         $this->bill_tax_duty_account = null;
-    }
-
-    public function clearPackageCarrierDetails()
-    {
-        \App\Models\Package::where('shipment_id', $this->id)->update([
-            'carrier_tracking_number'=>null,
-            'carrier_packaging_code'=>null,
-            'barcode'=>null
-        ]);
-    }
-
-    public function clearPackageLabels()
-    {
-        \App\Models\Label::where('shipment_id', $this->id)->delete();
     }
 
     /**
