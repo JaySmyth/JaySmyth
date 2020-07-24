@@ -234,6 +234,8 @@ class ShipmentsController extends Controller
             return redirect('shipments/create');
         }
 
+        dd($request->all());
+
         $response = CarrierAPI::createShipment($request->all());
 
         if (isset($response['errors']) && $response['errors'] != []) {
@@ -1023,16 +1025,101 @@ class ShipmentsController extends Controller
         $this->authorize('reset', $shipment);
 
         $request->validate([
-            'service' => 'required|string',
+            'service' => 'required|integer',
             'pricing' => 'required|boolean'
         ]);
 
-        $shipment->reset($request->service, $request->pricing);
+        $shipment->reset();
 
         $shipment->log('Shipment reset');
 
+        /*
+         * Build a data array and submit a new shipment.
+         */
+
+        $packages = [];
+
+        foreach ($shipment->packages as $package) {
+            $packages[] = [
+                "dry_ice_weight" => $package->dry_ice_weight,
+                "packaging_code" => $package->packaging_code,
+                "weight" => $package->weight,
+                "length" => $package->length,
+                "width" => $package->width,
+                "height" => $package->height,
+            ];
+        }
+
+        $data = [
+            "shipment_id" => $shipment->id,
+            "user_id" => $shipment->user_id,
+            "print_formats_id" => $shipment->print_formats_id,
+            "mode" => "courier",
+            "mode_id" => "1",
+            "dims_uom" => $shipment->dims_uom,
+            "weight_uom" => $shipment->weight_uom,
+            "date_format" => "dd-mm-yyyy",
+            "currency_code" => $shipment->customs_value_currency_code,
+            "weight" => $shipment->weight,
+            "service_id" => $request->service,
+            "customs_value" => $shipment->customs_value,
+            "customs_value_currency_code" => $shipment->customs_value_currency_code,
+            "sender_name" => $shipment->sender_name,
+            "sender_company_name" => $shipment->sender_company_name,
+            "sender_type" => $shipment->sender_type,
+            "sender_address1" => $shipment->sender_address1,
+            "sender_address2" => $shipment->sender_address2,
+            "sender_address3" => $shipment->sender_address3,
+            "sender_city" => $shipment->sender_city,
+            "sender_country_code" => $shipment->sender_country_code,
+            "sender_state" => $shipment->sender_state,
+            "sender_postcode" => $shipment->sender_postcode,
+            "sender_telephone" => $shipment->sender_telephone,
+            "sender_email" => $shipment->sender_email,
+            "company_id" => $shipment->company_id,
+            "recipient_name" => $shipment->recipient_name,
+            "recipient_company_name" => $shipment->recipient_company_name,
+            "recipient_type" => $shipment->recipient_type,
+            "recipient_address1" => $shipment->recipient_address1,
+            "recipient_address2" => $shipment->recipient_address2,
+            "recipient_address3" => $shipment->recipient_address3,
+            "recipient_city" => $shipment->recipient_city,
+            "recipient_country_code" => $shipment->recipient_country_code,
+            "recipient_state" => $shipment->recipient_state,
+            "recipient_postcode" => $shipment->recipient_postcode,
+            "recipient_telephone" => $shipment->recipient_telephone,
+            "recipient_email" => $shipment->recipient_email,
+            "recipient_account_number" => $shipment->recipient_account_number,
+            "pieces" => $shipment->pieces,
+            "shipment_reference" => $shipment->shipment_reference,
+            "ship_reason" => $shipment->ship_reason,
+            "collection_date" => date('d-m-Y', time()),
+            "hazardous" => $shipment->hazardous,
+            "special_instructions" => $shipment->special_instructions,
+            "bill_shipping" => $shipment->bill_shipping,
+            "bill_tax_duty" => $shipment->bill_tax_duty,
+            "bill_shipping_account" => $shipment->bill_shipping_account,
+            "bill_tax_duty_account" => $shipment->bill_tax_duty_account,
+            "invoice_type" => $shipment->invoice_type,
+            "terms_of_sale" => $shipment->terms_of_sale,
+            "eori" => $shipment->eori,
+            "ultimate_destination_country_code" => $shipment->ultimate_destination_country_code,
+            "commercial_invoice_comments" => $shipment->commercial_invoice_comments,
+            "insurance_value" => $shipment->insurance_value,
+            "lithium_batteries" => $shipment->lithium_batteries,
+            "packages" => $packages,
+            "goods_description" => $shipment->goods_description
+        ];
+
+        $response = CarrierAPI::createShipment($data);
+
+        if (isset($response['errors']) && $response['errors'] != []) {
+            flash()->error('Errors found!', $response['errors'], true);
+            return redirect('shipments/' . $shipment->id . '/edit')->withInput();
+        }
+
         // Notify user and redirect
-        flash()->info('Shipment Reset!', 'Please resubmit the shipment.', true);
+        flash()->info('Shipment Reset!');
 
         return redirect('shipments');
     }

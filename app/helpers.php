@@ -369,7 +369,6 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             $result = App\Models\Route::select('name', 'id')->pluck('name', 'id');
             break;
         case 'services':
-            //$result = App\Models\Service::select('id', 'carrier_name')->orderBy('carrier_name')->pluck('carrier_name', 'id');
             $result = App\Models\Service::select('name', 'code')->orderBy('name')->groupBy('name')->pluck('name', 'code');
             break;
         case 'uniqueServices':
