@@ -1381,6 +1381,9 @@ class Shipment extends Model
             \App\Models\Package::where('shipment_id', $this->id)->delete();
             \App\Models\Content::where('shipment_id', $this->id)->delete();
             \App\Models\Label::where('shipment_id', $this->id)->delete();
+            return true;
+        } else {
+            return false;
         }
     }
 
