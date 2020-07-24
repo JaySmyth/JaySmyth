@@ -1047,6 +1047,7 @@ class ShipmentsController extends Controller
 
         // Original pricing
         $originalQuoted = json_decode($shipment->quoted, true);
+        $shipmentId= $shipment->id;
 
         $shipment->reset();
 
@@ -1134,6 +1135,9 @@ class ShipmentsController extends Controller
             flash()->error('Errors found!', $response['errors'], true);
             return redirect('shipments/' . $shipment->id . '/edit')->withInput();
         }
+
+        // Refresh Shipment
+        $shipment = Shipment::find($shipmentId);
 
         // Reinstate original if we do not want to reprice the shipment
         if (! $request->reprice) {
