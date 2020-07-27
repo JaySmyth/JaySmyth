@@ -675,7 +675,7 @@ class Shipment extends Model
      */
     public function isResetable()
     {
-        if ($this->isActive() || $this->status->code == 'saved') {
+        if (($this->isActive() || $this->status->code == 'saved') && $this->service->code == 'uk48') {
             return true;
         }
 

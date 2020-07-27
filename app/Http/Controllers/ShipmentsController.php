@@ -1175,6 +1175,6 @@ class ShipmentsController extends Controller
         // Notify user and redirect
         flash()->info('Shipment Reset!');
 
-        return redirect('shipments');
+        return back();
     }
 }
