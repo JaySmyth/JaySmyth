@@ -149,7 +149,7 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
         $address = new \Ups\Entity\Address();
         $address->setAddressLine1($shipment['recipient_address1']);
         $address->setAddressLine2($shipment['recipient_address2']);
-        $address->setAddressLine3($shipment['recipient_address3']);
+        $address->setAddressLine3(!empty($shipment['recipient_address3']) ? $shipment['recipient_address3'] : null);
         $address->setPostalCode($shipment['recipient_postcode']);
         $address->setCity($shipment['recipient_city']);
         if (in_array($shipment['recipient_country_code'], ['US', 'CA'])) {
@@ -161,7 +161,7 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
         $shipTo->setCompanyName($shipment['recipient_company_name']);
         $shipTo->setAttentionName($shipment['recipient_name']);
         $shipTo->setCompanyName($shipment['recipient_company_name']);
-        $shipTo->setEmailAddress($shipment['recipient_email']);
+        $shipTo->setEmailAddress(!empty($shipment['recipient_email']) ? $shipment['recipient_email'] : null);
         $shipTo->setPhoneNumber($shipment['recipient_telephone']);
         $upsShipment->setShipTo($shipTo);
 
