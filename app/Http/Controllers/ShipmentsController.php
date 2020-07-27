@@ -1024,7 +1024,9 @@ class ShipmentsController extends Controller
     {
         $this->authorize('reset', $shipment);
 
-        return view('shipments.reset', ['shipment' => $shipment]);
+        $referer = request()->headers->get('referer');
+
+        return view('shipments.reset', ['shipment' => $shipment, 'referer' => $referer]);
     }
 
 
@@ -1175,6 +1177,10 @@ class ShipmentsController extends Controller
         // Notify user and redirect
         flash()->info('Shipment Reset!');
 
-        return back();
+        if($request->redirect){
+            return redirect($request->redirect);
+        }
+
+        return redirect("shipments");
     }
 }

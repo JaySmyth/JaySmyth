@@ -18,6 +18,8 @@
 
         @csrf
 
+        <input type="hidden" name="redirect" value="{{ $referer }}">
+
         <div class="row justify-content-between">
 
             <div class="col-5">
