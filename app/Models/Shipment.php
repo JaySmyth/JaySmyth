@@ -669,6 +669,22 @@ class Shipment extends Model
     }
 
     /**
+     * A shipment is resetable.
+     *
+     * @return bool
+     */
+    public function isResetable()
+    {
+        if ($this->isActive() || $this->status->code == 'saved') {
+            return true;
+        }
+
+        return false;
+    }
+
+
+
+    /**
      * Shipment active - i.e. not cancelled or delivered.
      *
      * @return bool

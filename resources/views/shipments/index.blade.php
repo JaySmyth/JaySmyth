@@ -296,7 +296,7 @@
                     @endif
 
                     @if(Auth::user()->hasIfsRole())
-                        @if($shipment->isCancellable())
+                        @if($shipment->isResetable())
                             <a href="{{ url('/shipments/' . $shipment->id . '/reset') }}" title="Reset Shipment"><span class="fas fa-backspace ml-sm-2" aria-hidden="true"></span></a>
                         @else
                             <span class="fas fa-backspace ml-sm-2 faded" aria-hidden="true" title="Reset Shipment (unavailable)"></span>
