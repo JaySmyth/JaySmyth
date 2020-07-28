@@ -119,15 +119,6 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:get-tracking --active=0')->twiceDaily(8, 22);
 
         /*
-         * Primary Logistics
-         */
-        $schedule->command('primary-logistics:create-orders')->hourly();
-        $schedule->command('primary-logistics:cancel-orders')->hourly();
-        $schedule->command('primary-logistics:get-tracking-numbers')->hourly();
-        $schedule->command('primary-logistics:get-inventory')->weekdays()->dailyAt('09:30');
-        $schedule->command('ifs:check-for-missing-primary-freight-details')->dailyAt(8, 00);
-
-        /*
          * RF server
          */
         $schedule->command('ifs:start-rfserver')->between('7:00', '21:00')->withoutOverlapping(1);
