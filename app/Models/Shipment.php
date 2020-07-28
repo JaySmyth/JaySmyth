@@ -364,6 +364,11 @@ class Shipment extends Model
             case 14:
                 $url = "https://track.anpost.ie/TrackingResults.aspx?rtt=1&items=$this->carrier_tracking_number";
                 break;
+            // XDP
+            case 16:
+                $url = "https://xdp.co.uk/track.php?c=$this->carrier_tracking_number&code=" . str_replace(' ', '+', $this->recipient_postcode);
+                break;
+
             default:
                 break;
         }
