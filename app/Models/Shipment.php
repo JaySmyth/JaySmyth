@@ -1393,7 +1393,6 @@ class Shipment extends Model
     {
         // If shipment is in transit or delivered - do nothing
         if (in_array($this->status_id, [1,2,3,7,8])) {
-            $this->setCancelled();
             $this->form_values = $this->convertToFormValues();
             $this->clearCarrierDetails();
             $this->status_id=1;
