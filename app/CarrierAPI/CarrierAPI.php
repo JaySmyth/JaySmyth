@@ -1009,7 +1009,9 @@ class CarrierAPI
                 $cnt++;
             }
 
-            $data['max_dimension'] = max($dims);
+            $data['max_dimension'] = (is_array($dims)) ? max($dims) : 0;
+
+
             if (! isset($shipment['volumetric_weight']) || $volumetric_weight > $shipment['volumetric_weight']) {
                 $shipment['volumetric_weight'] = $volumetric_weight;
             }
@@ -1020,7 +1022,7 @@ class CarrierAPI
             }
 
             $shipment['dry_ice_total_weight'] = $dryIceTotalWeight;
-            $shipment['max_dimension'] = max($dims);
+            $shipment['max_dimension'] = (is_array($dims)) ? max($dims) : 0;
         }
 
         return $shipment;
