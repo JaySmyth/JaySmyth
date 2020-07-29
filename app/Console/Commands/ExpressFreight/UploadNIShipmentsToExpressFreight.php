@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands\ExpressFreight;
 
-use App\Models\Shipment;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
@@ -56,8 +55,8 @@ class UploadNIShipmentsToExpressFreight extends Command
     {
         parent::__construct();
 
-        $this->fileName = 'exp_ni_'.time().'.csv';
-        $this->filePath = '/home/expressfreight/manifests/ni/'.$this->fileName;
+        $this->fileName = 'exp_ni_' . time() . '.csv';
+        $this->filePath = '/home/expressfreight/manifests/ni/' . $this->fileName;
     }
 
     /**
@@ -75,13 +74,7 @@ class UploadNIShipmentsToExpressFreight extends Command
             // Create the file to upload
             $this->createFile();
 
-            // Update the source flag
-            $this->setShipmentsToUploaded();
-
-            // Send notification
-            if (count($this->validShipments) > 0) {
-                Mail::to('ASteenson@expressfreight.co.uk')->cc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight NI Manifest ('.count($this->validShipments).' shipments)', 'Please see attached file', $this->filePath));
-            }
+            Mail::to('ASteenson@expressfreight.co.uk')->cc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight NI Manifest (' . $this->shipments->count() . ' shipments)', 'Please see attached file', $this->filePath));
         }
     }
 
@@ -95,85 +88,82 @@ class UploadNIShipmentsToExpressFreight extends Command
         $handle = fopen($this->filePath, 'w');
 
         // Add heading row
-        fputcsv($handle, ['Consignment Number', 'Despatch Date', 'Consignee Name', 'Street 1', 'Street 2', 'City/Town', 'County', 'Postcode', 'Location', 'Instructions', 'Contact Number', 'Number Of Cartons', 'Carton Weight', 'Number Of Pallets', 'Pallet Weight', 'Number Of Others', 'Other Weight', 'Number Of Sets', 'Set Weight', 'COD Amount', 'COD Currency', 'Parcel number', 'Service Type', 'Contact Name']);
+        fputcsv($handle, [
+            'Consignment Number',
+            'Despatch Date',
+            'Consignee Name',
+            'Street 1',
+            'Street 2',
+            'City/Town',
+            'County',
+            'Postcode',
+            'Location',
+            'Instructions',
+            'Contact Number',
+            'Number Of Cartons',
+            'Carton Weight',
+            'Number Of Pallets',
+            'Pallet Weight',
+            'Number Of Others',
+            'Other Weight',
+            'Number Of Sets',
+            'Set Weight',
+            'COD Amount',
+            'COD Currency',
+            'Parcel number',
+            'Service Type',
+            'Contact Name'
+        ]);
 
         foreach ($this->shipments as $shipment) :
 
-            if ($this->isValid($shipment)) {
-                $line = [
-                    $shipment->carrier_consignment_number,
-                    $shipment->ship_date->format('d/m/Y'),
-                    $shipment->recipient_name,
-                    $shipment->recipient_company_name.' - '.$shipment->recipient_address1,
-                    $shipment->recipient_address2,
-                    $shipment->recipient_city,
-                    $shipment->recipient_state,
-                    $shipment->recipient_postcode,
-                    'North Ireland',
-                    $shipment->special_instructions,
-                    $shipment->recipient_telephone,
-                    $shipment->pieces,
-                    $shipment->weight,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    null,
-                    $shipment->consignment_number,
-                    'STANDARD',
-                    $shipment->recipient_name,
-                ];
+            $line = [
+                $shipment->carrier_consignment_number,
+                $shipment->ship_date->format('d/m/Y'),
+                $shipment->recipient_name,
+                $shipment->recipient_company_name . ' - ' . $shipment->recipient_address1,
+                $shipment->recipient_address2,
+                $shipment->recipient_city,
+                $shipment->recipient_state,
+                $shipment->recipient_postcode,
+                'North Ireland',
+                $shipment->special_instructions,
+                $shipment->recipient_telephone,
+                $shipment->pieces,
+                $shipment->weight,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                null,
+                $shipment->consignment_number,
+                'STANDARD',
+                $shipment->recipient_name,
+            ];
 
-                // Remove any commas
-                $line = array_map(
-                    function ($str) {
-                        return str_replace(',', '', $str);
-                    },
-                    $line
-                );
+            // Remove any commas
+            $line = array_map(
+                function ($str) {
+                    return str_replace(',', '', $str);
+                },
+                $line
+            );
 
-                fputcsv($handle, $line);
+            fputcsv($handle, $line);
 
-                // Add to array of valid shipments
-                $this->validShipments[] = $shipment->id;
-            }
+            $shipment->received_sent = true;
+            $shipment->source = $this->fileName;
+            $shipment->save();
+
+            $shipment->log('Uploaded to Express Freight');
 
         endforeach;
 
         fclose($handle);
     }
 
-    /**
-     * Check that a shipment is valid for express Freight upload.
-     *
-     * @return bool
-     */
-    private function isValid($shipment)
-    {
-        // Already uploaded
-        if (stristr($shipment->source, '.csv')) {
-            return false;
-        }
 
-        if (strtoupper(substr($shipment->recipient_postcode, 0, 2)) != 'BT') {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Update shipment records with an identifier to show that they have been uploaded to PF.
-     */
-    private function setShipmentsToUploaded()
-    {
-        // set the source field on all shipments to that of the filename
-        Shipment::whereIn('id', $this->validShipments)->update([
-            'received_sent' => 1,
-            'source' => $this->fileName,
-        ]);
-    }
 }
