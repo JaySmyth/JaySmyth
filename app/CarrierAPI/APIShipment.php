@@ -404,7 +404,7 @@ class APIShipment
             $errors = $this->checkPackageLimits($shipment, $errors);
 
             // Check collection date is valid
-            $errors = $this->checkCollectionDate($shipment, $errors);
+            //$errors = $this->checkCollectionDate($shipment, $errors);
         }
 
         return $errors;
