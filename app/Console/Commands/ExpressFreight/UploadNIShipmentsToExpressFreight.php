@@ -34,17 +34,13 @@ class UploadNIShipmentsToExpressFreight extends Command
      * @var
      */
     protected $fileName;
+
     /**
      * File path.
      *
      * @var string
      */
     protected $filePath;
-
-    /**
-     * Array of valid shipment ids.
-     */
-    protected $validShipments = [];
 
     /**
      * Create a new job instance.
@@ -164,6 +160,5 @@ class UploadNIShipmentsToExpressFreight extends Command
 
         fclose($handle);
     }
-
 
 }

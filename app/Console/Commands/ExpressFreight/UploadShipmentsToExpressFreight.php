@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands\ExpressFreight;
 
-use App\Models\Shipment;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
@@ -43,11 +42,6 @@ class UploadShipmentsToExpressFreight extends Command
     protected $filePath;
 
     /**
-     * Array of valid shipment ids.
-     */
-    protected $validShipments = [];
-
-    /**
      * Create a new job instance.
      *
      * @return void
@@ -56,8 +50,8 @@ class UploadShipmentsToExpressFreight extends Command
     {
         parent::__construct();
 
-        $this->fileName = 'express_freight_'.time().'.csv';
-        $this->filePath = '/home/expressfreight/manifests/roi/'.$this->fileName;
+        $this->fileName = 'express_freight_' . time() . '.csv';
+        $this->filePath = '/home/expressfreight/manifests/roi/' . $this->fileName;
     }
 
     /**
@@ -70,15 +64,11 @@ class UploadShipmentsToExpressFreight extends Command
         // Load shipments that have been received at IFS
         $this->shipments = \App\Models\Shipment::whereCarrierId(14)->whereReceived(1)->whereReceivedSent(0)->whereNotIn('status_id', [1, 7])->get();
 
-        // Create the file to upload
-        $this->createFile();
+        if ($this->shipments->count() > 0) {
+            // Create the file to upload
+            $this->createFile();
 
-        // Update the source flag
-        $this->setShipmentsToUploaded();
-
-        // Send notification
-        if (count($this->validShipments) > 0) {
-            Mail::to('ASteenson@expressfreight.co.uk')->cc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight Manifest ('.count($this->validShipments).' shipments)', 'Please see attached file', $this->filePath));
+            Mail::to('ASteenson@expressfreight.co.uk')->cc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight Manifest (' . $this->shipments->count() . ' shipments)', 'Please see attached file', $this->filePath));
         }
     }
 
@@ -96,71 +86,46 @@ class UploadShipmentsToExpressFreight extends Command
 
         foreach ($this->shipments as $shipment) :
 
-            if ($this->isValid($shipment)) {
-                foreach ($shipment->packages as $package):
+            foreach ($shipment->packages as $package):
 
-                    $line = [
-                        $package->carrier_tracking_number,
-                        $shipment->consignment_number,
-                        'Pkg '.$package->index.' of '.$shipment->pieces,
-                        $package->weight,
-                        $shipment->ship_date->format('d/m/Y'),
-                        $shipment->recipient_name,
-                        $shipment->recipient_company_name,
-                        $shipment->recipient_address1,
-                        $shipment->recipient_address2,
-                        $shipment->recipient_city,
-                        $shipment->recipient_state,
-                        $shipment->recipient_postcode,
-                        $shipment->recipient_country_code,
-                        0,
-                    ];
+                $line = [
+                    $package->carrier_tracking_number,
+                    $shipment->consignment_number,
+                    'Pkg ' . $package->index . ' of ' . $shipment->pieces,
+                    $package->weight,
+                    $shipment->ship_date->format('d/m/Y'),
+                    $shipment->recipient_name,
+                    $shipment->recipient_company_name,
+                    $shipment->recipient_address1,
+                    $shipment->recipient_address2,
+                    $shipment->recipient_city,
+                    $shipment->recipient_state,
+                    $shipment->recipient_postcode,
+                    $shipment->recipient_country_code,
+                    0,
+                ];
 
                 // Remove any commas
                 $line = array_map(
-                        function ($str) {
-                            return str_replace(',', '', $str);
-                        },
-                        $line
-                    );
+                    function ($str) {
+                        return str_replace(',', '', $str);
+                    },
+                    $line
+                );
 
                 fputcsv($handle, $line);
 
-                endforeach;
+            endforeach;
 
-                // Add to array of valid shipments
-                $this->validShipments[] = $shipment->id;
-            }
+            $shipment->received_sent = true;
+            $shipment->source = $this->fileName;
+            $shipment->save();
+
+            $shipment->log('Uploaded to Express Freight');
 
         endforeach;
 
         fclose($handle);
     }
 
-    /**
-     * Check that a shipment is valid for express Freight upload.
-     *
-     * @return bool
-     */
-    private function isValid($shipment)
-    {
-        // Already uploaded
-        if (stristr($shipment->source, '.csv')) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Update shipment records with an identifier to show that they have been uploaded to PF.
-     */
-    private function setShipmentsToUploaded()
-    {
-        // set the source field on all shipments to that of the filename
-        Shipment::whereIn('id', $this->validShipments)->update([
-            'received_sent' => 1,
-            'source' => $this->fileName,
-        ]);
-    }
 }
