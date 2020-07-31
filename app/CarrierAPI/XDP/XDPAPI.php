@@ -131,6 +131,7 @@ class XDPAPI extends \App\CarrierAPI\CarrierBase
             $response['packages'][$i]['carrier_tracking_number'] = $reply['barcode'][$i];
             $response['packages'][$i]['barcode'] = $reply['barcode'][$i];
             $response['packages'][$i]['carrier_tracking_code'] = $reply['barcode'][$i]; //??
+            $response['packages'][$i]['sequence_number'] = $i + 1;
         }
 
         // Return Labels
