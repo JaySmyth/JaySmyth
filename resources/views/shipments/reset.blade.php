@@ -65,7 +65,7 @@
             </div>
 
             <div class="col-6">
-                <div class="card h-100">
+                <div class="card mb-5">
 
                     <div class="card-header">Sender / Recipient
                         @if($shipment->legacy)
@@ -170,6 +170,32 @@
                         </div>
                     </div>
                 </div>
+
+
+                <h4 class="mb-2">Packages
+                    <span class="badge badge-pill badge-secondary badge-sm ml-sm-1">{{ $shipment->packages->count()}}</span></h4>
+                <table class="table table-striped table-bordered mb-5">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th class="text-right">Length</th>
+                        <th class="text-right">Width</th>
+                        <th class="text-right">Height</th>
+                        <th class="text-right">Weight</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach ($shipment->packages as $package)
+                        <tr>
+                            <td>{{$package->index}}</td>
+                            <td class="text-right">{{$package->length}} {{$shipment->dims_uom}}</td>
+                            <td class="text-right">{{$package->width}} {{$shipment->dims_uom}}</td>
+                            <td class="text-right">{{$package->height}} {{$shipment->dims_uom}}</td>
+                            <td class="text-right">{{$package->weight}} {{$shipment->weight_uom}}</td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
 
