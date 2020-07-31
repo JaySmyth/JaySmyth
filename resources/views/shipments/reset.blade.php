@@ -31,7 +31,7 @@
                     </label>
 
                     <div class="col-sm-6">
-                        {!! Form::select('service',  [76 => 'XDP UK48', 19 => 'FedEx UK', 66 => 'Express Freight NI'], old('service'), array('class' => 'form-control')) !!}
+                        {!! Form::select('service',  [76 => 'XDP UK48', 19 => 'FedEx UK'], old('service'), array('class' => 'form-control')) !!}
 
                         @if ($errors->has('service'))
                             <span class="form-text"><strong>{{ $errors->first('service') }}</strong></span>
@@ -64,12 +64,110 @@
 
             </div>
 
-            <div class="col-5">
-                <div class="card text-large">
-                    <div class="card-header"><span class="fas fa-info-circle" aria-hidden="true"></span> <strong
-                                class="ml-sm-1">Info</strong> <span class="ml-sm-4">Shipment Reset</span></div>
-                    <div class="card-body">
+            <div class="col-6">
+                <div class="card h-100">
 
+                    <div class="card-header">Sender / Recipient
+                        @if($shipment->legacy)
+                            <span class="float-right text-muted font-italic">Raised on legacy system - {{$shipment->carrier_consignment_number}}</span>
+                        @endif
+                    </div>
+
+                    <div class="card-body text-large">
+                        <div class="row text-truncate">
+                            <div class="col-sm-5">
+
+                                <h5>Sender
+                                    @if($shipment->sender_type == 'c')
+                                        <span class="far fa-building ml-sm-2" aria-hidden="true" data-placement="right" data-toggle="tooltip" data-original-title="{{getAddressType($shipment->sender_type)}}"></span>
+                                    @else
+                                        <span class="fas fa-user ml-sm-2" aria-hidden="true" data-placement="right" data-toggle="tooltip" data-original-title="{{getAddressType($shipment->sender_type)}}"></span>
+                                    @endif
+                                </h5>
+
+                                {{$shipment->sender_name}}<br>
+                                {{$shipment->sender_company_name}}<br>
+                                {{$shipment->sender_address1}}<br>
+
+                                @if($shipment->sender_address2)
+                                    {{$shipment->sender_address2}}<br>
+                                @endif
+
+                                @if($shipment->sender_address3)
+                                    {{$shipment->sender_address3}}<br>
+                                @endif
+
+                                {{$shipment->sender_city}}<br>
+                                {{$shipment->sender_state}} {{$shipment->sender_postcode}}<br>
+                                <strong>{{$shipment->sender_country}}</strong><br>
+
+                                @if(!$shipment->sender_address2)<br>@endif
+
+                                @if(!$shipment->sender_address3)<br>@endif
+
+                                @if($shipment->sender_telephone)
+                                    Tel: {{$shipment->sender_telephone}}<br>
+                                @endif
+
+                                @if($shipment->sender_email)
+                                    <a href="mailto:{{$shipment->sender_email}}">{{$shipment->sender_email}}</a>
+                                @endif
+
+                            </div>
+
+                            <div class="col-sm-2 pt-4 text-center">
+                                <span class="chevron fa fa-chevron-right pt-4 mt-4" aria-hidden="true"></span>
+                            </div>
+
+                            <div class="col-sm-5">
+                                <h5>Recipient
+                                    @if($shipment->recipient_type == 'c')
+                                        <span class="far fa-building ml-sm-2" aria-hidden="true" data-placement="right" data-toggle="tooltip" data-original-title="{{getAddressType($shipment->recipient_type)}}"></span>
+                                    @else
+                                        <span class="fas fa-user ml-sm-2" aria-hidden="true" data-placement="right" data-toggle="tooltip" data-original-title="{{getAddressType($shipment->recipient_type)}}"></span>
+                                    @endif
+
+                                </h5>
+
+                                @if($shipment->recipient_name)
+                                    {{$shipment->recipient_name}}<br>
+                                @endif
+
+                                @if($shipment->recipient_company_name)
+                                    {{$shipment->recipient_company_name}}<br>
+                                @endif
+
+                                {{$shipment->recipient_address1}}<br>
+
+                                @if($shipment->recipient_address2)
+                                    {{$shipment->recipient_address2}}<br>
+                                @endif
+
+                                @if($shipment->recipient_address3)
+                                    {{$shipment->recipient_address3}}<br>
+                                @endif
+
+                                {{$shipment->recipient_city}}<br>
+                                {{$shipment->recipient_state}} {{$shipment->recipient_postcode}}<br>
+                                <strong>{{$shipment->recipient_country}}</strong><br>
+
+                                @if(!$shipment->recipient_company_name)<br>@endif
+
+                                @if(!$shipment->recipient_address2)<br>@endif
+
+                                @if(!$shipment->recipient_address3)<br>@endif
+
+                                @if($shipment->recipient_telephone)
+                                    Tel: {{$shipment->recipient_telephone}}<br>
+                                @endif
+
+                                @if($shipment->recipient_email)
+                                    <a class="text-truncate" href="mailto:{{$shipment->recipient_email}}">{{$shipment->recipient_email}}</a>
+                                @endif
+
+
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
