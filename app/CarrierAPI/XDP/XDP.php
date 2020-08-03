@@ -104,17 +104,11 @@ class XDP
         $result = new SimpleXMLElement($xml);
 
         // Check for errors: move them to our reply array
-        if (isset($result->responses->response->valid)) {
-            $status = (string) $result->responses->response->valid;
-            if ($status=='ERROR') {
-                foreach ($result->responses->response->children() as $error) {
-                    if (substr($error, 8) == 'ERROR - ') {
-                        $reply['errors'][] = substr($error, 8, 999);
-                    }
-                }
-
-                return $reply;
+        if (isset($result->responses->response->errors)) {
+            foreach ($result->responses->response->errors as $error) {
+                $reply['errors'][] = (string)$error->error;
             }
+            return $reply;
         }
 
         $consignmentNumber='';
