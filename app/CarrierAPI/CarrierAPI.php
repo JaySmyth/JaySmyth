@@ -538,14 +538,6 @@ class CarrierAPI
             $data['collection_route'] = 'ADHOC';
         }
 
-        // Patch for undefined indexes
-        $requiredKeys = ['sender_address2', 'recipient_address2'];
-
-        foreach ($requiredKeys as $key){
-            if(!array_key_exists($key, $data)){
-                $data[$key] = null;
-            }
-        }
 
         /*
          * Save the serialized form values
@@ -811,6 +803,16 @@ class CarrierAPI
         $shipment = $this->checkAddresses($shipment);
 
         if (isset($shipment['service_id']) && $shipment['service_id'] > '') {
+
+            // Patch for undefined indexes
+            $requiredKeys = ['sender_address2', 'recipient_address2'];
+
+            foreach ($requiredKeys as $key){
+                if(!array_key_exists($key, $shipment)){
+                    $shipment[$key] = null;
+                }
+            }
+
             // Set Mode of transport
             $shipment['mode'] = Mode::find($shipment['mode_id'])->name;
 
