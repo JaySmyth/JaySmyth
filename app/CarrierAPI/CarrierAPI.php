@@ -538,6 +538,15 @@ class CarrierAPI
             $data['collection_route'] = 'ADHOC';
         }
 
+        // Patch for undefined indexes
+        $requiredKeys = ['sender_address2', 'recipient_address2'];
+
+        foreach ($requiredKeys as $key){
+            if(!array_key_exists($key, $data)){
+                $data[$key] = null;
+            }
+        }
+
         /*
          * Save the serialized form values
          */
