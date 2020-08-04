@@ -11,6 +11,7 @@
 namespace App\Pricing;
 
 use App\Models\DomesticZone;
+use App\Models\XdpEas;
 
 class PricingModel7 extends PricingModel
 {
@@ -44,5 +45,12 @@ class PricingModel7 extends PricingModel
     {
         $domesticZones = new DomesticZone();
         $this->zone = $domesticZones->getZone($this->shipment, $this->rate['model']);
+    }
+
+    public function isOOA()
+    {
+        $eas = new XdpEas();
+
+        return $eas->isOutOfArea($this->shipment['recipient_postcode']);
     }
 }
