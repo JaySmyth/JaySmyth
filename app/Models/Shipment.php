@@ -764,7 +764,7 @@ class Shipment extends Model
 
         $slice = Str::before($this->recipient_postcode, ' ');
 
-        $domesticZone = \App\Models\DomesticZone::where('postcode', $slice)->first();
+        $domesticZone = \App\Models\DomesticZone::where('postcode', $slice)->where('model', $this->carrier->code)->first();
 
         if(!$domesticZone){
 
@@ -772,7 +772,7 @@ class Shipment extends Model
 
             for ($i = $l; $i >= 3; $i--) {
 
-                $result = \App\Models\DomesticZone::where('postcode', substr($postcode, 0, $i))->where('carrier', $this->carrier->name)->first();
+                $result = \App\Models\DomesticZone::where('postcode', substr($postcode, 0, $i))->where('model', $this->carrier->code)->first();
 
                 if ($result) {
                     return $result->sla;
