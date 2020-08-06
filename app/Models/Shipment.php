@@ -750,17 +750,39 @@ class Shipment extends Model
 
 
     /**
-     * TEMPORARY: Service level agreement for FedEx UK shipments.
+     * Service level agreement for FedEx UK shipments.
      *
      * @return int
      */
     public function getSla()
     {
-        if (substr(strtoupper($this->recipient_postcode), 0, 2) == 'BT') {
+        $postcode = trim($this->recipient_postcode);
+
+        if (substr(strtoupper($postcode), 0, 2) == 'BT') {
             return 48;
         }
 
-        // Extended area postcodes here
+        $slice = Str::before($this->recipient_postcode, ' ');
+
+        $domesticZone = \App\Models\DomesticZone::where('postcode', $slice)->first();
+
+        if(!$domesticZone){
+
+            $l = strlen($postcode);
+
+            for ($i = $l; $i >= 3; $i--) {
+
+                $result = \App\Models\DomesticZone::where('postcode', substr($postcode, 0, $i))->where('carrier', $this->carrier->name)->first();
+
+                if ($result) {
+                    return $result->sla;
+                }
+            }
+        }
+
+        if ($domesticZone) {
+            return $domesticZone->sla;
+        }
 
         return 24;
     }
