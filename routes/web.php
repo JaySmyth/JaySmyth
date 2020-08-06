@@ -298,6 +298,7 @@ Route::get('reports/collection-settings/{id}', 'ReportsController@collectionSett
 Route::get('reports/shipments-by-carrier/{id}', 'ReportsController@shipmentsByCarrier');
 Route::get('reports/scanning-kpis/{id}', 'ReportsController@scanningKpis');
 Route::get('reports/label-downloads/{id}', 'ReportsController@labelDownloads');
+Route::get('reports/performance/{id}', 'ReportsController@performance');
 
 /*
   |--------------------------------------------------------------------------

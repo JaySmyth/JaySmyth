@@ -318,7 +318,6 @@ class Shipment extends Model
         $url = null;
 
         switch ($this->carrier_id) {
-
             // IFS Air Freight
             case 1:
                 // schenker tracking for CDE
@@ -389,13 +388,13 @@ class Shipment extends Model
             $FukShipment = FukShipment::select('id')->where('docketno', $this->carrier_consignment_number)->where('compID', $this->company_id)->first();
 
             if ($FukShipment) {
-                return 'https://www.ifsgl.com/CourierUK/reprint.php?id='.$FukShipment->id.'&format=A4';
+                return 'https://www.ifsgl.com/CourierUK/reprint.php?id=' . $FukShipment->id . '&format=A4';
             } else {
                 return;
             }
         }
 
-        return 'https://www.ifsgl.com/Courier/print.php?id='.$this->carrier_consignment_number;
+        return 'https://www.ifsgl.com/Courier/print.php?id=' . $this->carrier_consignment_number;
     }
 
     /**
@@ -454,7 +453,7 @@ class Shipment extends Model
         if ($this->shipping_charge > 0) {
             $margin = ($this->shipping_charge - $this->shipping_cost) / $this->shipping_charge * 100;
 
-            return number_format($margin, 2).'%';
+            return number_format($margin, 2) . '%';
         }
 
         return 'n/a';
@@ -496,9 +495,9 @@ class Shipment extends Model
     public function getProfitFormattedAttribute()
     {
         if ($this->shipping_cost > $this->shipping_charge) {
-            return '-'.number_format($this->profit, 2);
+            return '-' . number_format($this->profit, 2);
         } elseif ($this->shipping_charge > $this->shipping_cost) {
-            return '+'.number_format($this->profit, 2);
+            return '+' . number_format($this->profit, 2);
         } else {
             return number_format($this->profit, 2);
         }
@@ -674,6 +673,20 @@ class Shipment extends Model
     }
 
     /**
+     * Shipment active - i.e. not cancelled or delivered.
+     *
+     * @return bool
+     */
+    public function isActive()
+    {
+        if (in_array($this->status->code, ['saved', 'cancelled', 'return_to_sender', 'available_for_pickup', 'failure', 'unknown']) || $this->delivered) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * A shipment is resetable.
      *
      * @return bool
@@ -687,20 +700,69 @@ class Shipment extends Model
         return false;
     }
 
+    /**
+     * Determine if there is a delay and who is responsible.
+     *
+     * @return string
+     */
+    public function getDelay()
+    {
+        if ($this->time_in_transit < $this->getSla()) {
+            return 'none';
+        }
+
+        $delays = [
+            'receiver' => [
+                'Alternate delivery requested',
+                'Customer premises closed',
+                'Business closed',
+                'Customer not available',
+                'Future delivery requested',
+                'Incorrect address',
+                'Local delivery restriction',
+                'Refused by recipient',
+                'revised delivery address',
+                'Incorrect recipient address',
+            ],
+            'carrier' => [
+                'Package not due for delivery',
+                'Delivery delayed, scheduled for next business day',
+                'Package at station, arrived after courier dispatch',
+            ]
+        ];
+
+        foreach ($this->tracking as $tracking) {
+            foreach ($delays['receiver'] as $delay) {
+                if (stristr($tracking->message, $delay)) {
+                    return 'receiver';
+                }
+            }
+
+            foreach ($delays['carrier'] as $delay) {
+                if (stristr($tracking->message, $delay)) {
+                    return 'carrier';
+                }
+            }
+        }
+
+        return 'unknown';
+    }
 
 
     /**
-     * Shipment active - i.e. not cancelled or delivered.
+     * TEMPORARY: Service level agreement for FedEx UK shipments.
      *
-     * @return bool
+     * @return int
      */
-    public function isActive()
+    public function getSla()
     {
-        if (in_array($this->status->code, ['saved', 'cancelled', 'return_to_sender', 'available_for_pickup', 'failure', 'unknown']) || $this->delivered) {
-            return false;
+        if (substr(strtoupper($this->recipient_postcode), 0, 2) == 'BT') {
+            return 48;
         }
 
-        return true;
+        // Extended area postcodes here
+
+        return 24;
     }
 
     /**
@@ -858,7 +920,6 @@ class Shipment extends Model
 
         // Update the shipment status to "received" (only if not on hold)
         if ($this->status->code == 'pre_transit') {
-
             // Update the ship date
             $this->ship_date = toCarbon($dateReceived);
             $this->save();
@@ -903,7 +964,6 @@ class Shipment extends Model
         // Only update if we have been given a valid status and the shipment is not currently set to this status
         // Also, dont update the status if currently RTS or Delivered - GMcNicholl 25-09-2018 17:54
         if ($status && $this->status_id != $status->id && ! in_array($this->status_id, ['6', '9'])) {
-
             // Change the status on the shipment record
             $this->status_id = $status->id;
             $this->save();
@@ -959,7 +1019,7 @@ class Shipment extends Model
             return Tracking::firstOrCreate(['message' => $message, 'status' => $statusCode, 'datetime' => $datetime, 'shipment_id' => $this->id])->update([
                 'local_datetime' => $datetime,
                 'carrier' => $this->carrier->name,
-                'tracker_id' => 'trk_'.Str::random(26),
+                'tracker_id' => 'trk_' . Str::random(26),
                 'city' => $location['city'],
                 'state' => $location['state'],
                 'country_code' => $location['country_code'],
@@ -1062,11 +1122,11 @@ class Shipment extends Model
             'weight' => $this->weight,
             'goods_description' => $this->goods_description,
             'volumetric_weight' => $this->volumetric_weight,
-            'instructions' => 'Deliver to: '.$this->recipient_name.', '.$this->recipient_address1.', '.$this->recipient_city.' '.$this->recipient_postcode.' '.$this->instructions,
+            'instructions' => 'Deliver to: ' . $this->recipient_name . ', ' . $this->recipient_address1 . ', ' . $this->recipient_city . ' ' . $this->recipient_postcode . ' ' . $this->instructions,
             'scs_job_number' => $this->scs_job_number,
             'scs_company_code' => ($this->company->group_account) ? $this->company->group_account : $this->company->scs_code,
             'cash_on_delivery' => 0,
-            'final_destination' => $this->recipient_city.','.$this->recipient_country,
+            'final_destination' => $this->recipient_city . ',' . $this->recipient_country,
             'type' => 'd',
             'from_type' => 'c',
             'from_company_name' => $this->company->company_name,
@@ -1152,7 +1212,7 @@ class Shipment extends Model
 
         // If sender postcode not "BT", mainland pickup may need cancelled
         if (! $this->originatesFromBtPostcode() && strtoupper($this->sender_country_code != 'US')) {
-            Mail::to('courier@antrim.ifsgroup.com')->cc('courieruk@antrim.ifsgroup.com')->queue(new GenericError('Shipment Cancelled ('.$this->company->company_name.'/'.$this->consignment_number.')', 'Carrier pickup may need to be cancelled.'));
+            Mail::to('courier@antrim.ifsgroup.com')->cc('courieruk@antrim.ifsgroup.com')->queue(new GenericError('Shipment Cancelled (' . $this->company->company_name . '/' . $this->consignment_number . ')', 'Carrier pickup may need to be cancelled.'));
         }
 
         /*
@@ -1251,7 +1311,7 @@ class Shipment extends Model
             }
         }
 
-        return $count.' of '.$this->pieces;
+        return $count . ' of ' . $this->pieces;
     }
 
     /**
@@ -1275,7 +1335,7 @@ class Shipment extends Model
             'scs_job_number' => $this->scs_job_number,
             'scs_company_code' => ($this->company->group_account) ? $this->company->group_account : $this->company->scs_code,
             'cash_on_delivery' => 0,
-            'final_destination' => $this->recipient_city.','.$this->recipient_country,
+            'final_destination' => $this->recipient_city . ',' . $this->recipient_country,
             'type' => 'c',
             'from_type' => $this->sender_type,
             'from_name' => $this->sender_name,
@@ -1319,7 +1379,6 @@ class Shipment extends Model
      */
     public function price($toBeSaved = true, $debug = false)
     {
-
         // Build Packages Array
         $packages = [];
         foreach ($this->packages as $package) {
@@ -1392,10 +1451,10 @@ class Shipment extends Model
     public function reset()
     {
         // If shipment is in transit or delivered - do nothing
-        if (in_array($this->status_id, [1,2,3,7,8])) {
+        if (in_array($this->status_id, [1, 2, 3, 7, 8])) {
             $this->form_values = $this->convertToFormValues();
             $this->clearCarrierDetails();
-            $this->status_id=1;
+            $this->status_id = 1;
             $this->save();
 
             // Remove related records
@@ -1410,104 +1469,104 @@ class Shipment extends Model
 
     public function convertToFormValues()
     {
-        $alerts=$this->alerts;
-        $packages=$this->packages;
-        $contents=$this->contents;
-        $value["commodity_count"]=count($contents);
+        $alerts = $this->alerts;
+        $packages = $this->packages;
+        $contents = $this->contents;
+        $value["commodity_count"] = count($contents);
         $value["sender_name"] = $this->sender_name;
-        $value["sender_company_name"]=$this->sender_company_name;
-        $value["sender_type"]=$this->sender_type;
-        $value["sender_address1"]=$this->sender_address1;
-        $value["sender_address2"]=$this->sender_address2;
-        $value["sender_address3"]=$this->sender_address3;
-        $value["sender_city"]=$this->sender_city;
-        $value["sender_country_code"]=$this->sender_country_code;
-        $value["sender_state"]=$this->sender_state;
-        $value["sender_postcode"]=$this->sender_postcode;
-        $value["sender_telephone"]=$this->sender_telephone;
-        $value["sender_email"]=$this->sender_email;
-        $value["company_id"]=$this->company_id;
-        $value["recipient_name"]=$this->recipient_name;
-        $value["recipient_company_name"]=$this->recipient_company_name;
-        $value["recipient_type"]=$this->recipient_type;
-        $value["recipient_address1"]=$this->recipient_address1;
-        $value["recipient_address2"]=$this->recipient_address2;
-        $value["recipient_city"]=$this->recipient_city;
-        $value["recipient_country_code"]=$this->recipient_country_code;
-        $value["recipient_state"]=$this->recipient_state;
-        $value["recipient_postcode"]=$this->recipient_postcode;
-        $value["recipient_telephone"]=$this->recipient_telephone;
-        $value["recipient_email"]=$this->recipient_email;
-        $value["recipient_account_number"]=$this->recipient_account_number;
-        $value["pieces"]=$this->pieces;
-        $value["shipment_reference"]=$this->shipment_reference;
-        $value["ship_reason"]=$this->ship_reason;
-        $value["collection_date"]=$this->collection_date;                       // Format as dd-mm-yyyy
-        $value["hazardous"]=$this->hazardous;
-        $value["special_instructions"]=$this->special_instructions;
+        $value["sender_company_name"] = $this->sender_company_name;
+        $value["sender_type"] = $this->sender_type;
+        $value["sender_address1"] = $this->sender_address1;
+        $value["sender_address2"] = $this->sender_address2;
+        $value["sender_address3"] = $this->sender_address3;
+        $value["sender_city"] = $this->sender_city;
+        $value["sender_country_code"] = $this->sender_country_code;
+        $value["sender_state"] = $this->sender_state;
+        $value["sender_postcode"] = $this->sender_postcode;
+        $value["sender_telephone"] = $this->sender_telephone;
+        $value["sender_email"] = $this->sender_email;
+        $value["company_id"] = $this->company_id;
+        $value["recipient_name"] = $this->recipient_name;
+        $value["recipient_company_name"] = $this->recipient_company_name;
+        $value["recipient_type"] = $this->recipient_type;
+        $value["recipient_address1"] = $this->recipient_address1;
+        $value["recipient_address2"] = $this->recipient_address2;
+        $value["recipient_city"] = $this->recipient_city;
+        $value["recipient_country_code"] = $this->recipient_country_code;
+        $value["recipient_state"] = $this->recipient_state;
+        $value["recipient_postcode"] = $this->recipient_postcode;
+        $value["recipient_telephone"] = $this->recipient_telephone;
+        $value["recipient_email"] = $this->recipient_email;
+        $value["recipient_account_number"] = $this->recipient_account_number;
+        $value["pieces"] = $this->pieces;
+        $value["shipment_reference"] = $this->shipment_reference;
+        $value["ship_reason"] = $this->ship_reason;
+        $value["collection_date"] = $this->collection_date;                       // Format as dd-mm-yyyy
+        $value["hazardous"] = $this->hazardous;
+        $value["special_instructions"] = $this->special_instructions;
 
         foreach ($alerts as $alert) {
-            if (substr($alert->email, 0, 7)!="alerts.") {
-                if ($alert->email==$this->sender_email) {
-                    $alertType="sender";
-                } elseif ($alert->email==$this->recipient_email) {
-                    $alertType="recipient";
-                } elseif ($alert->email==$this->broker_email) {
-                    $alertType="broker";
+            if (substr($alert->email, 0, 7) != "alerts.") {
+                if ($alert->email == $this->sender_email) {
+                    $alertType = "sender";
+                } elseif ($alert->email == $this->recipient_email) {
+                    $alertType = "recipient";
+                } elseif ($alert->email == $this->broker_email) {
+                    $alertType = "broker";
                 } else {
-                    $alertType="other";
+                    $alertType = "other";
                 }
-                $value["display_".$alertType."_email"]=$alert->email;
-                $milestones = ['despatched','collected','out_for_delivery','delivered','cancelled','problems'];
+                $value["display_" . $alertType . "_email"] = $alert->email;
+                $milestones = ['despatched', 'collected', 'out_for_delivery', 'delivered', 'cancelled', 'problems'];
                 foreach ($milestones as $milestone) {
                     if ($alert->$milestone) {
-                        $value["alerts"][$alertType][$milestone]=$alert->$milestone;
+                        $value["alerts"][$alertType][$milestone] = $alert->$milestone;
                     }
                 }
             }
         }
-        $value["display_recipient_email"]=$this->recipient_email;
-        $value["display_broker_email"]=$this->broker_email;
-        $value["other_email"]=$this->other_email;
-        $value["bill_shipping"]=$this->bill_shipping;
-        $value["bill_tax_duty"]=$this->bill_tax_duty;
-        $value["bill_shipping_account"]=$this->bill_shipping_account;
-        $value["bill_tax_duty_account"]=$this->bill_tax_duty_account;
-        $value["invoice_type"]=$this->invoice_type;
-        $value["terms_of_sale"]=$this->terms_of_sale;
-        $value["eori"]=$this->eori;
-        $value["ultimate_destination_country_code"]=$this->ultimate_destination_country_code;
-        $value["commercial_invoice_comments"]=$this->commercial_invoice_comments;
-        $value["insurance_value"]=$this->insurance_value;
-        $value["lithium_batteries"]=$this->lithium_batteries;
+        $value["display_recipient_email"] = $this->recipient_email;
+        $value["display_broker_email"] = $this->broker_email;
+        $value["other_email"] = $this->other_email;
+        $value["bill_shipping"] = $this->bill_shipping;
+        $value["bill_tax_duty"] = $this->bill_tax_duty;
+        $value["bill_shipping_account"] = $this->bill_shipping_account;
+        $value["bill_tax_duty_account"] = $this->bill_tax_duty_account;
+        $value["invoice_type"] = $this->invoice_type;
+        $value["terms_of_sale"] = $this->terms_of_sale;
+        $value["eori"] = $this->eori;
+        $value["ultimate_destination_country_code"] = $this->ultimate_destination_country_code;
+        $value["commercial_invoice_comments"] = $this->commercial_invoice_comments;
+        $value["insurance_value"] = $this->insurance_value;
+        $value["lithium_batteries"] = $this->lithium_batteries;
         foreach ($packages as $package) {
-            $temp=[];
-            $temp["dry_ice_weight"]=$package->dry_ice_weight;
-            $temp["packaging_code"]=$package->packaging_code;
-            $temp["weight"]=$package->weight;
-            $temp["length"]=$package->length;
-            $temp["width"]=$package->width;
-            $temp["height"]=$package->height;
+            $temp = [];
+            $temp["dry_ice_weight"] = $package->dry_ice_weight;
+            $temp["packaging_code"] = $package->packaging_code;
+            $temp["weight"] = $package->weight;
+            $temp["length"] = $package->length;
+            $temp["width"] = $package->width;
+            $temp["height"] = $package->height;
             $value['packages'][] = $temp;
         }
-        if (!empty($contents)) {
+        if (! empty($contents)) {
             foreach ($contents as $content) {
-                $temp=[];
-                $temp["description"]=$content->description;
-                $temp["id"]=$content->id;
-                $temp["product_code"]=$content->product_code;
-                $temp["currency_code"]=$content->currency_code;
-                $temp["country_of_manufacture"]=$content->country_of_manufacture;
-                $temp["manufacturer"]=$content->manufacturer;
-                $temp["uom"]=$content->uom;
-                $temp["commodity_code"]=$content->commodity_code;
-                $temp["harmonized_code"]=$content->harmonized_code;
-                $temp["shipping_cost"]=$content->shipping_cost;
-                $temp["package_index"]=$content->package_index;
-                $temp["quantity"]=$content->quantity;
-                $temp["unit_weight"]=$content->unit_weight;
-                $temp["unit_value"]=$content->unit_value;
-                $value['contents'][]=$temp;
+                $temp = [];
+                $temp["description"] = $content->description;
+                $temp["id"] = $content->id;
+                $temp["product_code"] = $content->product_code;
+                $temp["currency_code"] = $content->currency_code;
+                $temp["country_of_manufacture"] = $content->country_of_manufacture;
+                $temp["manufacturer"] = $content->manufacturer;
+                $temp["uom"] = $content->uom;
+                $temp["commodity_code"] = $content->commodity_code;
+                $temp["harmonized_code"] = $content->harmonized_code;
+                $temp["shipping_cost"] = $content->shipping_cost;
+                $temp["package_index"] = $content->package_index;
+                $temp["quantity"] = $content->quantity;
+                $temp["unit_weight"] = $content->unit_weight;
+                $temp["unit_value"] = $content->unit_value;
+                $value['contents'][] = $temp;
             }
         }
 
@@ -1577,7 +1636,6 @@ class Shipment extends Model
         foreach ($manifestProfiles as $manifestProfile) :
 
             if ($manifestProfile->isShipmentViable($this->id)) {
-
                 // Load the last manifest for this profile
                 $lastManifest = Manifest::whereManifestProfileId($manifestProfile->id)->orderBy('id', 'desc')->first();
 
@@ -1632,9 +1690,8 @@ class Shipment extends Model
         $pngArray = [];
 
         if ($this->label) {
-
             // Save the base64 string as PDF document in the temp directory
-            $pdfPath = storage_path('app/temp/'.$this->token.Str::random(6).'.pdf');
+            $pdfPath = storage_path('app/temp/' . $this->token . Str::random(6) . '.pdf');
             $decodedFile = base64_decode($this->label->base64);
             file_put_contents($pdfPath, $decodedFile);
 
@@ -1644,7 +1701,7 @@ class Shipment extends Model
 
             foreach (range(1, $numberOfPages) as $pageNumber) {
                 $key = ($numberOfPages > $this->pieces && $pageNumber == 1) ? 'master' : 'package';
-                $pngPath = storage_path('app/temp/'.Str::random(3).time().'.png');
+                $pngPath = storage_path('app/temp/' . Str::random(3) . time() . '.png');
                 $pdf->setPage($pageNumber)->setCompressionQuality(100)->setResolution(300)->setOutputFormat('png')->saveImage($pngPath);
 
                 if (file_exists($pngPath)) {

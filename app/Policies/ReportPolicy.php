@@ -260,4 +260,16 @@ class ReportPolicy
             return true;
         }
     }
+
+    /**
+     * View report.
+     *
+     * @return bool
+     */
+    public function performance(User $user)
+    {
+        if ($user->hasIfsRole() && $user->hasPermission('view_performance_report')) {
+            return true;
+        }
+    }
 }

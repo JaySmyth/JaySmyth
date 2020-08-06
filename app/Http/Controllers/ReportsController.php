@@ -71,12 +71,12 @@ class ReportsController extends Controller
         $dropdown = [];
 
         foreach ($manifests as $m) {
-            $dropdown[$m->id] = $m->number.' ('.$m->created_at->timezone($request->user()->time_zone)->format($request->user()->date_format).')';
+            $dropdown[$m->id] = $m->number . ' (' . $m->created_at->timezone($request->user()->time_zone)->format($request->user()->date_format) . ')';
         }
 
         $parisShipments = $this->getCustomsReportShipments($report, $request, 'fedexRouteParis');
         $memphisShipments = $this->getCustomsReportShipments($report, $request, 'fedexRouteMemphis');
-        $range = number_format($criteria['customs_value_low'], 2).'GBP - '.number_format($criteria['customs_value_high'], 2).'GBP';
+        $range = number_format($criteria['customs_value_low'], 2) . 'GBP - ' . number_format($criteria['customs_value_high'], 2) . 'GBP';
 
         return view('reports.customs', compact('manifest', 'dropdown', 'report', 'parisShipments', 'memphisShipments', 'range'));
     }
@@ -302,6 +302,45 @@ class ReportsController extends Controller
             ->paginate(250);
 
         return view('reports.dims', compact('report', 'shipments'));
+    }
+
+    /**
+     * Performance report.
+     *
+     * @param Request $request
+     * @param type $id
+     * @return type
+     */
+    public function performance(Request $request, $id)
+    {
+        $report = Report::findOrFail($id);
+
+        $this->authorize(new Report);
+
+        $dateFrom = new Carbon($request->date_from);
+        $dateTo = new Carbon($request->date_to);
+
+        $shipments = Shipment::select('shipments.*')
+            ->orderBy('created_at', 'DESC')
+            ->orderBy('shipments.id', 'DESC')
+            ->hasCompany($request->company)
+            ->shipDateBetween($dateFrom, $dateTo)
+            ->whereDelivered(1)
+            ->get();
+
+        $total = $shipments->count();
+
+        $results = [];
+
+        foreach ($shipments as $shipment) {
+                $results[$shipment->getDelay()][] = $shipment;
+        }
+
+        foreach (array_keys($results) as $delay){
+            $results['percentages'][$delay] = round((100 / $total) * count($results[$delay]), 1) . '%';
+        }
+
+        return view('reports.performance', compact('report', 'results', 'total'));
     }
 
     /**
