@@ -35,6 +35,10 @@
 
         <main class="col-sm-10 ml-sm-auto" role="main">
 
+            <h2>{{ $report->name }}</h2>
+
+            <hr>
+
             <h4 class="mb-3">Total Shipments Delivered <span class="badge badge-pill badge-secondary badge-sm ml-sm-1">{{ $total }}</span></h4>
             <table class="table table-striped table-bordered table-sm mb-5">
                 <thead>

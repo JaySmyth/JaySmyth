@@ -321,8 +321,7 @@ class ReportsController extends Controller
         $dateTo = new Carbon($request->date_to);
 
         $shipments = Shipment::select('shipments.*')
-            ->orderBy('created_at', 'DESC')
-            ->orderBy('shipments.id', 'DESC')
+            ->orderBy('ship_date')
             ->hasCompany($request->company)
             ->shipDateBetween($dateFrom, $dateTo)
             ->whereDelivered(1)
