@@ -22,11 +22,6 @@
                        class="form-control datepicker" placeholder="Date To">
             </div>
 
-            <div class="form-group">
-                <label for="month">Shipper</label>
-                {!! Form::select('company', dropDown('enabledSites', 'All Shippers'), Request::get('company'), array('class' => 'form-control')) !!}
-            </div>
-
             <button type="submit" class="btn btn-primary mt-3">Update Report</button>
 
             {!! Form::Close() !!}

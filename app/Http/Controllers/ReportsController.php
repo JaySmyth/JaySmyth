@@ -322,7 +322,7 @@ class ReportsController extends Controller
 
         $shipments = Shipment::select('shipments.*')
             ->orderBy('ship_date')
-            ->hasCompany($request->company)
+            ->whereCompanyId(1015)
             ->shipDateBetween($dateFrom, $dateTo)
             ->whereDelivered(1)
             ->get();
