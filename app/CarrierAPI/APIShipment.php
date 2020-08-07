@@ -367,13 +367,11 @@ class APIShipment
     public function buildValidationErrors($messages)
     {
         foreach ($messages->all() as $message) {
-
-            if($message == 'validation.not_regex'){
+            if ($message == 'validation.not_regex') {
                 $errors[] = 'Please provide a valid commodity description';
             } else {
                 $errors[] = ucfirst($message);
             }
-
         }
 
         return $errors;
@@ -402,6 +400,9 @@ class APIShipment
 
             // Validate based on Service limits
             $errors = $this->checkPackageLimits($shipment, $errors);
+
+            // Validate based on Country Restrictions
+            $errors = $this->checkCountryRestrictions($shipment, $errors);
 
             // Check collection date is valid
             //$errors = $this->checkCollectionDate($shipment, $errors);
@@ -648,7 +649,7 @@ class APIShipment
         return CompanyPackagingType::where('company_id', $companyId)->where('mode_id', $modeId)->get()->implode('code', ',');
     }
 
-    public function checkPayAccounts($shipment, $errors)
+    public function checkPayAccounts($shipment, $errors = [])
     {
 
         // Exempt UK Domestic Shipments
@@ -684,7 +685,7 @@ class APIShipment
         return $errors;
     }
 
-    public function checkPostCodes($shipment, $errors)
+    public function checkPostCodes($shipment, $errors = [])
     {
         $senderPostcode = (! empty($shipment['sender_postcode'])) ? $shipment['sender_postcode'] : '';
         $recipientPostcode = (! empty($shipment['recipient_postcode'])) ? $shipment['recipient_postcode'] : '';
@@ -722,7 +723,24 @@ class APIShipment
         }
     }
 
-    public function checkPackageLimits($shipment, $errors = '')
+    public function checkCountryRestrictions($shipment, $errors = [])
+    {
+        # If Shipment to Russia
+        if (strtoupper($shipment['recipient_country_code']) == 'RU') {
+            $value = convertCurrencies(
+                $shipment['customs_value_currency_code'],
+                'EUR',
+                $shipment['customs_value']
+            );
+            if ($value > 200) {
+                $errors[] = 'Customs value exceeds 200 euros';
+            }
+        }
+
+        return $errors;
+    }
+
+    public function checkPackageLimits($shipment, $errors = [])
     {
 
         // Determine Service Min/ Max Values
