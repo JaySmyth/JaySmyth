@@ -320,22 +320,22 @@ class ReportsController extends Controller
         $dateFrom = new Carbon($request->date_from);
         $dateTo = new Carbon($request->date_to);
 
-        $shipments = Shipment::select('shipments.*')
+        $total = 0;
+        $results = [];
+
+        Shipment::select('shipments.*')
             ->orderBy('ship_date')
             ->whereCompanyId(1015)
             ->shipDateBetween($dateFrom, $dateTo)
             ->whereDelivered(1)
-            ->get();
+            ->chunk(500, function ($shipments) use (&$total, &$results) {
+                foreach ($shipments as $shipment) {
+                    $total++;
+                    $results[$shipment->getDelay()][] = $shipment;
+                }
+            });
 
-        $total = $shipments->count();
-
-        $results = [];
-
-        foreach ($shipments as $shipment) {
-                $results[$shipment->getDelay()][] = $shipment;
-        }
-
-        foreach (array_keys($results) as $delay){
+        foreach (array_keys($results) as $delay) {
             $results['percentages'][$delay] = round((100 / $total) * count($results[$delay]), 1) . '%';
         }
 

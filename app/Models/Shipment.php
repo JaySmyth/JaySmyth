@@ -711,8 +711,7 @@ class Shipment extends Model
             return 'none';
         }
 
-        $delays = [
-            'receiver' => [
+        $receiverDelays = [
                 'Alternate delivery requested',
                 'Customer premises closed',
                 'Business closed',
@@ -723,29 +722,17 @@ class Shipment extends Model
                 'Refused by recipient',
                 'revised delivery address',
                 'Incorrect recipient address',
-            ],
-            'carrier' => [
-                'Package not due for delivery',
-                'Delivery delayed, scheduled for next business day',
-                'Package at station, arrived after courier dispatch',
-            ]
-        ];
+            ];
 
         foreach ($this->tracking as $tracking) {
-            foreach ($delays['receiver'] as $delay) {
+            foreach ($receiverDelays as $delay) {
                 if (stristr($tracking->message, $delay)) {
                     return 'receiver';
                 }
             }
-
-            foreach ($delays['carrier'] as $delay) {
-                if (stristr($tracking->message, $delay)) {
-                    return 'carrier';
-                }
-            }
         }
 
-        return 'unknown';
+        return 'carrier';
     }
 
 
