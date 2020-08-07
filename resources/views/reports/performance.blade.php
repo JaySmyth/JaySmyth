@@ -45,7 +45,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach(['receiver', 'carrier', 'unknown', 'none'] as $delay)
+                @foreach(['receiver', 'carrier', 'none'] as $delay)
                     <tr>
                         <td>{{ ucfirst($delay) }}</td>
                         <td>{{ isset($results[$delay]) ? count($results[$delay]) : 0 }}</td>
