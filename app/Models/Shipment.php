@@ -707,7 +707,7 @@ class Shipment extends Model
      */
     public function getDelay()
     {
-        if ($this->time_in_transit < $this->getSla()) {
+        if ($this->time_in_transit <= $this->getSla()) {
             return 'none';
         }
 
@@ -737,7 +737,7 @@ class Shipment extends Model
 
 
     /**
-     * Service level agreement for FedEx UK shipments.
+     * Service level agreement for domestic shipments.
      *
      * @return int
      */
