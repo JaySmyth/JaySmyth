@@ -1601,6 +1601,17 @@ function convertLegacyService($service, $gateway)
     }
 }
 
+function convertCurrencies($fromCurrency, $toCurrency, $value)
+{
+    $currency = new App\Models\Currency();
+
+    $base = $currency->where('code', strtoupper($fromCurrency))->first();
+    $dest = $currency->where('code', strtoupper($toCurrency))->first();
+    $newValue = number_format(($value * $dest->rate)/ $base->rate, 2);
+
+    return $newValue;
+}
+
 function convertLegacyCurrency($currency)
 {
     if (strtoupper($currency) == 'UKL') {
