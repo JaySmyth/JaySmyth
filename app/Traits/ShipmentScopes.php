@@ -508,16 +508,19 @@ trait ShipmentScopes
             $query->join('companies', 'shipments.company_id', '=', 'companies.id');
         }
 
-        return $query->whereReceived(1)
-            ->whereInvoicingStatus(0)
+        return $query->whereInvoicingStatus(0)
             ->whereNull('scs_job_number')
             ->whereNull('invoice_run_id')
             ->where('bill_shipping', 'sender')
             ->where('mode_id', 1)
             ->where('companies.legacy_pricing', 0)
             ->where('status_id', '<>', 7)
-            ->where('shipments.id', '>', 640711)
-            ->whereNotIn('companies.id', $excludedCompanies);
+            ->where('shipments.id', '>', 1222316)
+            ->whereNotIn('companies.id', $excludedCompanies)
+            ->where(function ($query) {
+                return $query->whereIn('status_id', ["4","5","6"])
+                         ->orWhere('manifest_id', '>', 1);
+            });
     }
 
     /**
