@@ -19,6 +19,24 @@ function flash()
     return app(\App\Http\Flash::class);
 }
 
+
+/**
+ * Formats a UK postcode with a space, 3rd character from end.
+ *
+ * @param $postcode
+ *
+ * @return string|string[]
+ */
+function formatUkPostcode($postcode){
+
+    $postcode = strtoupper(trim($postcode));
+
+    if(!Str::contains($postcode, ' ')){
+        $postcode = substr_replace($postcode, ' ', -3, -strlen($postcode));
+    }
+
+    return $postcode;
+}
 /**
  * Dump out data for debugging.
  *
