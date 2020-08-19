@@ -29,11 +29,12 @@ function flash()
  */
 function formatUkPostcode($postcode)
 {
-    $postcode = strtoupper(preg_replace("/[^A-Za-z0-9]/", '', $postcode));
+    $postcode = strtoupper(preg_replace("/[^A-Z0-9]/", '', $postcode));
     if (strlen($postcode) > 3) {
         return substr_replace($postcode, ' ', -3, -strlen($postcode));
     }
 }
+
 /**
  * Dump out data for debugging.
  *
