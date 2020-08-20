@@ -3,13 +3,12 @@
 namespace App\CarrierAPI\XDP;
 
 use App\Models\Service;
-use Illuminate\Support\Str;
+use App\Models\TransactionLog;
 use SimpleXMLElement;
 
 class XDP
 {
     private $shipment;
-    private $conref;
     private $xdp_connect_url = 'https://xdp.sysx.co.uk/api/webservice/rest/endpoint';
     private $xdp_label_url = '';
     private $username;
@@ -51,12 +50,15 @@ class XDP
         foreach ($this->shipment as $key => $value) {
             $this->shipment[$key] = str_replace('&', '', $value);
         }
+
+        $this->shipment['recipient_postcode'] = formatUkPostcode($this->shipment['recipient_postcode']);
     }
 
     /**
      * Get the account number to use.
      *
-     * @param type $mode
+     * @param  type  $mode
+     *
      * @return string
      */
     private function getBillShippingAccount($mode)
@@ -66,7 +68,7 @@ class XDP
         }
 
         // Provided by the end user
-        if (! empty($this->shipment['bill_shipping_account'])) {
+        if ( ! empty($this->shipment['bill_shipping_account'])) {
             return $this->shipment['bill_shipping_account'];
         }
 
@@ -96,7 +98,7 @@ class XDP
         $this->log('REPLY-1', 'I', $result);
 
         // Obtain the XML portion of the string returned
-        if (! $xml = $this->getXmlResult($result)) {
+        if ( ! $xml = $this->getXmlResult($result)) {
             return $reply['errors'][] = 'Invalid reply from carrier. Please try again.';
         }
 
@@ -106,20 +108,21 @@ class XDP
         // Check for errors: move them to our reply array
         if (isset($result->responses->response->errors)) {
             foreach ($result->responses->response->errors as $error) {
-                $reply['errors'][] = (string)$error->error;
+                $reply['errors'][] = (string) $error->error;
             }
+
             return $reply;
         }
 
-        $consignmentNumber='';
+        $consignmentNumber = '';
         if (isset($result->responses->response->consignmentno)) {
             $consignmentNumber = (string) $result->responses->response->consignmentno; // Cast the simpleXML object to a string
-            for ($i=1; $i<=$this->shipment['pieces'];$i++) {
+            for ($i = 1; $i <= $this->shipment['pieces']; $i++) {
                 $reply['barcode'][] = $consignmentNumber.str_pad($i, 3, '0', STR_PAD_LEFT);
             }
         }
 
-        if ($consignmentNumber=='') {
+        if ($consignmentNumber == '') {
             return $reply['errors'][] = 'Unable to obtain a consignment no from carrier.';
         }
 
@@ -129,7 +132,7 @@ class XDP
         $this->xdp_label_url = (string) $result->responses->response->label;
 
         // Pass the label data back to use when generating the XDP labels
-        $reply['label_data'] = $this->setLabelDataArray($result->consignment);
+        $reply['label_data']                 = $this->setLabelDataArray($result->consignment);
         $reply['carrier_consignment_number'] = $consignmentNumber;
 
         return $reply;
@@ -142,9 +145,9 @@ class XDP
      */
     private function generateXdpDeliveryXml()
     {
-        $prefix='<![CDATA[';
-        $postfix=']]>';
-        $xml = new SimpleXMLElement('<?xml version="1.0" standalone="yes"?><xdpwebservice></xdpwebservice>');
+        $prefix  = '<![CDATA[';
+        $postfix = ']]>';
+        $xml     = new SimpleXMLElement('<?xml version="1.0" standalone="yes"?><xdpwebservice></xdpwebservice>');
         $xml->addChild('type', 'create');
         $consignmentNode = $xml->addChild('consignment');
         $consignmentNode->addChild('accountno', $prefix.$this->username.$postfix);
@@ -184,25 +187,10 @@ class XDP
     }
 
     /**
-     * Get the shipment volume.
-     *
-     * @return int
-     */
-    protected function getTotalVolume()
-    {
-        $totalVolume = 0;
-
-        foreach ($this->shipment['packages'] as $package) {
-            $totalVolume += ($package['length'] / 100) * ($package['width'] / 100) * ($package['height'] / 100);
-        }
-
-        return $totalVolume;
-    }
-
-    /**
      * Get a goods description.
      *
-     * @param type $packageIndex
+     * @param  type  $packageIndex
+     *
      * @return string
      */
     private function getGoodsDescription($packageIndex = null)
@@ -215,7 +203,7 @@ class XDP
             return $this->shipment['goods_description'];
         }
 
-        if (! empty($this->shipment['contents'])) {
+        if ( ! empty($this->shipment['contents'])) {
             foreach ($this->shipment['contents'] as $content) {
                 return $content['description'];
             }
@@ -225,49 +213,27 @@ class XDP
     }
 
     /**
-     * Count the number of items in a package.
-     *
-     * @param type $packageIndex
-     * @return type
-     */
-    private function getPackageItemCount($packageIndex)
-    {
-        $items = 0;
-
-        if (isset($this->shipment['contents']) && is_array($this->shipment['contents'])) {
-            foreach ($this->shipment['contents'] as $content) {
-                $items++;
-            }
-        }
-
-        if ($items <= 0) {
-            return 1;
-        }
-
-        return $items;
-    }
-
-    /**
      * Create a transaction log.
      *
-     * @param type $type
-     * @param type $direction
-     * @param type $msg
+     * @param  type  $type
+     * @param  type  $direction
+     * @param  type  $msg
      */
     protected function log($type, $direction, $msg)
     {
-        \App\Models\TransactionLog::create([
-            'type' => $type,
-            'carrier' => 'xdp',
+        TransactionLog::create([
+            'type'      => $type,
+            'carrier'   => 'xdp',
             'direction' => $direction,
-            'msg' => $msg,
+            'msg'       => $msg,
         ]);
     }
 
     /**
      * Send express connect XML to XDP.
      *
-     * @param string $string
+     * @param  string  $string
+     *
      * @return type
      */
     private function postXdpConnect($string)
@@ -277,7 +243,7 @@ class XDP
         // $string.='<xdpwebservice><consignment><accountno><![CDATA["XDP123"]]></accountno><accesskey><![CDATA["1b4D7if8"]]></accesskey><references><ref><![CDATA["test"]]></ref></references><deliverycontact><![CDATA["MR Joe Bloggs"]]></deliverycontact><deliverycompany><![CDATA["XDP EXPRESS"]]></deliverycompany><deliveryaddress1><![CDATA["FAIRVIEW IND EST"]]></deliveryaddress1><deliveryaddress2><![CDATA["KINGSBURY ROAD"]]></deliveryaddress2><deliverytown><![CDATA["CURDWORTH"]]></// // deliverytown><deliverycounty><![CDATA["BIRMINGHAM"]]></deliverycounty><deliverypostcode><![CDATA["B76 9EE"]]></deliverypostcode><deliveryphone><![CDATA["01675 471498"]]></deliveryphone><deliveryemail><![CDATA["technical@XDP.CO.UK"]]></deliveryemail><deliverynotes><![CDATA[""]]></deliverynotes><servicelevel><![CDATA["O/N"]]></servicelevel><manifestpieces><![CDATA["2"]]></manifestpieces><manifestweight><![CDATA["20"]]></manifestweight><insurance><![CDATA["no"]]></insurance><insurancegoodsdesc><![CDATA[""]]></insurancegoodsdesc><insurancegoodsvalue><![CDATA[""]]></insurancegoodsvalue><label><![CDATA["yes"]]></label><pieces><piece><height><![CDATA["111"]]></height><width><![CDATA["222"]]></width><length><![CDATA["333"]]></length></piece><piece><height><![CDATA["111"]]></height><width><![CDATA["222"]]></width><length><![CDATA["333"]]></length></piece></pieces></consignment></xdpwebservice>';
         */
 
-        $method='POST';
+        $method = 'POST';
         $header = [
             'Accept: */*',
             'Content-type: application/x-www-form-urlencoded',
@@ -288,7 +254,7 @@ class XDP
         curl_setopt($ch, CURLOPT_URL, $this->xdp_connect_url);                // set url to post to
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        if (!empty($header)) {
+        if ( ! empty($header)) {
             curl_setopt($ch, CURLOPT_HEADER, 1);            // CURL to output header
             curl_setopt($ch, CURLOPT_HTTPHEADER, $header);  // Header for CURL to output
         } else {
@@ -309,12 +275,13 @@ class XDP
     /**
      * Get the result from the XDP Express Connect response.
      *
-     * @param type $response
+     * @param  type  $response
+     *
      * @return bool|string
      */
     private function getXmlResult($response)
     {
-        $sep = chr(10).chr(13);
+        $sep      = chr(10).chr(13);
         $elements = explode($sep, $response);
 
         foreach ($elements as $element) {
@@ -322,13 +289,67 @@ class XDP
                 return trim($element);
             }
         }
+
         return;
+    }
+
+    /**
+     * Build an array to pass to the label class.
+     *
+     * @param  SimpleXml object $result
+     *
+     * @return array
+     */
+    private function setLabelDataArray($result)
+    {
+        return base64_encode(file_get_contents($this->xdp_label_url));
+    }
+
+    /**
+     * Get the shipment volume.
+     *
+     * @return int
+     */
+    protected function getTotalVolume()
+    {
+        $totalVolume = 0;
+
+        foreach ($this->shipment['packages'] as $package) {
+            $totalVolume += ($package['length'] / 100) * ($package['width'] / 100) * ($package['height'] / 100);
+        }
+
+        return $totalVolume;
+    }
+
+    /**
+     * Count the number of items in a package.
+     *
+     * @param  type  $packageIndex
+     *
+     * @return type
+     */
+    private function getPackageItemCount($packageIndex)
+    {
+        $items = 0;
+
+        if (isset($this->shipment['contents']) && is_array($this->shipment['contents'])) {
+            foreach ($this->shipment['contents'] as $content) {
+                $items++;
+            }
+        }
+
+        if ($items <= 0) {
+            return 1;
+        }
+
+        return $items;
     }
 
     /**
      * Send express label XML to XDP.
      *
-     * @param type $string
+     * @param  type  $string
+     *
      * @return type
      */
     private function postXdpLabel($string)
@@ -337,7 +358,7 @@ class XDP
         curl_setopt($ch, CURLOPT_URL, $this->xdp_label_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-        if ((!empty(trim($this->username))) && (!empty(trim($this->password)))) {
+        if (( ! empty(trim($this->username))) && ( ! empty(trim($this->password)))) {
             curl_setopt($ch, CURLOPT_USERPWD, $this->username.':'.$this->password);
         }
 
@@ -354,16 +375,5 @@ class XDP
         curl_close($ch);
 
         return $result;
-    }
-
-    /**
-     * Build an array to pass to the label class.
-     *
-     * @param SimpleXml object $result
-     * @return array
-     */
-    private function setLabelDataArray($result)
-    {
-        return base64_encode(file_get_contents($this->xdp_label_url));
     }
 }
