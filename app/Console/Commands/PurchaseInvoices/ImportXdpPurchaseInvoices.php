@@ -115,7 +115,7 @@ class ImportXdpPurchaseInvoices extends Command
                 if ($rowNumber >= 20 && !empty($row['Consignment Number'])) {
 
                     // Lookup shipment
-                    $shipment = \App\Models\Shipment::whereConsignmentNumber($row['Consignment Number'])->where('carrier_id', 16)->first();
+                    $shipment = \App\Models\Shipment::whereCarrierConsignmentNumber($row['Consignment Number'])->where('carrier_id', 16)->first();
 
                     $purchaseInvoiceLine                             = new PurchaseInvoiceLine();
                     $purchaseInvoiceLine->purchase_invoice_id        = $this->purchaseInvoice->id;
