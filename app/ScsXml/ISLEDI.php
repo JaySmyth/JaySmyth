@@ -423,6 +423,11 @@ class ISLEDI
             $chargeType = 'MIS';
         }
 
+        // XDP bundle the Residential charge into Freight costs
+        if ($this->shipment['service_id'] == '76' && $chargeType == 'RES') {
+            $chargeType = 'FRT';
+        }
+
         // Identify Supplier SCS Account
         $service = Company::find($this->shipment['company_id'])->services()->where('services.id', $this->shipment['service_id'])->first();
         if (isset($service->pivot->scs_account) && $service->pivot->scs_account > '') {
