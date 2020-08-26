@@ -547,6 +547,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
                 'RAS' => 'RAS - Remote Area Surcharge',
                 'RES' => 'RES - Residential Surcharge',
                 'RTN' => 'RTN - Return Goods Fee',
+                'SMS' => 'SMS - SMS Alerts',
             ];
             break;
         case 'ifsChargeCodes':
