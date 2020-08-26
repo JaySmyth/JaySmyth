@@ -40,7 +40,7 @@ class UpdateScsJobNumbersOnPurchaseInvoiceLines extends Command
      */
     public function handle()
     {
-        $purchaseInvoices = PurchaseInvoice::whereStatus(0)->whereCarrierId(16)->get();
+        $purchaseInvoices = PurchaseInvoice::whereStatus(0)->get();
 
         foreach ($purchaseInvoices as $purchaseInvoice) {
             $this->line('Updating SCS job numbers on invoice with ID: '.$purchaseInvoice->id);
