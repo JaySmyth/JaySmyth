@@ -67,7 +67,7 @@ class ImportXdpPurchaseInvoices extends Command
 
         $this->sftpDirectory    = '/home/xdp/invoices/';
         $this->archiveDirectory = 'archive';
-        $this->fields           = ['Dispatch Date', 'Consignment Number', 'Shipment Reference', 'Postcode', 'Zone', 'Pieces', 'Weight', 'Service', 'Line Amount Ex. Vat'];
+        $this->fields           = ['Dispatch Date', 'Consignment Number', 'Shipment Reference', 'Postcode', 'Zone', 'Pieces', 'Weight', 'Service', 'Line Amount Ex. Vat', 'Fuel Surcharge'];
     }
 
     /**
@@ -156,6 +156,7 @@ class ImportXdpPurchaseInvoices extends Command
                         $this->applyCharge($row['Line Amount Ex. Vat'], 'SMS', 'SMS PRE-ALERTS', $purchaseInvoiceLine->id);
                     } else {
                         $this->applyCharge($row['Line Amount Ex. Vat'], 'FRT', 'FREIGHT CHARGE', $purchaseInvoiceLine->id);
+                        $this->applyCharge($row['Fuel Surcharge'], 'FSC', 'FUEL SURCHARGE', $purchaseInvoiceLine->id);
                     }
 
                 }
@@ -204,6 +205,11 @@ class ImportXdpPurchaseInvoices extends Command
                 $netTotal = $data[1];
             }
 
+            //Surcharge
+            if ($fileRow == 13) {
+                $surcharge = $data[1];
+            }
+
             //VAT Total
             if ($fileRow == 14) {
                 $vatTotal = $data[1];
@@ -236,7 +242,7 @@ class ImportXdpPurchaseInvoices extends Command
             'invoice_number'    => $invoiceNumber,
             'account_number'    => $accountCode,
             'total'             => $invoiceTotal,
-            'total_taxable'     => $netTotal,
+            'total_taxable'     => $netTotal + $surcharge,
             'total_non_taxable' => 0,
             'vat'               => $vatTotal,
             'currency_code'     => 'GBP',
