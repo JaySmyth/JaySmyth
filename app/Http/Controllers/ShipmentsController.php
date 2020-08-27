@@ -1073,6 +1073,24 @@ class ShipmentsController extends Controller
             ];
         }
 
+        $contents = [];
+
+        foreach ($shipment->contents as $content) {
+            $contents[] = [
+                  "description" => $content->description,
+                  "product_code" => $content->product_code,
+                  "currency_code" => $content->currency_code,
+                  "country_of_manufacture" => $content->country_of_manufacture,
+                  "manufacturer" => $content->manufacturer,
+                  "uom" => $content->uom,
+                  "commodity_code" => $content->commodity_code,
+                  "harmonized_code" => $content->harmonized_code,
+                  "quantity" =>  $content->quantity,
+                  "unit_weight" => $content->unit_weight,
+                  "unit_value" => $content->unit_value,
+            ];
+        }
+
         $data = [
             "shipment_id" => $shipment->id,
             "user_id" => $shipment->user_id,
@@ -1131,6 +1149,7 @@ class ShipmentsController extends Controller
             "insurance_value" => $shipment->insurance_value,
             "lithium_batteries" => $shipment->lithium_batteries,
             "packages" => $packages,
+            "contents" => $contents,
             "goods_description" => $shipment->goods_description
         ];
 
