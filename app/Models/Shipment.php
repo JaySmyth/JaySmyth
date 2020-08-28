@@ -333,7 +333,7 @@ class Shipment extends Model
             // UPS
             case 3:
                 if (stristr($this->carrier_tracking_number, '1Z')) {
-                    $url = "http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=$this->carrier_tracking_number";
+                    $url = "https://www.ups.com/track?loc=null&tracknum=$this->carrier_tracking_number&requester=WT";
                 }
                 break;
             // TNT
