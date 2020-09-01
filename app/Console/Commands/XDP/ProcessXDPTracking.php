@@ -223,7 +223,7 @@ class ProcessXDPTracking extends Command
             if ($shipment) {
                 $event = $this->getEvent($row, $shipment);
 
-                if (! in_array($event['status'], ['pre_transit'])) {
+                if (! in_array($event['status'], ['pre_transit']) && ! stristr($event['message'], 'price updated')) {
                     $tracking = \App\Models\Tracking::firstOrCreate([
                         'message' => $event['message'],
                         'status' => $event['status'],
