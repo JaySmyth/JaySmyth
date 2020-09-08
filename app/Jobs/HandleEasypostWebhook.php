@@ -218,20 +218,6 @@ class HandleEasypostWebhook implements ShouldQueue
     {
         $countryCode = getCountryCode($country);
 
-        if (! $countryCode) {
-            $countries = \App\Models\Country::all();
-
-            foreach ($countries as $country) :
-
-                // Check message for full country name or DHL append the country code as 3 digit alpha code onto the message
-                if (stristr($message, $country->country) || stristr($message, '-'.$country->alpha) || stristr($city, '-'.$country->alpha) || stristr($country, '-'.$country->alpha)) {
-                    $countryCode = $country->country_code;
-                    break;
-                }
-
-            endforeach;
-        }
-
         if (! $countryCode && substr($city, -3) == ' GB') {
             $countryCode = 'GB';
         }
