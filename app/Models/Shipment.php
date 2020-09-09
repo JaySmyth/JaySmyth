@@ -709,9 +709,9 @@ class Shipment extends Model
     {
         $slaInHours = $this->getSla();
         $slaInDays = $slaInHours / 24;
-        $transit = $this->ship_date->diffInWeekdays($this->delivery_date);
+        $cutOff = $this->ship_date->addWeekdays($slaInDays)->endOfDay();
 
-        if ($this->time_in_transit <= $slaInHours || $transit <= $slaInDays) {
+        if ($this->delivery_date <= $cutOff) {
             return 'none';
         }
 
