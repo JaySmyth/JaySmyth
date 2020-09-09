@@ -707,7 +707,11 @@ class Shipment extends Model
      */
     public function getDelay()
     {
-        if ($this->time_in_transit <= $this->getSla()) {
+        $slaInHours = $this->getSla();
+        $slaInDays = $slaInHours / 24;
+        $transit = $this->ship_date->diffInWeekdays($this->delivery_date);
+
+        if ($this->time_in_transit <= $slaInHours || $transit <= $slaInDays) {
             return 'none';
         }
 
