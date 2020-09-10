@@ -103,6 +103,7 @@ class ImportXdpPurchaseInvoices extends Command
         $this->info("Processing file $file");
 
         $rowNumber = 1;
+        $startRow  = 9999999;
 
         if (($handle = fopen($this->sftpDirectory.$file, 'r')) !== false) {
             while (($data = fgetcsv($handle, 2000, ',')) !== false) {
@@ -112,8 +113,11 @@ class ImportXdpPurchaseInvoices extends Command
 
                 $row = $this->assignFieldNames($data);
 
-                if ($rowNumber >= 20 && !empty($row['Consignment Number'])) {
+                if ($row['Dispatch Date'] == '#DETAIL') {
+                    $startRow = $rowNumber + 1;
+                }
 
+                if ($rowNumber >= $startRow && ! empty($row['Consignment Number'])) {
                     // Lookup shipment
                     $shipment = \App\Models\Shipment::whereCarrierConsignmentNumber($row['Consignment Number'])->where('carrier_id', 16)->first();
 
@@ -152,14 +156,13 @@ class ImportXdpPurchaseInvoices extends Command
                     $purchaseInvoiceLine->pod_signature              = ($shipment) ? $shipment->pod_signature : null;
                     $purchaseInvoiceLine->save();
 
-                    if(stristr($row['Consignment Number'], 'SMS')){
+                    if (stristr($row['Consignment Number'], 'SMS')) {
                         $this->applyCharge($row['Line Amount Ex. Vat'], 'SMS', 'SMS PRE-ALERTS', $purchaseInvoiceLine->id);
                     } else {
-                        $this->applyCharge($row['Line Amount Ex. Vat'] - 1.50 , 'FRT', 'FREIGHT CHARGE', $purchaseInvoiceLine->id);
+                        $this->applyCharge($row['Line Amount Ex. Vat'] - 1.50, 'FRT', 'FREIGHT CHARGE', $purchaseInvoiceLine->id);
                         $this->applyCharge($row['Fuel Surcharge'], 'FSC', 'FUEL SURCHARGE', $purchaseInvoiceLine->id);
                         $this->applyCharge(1.50, 'RES', 'RESIDENTIAL CHARGE', $purchaseInvoiceLine->id);
                     }
-
                 }
 
                 $rowNumber++;
@@ -180,7 +183,6 @@ class ImportXdpPurchaseInvoices extends Command
         $fileRow = 1;
 
         while (($data = fgetcsv($handle, 2000, ',')) !== false && $fileRow <= 15) {
-
             // Invoice number
             if ($fileRow == 7) {
                 $invoiceNumber = $data[1];
