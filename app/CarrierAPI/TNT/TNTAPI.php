@@ -83,9 +83,6 @@ class TNTAPI extends \App\CarrierAPI\CarrierBase
         // Prepare Response
         $response = $this->createShipmentResponse($reply, $shipment['service_code'], $route_id, $shipment);
 
-        // Create an easypost tracker
-        dispatch(new \App\Jobs\CreateEasypostTracker($response['consignment_number'], $this->getEasypostCarrier($shipment)));
-
         return $response;
     }
 

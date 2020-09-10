@@ -42,8 +42,6 @@ class Kernel extends ConsoleKernel
         Commands\NotifyTransportDepartmentPodRequired::class,
         Commands\UpdateScsJobNumbersOnPurchaseInvoiceLines::class,
         Commands\ProcessShipmentUploads::class,
-        Commands\UpdatePrimaryFreightShipments::class,
-        Commands\CheckForMissingPrimaryFreightDetails::class,
         Commands\GeneratePodDockets::class,
         Commands\ManifestUnmanifestedShipments::class,
         Commands\ImportMultifreightFiles::class,
@@ -60,14 +58,10 @@ class Kernel extends ConsoleKernel
         Commands\IncreaseCostRate::class,
         Commands\PerformRateIncrease::class,
         Commands\UpdateShopify::class,
-        Commands\BulkCreateTrackers::class,
-        Commands\PrimaryLogistics\CreateOrders::class,
-        Commands\PrimaryLogistics\CancelOrders::class,
-        Commands\PrimaryLogistics\GetTrackingNumbers::class,
-        Commands\PrimaryLogistics\GetInventory::class,
         Commands\LogScanningKpis::class,
         Commands\TntTotalVolume::class,
         Commands\GetTracking::class,
+        Commands\DispatchEasypostTrackers::class
     ];
 
     /**
@@ -113,6 +107,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:update-stagnant-shipments')->dailyAt('07:05');
         $schedule->command('ifs:process-shipment-uploads')->withoutOverlapping(2);
         $schedule->command('ifs:check-for-duplicate-shipments')->twiceDaily(12, 16);
+        $schedule->command('ifs:dispatch-easypost-trackers')->dailyAt('20:30');
 
         /*
          * Tracking updates
@@ -167,13 +162,5 @@ class Kernel extends ConsoleKernel
          */
         $schedule->command('ifs:process-vendorvillage-orders')->everyFiveMinutes()->withoutOverlapping(5);
 
-        /*
-        * Primary Logistics
-        */
-        //$schedule->command('primary-logistics:create-orders')->hourly();
-        //$schedule->command('primary-logistics:cancel-orders')->hourly();
-        //$schedule->command('primary-logistics:get-tracking-numbers')->hourly();
-        //$schedule->command('primary-logistics:get-inventory')->weekdays()->dailyAt('09:30');
-        //$schedule->command('ifs:check-for-missing-primary-freight-details')->dailyAt(8, 00);
     }
 }

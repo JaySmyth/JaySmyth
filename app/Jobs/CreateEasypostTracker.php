@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Models\Shipment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -42,20 +41,13 @@ class CreateEasypostTracker implements ShouldQueue
             return;
         }
 
-        // Update unused field to show that shipment is being tracked by easypost
-        $shipment = Shipment::where('carrier_tracking_number', $this->trackingCode)->orderBy('id', 'desc')->first();
-
-        if ($shipment) {
-            $shipment->external_tracking_url = 'easypost';
-            $shipment->save();
-        }
-
         try {
             \EasyPost\EasyPost::setApiKey($this->key);
             \EasyPost\Tracker::create(['tracking_code' => $this->trackingCode, 'carrier' => $this->carrier]);
         } catch (\EasyPost\Error $ex) {
             Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Create Easypost Tracker ('.$this->trackingCode.' - '.$this->carrier.')', $ex));
         }
+
     }
 
     /**

@@ -177,9 +177,6 @@ class UpdatePrimaryFreightShipments extends Command
                 // Set the shipment to received
                 $shipment->setReceived(null, 0, false, false);
 
-                // Create an easypost tracker
-                dispatch(new \App\Jobs\CreateEasypostTracker($shipment->carrier_consignment_number, $this->identifyCarrier($shipment->carrier_consignment_number)));
-
                 $this->setRowSucceeded($rowNumber, $row);
 
                 $this->addToTrackingFile($shipment);

@@ -45,9 +45,6 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
         // Prepare Response
         $response = $this->createShipmentResponse($reply, $shipment['service_code'], 1, $shipment);
 
-        // Create an easypost tracker
-        dispatch(new \App\Jobs\CreateEasypostTracker($response['consignment_number'], 'DHLExpress'));
-
         return $response;
     }
 

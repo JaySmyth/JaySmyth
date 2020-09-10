@@ -10,7 +10,6 @@
 namespace App\CarrierAPI;
 
 use App;
-use App\Jobs\CreateEasypostTracker;
 use App\Models\Mode;
 use App\CarrierAPI\APIShipment;
 use App\CarrierAPI\CWide\CWideAPI;
@@ -713,9 +712,6 @@ class CarrierAPI
 
             return; // Return null to signify problem
         }
-
-        // Create a tracker
-        dispatch(new CreateEasypostTracker($data['carrier_consignment_number'], $shipment->carrier->easypost));
 
         return $shipment;
     }
