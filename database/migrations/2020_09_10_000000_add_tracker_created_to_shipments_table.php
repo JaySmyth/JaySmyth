@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddExceptionSentToTrackingTable extends Migration
+class AddTrackerCreatedToShipmentsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddExceptionSentToTrackingTable extends Migration
      */
     public function up()
     {
-        Schema::table('tracking', function (Blueprint $table) {
-            $table->boolean('exception_sent')->default(0)->after('source');
+        Schema::table('shipments', function (Blueprint $table) {
+            $table->boolean('tracker_created')->default(0)->after('source');
         });
     }
 
@@ -25,8 +25,8 @@ class AddExceptionSentToTrackingTable extends Migration
      */
     public function down()
     {
-        Schema::table('tracking', function (Blueprint $table) {
-            $table->dropColumn('exception_sent');
+        Schema::table('shipments', function (Blueprint $table) {
+            $table->dropColumn('tracker_created');
         });
     }
 }
