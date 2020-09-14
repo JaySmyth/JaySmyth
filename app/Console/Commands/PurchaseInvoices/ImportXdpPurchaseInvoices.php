@@ -159,9 +159,8 @@ class ImportXdpPurchaseInvoices extends Command
                     if (stristr($row['Consignment Number'], 'SMS')) {
                         $this->applyCharge($row['Line Amount Ex. Vat'], 'SMS', 'SMS PRE-ALERTS', $purchaseInvoiceLine->id);
                     } else {
-                        $this->applyCharge($row['Line Amount Ex. Vat'] - 1.50, 'FRT', 'FREIGHT CHARGE', $purchaseInvoiceLine->id);
+                        $this->applyCharge($row['Line Amount Ex. Vat'], 'FRT', 'FREIGHT CHARGE', $purchaseInvoiceLine->id);
                         $this->applyCharge($row['Fuel Surcharge'], 'FSC', 'FUEL SURCHARGE', $purchaseInvoiceLine->id);
-                        $this->applyCharge(1.50, 'RES', 'RESIDENTIAL CHARGE', $purchaseInvoiceLine->id);
                     }
                 }
 
