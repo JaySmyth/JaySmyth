@@ -175,7 +175,7 @@ class XDP
         $consignmentNode->addChild('insurancegoodsvalue', $prefix.'0'.$postfix);
 
         $consignmentNode->addChild('label', $prefix.'yes'.$postfix);
-        $dimmensionNode = $consignmentNode->addChild('dimensions');
+        $dimmensionNode = $consignmentNode->addChild('pieces');
         foreach ($this->shipment['packages'] as $package) {
             $packageNode = $dimmensionNode->addChild('piece');
             $packageNode->addChild('height', $package['height']);
