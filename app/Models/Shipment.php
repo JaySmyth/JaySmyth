@@ -328,7 +328,7 @@ class Shipment extends Model
 
             // Fedex
             case 2:
-                $url = "https://www.fedex.com/apps/fedextrack/?action=track&tracknumbers=$this->carrier_tracking_number&locale=en_GB&cntry_code=gb";
+                $url = "https://www.fedex.com/apps/fedextrack/index.html?tracknumbers=$this->carrier_tracking_number&cntry_code=gb";
                 break;
             // UPS
             case 3:
