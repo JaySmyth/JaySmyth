@@ -78,11 +78,11 @@ class ProcessXDPTracking extends Command
     {
         $this->downloadFiles();
 
-        $this->info('Checking ' . $this->directory . ' for files to process');
+        $this->info('Checking '.$this->directory.' for files to process');
 
         if ($handle = opendir($this->directory)) {
             while (false !== ($file = readdir($handle))) {
-                if (! is_dir($file) && $file != 'archive') {
+                if ( ! is_dir($file) && $file != 'archive') {
                     $this->processFile($file);
                     $this->archiveFile($file);
                 }
@@ -104,20 +104,21 @@ class ProcessXDPTracking extends Command
         $connection = ftp_connect($this->ftpHost);
 
         // Check connection was made
-        if (! $connection) {
-            $this->error('Unable to connect to FTP host -> ' . $this->ftpHost);
+        if ( ! $connection) {
+            $this->error('Unable to connect to FTP host -> '.$this->ftpHost);
 
             return false;
         }
 
         $loginResult = ftp_login($connection, $this->ftpUsername, $this->ftpPassword);
 
-        if (! $loginResult) {
-            $this->error('Unable to login to FTP host -> ' . $this->ftpHost);
+        if ( ! $loginResult) {
+            $this->error('Unable to login to FTP host -> '.$this->ftpHost);
+
             return false;
         }
 
-        $this->info('Connection established to FTP host -> ' . $this->ftpHost);
+        $this->info('Connection established to FTP host -> '.$this->ftpHost);
 
         // Set passive connection
         ftp_pasv($connection, true);
@@ -125,25 +126,25 @@ class ProcessXDPTracking extends Command
         // Get the file list for /
         $fileList = ftp_rawlist($connection, $this->ftpWorkingDirectory);
 
-        $this->line(count($fileList) . ' files on remote server');
+        $this->line(count($fileList).' files on remote server');
 
         foreach ($fileList as $file):
 
             if ($filename = $this->validateFile($file)) {
                 // Open a local file to write to
-                $handle = fopen($this->directory . $filename, 'w');
+                $handle = fopen($this->directory.$filename, 'w');
 
                 // Download file
-                ftp_fget($connection, $handle, $this->ftpWorkingDirectory . $filename, FTP_ASCII, 0);
+                ftp_fget($connection, $handle, $this->ftpWorkingDirectory.$filename, FTP_ASCII, 0);
 
-                if (! $this->testMode) {
-                    if (file_exists($this->directory . $filename)) {
+                if ( ! $this->testMode) {
+                    if (file_exists($this->directory.$filename)) {
                         $this->line('Attempting to delete file from remote server');
 
-                        if (ftp_delete($connection, $this->ftpWorkingDirectory . $filename)) {
+                        if (ftp_delete($connection, $this->ftpWorkingDirectory.$filename)) {
                             $this->info('File deleted from remote server');
                         } else {
-                            $this->error('Unable to delete file:' . $this->ftpWorkingDirectory . $filename);
+                            $this->error('Unable to delete file:'.$this->ftpWorkingDirectory.$filename);
                         }
                     }
                 }
@@ -157,7 +158,8 @@ class ProcessXDPTracking extends Command
     /**
      * Check if a file has been downloaded before and returns filename.
      *
-     * @param type $string
+     * @param  type  $string
+     *
      * @return string filename
      */
     protected function validateFile($string)
@@ -171,8 +173,9 @@ class ProcessXDPTracking extends Command
         return $filename;
 
         // Check the current directory and the archive directory to see if the file has already been downloaded
-        if (file_exists($this->directory . $filename) || file_exists($this->directory . 'archive' . '/' . $filename)) {
+        if (file_exists($this->directory.$filename) || file_exists($this->directory.'archive'.'/'.$filename)) {
             $this->error("File $filename has already been downloaded");
+
             return false;
         }
 
@@ -189,9 +192,9 @@ class ProcessXDPTracking extends Command
         $this->info("Processing $file");
 
         $rowNumber = 1;
-        $data = null;
+        $data      = null;
 
-        if (($handle = fopen($this->directory . $file, 'r')) !== false) {
+        if (($handle = fopen($this->directory.$file, 'r')) !== false) {
             while (($data = fgetcsv($handle, 1000)) !== false) {
                 $this->processRow($data);
                 $rowNumber++;
@@ -204,8 +207,8 @@ class ProcessXDPTracking extends Command
     /**
      * Process a row read from the uploaded file.
      *
-     * @param type $rowNumber
-     * @param type $data
+     * @param  type  $rowNumber
+     * @param  type  $data
      *
      * @return void
      */
@@ -223,10 +226,10 @@ class ProcessXDPTracking extends Command
             if ($shipment) {
                 $event = $this->getEvent($row, $shipment);
 
-                if (! in_array($event['status'], ['pre_transit']) && ! stristr($event['message'], 'price updated')) {
+                if ( ! in_array($event['status'], ['pre_transit']) && ! stristr($event['message'], 'price updated')) {
                     $tracking = \App\Models\Tracking::firstOrCreate([
-                        'message' => $event['message'],
-                        'status' => $event['status'],
+                        'message'     => $event['message'],
+                        'status'      => $event['status'],
                         'shipment_id' => $shipment->id
                     ])->update($event);
 
@@ -241,7 +244,7 @@ class ProcessXDPTracking extends Command
     /**
      * Read one line at a time and create an array of field names and values.
      *
-     * @param type $data
+     * @param  type  $data
      *
      * @return void
      */
@@ -261,13 +264,16 @@ class ProcessXDPTracking extends Command
     /**
      * Basic row validation.
      * `
-     * @param type $row
+     *
+     * @param  type  $row
+     *
      * @return bool
      */
     protected function validateRow($row)
     {
         if (count($row) != count($this->fields)) {
             $this->error('invalid number of fields detected');
+
             return false;
         }
 
@@ -276,20 +282,20 @@ class ProcessXDPTracking extends Command
 
     protected function getEvent($row, $shipment)
     {
-        $datetime = gmtToCarbonUtc(Carbon::createFromformat('d/m/Y H:i:s', $row['Date'] . $row['Time']));
+        $datetime = gmtToCarbonUtc(Carbon::createFromformat('d/m/Y H:i:s', $row['Date'].$row['Time']));
 
         return [
-            'status' => $this->getStatus($row),
-            'status_detail' => null,
-            'city' => $this->getCity($row, $shipment),
-            'country_code' => 'GB',
-            'postcode' => null,
+            'status'         => $this->getStatus($row),
+            'status_detail'  => null,
+            'city'           => $this->getCity($row, $shipment),
+            'country_code'   => 'GB',
+            'postcode'       => null,
             'local_datetime' => $datetime,
-            'datetime' => $datetime,
-            'carrier' => 'XDP',
-            'source' => 'XDP',
-            'message' => $row['Status Data'],
-            'signed_by' => null,
+            'datetime'       => $datetime,
+            'carrier'        => 'XDP',
+            'source'         => 'XDP',
+            'message'        => $row['Status Data'],
+            'signed_by'      => null,
         ];
     }
 
@@ -324,6 +330,7 @@ class ProcessXDPTracking extends Command
                 if (stristr($row['Status Data'], 'carded')) {
                     return 'available_for_pickup';
                 }
+
                 return 'failure';
 
             default:
@@ -336,11 +343,12 @@ class ProcessXDPTracking extends Command
      *
      * @param $row
      * @param $shipment
+     *
      * @return string
      */
     protected function getCity($row, $shipment)
     {
-        if ($row['Status Type'] == 'DELIVERY' || $row['Status Type'] == 'DELIVERED') {
+        if (in_array($row['Status Type'], ['DELIVERY', 'DELIVERED', 'CARDED'])) {
             return $shipment->recipient_city;
         }
 
@@ -350,7 +358,7 @@ class ProcessXDPTracking extends Command
     /**
      * Perform any necessary actions based upon the current event status.
      *
-     * @param type $event
+     * @param  type  $event
      */
     private function processEvent($event, $shipment)
     {
@@ -360,7 +368,7 @@ class ProcessXDPTracking extends Command
         $this->ensureShipmentReceived($event, $shipment);
 
         // Update the shipment status (ignore pre-transit and delivered)
-        if (! in_array($event['status'], ['pre_transit', 'delivered', 'failure'])) {
+        if ( ! in_array($event['status'], ['pre_transit', 'delivered', 'failure'])) {
             $shipment->setStatus($event['status'], 0, false, false);
         }
 
@@ -390,12 +398,12 @@ class ProcessXDPTracking extends Command
 
             default:
                 // unknown status
-                Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Unknown tracking status (' . $event['status'] . ')',
+                Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Unknown tracking status ('.$event['status'].')',
                     $this->trackingNumber));
                 break;
         }
 
-        if (! $sentProblem) {
+        if ( ! $sentProblem) {
             $this->alertProblem($event['message'], $shipment);
         }
     }
@@ -404,15 +412,15 @@ class ProcessXDPTracking extends Command
     /**
      * Set to received using tracking event.
      *
-     * @param type $event
+     * @param  type  $event
      */
     protected function ensureShipmentReceived($event, $shipment)
     {
         $ignore = ['pre_transit', 'cancelled', 'unknown', 'error', 'failure'];
 
-        if (! in_array($event['status'], $ignore)) {
+        if ( ! in_array($event['status'], $ignore)) {
             // Set to received
-            if (! $shipment->received) {
+            if ( ! $shipment->received) {
                 $shipment->setReceived($event['datetime'], 0, true);
             }
 
@@ -427,7 +435,7 @@ class ProcessXDPTracking extends Command
     /**
      * Check if we have received a "problem" event that we need to send email for.
      *
-     * @param type $message
+     * @param  type  $message
      */
     private function alertProblem($message, $shipment)
     {
@@ -445,19 +453,20 @@ class ProcessXDPTracking extends Command
     /**
      * Move file to archive directory.
      *
-     * @param string $file
+     * @param  string  $file
+     *
      * @return bool
      */
     protected function archiveFile($file)
     {
         $this->info("Archiving file $file");
 
-        $originalFile = $this->directory . $file;
-        $archiveFile = $this->directory . 'archive' . '/' . $file;
+        $originalFile = $this->directory.$file;
+        $archiveFile  = $this->directory.'archive'.'/'.$file;
 
         $this->info("Moving $originalFile to archive");
 
-        if (! file_exists($originalFile)) {
+        if ( ! file_exists($originalFile)) {
             $this->error("Problem archiving $file  - file not found");
         }
 
