@@ -43,12 +43,9 @@ class DispatchEasypostTrackers extends Command
         foreach (Shipment::where('tracker_created', false)->whereNotIn('status_id', [1, 7])->cursor() as $shipment) {
             $this->line('Dispatching job for '.$shipment->consignment_number);
 
-            if($shipment->carrier->easypost != '***'){
-                dispatch(new CreateEasypostTracker($shipment->carrier_consignment_number, $shipment->carrier->easypost));
+            if ($shipment->carrier->easypost != '***') {
+                dispatch(new CreateEasypostTracker($shipment->id));
             }
-
-            $shipment->tracker_created = true;
-            $shipment->save();
         }
     }
 }

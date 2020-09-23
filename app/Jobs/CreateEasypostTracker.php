@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Shipment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -14,8 +15,7 @@ class CreateEasypostTracker implements ShouldQueue
         Queueable,
         SerializesModels;
 
-    protected $trackingCode;
-    protected $carrier;
+    protected $shipment;
     protected $key;
 
     /**
@@ -23,10 +23,9 @@ class CreateEasypostTracker implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($trackingCode, $carrier)
+    public function __construct($shipmentId)
     {
-        $this->trackingCode = $trackingCode;
-        $this->carrier = $carrier;
+        $this->shipment = Shipment::find($shipmentId);
         $this->key = config('services.easypost.key');
     }
 
@@ -37,15 +36,19 @@ class CreateEasypostTracker implements ShouldQueue
      */
     public function handle()
     {
-        if ($this->carrier == '***') {
+        if ($this->shipment->carrier->easypost == '***') {
             return;
         }
 
         try {
             \EasyPost\EasyPost::setApiKey($this->key);
-            \EasyPost\Tracker::create(['tracking_code' => $this->trackingCode, 'carrier' => $this->carrier]);
+            \EasyPost\Tracker::create(['tracking_code' => $this->shipment->carrier_consignment_number, 'carrier' => $this->shipment->carrier->easypost]);
+
+            $this->shipment->tracker_created = true;
+            $this->shipment->save();
+
         } catch (\EasyPost\Error $ex) {
-            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Create Easypost Tracker ('.$this->trackingCode.' - '.$this->carrier.')', $ex));
+            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Create Easypost Tracker ('.$this->shipment->carrier_consignment_number.' - '.$this->shipment->carrier->easypost.')', $ex));
         }
 
     }
@@ -58,6 +61,6 @@ class CreateEasypostTracker implements ShouldQueue
      */
     public function failed($exception)
     {
-        Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Create Easypost Tracker ('.$this->trackingCode.' - '.$this->carrier.')', $exception));
+        Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Create Easypost Tracker ('.$this->shipment->carrier_consignment_number.' - '.$this->shipment->carrier->easypost.')', $exception));
     }
 }
