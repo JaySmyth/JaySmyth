@@ -5,6 +5,7 @@ namespace App\Console\Commands\Transend;
 use App\Models\Package;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class ProcessFiles extends Command
 {
@@ -138,27 +139,21 @@ class ProcessFiles extends Command
         // Download the files from remote FTP site
         $this->downloadFiles();
 
-        $this->line('Checking '.$this->directory.' for files to process');
+        $this->line('Checking '.$this->directory.' for CSV files to process');
 
         if ($handle = opendir($this->directory)) {
             while (false !== ($file = readdir($handle))) {
-                if (! is_dir($file) && stristr($file, '.csv')) {
-                    // File already exists in the archive - delete it
-                    if (file_exists($this->directory.$this->archiveDirectory.'/'.$file)) {
-                        if (file_exists($this->directory.$file)) {
-                            unlink($this->directory.$file);
-                        }
+                if ( ! is_dir($file) && stristr($file, '.csv')) {
+                    $lockFile = $this->directory.$file.'.LCK';
 
-                        Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError(
-                            'File already exists in archive directory',
-                            "$file already processed"
-                        ));
-                    } else {
-                        $this->processFile($file);
-                    }
+                    // Rename the file - give it a .LCK extension
+                    rename($this->directory.$file, $lockFile);
 
-                    if (! $this->testMode) {
-                        $this->archiveFile($file);
+                    // Process the lock file
+                    $this->processFile($lockFile);
+
+                    if ( ! $this->testMode) {
+                        $this->archiveFile($lockFile);
                     }
                 }
             }
@@ -181,7 +176,7 @@ class ProcessFiles extends Command
         $connection = ftp_connect($this->ftpHost);
 
         // Check connection was made
-        if (! $connection) {
+        if ( ! $connection) {
             $this->error('Unable to connect to FTP host -> '.$this->ftpHost);
 
             return false;
@@ -189,7 +184,7 @@ class ProcessFiles extends Command
 
         $loginResult = ftp_login($connection, $this->ftpUsername, $this->ftpPassword);
 
-        if (! $loginResult) {
+        if ( ! $loginResult) {
             $this->error('Unable to login to FTP host -> '.$this->ftpHost);
 
             return false;
@@ -211,14 +206,14 @@ class ProcessFiles extends Command
 
         foreach ($fileList as $file):
 
-            if ($filename = $this->validateFile($file)) {
+            if ($filename = $this->getFilename($file)) {
                 // Open a local file to write to
                 $handle = fopen($this->directory.'/'.$filename, 'w');
 
                 // Download file
                 ftp_fget($connection, $handle, $this->ftpWorkingDirectory.$filename, FTP_ASCII, 0);
 
-                if (! $this->testMode) {
+                if ( ! $this->testMode) {
                     if (file_exists($this->directory.'/'.$filename)) {
                         $this->line('Attempting to delete file from remote server');
 
@@ -239,31 +234,23 @@ class ProcessFiles extends Command
     /**
      * Check if a file has been downloaded before and returns filename.
      *
-     * @param type $string
+     * @param  type  $string
+     *
      * @return string filename
      */
-    private function validateFile($string)
+    private function getFilename($string)
     {
         // Obtain the file name from the string returned from ftp_rawlist
         $pieces = explode(' ', $string);
 
         // Last array element
-        $filename = end($pieces);
-
-        // Check the current directory and the archive directory to see if the file has already been downloaded
-        if (file_exists($this->directory.'/'.$filename) || file_exists($this->directory.$this->archiveDirectory.'/'.$filename)) {
-            $this->error("File $filename has already been downloaded");
-
-            return false;
-        }
-
-        return $filename;
+        return end($pieces);
     }
 
     /**
      * Read the file contents and insert records.
      *
-     * @param type $file
+     * @param  type  $file
      */
     protected function processFile($file)
     {
@@ -273,9 +260,9 @@ class ProcessFiles extends Command
             while (($data = fgetcsv($handle, 2000, ',')) !== false) {
                 $row = $this->assignFieldNames($data);
 
-                $this->transportJob = (! empty($row['JobRef1'])) ? \App\Models\TransportJob::whereNumber($row['JobRef1'])->first() : false;
-                $this->transendCode = (! empty($row['ExceptionReasonCode'])) ? \App\Models\TransendCode::whereCode($row['ExceptionReasonCode'])->first() : false;
-                $this->shipment = false;
+                $this->transportJob = ( ! empty($row['JobRef1'])) ? \App\Models\TransportJob::whereNumber($row['JobRef1'])->first() : false;
+                $this->transendCode = ( ! empty($row['ExceptionReasonCode'])) ? \App\Models\TransendCode::whereCode($row['ExceptionReasonCode'])->first() : false;
+                $this->shipment     = false;
 
                 if ($this->transportJob) {
                     $this->shipment = ($this->transportJob->shipment) ? $this->transportJob->shipment : false;
@@ -283,7 +270,7 @@ class ProcessFiles extends Command
                     // Log the transaction
                     $this->transportJob->log(
                         'Transend transaction received',
-                        ($this->transendCode) ? $this->transendCode->description : null,
+                        $file,
                         $row
                     );
                 }
@@ -304,7 +291,7 @@ class ProcessFiles extends Command
     /**
      * Read one line at a time and create an array of field names and values.
      *
-     * @param array $data
+     * @param  array  $data
      *
      * @return array
      */
@@ -326,7 +313,8 @@ class ProcessFiles extends Command
     /**
      * Parse the datetime string to carbon UTC.
      *
-     * @param type $datetime
+     * @param  type  $datetime
+     *
      * @return type
      */
     protected function parseDateTime($datetime)
@@ -345,7 +333,8 @@ class ProcessFiles extends Command
     /**
      * Completed job - one row per barcode.
      *
-     * @param type $row
+     * @param  type  $row
+     *
      * @return
      */
     protected function processRecordType1($row, $datetime)
@@ -354,7 +343,7 @@ class ProcessFiles extends Command
 
         if ($this->shipment) {
             $package = $this->shipment->packages->where('barcode', $row['Barcode'])->first();
-        } elseif (! empty($row['Barcode'])) {
+        } elseif ( ! empty($row['Barcode'])) {
             $package = Package::whereBarcode($row['Barcode'])->first();
 
             if ($package) {
@@ -370,7 +359,7 @@ class ProcessFiles extends Command
             switch ($row['JobTypeCode']) {
                 case 'LOADJOB':
 
-                    if (! $this->testMode && $row['ExceptionReasonCode'] != 'LOADSHORT') {
+                    if ( ! $this->testMode && $row['ExceptionReasonCode'] != 'LOADSHORT') {
                         // Packaged loaded to vehicle
                         $package->setLoaded($datetime);
 
@@ -384,9 +373,9 @@ class ProcessFiles extends Command
 
                         // NI delivery loaded - set the shipment status to "out for delivery"
                         if (in_array(
-                            strtoupper($this->shipment->service->carrier_code),
-                            ['NI24', 'NI48']
-                        ) && $this->shipment->isActive()) {
+                                strtoupper($this->shipment->service->carrier_code),
+                                ['NI24', 'NI48']
+                            ) && $this->shipment->isActive()) {
                             $this->shipment->setStatus('out_for_delivery', 0, $datetime->addMinutes(5));
                         }
 
@@ -399,7 +388,7 @@ class ProcessFiles extends Command
 
                 case 'UNLOADJOB':
 
-                    if (! $this->testMode) {
+                    if ( ! $this->testMode) {
                         if ($package->received && $package->loaded) {
                             $package->date_received = $package->date_loaded->subMinutes(5);
                             $package->save();
@@ -452,7 +441,7 @@ class ProcessFiles extends Command
                 $this->info($this->transportJob->number.' CLOSED!');
             }
 
-            if (! empty($row['ExceptionReasonCode'])) {
+            if ( ! empty($row['ExceptionReasonCode'])) {
                 $this->handleTransendCode($row['ExceptionReasonCode'], $datetime);
             }
         }
@@ -461,7 +450,8 @@ class ProcessFiles extends Command
     /**
      * Determine if a package can be marked as collected.
      *
-     * @param type $package
+     * @param  type  $package
+     *
      * @return bool
      */
     protected function canBeCollected($package, $row)
@@ -500,7 +490,8 @@ class ProcessFiles extends Command
     /**
      * Determine if a transport job can be closed.
      *
-     * @param type $row
+     * @param  type  $row
+     *
      * @return bool
      */
     protected function canBeClosedOff($row)
@@ -509,7 +500,7 @@ class ProcessFiles extends Command
             return false;
         }
 
-        if (! $this->transportJob) {
+        if ( ! $this->transportJob) {
             return false;
         }
 
@@ -527,7 +518,7 @@ class ProcessFiles extends Command
             return false;
         }
 
-        if (! empty($row['TypedName']) && ! $this->transportJob->completed && $row['JobTypeCode'] != 'LOADJOB') {
+        if ( ! empty($row['TypedName']) && ! $this->transportJob->completed && $row['JobTypeCode'] != 'LOADJOB') {
             return true;
         }
     }
@@ -535,7 +526,8 @@ class ProcessFiles extends Command
     /**
      * Image url.
      *
-     * @param type $signature
+     * @param  type  $signature
+     *
      * @return type
      */
     protected function getSignatureImageUrl($signature)
@@ -548,14 +540,14 @@ class ProcessFiles extends Command
     /**
      * Lookup transend code and handle accordingly.
      *
-     * @param type $code
-     * @param type $datetime
+     * @param  type  $code
+     * @param  type  $datetime
      *
      * @return void
      */
     protected function handleTransendCode($code, $datetime)
     {
-        if (! $this->transportJob) {
+        if ( ! $this->transportJob) {
             return false;
         }
 
@@ -571,14 +563,14 @@ class ProcessFiles extends Command
 
             // Update the transport job to "not sent"
             if ($this->transendCode->resend) {
-                if (! $this->testMode) {
+                if ( ! $this->testMode) {
                     $this->transportJob->resend($this->transendCode->resend_same_day);
                 }
 
                 $this->line('Job resent: '.$this->transportJob->number);
 
                 if ($this->transendCode->hold) {
-                    if (! $this->testMode) {
+                    if ( ! $this->testMode) {
                         $this->transportJob->setTransendRoute('HOLD');
                     }
 
@@ -590,7 +582,7 @@ class ProcessFiles extends Command
             if ($this->shipment && $this->transendCode->add_tracking_event) {
                 $scanLocation = ($this->transportJob->type == 'c') ? 'shipper' : 'destination';
 
-                if (! $this->testMode) {
+                if ( ! $this->testMode) {
                     $this->shipment->addTracking(
                         $this->shipment->status->code,
                         $datetime,
@@ -617,7 +609,8 @@ class ProcessFiles extends Command
     /**
      * Move file to archive directory.
      *
-     * @param string $file
+     * @param  string  $file
+     *
      * @return bool
      */
     protected function archiveFile($file)
@@ -625,15 +618,15 @@ class ProcessFiles extends Command
         $this->info("Archiving file $file");
 
         $originalFile = $this->directory.$file;
-        $archiveFile = $this->directory.$this->archiveDirectory.'/'.$file;
+        $archiveFile  = $this->directory.$this->archiveDirectory.'/'.Str::before($file, '.LCK');
 
         $this->info("Moving $originalFile to archive");
 
-        if (! file_exists($originalFile)) {
+        if ( ! file_exists($originalFile)) {
             $this->error("Problem archiving $file  - file not found");
         }
 
-        if (! file_exists($archiveFile)) {
+        if ( ! file_exists($archiveFile)) {
             if (copy($originalFile, $archiveFile)) {
                 unlink($originalFile);
                 $this->info('File archived successfully');
