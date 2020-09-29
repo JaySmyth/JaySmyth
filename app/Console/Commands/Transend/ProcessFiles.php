@@ -143,7 +143,7 @@ class ProcessFiles extends Command
 
         if ($handle = opendir($this->directory)) {
             while (false !== ($file = readdir($handle))) {
-                if ( ! is_dir($file) && stristr($file, '.csv')) {
+                if (! is_dir($file) && substr($file, -4) == '.csv') {
                     if (file_exists($this->directory.$file)) {
                         $lockFile = $file.'.LCK';
 
@@ -153,7 +153,7 @@ class ProcessFiles extends Command
                         // Process the lock file
                         $this->processFile($lockFile);
 
-                        if ( ! $this->testMode) {
+                        if (! $this->testMode) {
                             $this->archiveFile($lockFile);
                         }
                     } else {
@@ -180,7 +180,7 @@ class ProcessFiles extends Command
         $connection = ftp_connect($this->ftpHost);
 
         // Check connection was made
-        if ( ! $connection) {
+        if (! $connection) {
             $this->error('Unable to connect to FTP host -> '.$this->ftpHost);
 
             return false;
@@ -188,7 +188,7 @@ class ProcessFiles extends Command
 
         $loginResult = ftp_login($connection, $this->ftpUsername, $this->ftpPassword);
 
-        if ( ! $loginResult) {
+        if (! $loginResult) {
             $this->error('Unable to login to FTP host -> '.$this->ftpHost);
 
             return false;
@@ -217,7 +217,7 @@ class ProcessFiles extends Command
                 // Download file
                 ftp_fget($connection, $handle, $this->ftpWorkingDirectory.$filename, FTP_ASCII, 0);
 
-                if ( ! $this->testMode) {
+                if (! $this->testMode) {
                     if (file_exists($this->directory.'/'.$filename)) {
                         $this->line('Attempting to delete file from remote server');
 
@@ -264,8 +264,8 @@ class ProcessFiles extends Command
             while (($data = fgetcsv($handle, 2000, ',')) !== false) {
                 $row = $this->assignFieldNames($data);
 
-                $this->transportJob = ( ! empty($row['JobRef1'])) ? \App\Models\TransportJob::whereNumber($row['JobRef1'])->first() : false;
-                $this->transendCode = ( ! empty($row['ExceptionReasonCode'])) ? \App\Models\TransendCode::whereCode($row['ExceptionReasonCode'])->first() : false;
+                $this->transportJob = (! empty($row['JobRef1'])) ? \App\Models\TransportJob::whereNumber($row['JobRef1'])->first() : false;
+                $this->transendCode = (! empty($row['ExceptionReasonCode'])) ? \App\Models\TransendCode::whereCode($row['ExceptionReasonCode'])->first() : false;
                 $this->shipment     = false;
 
                 if ($this->transportJob) {
@@ -347,7 +347,7 @@ class ProcessFiles extends Command
 
         if ($this->shipment) {
             $package = $this->shipment->packages->where('barcode', $row['Barcode'])->first();
-        } elseif ( ! empty($row['Barcode'])) {
+        } elseif (! empty($row['Barcode'])) {
             $package = Package::whereBarcode($row['Barcode'])->first();
 
             if ($package) {
@@ -363,7 +363,7 @@ class ProcessFiles extends Command
             switch ($row['JobTypeCode']) {
                 case 'LOADJOB':
 
-                    if ( ! $this->testMode && $row['ExceptionReasonCode'] != 'LOADSHORT') {
+                    if (! $this->testMode && $row['ExceptionReasonCode'] != 'LOADSHORT') {
                         // Packaged loaded to vehicle
                         $package->setLoaded($datetime);
 
@@ -377,9 +377,9 @@ class ProcessFiles extends Command
 
                         // NI delivery loaded - set the shipment status to "out for delivery"
                         if (in_array(
-                                strtoupper($this->shipment->service->carrier_code),
-                                ['NI24', 'NI48']
-                            ) && $this->shipment->isActive()) {
+                            strtoupper($this->shipment->service->carrier_code),
+                            ['NI24', 'NI48']
+                        ) && $this->shipment->isActive()) {
                             $this->shipment->setStatus('out_for_delivery', 0, $datetime->addMinutes(5));
                         }
 
@@ -392,7 +392,7 @@ class ProcessFiles extends Command
 
                 case 'UNLOADJOB':
 
-                    if ( ! $this->testMode) {
+                    if (! $this->testMode) {
                         if ($package->received && $package->loaded) {
                             $package->date_received = $package->date_loaded->subMinutes(5);
                             $package->save();
@@ -445,7 +445,7 @@ class ProcessFiles extends Command
                 $this->info($this->transportJob->number.' CLOSED!');
             }
 
-            if ( ! empty($row['ExceptionReasonCode'])) {
+            if (! empty($row['ExceptionReasonCode'])) {
                 $this->handleTransendCode($row['ExceptionReasonCode'], $datetime);
             }
         }
@@ -504,7 +504,7 @@ class ProcessFiles extends Command
             return false;
         }
 
-        if ( ! $this->transportJob) {
+        if (! $this->transportJob) {
             return false;
         }
 
@@ -522,7 +522,7 @@ class ProcessFiles extends Command
             return false;
         }
 
-        if ( ! empty($row['TypedName']) && ! $this->transportJob->completed && $row['JobTypeCode'] != 'LOADJOB') {
+        if (! empty($row['TypedName']) && ! $this->transportJob->completed && $row['JobTypeCode'] != 'LOADJOB') {
             return true;
         }
     }
@@ -551,7 +551,7 @@ class ProcessFiles extends Command
      */
     protected function handleTransendCode($code, $datetime)
     {
-        if ( ! $this->transportJob) {
+        if (! $this->transportJob) {
             return false;
         }
 
@@ -567,14 +567,14 @@ class ProcessFiles extends Command
 
             // Update the transport job to "not sent"
             if ($this->transendCode->resend) {
-                if ( ! $this->testMode) {
+                if (! $this->testMode) {
                     $this->transportJob->resend($this->transendCode->resend_same_day);
                 }
 
                 $this->line('Job resent: '.$this->transportJob->number);
 
                 if ($this->transendCode->hold) {
-                    if ( ! $this->testMode) {
+                    if (! $this->testMode) {
                         $this->transportJob->setTransendRoute('HOLD');
                     }
 
@@ -586,7 +586,7 @@ class ProcessFiles extends Command
             if ($this->shipment && $this->transendCode->add_tracking_event) {
                 $scanLocation = ($this->transportJob->type == 'c') ? 'shipper' : 'destination';
 
-                if ( ! $this->testMode) {
+                if (! $this->testMode) {
                     $this->shipment->addTracking(
                         $this->shipment->status->code,
                         $datetime,
@@ -626,11 +626,11 @@ class ProcessFiles extends Command
 
         $this->info("Moving $originalFile to archive");
 
-        if ( ! file_exists($originalFile)) {
+        if (! file_exists($originalFile)) {
             $this->error("Problem archiving $file  - file not found");
         }
 
-        if ( ! file_exists($archiveFile)) {
+        if (! file_exists($archiveFile)) {
             if (copy($originalFile, $archiveFile)) {
                 unlink($originalFile);
                 $this->info('File archived successfully');
