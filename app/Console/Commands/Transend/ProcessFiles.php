@@ -633,7 +633,7 @@ class ProcessFiles extends Command
             }
         } else {
             $this->error("Problem archiving $archiveFile  - already exists");
-            Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError(
+            Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError(
                 'Error archiving transend export file',
                 "Problem archiving $archiveFile  - already exists"
             ));
