@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
+use App\Models\Company;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -122,6 +123,9 @@ class UsersController extends Controller
         if ($request->send_email) {
             Mail::to($user->email)->bcc('cxadmin@antrim.ifsgroup.com')->queue(new \App\Mail\UserCreated($user, $password));
         }
+
+        // Insert a record into the logs
+        Company::find($request->company_id)->log('User created', $user->email);
 
         flash()->success('Created!', 'User created successfully.');
 

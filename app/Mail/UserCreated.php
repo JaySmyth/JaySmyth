@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
@@ -12,8 +11,9 @@ class UserCreated extends Mailable
     use Queueable,
         SerializesModels;
 
-    protected $user;
-    protected $password;
+    public $user;
+    public $password;
+    public $createdBy;
 
     /**
      * Create a new message instance.
@@ -22,7 +22,7 @@ class UserCreated extends Mailable
      */
     public function __construct($user, $password)
     {
-        $this->user = $user;
+        $this->user     = $user;
         $this->password = $password;
     }
 
@@ -34,7 +34,6 @@ class UserCreated extends Mailable
     public function build()
     {
         return $this->view('emails.users.create')
-                        ->subject('IFS Global Logistics - Account Details')
-                        ->with(['user' => $this->user, 'password' => $this->password]);
+                    ->subject('IFS Global Logistics - Account Details');
     }
 }
