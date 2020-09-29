@@ -2,8 +2,6 @@
 
 @section('content')
 
-Ref: U/{{ Auth::User()->id }}
-
 <p>Dear {{$user->name}},</p>
 
 <p>Your account to access IFS Global Logistics has been created.</p>
