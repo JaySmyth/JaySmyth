@@ -144,17 +144,20 @@ class ProcessFiles extends Command
         if ($handle = opendir($this->directory)) {
             while (false !== ($file = readdir($handle))) {
                 if ( ! is_dir($file) && stristr($file, '.csv')) {
+                    if (file_exists($this->directory.$file)) {
+                        $lockFile = $file.'.LCK';
 
-                    $lockFile = $file.'.LCK';
+                        // Rename the file - give it a .LCK extension
+                        rename($this->directory.$file, $this->directory.$lockFile);
 
-                    // Rename the file - give it a .LCK extension
-                    rename($this->directory.$file, $this->directory.$lockFile);
+                        // Process the lock file
+                        $this->processFile($lockFile);
 
-                    // Process the lock file
-                    $this->processFile($lockFile);
-
-                    if ( ! $this->testMode) {
-                        $this->archiveFile($lockFile);
+                        if ( ! $this->testMode) {
+                            $this->archiveFile($lockFile);
+                        }
+                    } else {
+                        $this->info('File processed by another task!');
                     }
                 }
             }
