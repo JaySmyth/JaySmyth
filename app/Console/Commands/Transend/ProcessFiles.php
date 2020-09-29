@@ -144,10 +144,11 @@ class ProcessFiles extends Command
         if ($handle = opendir($this->directory)) {
             while (false !== ($file = readdir($handle))) {
                 if ( ! is_dir($file) && stristr($file, '.csv')) {
-                    $lockFile = $this->directory.$file.'.LCK';
+
+                    $lockFile = $file.'.LCK';
 
                     // Rename the file - give it a .LCK extension
-                    rename($this->directory.$file, $lockFile);
+                    rename($this->directory.$file, $this->directory.$lockFile);
 
                     // Process the lock file
                     $this->processFile($lockFile);
@@ -254,7 +255,7 @@ class ProcessFiles extends Command
      */
     protected function processFile($file)
     {
-        $this->line("Processing file $file");
+        $this->line("Processing lock file: $file");
 
         if (($handle = fopen($this->directory.$file, 'r')) !== false) {
             while (($data = fgetcsv($handle, 2000, ',')) !== false) {
@@ -270,7 +271,7 @@ class ProcessFiles extends Command
                     // Log the transaction
                     $this->transportJob->log(
                         'Transend transaction received',
-                        $file,
+                        Str::before($file, '.LCK'),
                         $row
                     );
                 }
