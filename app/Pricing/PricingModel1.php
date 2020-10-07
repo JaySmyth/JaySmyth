@@ -51,6 +51,7 @@ class PricingModel1 extends PricingModel
 
             case 'uk24':
             case 'uk24r':
+            case 'uk48':
             case 'uk48m':
             case 'uk48s':
             case 'uk48r':
@@ -136,8 +137,10 @@ class PricingModel1 extends PricingModel
 
             // Get Rate for this package
             $this->getPackageRate($this->packagingType);
+            $this->log('Packaging Type: '.$this->packagingType);
 
             if (isset($this->rateDetail->first) && isset($this->rateDetail->others) && isset($this->rateDetail->notional_weight)) {
+                $this->log('Calc Charge for 1st Piece');
 
                 // Calc Charge for 1st piece
                 if ($this->rateDetail->first > 0) {
