@@ -52,9 +52,11 @@ class PricingModel1 extends PricingModel
             case 'uk24':
             case 'uk24r':
             case 'uk48':
+            case 'uk48m':
             case 'uk48s':
             case 'uk48r':
             case 'uk48p':
+            case 'uknc':
                 $this->zone = $domesticZones->getZone($this->shipment);
                 $this->costsRequired = 'Y';
                 break;
@@ -135,8 +137,10 @@ class PricingModel1 extends PricingModel
 
             // Get Rate for this package
             $this->getPackageRate($this->packagingType);
+            $this->log('Packaging Type: '.$this->packagingType);
 
             if (isset($this->rateDetail->first) && isset($this->rateDetail->others) && isset($this->rateDetail->notional_weight)) {
+                $this->log('Calc Charge for 1st Piece');
 
                 // Calc Charge for 1st piece
                 if ($this->rateDetail->first > 0) {
@@ -374,10 +378,22 @@ class PricingModel1 extends PricingModel
      */
     public function isCOL()
     {
+        $serviceCode = strtolower($this->shipment['service_code']);
+        switch ($serviceCode) {
+            case 'uk48m':
+                $accountPostcode = strtoupper(Company::find($this->shipment['company_id'])->postcode);
+                $recipientPostCode = strtoUpper($this->shipment['recipient_postcode']);
 
-        // Shipped from the UK mainland
-        if (strtolower($this->shipment['service_code']) == 'uk48r') {
-            return true;
+                // UK mainland return to CountryWide Depot or UK Mainland Customer
+                if (in_array($recipientPostCode, [$accountPostcode, 'M17 1SF'])) {
+                    return true;
+                }
+            break;
+
+            case 'uk48r':
+                // UK mainland Returns to UK Mainland Customer
+                return true;
+            break;
         }
 
         return false;
