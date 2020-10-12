@@ -405,7 +405,7 @@ class APIShipment
             $errors = $this->checkCountryRestrictions($shipment, $errors);
 
             // Check collection date is valid
-            //$errors = $this->checkCollectionDate($shipment, $errors);
+            $errors = $this->checkCollectionDate($shipment, $errors);
         }
 
         return $errors;
