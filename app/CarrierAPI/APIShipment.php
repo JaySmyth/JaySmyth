@@ -14,6 +14,7 @@ use App\Models\Country;
 use App\Models\Currency;
 use App\Models\Postcode;
 use App\Models\Service;
+use App\Rules\DoesNotExist;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 
@@ -525,7 +526,7 @@ class APIShipment
 
         $rules['commercial_invoice_comments'] = 'nullable|string';
         if (isset($shipment['commodity_count']) && $shipment['commodity_count'] > 0) {
-            $rules['contents.*.description'] = 'required|string|min:3|max:100|not_regex:/^[0-9]+$/';
+            $rules['contents.*.description'] = ['required', 'string', 'min:3', 'max:100', 'not_regex:/^[0-9]+$/', new DoesNotExist('invalid_commodity_descriptions', 'description')];
             $rules['contents.*.quantity'] = 'required|integer|greater_than_value:0';
             $rules['contents.*.uom'] = 'required|exists:uoms,code';
             $rules['contents.*.unit_value'] = 'required|numeric|greater_than_value:0';
