@@ -706,7 +706,7 @@
                                 Please describe the contents of your shipment. Click the
                                 <strong>Add Commodity</strong> button to get started.
 
-                                <p class="text-danger mt-3">You must provide accurate commodity details to prevent your shipment being held by customs.<br>Shipments with no harmonized code or vaugue descriptions such as "Spare Parts", "Miscellaneous", "Personal Items" etc. will be held by customs.</p>
+                                <p class="text-danger mt-3">You must provide accurate commodity details to prevent your shipment being held by customs.<br>Shipments with no harmonized code or vague descriptions such as "Spare Parts", "Miscellaneous", "Personal Items" etc. will be held by customs.</p>
                             </div>
                         @endif
 
