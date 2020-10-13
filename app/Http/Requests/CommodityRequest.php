@@ -30,7 +30,7 @@ class CommodityRequest extends Request
             'manufacturer' => 'nullable|min:3',
             'country_of_manufacture' => 'required|alpha|size:2',
             'commodity_code' => 'nullable|numeric',
-            'harmonized_code' => 'nullable|digits:10',
+            'harmonized_code' => 'required|digits:10',
             'unit_value' => 'required|numeric',
             'currency_code' => 'required|alpha|size:3',
             'uom' => 'required|regex:/^[a-zA-Z ]+$/',

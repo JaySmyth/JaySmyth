@@ -637,10 +637,12 @@
                 <div id="panel-contents" class="card">
                     <div class="card-header font-weight-bold pt-1 pb-1">
                         Shipment Contents
-                        <span class="fas fa-info-circle" aria-hidden="true" data-placement="bottom" data-toggle="tooltip" data-original-title="This panel allows you to define what is contained within each of your packages. There MUST be at least one line for every package. For shipments with multiple packages but only one commodity, use the 'Fill' button to autocomplete the package contents for you (the 'Fill' button is only displayed when appropriate)."></span>
+                        <span class="fas fa-info-circle" aria-hidden="true" data-placement="bottom" data-toggle="tooltip" data-original-title="This panel allows you to define what is contained within your shipment. It is your legal responsibility to provide correct commodity information. Please contact Courier if you require assistance."></span>
+
                         <div class="float-right">
                             <button type="button" id="button-add-commodity" class="btn btn-outline-secondary btn-sm btn-xs" data-toggle="modal" data-target="#commodities">Add Commodity</button>
                         </div>
+
                     </div>
                     <div id="container-contents" class="card-body pt-2 pb-2 text-nowrap">
                         <div id="commodity-headings" class="row font-weight-bold">
@@ -703,6 +705,8 @@
                             <div id="customs-information" class="well well-lg text-center mt-5">
                                 Please describe the contents of your shipment. Click the
                                 <strong>Add Commodity</strong> button to get started.
+
+                                <p class="text-danger mt-3">You must provide accurate commodity details to prevent your shipment being held by customs.<br>Shipments with no harmonized code or vaugue descriptions such as "Spare Parts", "Miscellaneous", "Personal Items" etc. will be held by customs.</p>
                             </div>
                         @endif
 

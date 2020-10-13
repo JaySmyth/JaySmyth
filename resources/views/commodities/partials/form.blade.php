@@ -1,5 +1,5 @@
 <p class="text-large text-center text-danger">It is your legal responsibility to provide correct commodity information. Please contact IFS if you require assistance.</p>
-
+<p class="text-large text-center text-danger font-weight-bold">You must provide valid commodity details to prevent your shipment being held by customs!</p>
 <p class="text-large text-center mb-4">See <a href="https://www.gov.uk/trade-tariff/sections" target="_blank">https://www.gov.uk/trade-tariff/sections</a> for correct commodity code and <a href="https://hts.usitc.gov/" target="_blank">https://hts.usitc.gov/</a> for correct harmonized code.</p>
 
 
@@ -121,7 +121,7 @@
 
         <div class="form-group row{{ $errors->has('harmonized_code') ? ' has-danger' : '' }}">
             <label class="col-sm-4  col-form-label">
-                Harmonized Code:
+                Harmonized Code: <abbr title="This information is required.">*</abbr>
             </label>
 
             <div class="col-sm-7">
@@ -138,7 +138,7 @@
 
         <div class="form-group row{{ $errors->has('unit_value') ? ' has-danger' : '' }}">
             <label class="col-sm-4  col-form-label">
-                Value:
+                Value: <abbr title="This information is required.">*</abbr>
             </label>
 
             <div class="col-sm-4">
@@ -175,7 +175,7 @@
 
         <div class="form-group row{{ $errors->has('unit_weight') ? ' has-danger' : '' }}">
             <label class="col-sm-4  col-form-label">
-                Weight:
+                Weight: <abbr title="This information is required.">*</abbr>
             </label>
             <div class="col-sm-4">
                 {!! Form::Text('unit_weight', null, ['id' => 'commodity_unit_weight','class' => 'form-control decimal-only', 'maxlength' => '8']) !!}

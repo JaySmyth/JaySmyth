@@ -114,7 +114,7 @@
 
                         <div class="form-group row">
                             <label class="col-sm-6  col-form-label">
-                                Harmonized Code:
+                                Harmonized Code: <abbr title="This information is required.">*</abbr>
                             </label>
                             <div class="col-sm-6">
                                 {!! Form::Text('harmonized_code', null, ['id' => 'commodity_harmonized_code','class' => 'form-control form-control-sm numeric-only', 'maxlength' => '10']) !!}

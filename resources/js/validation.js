@@ -171,6 +171,7 @@ $("#commodity-form").validate({
             digits: true
         },
         harmonized_code: {
+            required: true,
             minlength: 10,
             digits: true
         },
