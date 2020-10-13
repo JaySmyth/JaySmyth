@@ -6,15 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class DomesticZone extends Model
 {
-    public function getZone($shipment, $model="fedex")
+    public function getZone($shipment, $model="1", $isReturn = false)
     {
+        $models = ['1' => 'fedex', '7' => 'XDP'];
         $zone = '';
         $postcode = '';
         $postCodeFound = false;
 
-        if (isset($shipment['recipient_postcode'])) {
-            $postcode = trim($shipment['recipient_postcode']);
-        }
+        // Decide which postcode to use to identify zone
+        $zonePostcode = ($isReturn) ? $shipment['sender_postcode'] : $shipment['recipient_postcode'];
+        $postcode = trim($zonePostcode) ?? '';
 
         // Remove all extraneous chars and compare against FedexUK DB
         $newPostCode = preg_replace('/\s+/', ' ', $postcode); // Replace multiple spaces
@@ -29,7 +30,7 @@ class DomesticZone extends Model
 
                 // Must have at least 1 Char
                 $zone = self::where('postcode', '=', substr($newPostCode, 0, $l))
-                              ->where('model', $model)
+                              ->where('model', $models[$model])
                               ->first();
                 if (! empty($zone)) {
                     $postCodeFound = true;

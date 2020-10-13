@@ -37,11 +37,9 @@ class Handler extends ExceptionHandler
      */
     public function report(Throwable $exception)
     {
-        /*
         if ($this->shouldReport($exception)) {
             $this->sendEmail($exception); // sends an email
         }
-        */
 
         return parent::report($exception);
     }
@@ -80,22 +78,23 @@ class Handler extends ExceptionHandler
      * @param  \Throwable  $exception
      * @return void
      */
-     /*
     public function sendEmail(Throwable $exception)
     {
         try {
-            // $e = FlattenException::create($exception);
+            $msg = $exception->getMessage().' on line '.$exception->getLine().' of '.$exception->getFile().'<br><br>';
+            $traces = $exception->getTrace();
+            $padding = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+            foreach ($traces as $trace) {
+                $msg .= (isset($trace['file'])) ? 'File: '.$trace['file'].' - ' : '';
+                $msg .= (isset($trace['line'])) ? 'Line: '.$trace['line'].' | ' : '';
+                $msg .= (isset($trace['class'])) ? 'Class: '.$trace['class'].' | ' : '';
+                $msg .= (isset($trace['function'])) ? 'Function: '.$trace['function'].'<br>' : '<br>';
+            }
 
-            // $handler = new SymfonyExceptionHandler();
-
-            // $html = $handler->getHtml($e);
-            // $html = $exception->getMessage();
-
-            //Mail::to(['gmcbroom@antrim.ifsgroup.com', 'dshannon@antrim.ifsgroup.com'])->send(new ErrorException($html));
-            dd($ex);
+            // dd($msg);
+            Mail::to(['gmcbroom@antrim.ifsgroup.com', 'dshannon@antrim.ifsgroup.com'])->send(new ErrorException($msg));
         } catch (Exception $ex) {
             dd($ex);
         }
     }
-    */
 }

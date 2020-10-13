@@ -16,6 +16,7 @@ use App\Models\SurchargeDetail;
 class PricingModel
 {
     public $debug = false;
+    public $company;
     public $shipment;
     public $service;
     public $zone;
@@ -108,7 +109,8 @@ class PricingModel
             'tnt' => '4',
             'dhl' => '5',
             'cwide' => '6',
-            'xdp' => '7'
+            'xdp' => '7',
+            'domestic2' => '8',
         ];
 
         // Calculate Fuel Surcharge on the following charge codes
@@ -167,6 +169,7 @@ class PricingModel
         $this->shipment = $shipment;
         $this->priceType = $priceType;
         $this->service = Service::find($shipment['service_id']);
+        $this->company = Company::find($shipment['company_id']);
 
         $this->log("PriceType: $priceType");
         $this->log('ServiceId: '.$shipment['service_id']);
@@ -203,6 +206,7 @@ class PricingModel
                 $this->log('*** Failed with errors');
             }
         }
+
         $this->response['log'] = $this->log;
 
         return $this->response;
@@ -261,8 +265,7 @@ class PricingModel
         }
 
         // Identify Shipment Package type for pricing
-        $packageType = Company::find($this->shipment['company_id'])
-                ->getPackagingTypes($this->shipment['mode_id'])
+        $packageType = $this->company->getPackagingTypes($this->shipment['mode_id'])
                 ->where('code', $this->shipment['packages'][$pkgNo]['packaging_code'])
                 ->first();
 
@@ -530,7 +533,7 @@ class PricingModel
     public function isESS()
     {
         // Convert Collection date into a known format
-        // $localisation = Company::find($this->shipment['company_id'])->localisation;
+        // $localisation = $this->company->localisation;
 
         // $date_format = getDateFormat($this->shipment['date_format']);
         // $collectionDate = Carbon::createFromformat($date_format, $this->shipment['collection_date'], $localisation->time_zone)->format('Y-m-d');
@@ -1204,6 +1207,11 @@ class PricingModel
         }
 
         // $this->addSurcharge($charge);
+    }
+
+    public function isReturn()
+    {
+        return false;
     }
 
     public function show($var, $desc = 'Debug')
