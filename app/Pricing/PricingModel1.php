@@ -37,11 +37,13 @@ class PricingModel1 extends PricingModel
      * *************************************
      */
     public $maxStdDimension = 150;
+    public $surcharge;              // local only
 
     public function __construct()
     {
         parent::__construct();
         $this->pricingZones = new DomesticZone;
+        $this->fedexEas = new \App\Models\FedexEas();
     }
 
     public function getZone()
@@ -57,7 +59,7 @@ class PricingModel1 extends PricingModel
             case 'uk48r':
             case 'uk48p':
             case 'uknc':
-                $this->zone = $domesticZones->getZone($this->shipment);
+                $this->zone = $domesticZones->getZone($this->shipment, $this->model, $this->isReturn());
                 $this->costsRequired = 'Y';
                 break;
 
@@ -381,13 +383,7 @@ class PricingModel1 extends PricingModel
         $serviceCode = strtolower($this->shipment['service_code']);
         switch ($serviceCode) {
             case 'uk48m':
-                $accountPostcode = strtoupper(Company::find($this->shipment['company_id'])->postcode);
-                $recipientPostCode = strtoUpper($this->shipment['recipient_postcode']);
-
-                // UK mainland return to CountryWide Depot or UK Mainland Customer
-                if (in_array($recipientPostCode, [$accountPostcode, 'M17 1SF'])) {
-                    return true;
-                }
+                return $this->isReturn();
             break;
 
             case 'uk48r':
@@ -402,8 +398,7 @@ class PricingModel1 extends PricingModel
     public function isEAS()
     {
         if (isset($this->shipment['recipient_postcode'])) {
-            $surcharge = new \App\Models\FedexEas();
-            if (strtoupper($surcharge->getSurcharge($this->shipment['recipient_postcode'])) == 'EAS') {
+            if (strtoupper($this->fedexEas->getSurcharge($this->shipment['recipient_postcode'])) == 'EAS') {
                 return true;
             }
         }
@@ -414,8 +409,7 @@ class PricingModel1 extends PricingModel
     public function isRAS()
     {
         if (isset($this->shipment['recipient_country_code'])) {
-            $surcharge = new \App\Models\FedexEas();
-            if (strtoupper($surcharge->getSurcharge($this->shipment['recipient_postcode'])) == 'RAS') {
+            if (strtoupper($this->fedexEas->getSurcharge($this->shipment['recipient_postcode'])) == 'RAS') {
                 return true;
             }
         }
@@ -425,8 +419,20 @@ class PricingModel1 extends PricingModel
 
     public function isOOA()
     {
-        $surcharge = new \App\Models\FedexEas();
-        if (strtoupper($surcharge->getSurcharge($this->shipment['recipient_postcode'])) == 'OOA') {
+        if (strtoupper($this->fedexEas->getSurcharge($this->shipment['recipient_postcode'])) == 'OOA') {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function isReturn()
+    {
+        $accountPostcode = strtoupper($this->company->postcode);
+        $recipientPostCode = strtoUpper($this->shipment['recipient_postcode']);
+
+        // UK mainland return to CountryWide Depot or UK Mainland Customer
+        if (in_array($recipientPostCode, [$accountPostcode, 'M17 1SF'])) {
             return true;
         }
 

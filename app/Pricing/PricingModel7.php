@@ -44,7 +44,7 @@ class PricingModel7 extends PricingModel
     public function getZone()
     {
         $domesticZones = new DomesticZone();
-        $this->zone = $domesticZones->getZone($this->shipment, $this->rate['model']);
+        $this->zone = $domesticZones->getZone($this->shipment, $this->model, $this->isReturn());
     }
 
     public function isOOA()
