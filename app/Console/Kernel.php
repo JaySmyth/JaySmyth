@@ -83,14 +83,14 @@ class Kernel extends ConsoleKernel
         /*
          * Purchase Invoice imports
          */
-        $schedule->command('ifs:import-fedex-purchase-invoices')->weekdays()->hourly()->between('8:00', '16:00');
-        $schedule->command('ifs:import-ups-purchase-invoices')->weekdays()->hourly()->between('8:00', '16:00');
-        $schedule->command('ifs:import-dhl-purchase-invoices')->weekdays()->hourly()->between('8:00', '16:00');
-        $schedule->command('ifs:import-primary-freight-purchase-invoices')->weekdays()->hourly()->between('8:00', '16:00');
-        $schedule->command('ifs:import-tnt-purchase-invoices')->weekdays()->hourly()->between('8:00', '16:00');
-        $schedule->command('ifs:import-express-freight-purchase-invoices')->weekdays()->hourly()->between('8:00', '16:00');
-        $schedule->command('ifs:import-xdp-purchase-invoices')->weekdays()->hourly()->between('8:00', '16:00');
-        $schedule->command('ifs:update-scs-job-numbers-on-purchase-invoice-lines')->weekdays()->twiceDaily(8, 14);
+        $schedule->command('ifs:import-fedex-purchase-invoices')->weekdays()->hourly()->between('7:00', '17:00');
+        $schedule->command('ifs:import-ups-purchase-invoices')->weekdays()->hourly()->between('7:00', '17:00');
+        $schedule->command('ifs:import-dhl-purchase-invoices')->weekdays()->hourly()->between('7:00', '17:00');
+        $schedule->command('ifs:import-primary-freight-purchase-invoices')->weekdays()->hourly()->between('7:00', '17:00');
+        $schedule->command('ifs:import-tnt-purchase-invoices')->weekdays()->hourly()->between('7:00', '17:00');
+        $schedule->command('ifs:import-express-freight-purchase-invoices')->weekdays()->hourly()->between('7:00', '17:00');
+        $schedule->command('ifs:import-xdp-purchase-invoices')->weekdays()->hourly()->between('7:00', '17:00');
+        $schedule->command('ifs:update-scs-job-numbers-on-purchase-invoice-lines')->weekdays()->everyThreeHours();
 
         /*
          * Transend
