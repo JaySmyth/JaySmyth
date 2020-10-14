@@ -2,7 +2,7 @@
 
 @section('content')
 
-    @include('partials.title', ['title' => 'Invalid Commodity Descriptions', 'results'=> $descriptions, 'create' => 'description'])
+    @include('partials.title', ['title' => 'Invalid Commodity Descriptions', 'results'=> $descriptions, 'create' => 'invalid_commodity_description'])
 
     <table class="table table-striped table-sm">
         <thead>

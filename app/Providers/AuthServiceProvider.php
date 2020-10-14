@@ -45,6 +45,7 @@ class AuthServiceProvider extends ServiceProvider
         \App\Models\Quotation::class => \App\Policies\QuotationPolicy::class,
         \App\Models\Log::class => \App\Policies\LogPolicy::class,
         \App\Models\SeaFreightTracking::class => \App\Policies\SeaFreightTrackingPolicy::class,
+        \App\Models\InvalidCommodityDescription::class => \App\Policies\InvalidCommodityDescriptionPolicy::class,
     ];
 
     /**
