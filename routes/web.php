@@ -572,3 +572,13 @@ Route::resource('shipment-uploads', 'ShipmentUploadsController');
  */
 Route::resource('import-configs', 'ImportConfigsController');
 Route::get('import-configs/{importConfig}/download-example', 'ImportConfigsController@downloadExample');
+
+/*
+  |--------------------------------------------------------------------------
+  | Invalid Commodity Descriptions
+  |--------------------------------------------------------------------------
+ */
+Route::get('invalid-commodity-descriptions', 'InvalidCommodityDescriptionController@index');
+Route::post('invalid-commodity-descriptions', 'InvalidCommodityDescriptionController@store');
+Route::view('invalid-commodity-descriptions/create', 'invalid_commodity_descriptions/create');
+Route::delete('invalid-commodity-descriptions/{description}', 'InvalidCommodityDescriptionController@delete');

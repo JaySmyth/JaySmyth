@@ -37,6 +37,14 @@
 
 @section('content')
 
+@section('toolbar')
+
+    @can('create_invalid_commodity_description')
+        <a href="{{ url('/invalid-commodity-descriptions') }}" title="Invalid Commodity Descriptions"><span class="fas fa-stop-circle fa-lg" aria-hidden="true"></span></a>
+    @endif
+
+@endsection
+
 @include('partials.title', ['title' => 'commodities', 'results'=> $commodities,  'create' => 'commodities'])
 
 {!! Form::Open(['url' => 'commodities', 'autocomplete' => 'off']) !!}
