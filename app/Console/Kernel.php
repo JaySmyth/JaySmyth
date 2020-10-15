@@ -108,13 +108,13 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:update-stagnant-shipments')->dailyAt('07:05');
         $schedule->command('ifs:process-shipment-uploads')->withoutOverlapping(2);
         $schedule->command('ifs:check-for-duplicate-shipments')->twiceDaily(12, 16);
-        $schedule->command('ifs:dispatch-easypost-trackers')->dailyAt('20:30');
+        $schedule->command('ifs:dispatch-easypost-trackers')->dailyAt('21:30');
 
         /*
          * Tracking updates
          */
         $schedule->command('ifs:get-tracking --active=1')->everyThirtyMinutes()->withoutOverlapping(10);
-        $schedule->command('ifs:get-tracking --active=0')->twiceDaily(8, 22);
+        $schedule->command('ifs:get-tracking --active=0')->twiceDaily(8, 23);
 
         /*
          * RF server
