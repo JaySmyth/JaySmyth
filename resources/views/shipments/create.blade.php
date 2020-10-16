@@ -266,14 +266,14 @@
                                 <div class="form-group row">
                                     {!! Form::Label('Bill Shipping To:', null, array('class' => 'col-md-5 col-form-label')) !!}
                                     <div class="col-md-7">
-                                        {!! Form::select('bill_shipping', array('sender' => 'Sender', 'recipient' => 'Recipient', 'other' => 'Other'), old('bill_shipping'), array('id' => 'bill_shipping', 'class' =>'form-control form-control-sm')) !!}
+                                        {!! Form::select('bill_shipping', array('sender' => 'Sender', 'recipient' => 'Recipient'), old('bill_shipping'), array('id' => 'bill_shipping', 'class' =>'form-control form-control-sm')) !!}
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
                                     {!! Form::Label('Bill Tax and Duty To:', null, array('class' => 'col-md-5 col-form-label')) !!}
                                     <div class="col-md-7">
-                                        {!! Form::select('bill_tax_duty', array('sender' => 'Sender', 'recipient' => 'Recipient', 'other' => 'Other'), old('bill_tax_duty'), array('id' => 'bill_tax_duty', 'class' =>'form-control form-control-sm')) !!}
+                                        {!! Form::select('bill_tax_duty', array('sender' => 'Sender', 'recipient' => 'Recipient'), old('bill_tax_duty'), array('id' => 'bill_tax_duty', 'class' =>'form-control form-control-sm')) !!}
                                     </div>
                                 </div>
                                 <br>
@@ -705,6 +705,7 @@
                             <div id="customs-information" class="well well-lg text-center mt-5">
                                 Please describe the contents of your shipment. Click the
                                 <strong>Add Commodity</strong> button to get started.
+                                <!-- <p class="text-danger mt-3">You must provide accurate commodity details to prevent your shipment being held by customs.<br>Shipments with no harmonized code or vague descriptions such as "Spare Parts", "Miscellaneous", "Personal Items" etc. will be held by customs.</p> -->
                             </div>
                         @endif
 
