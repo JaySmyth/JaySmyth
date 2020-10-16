@@ -103,12 +103,12 @@ class Kernel extends ConsoleKernel
         /*
          * Shipment related
          */
-        $schedule->command('ifs:auto-manifest')->weekdays()->everyFiveMinutes();
+        $schedule->command('ifs:auto-manifest')->weekdays()->everyMinute();
         $schedule->command('ifs:cancel-old-shipments')->dailyAt('07:00');
         $schedule->command('ifs:update-stagnant-shipments')->dailyAt('07:05');
         $schedule->command('ifs:process-shipment-uploads')->withoutOverlapping(2);
         $schedule->command('ifs:check-for-duplicate-shipments')->twiceDaily(12, 16);
-        $schedule->command('ifs:dispatch-easypost-trackers')->dailyAt('21:30');
+        $schedule->command('ifs:dispatch-easypost-trackers')->dailyAt('20:40');
 
         /*
          * Tracking updates
