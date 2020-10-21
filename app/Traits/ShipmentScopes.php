@@ -582,20 +582,20 @@ trait ShipmentScopes
 
 
     /**
-     * FedEx shipments that require commercial invoice upload.
+     * FedEx shipments that require commercial invoice upload (ETD).
      *
      * @param $query
      *
      * @return mixed
      */
-    public function scopeNeedsFedExEdt($query)
+    public function scopeNeedsFedExEtd($query)
     {
         if ( ! isJoined($query, 'companies')) {
             $query->join('companies', 'shipments.company_id', '=', 'companies.id');
         }
 
         return $query->select('shipments.id', 'carrier_consignment_number')
-                     ->notEu()
+                     ->isInternational()
                      ->where('carrier_id', 2)
                      ->where('etd', false)
                      ->whereNotIn('status_id', [1, 7])

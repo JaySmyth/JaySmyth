@@ -239,6 +239,10 @@ class FedexSettings
         // Document Fields
         $this->fieldDefs[] = 'documents_description/2396/DOCUMENTS/0/0';
         $this->fieldDefs[] = 'documents_flag/190/DOCUMENTS/0/0';
+
+        // ETD (FedEx Electronic Trade Document)
+        $this->fieldDefs[] = 'etd_indicator/2805/ETD/0/0';
+        $this->fieldDefs[] = 'post_shipment_document_indicator/7705/ETD/0/0';
         //
         // Commodity Fields
         $this->fieldDefs[] = 'commercial_invoice_comments/418/COMMODITY/0/0';

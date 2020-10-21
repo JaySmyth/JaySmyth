@@ -20,7 +20,7 @@ class UploadFedExCommercialInvoices extends Command
      *
      * @var string
      */
-    protected $description = 'Generate and upload FedEx commercial invoices (EDT)';
+    protected $description = 'Generate and upload FedEx commercial invoices (ETD)';
 
     /**
      * Create a new command instance.
@@ -39,9 +39,9 @@ class UploadFedExCommercialInvoices extends Command
      */
     public function handle()
     {
-        foreach (Shipment::needsFedExEdt()->cursor() as $shipment) {
+        foreach (Shipment::needsFedExEtd()->cursor() as $shipment) {
 
-            $this->info('Dispatching job for shipment ' . $shipment->carrier_consignment_number);
+            $this->info('Dispatching ETD job for shipment ' . $shipment->carrier_consignment_number);
 
             dispatch(new UploadFedExCommercialInvoice($shipment->id));
         }

@@ -58,7 +58,7 @@ class UploadFedExCommercialInvoice implements ShouldQueue
                 $response = $fedex->transmitMessage($msg);
 
                 if (stristr($response, '0,"149"10')) {
-                    $this->shipment->edt = true;
+                    $this->shipment->etd = true;
                     $this->shipment->update();
                 }
             }
@@ -114,8 +114,9 @@ class UploadFedExCommercialInvoice implements ShouldQueue
 
         $connection = new Filesystem($adapter);
 
-        // Delete if already exists
-        $connection->delete($filename);
+        if ($connection->has($filename)) {
+            $connection->delete($filename);
+        }
 
         return $connection->write($filename, fopen($tempFile, 'r'));
     }
