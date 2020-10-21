@@ -579,4 +579,28 @@ trait ShipmentScopes
             return $query->where('manifests.number', $manifestNumber);
         }
     }
+
+
+    /**
+     * FedEx shipments that require commercial invoice upload.
+     *
+     * @param $query
+     *
+     * @return mixed
+     */
+    public function scopeNeedsFedExEdt($query)
+    {
+        if ( ! isJoined($query, 'companies')) {
+            $query->join('companies', 'shipments.company_id', '=', 'companies.id');
+        }
+
+        return $query->select('shipments.id', 'carrier_consignment_number')
+                     ->notEu()
+                     ->where('carrier_id', 2)
+                     ->where('etd', false)
+                     ->whereNotIn('status_id', [1, 7])
+                     ->where('shipments.created_at', '>=', now()->startOfDay())
+                     ->where('companies.plt_enabled', true);
+    }
+
 }
