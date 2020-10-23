@@ -1061,6 +1061,9 @@ class CarrierAPI
             // If country code has been set to GB then change
             if (isset($shipment['recipient_country_code']) && $shipment['recipient_country_code'] == 'GB') {
 
+                // Format UK postcode
+                $shipment['recipient_postcode'] = formatUkPostcode($shipment['recipient_postcode']);
+
                 // Take first 2 chars of the postcode
                 $prefix = strtoupper(substr($shipment['recipient_postcode'], 0, 2));
                 switch ($prefix) {
