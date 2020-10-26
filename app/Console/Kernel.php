@@ -76,76 +76,76 @@ class Kernel extends ConsoleKernel
         /*
          * Maintenance
          */
-        $schedule->exec('/sbin/reboot')->dailyAt('22:30');
-        $schedule->command('ifs:empty-temp-storage')->dailyAt('04:30');
-        $schedule->command('ifs:delete-old-log-entries')->dailyAt('06:20');
+        $schedule->exec('/sbin/reboot')->dailyAt('23:30');
+        $schedule->command('ifs:empty-temp-storage')->dailyAt('05:30');
+        $schedule->command('ifs:delete-old-log-entries')->dailyAt('07:20');
         $schedule->command('ifs:check-for-unprocessed-uploads')->hourly();
 
         /*
          * Purchase Invoice imports
          */
-        $schedule->command('ifs:import-fedex-purchase-invoices')->weekdays()->hourly()->between('7:00', '17:00');
-        $schedule->command('ifs:import-ups-purchase-invoices')->weekdays()->hourly()->between('7:00', '17:00');
-        $schedule->command('ifs:import-dhl-purchase-invoices')->weekdays()->hourly()->between('7:00', '17:00');
-        $schedule->command('ifs:import-primary-freight-purchase-invoices')->weekdays()->hourly()->between('7:00', '17:00');
-        $schedule->command('ifs:import-tnt-purchase-invoices')->weekdays()->hourly()->between('7:00', '17:00');
-        $schedule->command('ifs:import-express-freight-purchase-invoices')->weekdays()->hourly()->between('7:00', '17:00');
-        $schedule->command('ifs:import-xdp-purchase-invoices')->weekdays()->hourly()->between('7:00', '17:00');
+        $schedule->command('ifs:import-fedex-purchase-invoices')->weekdays()->hourly()->between('8:00', '18:00');
+        $schedule->command('ifs:import-ups-purchase-invoices')->weekdays()->hourly()->between('8:00', '18:00');
+        $schedule->command('ifs:import-dhl-purchase-invoices')->weekdays()->hourly()->between('8:00', '18:00');
+        $schedule->command('ifs:import-primary-freight-purchase-invoices')->weekdays()->hourly()->between('8:00', '18:00');
+        $schedule->command('ifs:import-tnt-purchase-invoices')->weekdays()->hourly()->between('8:00', '18:00');
+        $schedule->command('ifs:import-express-freight-purchase-invoices')->weekdays()->hourly()->between('8:00', '18:00');
+        $schedule->command('ifs:import-xdp-purchase-invoices')->weekdays()->hourly()->between('8:00', '18:00');
         $schedule->command('ifs:update-scs-job-numbers-on-purchase-invoice-lines')->weekdays()->everyThreeHours();
 
         /*
          * Transend
          */
-        $schedule->command('transend:send')->weekdays()->everyFiveMinutes()->between('6:10', '20:25')->withoutOverlapping(5);
-        $schedule->command('transend:cancel')->weekdays()->everyFiveMinutes()->between('6:10', '20:25')->withoutOverlapping(5);
-        $schedule->command('transend:process-files')->weekdays()->everyFiveMinutes()->between('6:10', '17:30');
-        $schedule->command('transend:process-files')->weekdays()->between('17:31', '20:25');
+        $schedule->command('transend:send')->weekdays()->everyFiveMinutes()->between('7:10', '21:25')->withoutOverlapping(5);
+        $schedule->command('transend:cancel')->weekdays()->everyFiveMinutes()->between('7:10', '21:25')->withoutOverlapping(5);
+        $schedule->command('transend:process-files')->weekdays()->everyFiveMinutes()->between('7:10', '18:30');
+        $schedule->command('transend:process-files')->weekdays()->between('18:31', '21:25');
 
         /*
          * Shipment related
          */
         $schedule->command('ifs:auto-manifest')->weekdays()->everyMinute();
-        $schedule->command('ifs:cancel-old-shipments')->dailyAt('07:00');
-        $schedule->command('ifs:update-stagnant-shipments')->dailyAt('07:05');
+        $schedule->command('ifs:cancel-old-shipments')->dailyAt('08:00');
+        $schedule->command('ifs:update-stagnant-shipments')->dailyAt('08:05');
         $schedule->command('ifs:process-shipment-uploads')->withoutOverlapping(2);
-        $schedule->command('ifs:check-for-duplicate-shipments')->twiceDaily(12, 16);
-        $schedule->command('ifs:dispatch-easypost-trackers')->dailyAt('20:40');
-        $schedule->command('ifs:upload-fedex-commercial-invoices')->weekdays()->everyFiveMinutes()->between('6:10', '19:30');
+        $schedule->command('ifs:check-for-duplicate-shipments')->twiceDaily(13, 17);
+        $schedule->command('ifs:dispatch-easypost-trackers')->dailyAt('21:40');
+        $schedule->command('ifs:upload-fedex-commercial-invoices')->weekdays()->everyFiveMinutes()->between('7:10', '20:30');
 
         /*
          * Tracking updates
          */
         $schedule->command('ifs:get-tracking --active=1')->everyThirtyMinutes()->withoutOverlapping(10);
-        $schedule->command('ifs:get-tracking --active=0')->twiceDaily(8, 23);
+        $schedule->command('ifs:get-tracking --active=0')->twiceDaily(9, 23);
 
         /*
          * RF server
          */
-        $schedule->command('ifs:start-rfserver')->between('7:00', '21:00')->withoutOverlapping(1);
-        $schedule->command('ifs:check-rfserver')->between('7:00', '21:00')->withoutOverlapping(1);
+        $schedule->command('ifs:start-rfserver')->between('8:00', '22:00')->withoutOverlapping(1);
+        $schedule->command('ifs:check-rfserver')->between('8:00', '22:00')->withoutOverlapping(1);
 
         /*
          * Misc
          */
         $schedule->command('ifs:upload-files')->withoutOverlapping(5);
-        $schedule->command('ifs:check-job-queue')->everyFiveMinutes()->between('6:15', '22:00')->withoutOverlapping(2);
+        $schedule->command('ifs:check-job-queue')->everyFiveMinutes()->between('7:15', '23:00')->withoutOverlapping(2);
 
         /*
          * Transport
          *
          */
-        $schedule->command('ifs:close-stagnant-transport-jobs')->dailyAt('05:35');
-        $schedule->command('ifs:correct-status-on-transport-jobs')->dailyAt('05:38');
-        $schedule->command('ifs:notify-transport-department-pod-required')->weekdays()->dailyAt('08:20');
-        $schedule->command('ifs:log-scanning-kpis')->weekdays()->dailyAt('08:00');
+        $schedule->command('ifs:close-stagnant-transport-jobs')->dailyAt('06:35');
+        $schedule->command('ifs:correct-status-on-transport-jobs')->dailyAt('06:38');
+        $schedule->command('ifs:notify-transport-department-pod-required')->weekdays()->dailyAt('09:20');
+        $schedule->command('ifs:log-scanning-kpis')->weekdays()->dailyAt('09:00');
 
         /*
          * Express Freight
          */
-        $schedule->command('ifs:reset-express-freight-consignment-number-sequence')->dailyAt('00:00');
-        $schedule->command('ifs:upload-shipments-to-express-freight')->weekdays()->dailyAt('16:45');
-        $schedule->command('ifs:upload-ni-shipments-to-express-freight')->weekdays()->dailyAt('16:45');
-        $schedule->command('ifs:process-express-freight-tracking')->weekdays()->hourly()->between('07:00', '19:00');
+        $schedule->command('ifs:reset-express-freight-consignment-number-sequence')->dailyAt('01:00');
+        $schedule->command('ifs:upload-shipments-to-express-freight')->weekdays()->dailyAt('17:45');
+        $schedule->command('ifs:upload-ni-shipments-to-express-freight')->weekdays()->dailyAt('17:45');
+        $schedule->command('ifs:process-express-freight-tracking')->weekdays()->hourly()->between('08:00', '20:00');
 
         /*
          * XDP
@@ -157,8 +157,8 @@ class Kernel extends ConsoleKernel
          */
         $schedule->command('ifs:import-multifreight-files')->weekdays()->everyFiveMinutes()->withoutOverlapping(10);
         $schedule->command('ifs:process-scs-collection-requests')->weekdays()->everyFiveMinutes()->withoutOverlapping(5);
-        $schedule->command('ifs:update-scs-job-numbers-on-shipments --invoiced=1')->weekdays()->hourly()->between('08:00', '16:00');
-        $schedule->command('ifs:update-scs-job-numbers-on-shipments --invoiced=0')->weekdays()->dailyAt('20:45');
+        $schedule->command('ifs:update-scs-job-numbers-on-shipments --invoiced=1')->weekdays()->hourly()->between('09:00', '17:00');
+        $schedule->command('ifs:update-scs-job-numbers-on-shipments --invoiced=0')->weekdays()->dailyAt('21:45');
 
         /*
          * Vendorvillage
