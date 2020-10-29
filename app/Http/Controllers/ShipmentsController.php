@@ -17,7 +17,11 @@ use App\Models\User;
 use App\Pricing\Pricing;
 use Auth;
 use Carbon\Carbon;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Application;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -806,7 +810,7 @@ class ShipmentsController extends Controller
 
         $shipments = $shipments->whereNotIn('status_id', [1, 7])
                                ->whereNotIn('carrier_id', [9, 10, 11, 12, 13])
-                               ->whereNotIn('company_id', [333])
+                               //->whereNotIn('company_id', [333])
                                ->where('legacy', '!=', 1)
                                ->where('on_hold', 0)
                                ->sortBy('route_id');
@@ -837,7 +841,7 @@ class ShipmentsController extends Controller
                              ->notDomestic()
                              ->notUkDomestic()
                              ->whereSource($source)
-                             ->whereNotIn('company_id', [333])
+                             //->whereNotIn('company_id', [333])
                              ->get();
 
         $pdf  = new Pdf('A4', 'D');
@@ -1072,8 +1076,8 @@ class ShipmentsController extends Controller
      * @param  Shipment  $shipment
      * @param  Request  $request
      *
-     * @return \Illuminate\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @return Application|RedirectResponse|Redirector
+     * @throws AuthorizationException
      */
     public function resetShipment(Shipment $shipment, Request $request)
     {
