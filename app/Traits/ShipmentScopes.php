@@ -599,8 +599,9 @@ trait ShipmentScopes
                      ->where('carrier_id', 2)
                      ->where('etd', false)
                      ->whereNotIn('status_id', [1, 7])
-                     ->where('shipments.created_at', '>=', now()->startOfDay())
-                     ->where('companies.plt_enabled', true);
+                     ->where('shipments.created_at', '>=', now()->subWeek())
+                     ->where('companies.plt_enabled', true)
+                     ->where('manifest_id', '>', 1);
     }
 
 }

@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
-use App\CarrierAPI\Facades\CarrierAPI;
 use App\CarrierAPI\Fedex\FedexAPI;
+use App\CarrierAPI\Pdf;
 use App\Models\Shipment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -80,8 +80,11 @@ class UploadFedExCommercialInvoice implements ShouldQueue
             return $path;
         }
 
-        // Generate CI as base64 PDF
-        $base64 = CarrierAPI::getCommercialInvoice($this->shipment->token);
+        // createShippingDocs expects a collection of shipments
+        $shipments = Shipment::where('id', $this->shipment->id)->get();
+
+        $pdf    = new Pdf();
+        $base64 = $pdf->createShippingDocs($shipments, 'CUSTOMS');
 
         // Write to file
         file_put_contents($path, base64_decode($base64));
