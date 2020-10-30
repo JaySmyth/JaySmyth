@@ -39,8 +39,7 @@ class UploadFedExCommercialInvoices extends Command
      */
     public function handle()
     {
-        //foreach (Shipment::where('company_id', 333)->needsFedExEtd()->cursor() as $shipment) {
-        foreach (Shipment::where('company_id', 508)->where('status_id', 2)->cursor() as $shipment) {
+        foreach (Shipment::where('company_id', 333)->needsFedExEtd()->cursor() as $shipment) {
             $this->info('Dispatching ETD job for shipment '.$shipment->carrier_consignment_number);
 
             dispatch(new UploadFedExCommercialInvoice($shipment->id));
