@@ -822,6 +822,11 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
 
         var domesticCountries = ['GB', 'IE'];
         var countryCode = $('#recipient_country_code').val();
+        var companyId = $('#company_id').val();
+
+        if (companyId == "1015" && countryCode == "IE") {
+            return false;
+        }
 
         if ($.inArray(countryCode, domesticCountries) !== -1) {
             return true;
