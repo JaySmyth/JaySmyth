@@ -110,7 +110,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:process-shipment-uploads')->withoutOverlapping(2);
         $schedule->command('ifs:check-for-duplicate-shipments')->twiceDaily(13, 17);
         $schedule->command('ifs:dispatch-easypost-trackers')->dailyAt('21:40');
-        $schedule->command('ifs:upload-fedex-commercial-invoices')->weekdays()->everyFiveMinutes()->between('17:10', '19:30');
+        //$schedule->command('ifs:upload-fedex-commercial-invoices')->weekdays()->everyFiveMinutes()->between('17:10', '19:30');
 
         /*
          * Tracking updates

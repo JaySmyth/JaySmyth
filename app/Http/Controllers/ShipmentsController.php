@@ -810,7 +810,7 @@ class ShipmentsController extends Controller
 
         $shipments = $shipments->whereNotIn('status_id', [1, 7])
                                ->whereNotIn('carrier_id', [9, 10, 11, 12, 13])
-                               ->whereNotIn('company_id', [333])
+                               //->whereNotIn('company_id', [333])
                                ->where('legacy', '!=', 1)
                                ->where('on_hold', 0)
                                ->sortBy('route_id');
@@ -841,7 +841,7 @@ class ShipmentsController extends Controller
                              ->notDomestic()
                              ->notUkDomestic()
                              ->whereSource($source)
-                             ->whereNotIn('company_id', [333])
+                             //->whereNotIn('company_id', [333])
                              ->get();
 
         $pdf  = new Pdf('A4', 'D');
