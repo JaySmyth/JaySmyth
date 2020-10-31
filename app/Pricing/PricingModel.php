@@ -44,6 +44,7 @@ class PricingModel
     public $upperMaxGirth;
     public $fuelChargeCodes;
     public $log = [];
+    public $shipDate;
     //
     public $maxStdDimension;                                                    // Largest package dimension not to have a surcharge applied
     public $maxStdWeight;                                                       // Largest package weight not to have a surcharge applied
@@ -170,6 +171,7 @@ class PricingModel
         $this->priceType = $priceType;
         $this->service = Service::find($shipment['service_id']);
         $this->company = Company::find($shipment['company_id']);
+        $this->shipDate = date('Y-m-d', strtotime($this->shipment['ship_date']));
 
         $this->log("PriceType: $priceType");
         $this->log('ServiceId: '.$shipment['service_id']);
@@ -365,7 +367,7 @@ class PricingModel
     public function getFuelPercentage()
     {
         $surcharge = new FuelSurcharge();
-        $fuelPercentage = $surcharge->getFuelPercentage($this->shipment['carrier_id'], $this->shipment['service_code'], $this->shipment['ship_date']);
+        $fuelPercentage = $surcharge->getFuelPercentage($this->shipment['carrier_id'], $this->shipment['service_code'], $this->shipDate);
 
         if (empty($fuelPercentage)) {
             $this->fuelPercentage = 0;
@@ -532,37 +534,21 @@ class PricingModel
     // Emergency situation surcharge
     public function isESS()
     {
-        // Convert Collection date into a known format
-        // $localisation = $this->company->localisation;
-
-        // $date_format = getDateFormat($this->shipment['date_format']);
-        // $collectionDate = Carbon::createFromformat($date_format, $this->shipment['collection_date'], $localisation->time_zone)->format('Y-m-d');
-
-        $shipmentDate = date('Y-m-d');
-
         // DHL
-        if (in_array($this->shipment['service_id'], [25,26,27])) {
-            if ($shipmentDate >= '2020-04-01') {
-                $this->dhlESS();
-            }
+        if (in_array($this->shipment['service_id'], [25,26,27,56,57,58])) {
+            $this->dhlESS();
         }
         // Fedex
-        if (in_array($this->shipment['service_id'], [10,46])) {
-            if ($shipmentDate >= '2020-04-06') {
-                $this->fedexESS();
-            }
+        if (in_array($this->shipment['service_id'], [10,46,78])) {
+            $this->fedexESS();
         }
         // TNT
         if (in_array($this->shipment['service_id'], [21,36,37,54,55])) {
-            if ($shipmentDate >= '2020-04-06') {
-                $this->fedexESS();
-            }
+            $this->fedexESS();
         }
         // UPS
-        if (in_array($this->shipment['service_id'], [17,11,16,48,49,50,30,14,15])) {
-            if ($shipmentDate >= '2020-04-12') {
-                $this->upsESS();
-            }
+        if (in_array($this->shipment['service_id'], [11,12,14,15,16,17,18,30,48,49,50])) {
+            $this->upsESS();
         }
 
         return false;
@@ -570,50 +556,69 @@ class PricingModel
 
     public function dhlESS()
     {
-        $shipmentDate = date('Y-m-d');
+        $description = ($this->shipDate >= '2020-11-02') ? 'Peak season surcharge' : 'Emergency Situation Surcharge';
         $chargeableWeight = round($this->chargeableWeight * 2)/2;
-        if ($shipmentDate >= '2020-05-24') {
-            if ($this->priceType == 'Costs') {
-                $value = $chargeableWeight * .18; // Costs
-            } else {
-                $value = $chargeableWeight * .22; // Sales
-            }
+        if ($this->priceType == 'Costs') {
+            $value = $chargeableWeight * .18; // Costs
         } else {
-            $value = 180.00;
-            if ($chargeableWeight <= 2.50) {
-                return false;
-            } elseif ($chargeableWeight <= 30) {
-                $value = 2.25;
-            } elseif ($chargeableWeight <= 70) {
-                $value = 13.50;
-            } elseif ($chargeableWeight <= 300) {
-                $value = 45.00;
-            }
+            $value = $chargeableWeight * .22; // Sales
         }
 
-        $this->addSurcharge(['code' => 'ADH', 'description' => "Emergency Situation Surcharge", 'value' => $value]);
+        $this->addSurcharge(['code' => 'ESS', 'description' => $description, 'value' => $value]);
     }
 
     public function fedexESS()
     {
+        // Current Values
+        $kgCost = .18;
+        $kgSales = .22;
+        $description = ($this->shipDate >= '2020-11-02') ? 'Peak season surcharge' : 'Emergency Situation Surcharge';
+
+        // If after date of increase amend as required
+        if ($this->shipDate >= '2020-11-02') {
+            if (in_array(strtoupper($this->shipment['recipient_country_code']), ['US','CA'])) {
+                $kgCost = .43;
+                $kgSales = .43;
+            }
+        }
+
+        // Do the actual calculation
         $chargeableWeight = round($this->chargeableWeight * 2)/2;
         if ($this->priceType == 'Costs') {
-            $value = ($chargeableWeight * 0.18 < .8) ? .8 : round($chargeableWeight * 0.18, 2);
+            $value = (($chargeableWeight * $kgCost) < .8) ? .8 : round($chargeableWeight * $kgCost, 2);
         } else {
-            $value = ($chargeableWeight * 0.22 < 1) ? 1 : round($chargeableWeight * 0.22, 2);
+            $value = (($chargeableWeight * $kgSales) < 1) ? 1 : round($chargeableWeight * $kgSales, 2);
         }
-        $this->addSurcharge(['code' => 'ADH', 'description' => "Emergency Situation Surcharge", 'value' => $value]);
+        $this->addSurcharge(['code' => 'ESS', 'description' => $description, 'value' => $value]);
     }
 
     public function upsESS()
     {
-        $chargeableWeight = round($this->chargeableWeight * 2)/2;
-        if ($this->priceType == 'Costs') {
-            $value = ($this->shipment['service_id']==17) ? $chargeableWeight * 0.61 : $chargeableWeight * 0.20;
-        } else {
-            $value = ($this->shipment['service_id']==17) ? $chargeableWeight * 0.75 : $chargeableWeight * 0.24;
+        if ($this->shipDate >= '2021-01-16') {
+            return;
         }
-        $this->addSurcharge(['code' => 'ADH', 'description' => "Emergency Situation Surcharge", 'value' => $value]);
+
+        if ($this->shipDate >= '2020-11-01') {
+            $description = 'Peak season surcharge';
+            if ($this->isADH()) {
+                $this->addSurcharge(['code' => 'ESS', 'description' => $description, 'value' => 5.30]);
+            }
+            if ($this->isLPS()) {
+                $this->addSurcharge(['code' => 'ESS', 'description' => $description, 'value' => 51.00]);
+            }
+            if ($this->isOSP()) {
+                $this->addSurcharge(['code' => 'ESS', 'description' => $description, 'value' => 81.00]);
+            }
+        } else {
+            $description = 'Emergency Situation Surcharge';
+            $chargeableWeight = round($this->chargeableWeight * 2)/2;
+            if ($this->priceType == 'Costs') {
+                $value = ($this->shipment['service_id']==17) ? $chargeableWeight * 0.61 : $chargeableWeight * 0.20;
+            } else {
+                $value = ($this->shipment['service_id']==17) ? $chargeableWeight * 0.75 : $chargeableWeight * 0.24;
+            }
+            $this->addSurcharge(['code' => 'ESS', 'description' => $description, 'value' => $value]);
+        }
     }
 
     // Accessible DG
