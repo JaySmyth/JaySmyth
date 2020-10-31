@@ -367,7 +367,7 @@ class PricingModel
     public function getFuelPercentage()
     {
         $surcharge = new FuelSurcharge();
-        $fuelPercentage = $surcharge->getFuelPercentage($this->shipment['carrier_id'], $this->shipment['service_code'], $this->shipDate);
+        $fuelPercentage = $surcharge->getFuelPercentage($this->shipment['carrier_id'], $this->shipment['service_code'], $this->shipment['ship_date']);
 
         if (empty($fuelPercentage)) {
             $this->fuelPercentage = 0;
