@@ -115,7 +115,7 @@ class PricingModel
         ];
 
         // Calculate Fuel Surcharge on the following charge codes
-        $this->fuelChargeCodes = ['ADH', 'BRO', 'COR', 'DISC', 'DTP', 'EAS', 'FRT', 'FUEL', 'ICE', 'LIA', 'LPS', 'MIS', 'OOA', 'OSP', 'OWP', 'RAS', 'RES'];
+        $this->fuelChargeCodes = ['ADH', 'BRO', 'COR', 'DISC', 'DTP', 'EAS', 'ESS','FRT', 'FUEL', 'ICE', 'LIA', 'LPS', 'MIS', 'OOA', 'OSP', 'OWP', 'RAS', 'RES'];
 
         $this->lowerMaxWeight = 9999;       // ADH & MAX
         $this->upperMaxWeight = 9999;       // ADH & MAX
