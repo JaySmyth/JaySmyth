@@ -13,6 +13,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
+        Commands\Brexit\UpgradeDhlEsxService::class,
         Commands\Maintenance\CancelOldShipments::class,
         Commands\Maintenance\ClearUpTrackingEvents::class,
         Commands\Maintenance\CloseStagnantTransportJobs::class,
