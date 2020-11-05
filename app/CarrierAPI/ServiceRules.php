@@ -167,13 +167,13 @@ class ServiceRules
     {
         if (isset($serviceDetails['pivot']['country_filter']) && $serviceDetails['pivot']['country_filter'] > '') {
             if (substr($serviceDetails['pivot']['country_filter'], 0, 1) == '!') {
-                if (strpos($serviceDetails['pivot']['country_filter'], $shipment['recipient_country_code']) !== false) {
+                if (stripos($serviceDetails['pivot']['country_filter'], $shipment['recipient_country_code']) !== false) {
                     return false;
                 } else {
                     return true;
                 }
             } else {
-                if (strpos($serviceDetails['pivot']['country_filter'], $shipment['recipient_country_code']) !== false) {
+                if (stripos($serviceDetails['pivot']['country_filter'], $shipment['recipient_country_code']) !== false) {
                     return true;
                 } else {
                     return false;
@@ -485,7 +485,7 @@ class ServiceRules
 
     private function sender_country_codes($shipment, $serviceDetails)
     {
-        return $this->checkCountry($shipment, $serviceDetails['sender_country_codes'], 'sender_country_code');
+        return $this->checkCountry($shipment['sender_country_code'], $serviceDetails['sender_country_codes']);
     }
 
     /*
@@ -495,58 +495,35 @@ class ServiceRules
      * **********************************************
      */
 
-    private function checkCountry($shipment, $test, $addressType)
+    private function checkCountry($countryCode, $criteria)
     {
-        if (substr($test, 0, 1) == '!') {
-            $negativeCondition = true;
-            $test = substr($test, 1, 999);
-        } else {
-            $negativeCondition = false;
+        // If criteria empty then return true
+        if (empty($criteria)) {
+            return true;
         }
 
-        // Check for comma separated list of countries
-        $countries = explode(',', $test);
-
-        if ($negativeCondition) {
-
-            // Fail on first match
-            $result = true;
-            foreach ($countries as $country) {
-
-                // Check for Types not allowed
-                if (strcasecmp($shipment[$addressType], $country) == 0) {
-                    $result = false;
-                }
-            }
-        } else {
-
-            // Fail if no match
-            $result = false;
-            foreach ($countries as $country) {
-
-                // Check for Types allowed
-                if (strcasecmp($shipment[$addressType], $country) == 0) {
-                    $result = true;
-                    break;
-                }
-            }
+        // Do I require a match or not
+        $requiredResult = true;
+        if (substr($criteria, 0, 1) == '!') {
+            $requiredResult = false;
+            $criteria = substr($criteria, 1, 999);
         }
 
-        // Return result
-        if ($this->debug) {
-            if ($result) {
-                echo "$test - passed".$this->eol;
-            } else {
-                echo "$test - failed".$this->eol;
+        // Check for a match
+        $result = false;
+        $countries = explode(',', $criteria);
+        foreach ($countries as $country) {
+            if (strcasecmp($countryCode, $country) == 0) {
+                $result = true;
             }
         }
-
-        return $result;
+        
+        return ($requiredResult == $result);
     }
 
     private function recipient_country_codes($shipment, $serviceDetails)
     {
-        return $this->checkCountry($shipment, $serviceDetails['recipient_country_codes'], 'recipient_country_code');
+        return $this->checkCountry($shipment['recipient_country_code'], $serviceDetails['recipient_country_codes']);
     }
 
     private function sender_postcode_regex($shipment, $serviceDetails)

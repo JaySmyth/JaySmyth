@@ -679,8 +679,10 @@ class Shipment extends Model
      */
     public function isActive()
     {
-        if (in_array($this->status->code, ['saved', 'cancelled', 'return_to_sender', 'available_for_pickup', 'failure', 'unknown']) || $this->delivered) {
-            return false;
+        if (isset($this->status->code)) {
+            if (in_array($this->status->code, ['saved', 'cancelled', 'return_to_sender', 'available_for_pickup', 'failure', 'unknown']) || $this->delivered) {
+                return false;
+            }
         }
 
         return true;
@@ -757,12 +759,10 @@ class Shipment extends Model
 
         $domesticZone = \App\Models\DomesticZone::where('postcode', $slice)->where('model', $this->carrier->code)->first();
 
-        if(!$domesticZone){
-
+        if (!$domesticZone) {
             $l = strlen($postcode);
 
             for ($i = $l; $i >= 3; $i--) {
-
                 $result = \App\Models\DomesticZone::where('postcode', substr($postcode, 0, $i))->where('model', $this->carrier->code)->first();
 
                 if ($result) {
