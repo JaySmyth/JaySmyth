@@ -53,6 +53,8 @@ class IFSAPI extends \App\CarrierAPI\CarrierBase
     {
         $rules['dry_ice'] = 'not_supported';
         $rules['insurance_value'] = 'not_supported';
+        $rules['sender_country_code'] = 'in:GB,gb';
+        $rules['recipient_country_code'] = 'in:GB,gb';
 
         return $this->applyRules($rules, $shipment);
     }
