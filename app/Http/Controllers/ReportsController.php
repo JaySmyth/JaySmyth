@@ -319,13 +319,18 @@ class ReportsController extends Controller
 
         $dateFrom = new Carbon($request->date_from);
         $dateTo = new Carbon($request->date_to);
-
+        $services = [];
+        if (isset($request->service) && $request->service > '') {
+            $services = \App\Models\Service::where('code', $request->service)->pluck('id');
+        }
         $total = 0;
         $results = [];
 
         Shipment::select('shipments.*')
             ->orderBy('ship_date')
-            ->whereCompanyId(1015)
+            ->hasCompany($request->company)
+            ->hasCarrier($request->carrier)
+            ->whereIn('service_id', $services)
             ->shipDateBetween($dateFrom, $dateTo)
             ->whereDelivered(1)
             ->chunk(500, function ($shipments) use (&$total, &$results) {
