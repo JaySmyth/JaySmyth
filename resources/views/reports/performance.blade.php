@@ -22,6 +22,21 @@
                        class="form-control datepicker" placeholder="Date To">
             </div>
 
+            <div class="form-group">
+                <label for="month">Service</label>
+                {!! Form::select('service', dropDown('serviceCodes', 'All Services'), Request::get('service'), array('class' => 'form-control')) !!}
+            </div>
+
+            <div class="form-group">
+                <label for="month">Carrier</label>
+                {!! Form::select('carrier', dropDown('carriers', 'All Carriers'), Request::get('carrier'), array('class' => 'form-control')) !!}
+            </div>
+
+            <div class="form-group">
+                <label for="month">Shipper</label>
+                {!! Form::select('company', dropDown('enabledSites', 'All Shippers'), Request::get('company'), array('class' => 'form-control')) !!}
+            </div>
+
             <button type="submit" class="btn btn-primary mt-3">Update Report</button>
 
             {!! Form::Close() !!}

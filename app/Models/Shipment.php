@@ -749,33 +749,56 @@ class Shipment extends Model
      */
     public function getSla()
     {
-        $postcode = trim($this->recipient_postcode);
+        $origin = substr(strtoupper(trim($this->sender_postcode)), 0, 2);
+        $dest = substr(strtoupper(trim($this->recipient_postcode)), 0, 2);
+        $ukDomestic = (isUkDomestic($this->sender_country_code) && isUkDomestic($this->recipient_country_code)) ? true : false;
 
-        if (substr(strtoupper($postcode), 0, 2) == 'BT') {
+        // NI to IE deliveries
+        if ($origin == 'BT' && $dest == 'IE') {
             return 48;
         }
 
-        $slice = Str::before($this->recipient_postcode, ' ');
+        // Domestic Shipment
+        if ($ukDomestic) {
+
+            // NI local deliveries
+            if ($origin == 'BT' && $dest == 'BT') {
+                return 48;
+            }
+
+            // Mainland (and islands) - Exception Decora LT (1015)
+            if ($dest != 'BT') {
+                $mainlandSla = $this->getDomesticSla();
+                return ($origin == 'BT' && $this->company_id != 1015) ? $mainlandSla + 24 : $mainlandSla;
+            }
+        }
+
+        // International
+        return 72;
+    }
+
+    public function getDomesticSla()
+    {
+        $postcode = trim($this->recipient_postcode);
+        $slice = Str::before($postcode, ' ');
 
         $domesticZone = \App\Models\DomesticZone::where('postcode', $slice)->where('model', $this->carrier->code)->first();
-
         if (!$domesticZone) {
             $l = strlen($postcode);
 
             for ($i = $l; $i >= 3; $i--) {
                 $result = \App\Models\DomesticZone::where('postcode', substr($postcode, 0, $i))->where('model', $this->carrier->code)->first();
-
                 if ($result) {
+                    if (substr(strtoupper($this->sender_postcode), 0, 2) == 'BT') {
+                        return $result->sla + 24;
+                    }
+
                     return $result->sla;
                 }
             }
         }
 
-        if ($domesticZone) {
-            return $domesticZone->sla;
-        }
-
-        return 24;
+        return ($domesticZone) ? $domesticZone->sla : 24;
     }
 
     /**
