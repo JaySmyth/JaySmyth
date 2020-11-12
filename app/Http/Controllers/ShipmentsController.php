@@ -1085,7 +1085,8 @@ class ShipmentsController extends Controller
 
         $request->validate([
             'service' => 'required|integer',
-            'reprice' => 'required|boolean'
+            'reprice' => 'required|boolean',
+            'packages' => 'required|array'
         ]);
 
         // Original pricing
@@ -1100,14 +1101,14 @@ class ShipmentsController extends Controller
 
         $packages = [];
 
-        foreach ($shipment->packages as $package) {
+        foreach ($request->packages as $package) {
             $packages[] = [
-                "dry_ice_weight" => $package->dry_ice_weight,
-                "packaging_code" => $package->packaging_code,
-                "weight"         => $package->weight,
-                "length"         => $package->length,
-                "width"          => $package->width,
-                "height"         => $package->height,
+                "dry_ice_weight" => 0,
+                "packaging_code" => 'CTN',
+                "weight"         => $package['weight'],
+                "length"         => $package['length'],
+                "width"          => $package['width'],
+                "height"         => $package['height'],
             ];
         }
 

@@ -54,13 +54,55 @@
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-sm-4">&nbsp;</div>
-                    <div class="col-sm-6">
-                        <a class="back btn btn-outline-secondary" role="button">Cancel</a>
-                        <button type="submit" class="btn btn-primary ml-sm-4">Reset Shipment</button>
-                    </div>
-                </div>
+
+                <h6 class="mt-4">Package Dimensions and Weights</h6>
+                <table class="table table-striped table-bordered table-sm mb-5">
+                    <thead>
+                    <tr>
+                        <th class="text-center">Length(cm)</th>
+                        <th class="text-center">Width(cm)</th>
+                        <th class="text-center">Height(cm)</th>
+                        <th class="text-center">Weight(kg)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="align-middle text-center">
+                            @foreach ($shipment->packages as $package)
+                                <input type="text" name="packages[{{ $package->index }}][length]"
+                                       class="form-control form-control-sm numeric-only-required"
+                                       value="{{ $package->length }}" placeholder="{{ $package->index }} Length(cm)">
+                            @endforeach
+                        </td>
+                        <td class="align-middle text-center">
+                            @foreach ($shipment->packages as $package)
+                                <input type="text" name="packages[{{ $package->index }}][width]"
+                                       class="form-control form-control-sm numeric-only-required"
+                                       value="{{ $package->width }}" placeholder="{{ $package->index }} Width(cm)">
+                            @endforeach
+                        </td>
+                        <td class="align-middle text-center">
+                            @foreach ($shipment->packages as $package)
+                                <input type="text" name="packages[{{ $package->index }}][height]"
+                                       class="form-control form-control-sm numeric-only-required"
+                                       value="{{ $package->height }}" placeholder="{{ $package->index }} Height(cm)">
+                            @endforeach
+                        </td>
+                        <td class="align-middle text-center">
+                            @foreach ($shipment->packages as $package)
+                                <input type="text" name="packages[{{ $package->index }}][weight]"
+                                       class="form-control form-control-sm decimal-only-required"
+                                       value="{{ $package->weight }}" placeholder="{{ $package->index }} Weight(kg)">
+                            @endforeach
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+                </table>
+
+                <a class="back btn btn-outline-secondary" role="button">Cancel</a>
+                <button type="submit" class="btn btn-primary ml-sm-4">Reset Shipment</button>
 
             </div>
 
@@ -79,9 +121,13 @@
 
                                 <h5>Sender
                                     @if($shipment->sender_type == 'c')
-                                        <span class="far fa-building ml-sm-2" aria-hidden="true" data-placement="right" data-toggle="tooltip" data-original-title="{{getAddressType($shipment->sender_type)}}"></span>
+                                        <span class="far fa-building ml-sm-2" aria-hidden="true" data-placement="right"
+                                              data-toggle="tooltip"
+                                              data-original-title="{{getAddressType($shipment->sender_type)}}"></span>
                                     @else
-                                        <span class="fas fa-user ml-sm-2" aria-hidden="true" data-placement="right" data-toggle="tooltip" data-original-title="{{getAddressType($shipment->sender_type)}}"></span>
+                                        <span class="fas fa-user ml-sm-2" aria-hidden="true" data-placement="right"
+                                              data-toggle="tooltip"
+                                              data-original-title="{{getAddressType($shipment->sender_type)}}"></span>
                                     @endif
                                 </h5>
 
@@ -122,9 +168,13 @@
                             <div class="col-sm-5">
                                 <h5>Recipient
                                     @if($shipment->recipient_type == 'c')
-                                        <span class="far fa-building ml-sm-2" aria-hidden="true" data-placement="right" data-toggle="tooltip" data-original-title="{{getAddressType($shipment->recipient_type)}}"></span>
+                                        <span class="far fa-building ml-sm-2" aria-hidden="true" data-placement="right"
+                                              data-toggle="tooltip"
+                                              data-original-title="{{getAddressType($shipment->recipient_type)}}"></span>
                                     @else
-                                        <span class="fas fa-user ml-sm-2" aria-hidden="true" data-placement="right" data-toggle="tooltip" data-original-title="{{getAddressType($shipment->recipient_type)}}"></span>
+                                        <span class="fas fa-user ml-sm-2" aria-hidden="true" data-placement="right"
+                                              data-toggle="tooltip"
+                                              data-original-title="{{getAddressType($shipment->recipient_type)}}"></span>
                                     @endif
 
                                 </h5>
@@ -162,7 +212,8 @@
                                 @endif
 
                                 @if($shipment->recipient_email)
-                                    <a class="text-truncate" href="mailto:{{$shipment->recipient_email}}">{{$shipment->recipient_email}}</a>
+                                    <a class="text-truncate"
+                                       href="mailto:{{$shipment->recipient_email}}">{{$shipment->recipient_email}}</a>
                                 @endif
 
 
@@ -173,7 +224,8 @@
 
 
                 <h4 class="mb-2">Packages
-                    <span class="badge badge-pill badge-secondary badge-sm ml-sm-1">{{ $shipment->packages->count()}}</span></h4>
+                    <span class="badge badge-pill badge-secondary badge-sm ml-sm-1">{{ $shipment->packages->count()}}</span>
+                </h4>
                 <table class="table table-striped table-bordered mb-5">
                     <thead>
                     <tr>
