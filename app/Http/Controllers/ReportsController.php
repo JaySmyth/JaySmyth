@@ -330,7 +330,7 @@ class ReportsController extends Controller
             ->orderBy('ship_date')
             ->hasCompany($request->company)
             ->hasCarrier($request->carrier)
-            ->whereIn('service_id', $services)
+            ->hasServiceIn($services)
             ->shipDateBetween($dateFrom, $dateTo)
             ->whereDelivered(1)
             ->chunk(500, function ($shipments) use (&$total, &$results) {

@@ -41,8 +41,9 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function map()
     {
-        $this->mapWebRoutes();
+        $this->mapShopifyRoutes();
         $this->mapApiRoutes();
+        $this->mapWebRoutes();
         //
     }
 
@@ -78,6 +79,24 @@ class RouteServiceProvider extends ServiceProvider
             'prefix' => 'api',
                 ], function ($router) {
                     require base_path('routes/api.php');
+                });
+    }
+
+    /**
+     * Define the "shopify" routes for the application.
+     *
+     * These routes are typically stateless.
+     *
+     * @return void
+     */
+    protected function mapShopifyRoutes()
+    {
+        Route::group([
+            'middleware' => 'api',
+            'namespace' => $this->namespace,
+            'prefix' => 'shopify',
+                ], function ($router) {
+                    require base_path('routes/shopify.php');
                 });
     }
 }
