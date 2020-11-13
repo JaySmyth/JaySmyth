@@ -1492,6 +1492,7 @@ class Shipment extends Model
             $this->clearCarrierDetails();
             $this->status_id = 1;
             $this->received = false;
+            $this->source = 'reset';
             $this->save();
 
             // Remove related records

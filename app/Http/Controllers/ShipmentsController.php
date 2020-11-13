@@ -469,7 +469,7 @@ class ShipmentsController extends Controller
 
             $this->authorize($shipment);
 
-            if ($shipment->status->code == 'saved') {
+            if ($shipment->status->code == 'saved' && $shipment->source != 'reset') {
                 return $shipment->destroy($id);
             }
 
