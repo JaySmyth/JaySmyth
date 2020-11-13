@@ -112,7 +112,7 @@ class ShipmentsController extends Controller
             $query->limit($limit);
         }
 
-        if ( ! $paginate) {
+        if (! $paginate) {
             return $query->get();
         }
 
@@ -146,7 +146,7 @@ class ShipmentsController extends Controller
     {
         $shipment = Shipment::findOrFail($id);
 
-        if ( ! $shipment->formViewAvailable()) {
+        if (! $shipment->formViewAvailable()) {
             flash()->error('Not available!', 'Sorry, form view not available for this shipment.', true);
 
             return back();
@@ -186,7 +186,7 @@ class ShipmentsController extends Controller
         ];
         $contents = null !== old('contents') ? old('contents') : [];
 
-        if ( ! $companyId) {
+        if (! $companyId) {
             // If old company ID doesn't exist, default to authenticated user's company id
             $companyId = null !== old('company_id') ? old('company_id') : Auth::user()->company_id;
         }
@@ -389,7 +389,7 @@ class ShipmentsController extends Controller
 
             foreach ($array['packages'] as $values) {
                 foreach ($values as $value) {
-                    if ( ! is_numeric($value)) {
+                    if (! is_numeric($value)) {
                         return 'error';
                     }
                 }
@@ -400,7 +400,7 @@ class ShipmentsController extends Controller
             $packages         = [];
 
             foreach ($shipment->packages as $package) {
-                if ( ! $shipment->supplied_weight || ! $shipment->supplied_volumetric_weight) {
+                if (! $shipment->supplied_weight || ! $shipment->supplied_volumetric_weight) {
                     $package->supplied_length            = $package->length;
                     $package->supplied_width             = $package->width;
                     $package->supplied_height            = $package->height;
@@ -426,7 +426,7 @@ class ShipmentsController extends Controller
                 $package->save();
             }
 
-            if ( ! $shipment->supplied_weight || ! $shipment->supplied_volumetric_weight) {
+            if (! $shipment->supplied_weight || ! $shipment->supplied_volumetric_weight) {
                 $shipment->supplied_weight            = $shipment->weight;
                 $shipment->supplied_volumetric_weight = $shipment->volumetric_weight;
             }
@@ -469,9 +469,9 @@ class ShipmentsController extends Controller
 
             $this->authorize($shipment);
 
-            if ($shipment->status->code == 'saved' && $shipment->source != 'reset') {
-                return $shipment->destroy($id);
-            }
+            // if ($shipment->status->code == 'saved' && $shipment->source != 'reset') {
+            //     return $shipment->destroy($id);
+            // }
 
             return $shipment->setCancelled(Auth::user()->id);
         }
@@ -522,7 +522,7 @@ class ShipmentsController extends Controller
     public function label($token, $printFormatCode = 'A4')
     {
         // user authenticated so use their preferred label size
-        if ( ! Auth::guest()) {
+        if (! Auth::guest()) {
             // warehouse login
             if (in_array(Auth::user()->id, [3026, 283, 2534])) {
                 flash()->error('Warning', 'Not authorised to print label.', true);
@@ -618,7 +618,7 @@ class ShipmentsController extends Controller
         ];
 
         // Call the API for invoice
-        if ( ! $commercialInvoice = CarrierAPI::getCommercialInvoice(
+        if (! $commercialInvoice = CarrierAPI::getCommercialInvoice(
             $token,
             $parameters,
             Auth::user()->localisation->document_size,
@@ -680,7 +680,7 @@ class ShipmentsController extends Controller
         Storage::move($path, $filename);
 
         // Check that the file was uploaded successfully
-        if ( ! Storage::disk('local')->exists($filename)) {
+        if (! Storage::disk('local')->exists($filename)) {
             flash()->error('Problem Uploading!', 'Unable to upload file. Please try again.');
 
             return back();
@@ -795,7 +795,7 @@ class ShipmentsController extends Controller
      */
     public function batchedShippingDocsPdf(Request $request, $labelType)
     {
-        if ( ! Auth::guest()) {
+        if (! Auth::guest()) {
             // warehouse login
             if (Auth::user()->id == 3026) {
                 flash()->error('Warning', 'Not authorised to print labels.', true);
@@ -972,7 +972,7 @@ class ShipmentsController extends Controller
 
         $shipment = Shipment::whereCompanyId($data['company_id'])->whereShipmentReference($data['shipment_reference'])->first();
 
-        if ( ! $shipment) {
+        if (! $shipment) {
             $shipment = Shipment::create($data);
 
             if ($shipment) {
@@ -1022,7 +1022,7 @@ class ShipmentsController extends Controller
         $shipment = Shipment::whereToken($token)->firstOrFail();
 
         // Call the API for invoice
-        if ( ! $despatchNote = CarrierAPI::getDespatchNote($token, Auth::user()->localisation->document_size, 'D')) {
+        if (! $despatchNote = CarrierAPI::getDespatchNote($token, Auth::user()->localisation->document_size, 'D')) {
             abort(404);
         }
     }
@@ -1204,7 +1204,7 @@ class ShipmentsController extends Controller
         $shipment = Shipment::find($shipmentId);
 
         // Reinstate original if we do not want to reprice the shipment
-        if ( ! $request->reprice) {
+        if (! $request->reprice) {
             // Get the Repriced details
             $newQuoted = json_decode($shipment->quoted, true);
 
