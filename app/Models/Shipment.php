@@ -1491,6 +1491,7 @@ class Shipment extends Model
             $this->form_values = $this->convertToFormValues();
             $this->clearCarrierDetails();
             $this->status_id = 1;
+            $this->received = false;
             $this->save();
 
             // Remove related records

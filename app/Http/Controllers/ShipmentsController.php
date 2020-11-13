@@ -1173,7 +1173,7 @@ class ShipmentsController extends Controller
             "pieces"                            => $shipment->pieces,
             "shipment_reference"                => $shipment->shipment_reference,
             "ship_reason"                       => $shipment->ship_reason,
-            "collection_date"                   => date('d-m-Y', time()),
+            "collection_date"                   => now()->addDay()->format('d-m-Y'),
             "hazardous"                         => $shipment->hazardous,
             "special_instructions"              => $shipment->special_instructions,
             "bill_shipping"                     => $shipment->bill_shipping,
