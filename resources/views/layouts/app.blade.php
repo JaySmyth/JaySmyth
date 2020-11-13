@@ -40,6 +40,8 @@
 
         @include('partials.modals.track')
 
+        @include('partials.modals.feedback')
+
         <!-- to the top -->
         <a id="to_top" title="Back to the top" href="#">
             <span class="fas fa-chevron-up fa-2x text-white" aria-hidden="true"></span>

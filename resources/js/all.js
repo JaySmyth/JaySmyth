@@ -32,6 +32,42 @@ $('#tracking_modal').on('shown.bs.modal', function () {
     $('#tracking_number').focus().select();
 });
 
+
+if ($("#feedback_modal").length) {
+
+    $(document).on('click', '.smiley', function () {
+        $('.smiley').removeClass('text-primary').addClass('text-muted');
+        $(this).removeClass('text-muted').addClass('text-primary');
+        $('#smiley').val($(this).data('smiley'));
+    });
+
+    $("#send-feedback").click(function () {
+
+        $('#feedback-error').text('');
+
+        $.ajax({
+            url: '/feedback-modal',
+            type: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                smiley: $('#smiley').val(),
+                comments: $('#comments').val()
+            },
+            success: function (data) {
+                $('#feedback_modal').modal('hide');
+                swal("Feedback sent!", 'Thank you for your feedback.', "success");
+                $('.smiley').removeClass('text-primary').addClass('text-muted');
+                $('#smiley').val('');
+                $('#comments').val('');
+            },
+            error: function (data) {
+                $('#feedback-error').text('Please click a smiley and provide a comment (min 20 characters).');
+            }
+        });
+    });
+
+}
+
 // Check all check boxes
 $(".check-all").click(function () {
     var tableRows = $(this).closest("table").children('tbody').children("tr");

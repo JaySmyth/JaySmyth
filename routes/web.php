@@ -4,6 +4,9 @@
 Route::get('test/{id}', 'APIController@test');
 Route::get('reprice/{shipment}', 'APIController@reprice');
 
+// Send feedback
+Route::post('feedback-modal', 'FeedbackController');
+
 // Wrap routes in a Session timeout wrapper (May need to move Auth routes outside)
 //Route::group(['middleware' => 'timeout'], function () {
 
