@@ -60,6 +60,9 @@ class TransendOrderImport implements ShouldQueue
 
         $jsonData = json_encode($this->buildRequest(), JSON_HEX_AMP | JSON_HEX_APOS);
 
+        // Remove pipe symbol (transend doesn't like them)
+        $jsonData = str_replace('|', '', $jsonData);
+
         if (! $jsonData) {
             Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Transend Order Import ('.$this->transportJob->number.')', 'Failed to json encode data'));
             exit();
