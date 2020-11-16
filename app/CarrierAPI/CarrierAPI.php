@@ -212,7 +212,7 @@ class CarrierAPI
     private function getAllSuitableServices($shipment, $carrierServices)
     {
         $cnt = 0;
-        $possibleServiceArray = [];
+        $possibleServicesArray = [];
         $serviceRules = new ServiceRules();
 
         /*
