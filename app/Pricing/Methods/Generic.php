@@ -8,9 +8,9 @@
  * ******************************************
  */
 
-namespace App\Pricing;
+namespace App\Pricing\Methods;
 
-class PricingModel0 extends PricingModel
+class Generic extends PricingModel
 {
     /*
      * *************************************
@@ -36,6 +36,7 @@ class PricingModel0 extends PricingModel
     public function __construct()
     {
         parent::__construct();
+        $this->model = 0;
     }
 
     public function calcSurcharge($code, $packages = 0)

@@ -143,7 +143,7 @@ class CarrierAPI
 
             $this->setEnvironment($mode);
 
-            $companyServices = $this->company->getServicesForMode($shipment['mode_id'])->toArray();
+            $companyServices = $this->company->getServicesForMode($shipment['mode_id']);
 
             $suitableServices = $this->getAllSuitableServices($shipment, $companyServices);
 
@@ -209,10 +209,10 @@ class CarrierAPI
      *
      * @return array Appropriate services
      */
-    private function getAllSuitableServices($shipment, $carrierServiceArray)
+    private function getAllSuitableServices($shipment, $carrierServices)
     {
         $cnt = 0;
-        $possibleServices = [];
+        $possibleServiceArray = [];
         $serviceRules = new ServiceRules();
 
         /*
@@ -221,13 +221,13 @@ class CarrierAPI
          * Customer/ mode.
          * *********************************************
          */
-        foreach ($carrierServiceArray as $serviceDetails) {
+        foreach ($carrierServices as $serviceDetails) {
 
             // Check if service is applicable for this shipment
             if ($serviceRules->isSuitable($shipment, $serviceDetails)) {
 
                 // Price Shipment for this service
-                $prices = Pricing::price($shipment, $serviceDetails['id']);
+                $prices = Pricing::price($shipment, $serviceDetails->id);
 
                 /*
                  * *********************************
@@ -236,13 +236,13 @@ class CarrierAPI
                  * *********************************
                  */
                 if ($this->serviceAllowed($shipment, $prices, $serviceDetails)) {
-                    $possibleServices[$cnt] = $this->formatService($cnt, $serviceDetails, $prices);
+                    $possibleServicesArray[$cnt] = $this->formatService($cnt, $serviceDetails, $prices);
                     $cnt++;
                 }
             }
         }
 
-        return $possibleServices;
+        return $possibleServicesArray;
     }
 
     public function serviceAllowed($shipment, $prices, $serviceDetails)
@@ -250,13 +250,13 @@ class CarrierAPI
         /*
          * If a monthly limit has been defined on company_service, check that it has not been exceeded
          */
-        if (isset($serviceDetails['pivot']['monthly_limit']) && $serviceDetails['pivot']['monthly_limit'] > 0) {
+        if (isset($serviceDetails->pivot->monthly_limit) && $serviceDetails->pivot->monthly_limit > 0) {
 
             // Count the shipments for the month
             $count = \App\Models\Shipment::whereCompanyId($this->company->id)->whereBetween('ship_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->whereNotIn('status_id', [1, 7])->count();
 
             // Limit has been exceeded, remove from array
-            if ($count >= $serviceDetails['pivot']['monthly_limit']) {
+            if ($count >= $serviceDetails->pivot->monthly_limit) {
                 return false;
             }
         }
@@ -264,8 +264,8 @@ class CarrierAPI
         /*
          * If a max weight limit has been defined on company_service, check that it has not been exceeded
          */
-        if (isset($serviceDetails['pivot']['max_weight_limit']) && $serviceDetails['pivot']['max_weight_limit'] > 0) {
-            if ($shipment['weight'] > $serviceDetails['pivot']['max_weight_limit']) {
+        if (isset($serviceDetails->pivot->max_weight_limit) && $serviceDetails->pivot->max_weight_limit > 0) {
+            if ($shipment['weight'] > $serviceDetails->pivot->max_weight_limit) {
                 return false;
             }
         }
@@ -278,15 +278,15 @@ class CarrierAPI
 
         // If this is a collect shipment
         if ($this->isCollect($shipment)) {
-            if ($serviceDetails['carrier_id'] == 2) {
+            if ($serviceDetails->carrier_id == 2) {
+                if (! empty($shipment['bill_shipping_account'])) {
 
-                // Fedex Collect Shipments are allowed
-                return true;
-            } else {
-
-                // Non Fedex Collect Shipments are not allowed
-                return false;
+                    // Fedex Collect Shipments are allowed is account specified
+                    return true;
+                }
             }
+
+            return false;
         }
 
         // If Customer allowed to choose Carrier
@@ -295,7 +295,7 @@ class CarrierAPI
         }
 
         // If this is one of the non pricing services (eg air, ipf, ...)
-        if (in_array($serviceDetails['code'], $this->nonPricedServices)) {
+        if (in_array($serviceDetails->code, $this->nonPricedServices)) {
             return true;
         }
 
@@ -318,7 +318,7 @@ class CarrierAPI
         if (! isset($prices['shipping_cost']) || $prices['shipping_cost'] == 0 || $frtSales == 0) {
 
             // If Zero costs are allowed
-            if ($serviceDetails['allow_zero_cost']) {
+            if ($serviceDetails->allow_zero_cost) {
 
                 // Can price shipment
                 if (isset($prices['shipping_charge']) && $prices['shipping_charge'] > 0) {
@@ -362,7 +362,7 @@ class CarrierAPI
 
     public function formatService($cnt, $serviceDetails, $prices)
     {
-        $service = $serviceDetails;
+        $service = $serviceDetails->toArray();
         $service['cost'] = $prices['shipping_cost'];
         $service['cost_currency'] = $prices['cost_currency'];
         $service['cost_detail'] = $prices['costs'];
@@ -803,8 +803,8 @@ class CarrierAPI
             // Patch for undefined indexes
             $requiredKeys = ['sender_address2', 'recipient_address2'];
 
-            foreach ($requiredKeys as $key){
-                if(!array_key_exists($key, $shipment)){
+            foreach ($requiredKeys as $key) {
+                if (!array_key_exists($key, $shipment)) {
                     $shipment[$key] = null;
                 }
             }

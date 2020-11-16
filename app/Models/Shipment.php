@@ -761,6 +761,11 @@ class Shipment extends Model
         // Domestic Shipment
         if ($ukDomestic) {
 
+            // XDP
+            if ($this->carrier_id = 16) {
+                return 72;
+            }
+
             // NI local deliveries
             if ($origin == 'BT' && $dest == 'BT') {
                 return 48;
@@ -774,7 +779,7 @@ class Shipment extends Model
         }
 
         // International
-        return 72;
+        return 120;
     }
 
     public function getDomesticSla()

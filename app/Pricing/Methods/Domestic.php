@@ -6,7 +6,7 @@
  * ******************************************
  */
 
-namespace App\Pricing;
+namespace App\Pricing\Methods;
 
 use App\Models\CarrierPackagingType;
 use App\Models\Company;
@@ -14,7 +14,7 @@ use App\Models\DomesticRate;
 use App\Models\DomesticZone;
 use App\Models\FedexEas;
 
-class PricingModel1 extends PricingModel
+class Domestic extends PricingModel
 {
     /*
      * *************************************
@@ -44,6 +44,7 @@ class PricingModel1 extends PricingModel
         parent::__construct();
         $this->pricingZones = new DomesticZone;
         $this->fedexEas = new \App\Models\FedexEas();
+        $this->model = 1;
     }
 
     public function getZone()

@@ -2,15 +2,13 @@
 
 /*
  * ******************************************
- * CountryWide Pricing
- *
- * Allows overiding specific methods for carrier
+ * Fedex International Pricing
  * ******************************************
  */
 
-namespace App\Pricing;
+namespace App\Pricing\Methods;
 
-class PricingModel6 extends PricingModel
+class FedexIntl extends PricingModel
 {
     /*
      * *************************************
@@ -36,5 +34,35 @@ class PricingModel6 extends PricingModel
     public function __construct()
     {
         parent::__construct();
+
+        // Calculate Fuel Surcharge on the following charge codes
+        $this->fuelChargeCodes = ['DISC', 'FRT'];
+        $this->model = 2;
+    }
+
+    /*
+     * **********************************
+     * Carrier Specific Surcharges
+     * **********************************
+     */
+
+    public function isOWP()
+    {
+        return false;
+    }
+
+    public function isOSP()
+    {
+        return false;
+    }
+
+    public function isLPS()
+    {
+        return false;
+    }
+
+    public function isRES()
+    {
+        return false;
     }
 }

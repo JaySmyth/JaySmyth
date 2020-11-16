@@ -2,13 +2,16 @@
 
 /*
  * ******************************************
- * Fedex International Pricing
+ * TNT Pricing -    Allows overiding specific
+ *                  methods for carrier
  * ******************************************
  */
 
-namespace App\Pricing;
+namespace App\Pricing\Methods;
 
-class PricingModel2 extends PricingModel
+use App\Models\TntEas;
+
+class Tnt extends PricingModel
 {
     /*
      * *************************************
@@ -34,34 +37,19 @@ class PricingModel2 extends PricingModel
     public function __construct()
     {
         parent::__construct();
-
-        // Calculate Fuel Surcharge on the following charge codes
-        $this->fuelChargeCodes = ['DISC', 'FRT'];
+        $this->model = 4;
     }
 
     /*
      * **********************************
-     * Carrier Specific Surcharges
+     * Carrier Specific Surcharges.
      * **********************************
      */
-
-    public function isOWP()
+    // Extended Area Surcharge
+    public function isRAS()
     {
-        return false;
-    }
-
-    public function isOSP()
-    {
-        return false;
-    }
-
-    public function isLPS()
-    {
-        return false;
-    }
-
-    public function isRES()
-    {
-        return false;
+        $eas = new TntEas();
+        // Implemented at child level
+        return $eas->isEas($this->shipment['recipient_country_code'], $this->shipment['recipient_postcode']);
     }
 }

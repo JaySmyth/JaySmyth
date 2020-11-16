@@ -7,13 +7,13 @@
  * ******************************************
  */
 
-namespace App\Pricing;
+namespace App\Pricing\Methods;
 
 use App\Models\CarrierPackagingType;
 use App\Models\Company;
 use App\Models\DhlEas;
 
-class PricingModel5 extends PricingModel
+class Dhl extends PricingModel
 {
     /*
      * *************************************
@@ -42,6 +42,7 @@ class PricingModel5 extends PricingModel
 
         $this->maxStdDimension = 120;
         $this->maxStdWeight = 70;
+        $this->model = 5;
     }
 
     /**

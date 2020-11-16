@@ -6,12 +6,12 @@
  * ******************************************
  */
 
-namespace App\Pricing;
+namespace App\Pricing\Methods;
 
 use App\Models\Surcharge;
 use App\Models\UpsEas;
 
-class PricingModel3 extends PricingModel
+class Ups extends PricingModel
 {
     /*
      * *************************************
@@ -45,6 +45,8 @@ class PricingModel3 extends PricingModel
 
         // Calculate Fuel Surcharge on the following charge codes
         $this->fuelChargeCodes = ['BRO', 'COR', 'DISC', 'DTP', 'EAS', 'FRT', 'FUEL', 'ICE', 'LIA', 'LPS', 'MIS', 'OOA', 'OSP', 'OWP', 'RAS', 'RES', 'PLP', 'PAH'];
+
+        $this->model = 3;
     }
 
     public function isRAS()

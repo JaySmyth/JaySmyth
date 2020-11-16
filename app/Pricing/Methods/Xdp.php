@@ -2,16 +2,18 @@
 
 /*
  * ******************************************
- * TNT Pricing -    Allows overiding specific
- *                  methods for carrier
+ * XDP Pricing
+ *
+ * Allows overiding specific methods for carrier
  * ******************************************
  */
 
-namespace App\Pricing;
+namespace App\Pricing\Methods;
 
-use App\Models\TntEas;
+use App\Models\DomesticZone;
+use App\Models\XdpEas;
 
-class PricingModel4 extends PricingModel
+class Xdp extends PricingModel
 {
     /*
      * *************************************
@@ -37,18 +39,20 @@ class PricingModel4 extends PricingModel
     public function __construct()
     {
         parent::__construct();
+
+        $this->model = 7;
     }
 
-    /*
-     * **********************************
-     * Carrier Specific Surcharges.
-     * **********************************
-     */
-    // Extended Area Surcharge
-    public function isRAS()
+    public function getZone()
     {
-        $eas = new TntEas();
-        // Implemented at child level
-        return $eas->isEas($this->shipment['recipient_country_code'], $this->shipment['recipient_postcode']);
+        $domesticZones = new DomesticZone();
+        $this->zone = $domesticZones->getZone($this->shipment, $this->model, $this->isReturn());
+    }
+
+    public function isOOA()
+    {
+        $eas = new XdpEas();
+
+        return $eas->isOutOfArea($this->shipment['recipient_postcode']);
     }
 }

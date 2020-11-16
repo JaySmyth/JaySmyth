@@ -25,14 +25,6 @@ use App\Models\CompanyRate;
 use App\Models\Package;
 use App\Models\Service;
 use App\Models\Shipment;
-use App\Pricing\PricingModel0;
-use App\Pricing\PricingModel1;
-use App\Pricing\PricingModel2;
-use App\Pricing\PricingModel3;
-use App\Pricing\PricingModel4;
-use App\Pricing\PricingModel5;
-use App\Pricing\PricingModel6;
-use App\Pricing\PricingModel7;
 
 /**
  * ********************************
@@ -67,10 +59,8 @@ class Pricing
 
     public function load($id)
     {
-        $shipment = Shipment::find($id);
-
-        if ($shipment) {
-            $shipmentArray = $shipment->toArray();
+        $shipmentArray = Shipment::find($id)->toArray();
+        if (! empty($shipmentArray)) {
             $shipmentArray['packages'] = Package::where('shipment_id', $id)->get()->toArray();
 
             return $this->price($shipmentArray, $shipmentArray['service_id']);
@@ -85,24 +75,15 @@ class Pricing
         $this->serviceId = $serviceId;
 
         // Fill in any missing data
-        $this->preProcess($shipment, $serviceId);
+        $this->preProcess();
 
-        // Calculate Costs
+        // Calculate Costs and capture logs
         $this->calcCosts();
+        $this->log[] = (isset($this->model)) ? $this->model->log : 'Rate Not Defined';
 
-        if (isset($this->model)) {
-            $this->log[] = $this->model->log;
-        } else {
-            $this->log[] = 'Rate Not Defined';
-        }
-
-        // Calculate Sales
+        // Calculate Sales and capture logs
         $this->calcSales();
-        if (isset($this->model)) {
-            $this->log[] = $this->model->log;
-        } else {
-            $this->log[] = 'Rate Not Defined';
-        }
+        $this->log[] = (isset($this->model)) ? $this->model->log : 'Rate Not Defined';
 
         return $this->createResponse();
     }
@@ -116,14 +97,7 @@ class Pricing
      */
     public function preProcess()
     {
-        if (!empty($this->serviceId)) {
-
-            // Use specified Service/ Carrier
-            $this->service = Service::find($this->serviceId);
-        } else {
-            $this->service = Service::find($this->shipment['service_id']);
-        }
-
+        $this->identifyService();
         $this->carrier = Carrier::find($this->service->carrier_id);
         $this->shipment['service_id'] = $this->service->id;
         $this->shipment['service_code'] = $this->service->code;
@@ -131,41 +105,29 @@ class Pricing
         $this->shipment['carrier_code'] = $this->carrier->code;
 
         // If no Shipment date set use today
-        if (! isset($this->shipment['ship_date']) || empty($this->shipment['ship_date'])) {
+        if (empty($this->shipment['ship_date'])) {
             $this->shipment['ship_date'] = date('Y-m-d');
         }
 
-        // Does company have a VAT exemption
         $company = Company::find($this->shipment['company_id']);
-        $this->shipment['vat_exempt'] = $company->vat_exempt;
+        if ($company) {
+            // Does company have a VAT exemption
+            $this->shipment['vat_exempt'] = Company::find($this->shipment['company_id'])->vat_exempt;
 
-        // Do we need to send pricing debug info
-        if ($company->carrier_choice == 'debug') {
-            $this->debug = true;
+            // Do we need to send pricing debug info
+            $this->debug = ($company->carrier_choice == 'debug') ? true : false;
         }
     }
 
-    public function addToArray($data, $result = [])
+    public function identifyService()
     {
-        if ($data) {
-            if (is_array($data)) {
-                foreach ($data as $value) {
-                    $result[] = $value;
-                }
-            } else {
-                $result[] = $data;
-            }
+        if (!empty($this->serviceId)) {
+            // Use specified Service Id
+            $this->service = Service::find($this->serviceId);
+        } else {
+            // Use Shipemnt Service Id
+            $this->service = Service::find($this->shipment['service_id']);
         }
-
-        return $result;
-    }
-
-    public function mergeErrors($costs, $sales)
-    {
-        $errors = $this->addToArray($costs);
-        $errors = $this->addToArray($sales, $errors);
-
-        return $errors;
     }
 
     public function sumCharges($charges, $chargeCode = '')
@@ -190,8 +152,7 @@ class Pricing
 
     public function createResponse()
     {
-        $errors = $this->mergeErrors($this->costs['errors'], $this->sales['errors']);
-
+        $errors = array_merge($this->costs['errors'], $this->sales['errors']);
         if (empty($errors)) {
             $response['shipping_cost'] = round($this->sumCharges($this->costs['charges']), 2);
             $response['shipping_charge'] = round($this->sumCharges($this->sales['charges']), 2);
@@ -262,35 +223,35 @@ class Pricing
              * *********************
              */
             case 'domestic':
-                $this->model = new PricingModel1($this->debug);
+                $this->model = new \App\Pricing\Methods\Domestic($this->debug);
                 break;
 
             case 'fedex':
-                $this->model = new PricingModel2($this->debug);
+                $this->model = new \App\Pricing\Methods\FedexIntl($this->debug);
                 break;
 
             case 'ups':
-                $this->model = new PricingModel3($this->debug);
+                $this->model = new \App\Pricing\Methods\Ups($this->debug);
                 break;
 
             case 'tnt':
-                $this->model = new PricingModel4($this->debug);
+                $this->model = new \App\Pricing\Methods\Tnt($this->debug);
                 break;
 
             case 'dhl':
-                $this->model = new PricingModel5($this->debug);
+                $this->model = new \App\Pricing\Methods\Dhl($this->debug);
                 break;
 
             case 'cwide':
-                $this->model = new PricingModel6($this->debug);
+                $this->model = new \App\Pricing\Methods\CountryWide($this->debug);
                 break;
 
             case 'xdp':
-                $this->model = new PricingModel7($this->debug);
+                $this->model = new \App\Pricing\Methods\Xdp($this->debug);
                 break;
 
             default:
-                $this->model = new PricingModel0($this->debug);
+                $this->model = new \App\Pricing\Methods\Generic($this->debug);
                 break;
         }
 
@@ -356,6 +317,7 @@ class Pricing
         $response['model'] = '';
         $response['rate_id'] = '';
         $response['packaging'] = '';
+        $response['charges'] = [];
 
         // If we know how to process this shipment and it is valid for the old system
         if (isset($rate['model'])) {
@@ -364,18 +326,13 @@ class Pricing
             $response = $this->model->price($this->shipment, $rate, $priceType);
         } else {
 
-            // Sorry can't price shipment
-            if ($priceType == 'Costs' && $this->service->allow_zero_cost == 1) {
+            // Unable to cost shipment but allowed a zero cost
+            if ($priceType == 'Costs' && $this->service->allow_zero_cost) {
 
                 // Allow Zero Costs
             } else {
                 $response['errors'][] = "$priceType Rate Table not found";
             }
-        }
-
-        // If no Cost/ Sale then set to empty array
-        if (! isset($response['charges'])) {
-            $response['charges'] = [];
         }
 
         return $response;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Pricing;
+namespace App\Pricing\Methods;
 
 use App\Models\Countries;
 use App\Models\CarrierPackagingType;
@@ -13,6 +13,12 @@ use App\Models\Service;
 use App\Models\Surcharge;
 use App\Models\SurchargeDetail;
 
+/*
+ *********************************
+ * Pricing methods common to
+ * all pricing methods
+ *********************************
+ */
 class PricingModel
 {
     public $debug = false;
@@ -72,9 +78,14 @@ class PricingModel
      * *************************************
      */
 
-    public function log($msg)
+    public function log($msg, $attributes = [])
     {
-        $this->log[] = $msg.' - '.date('H:i:s');
+        $this->log[] = date('H:i:s').' '.$msg;
+        if (! empty($attributes)) {
+            foreach ($attributes as $attribute => $value) {
+                $this->log[] = date('H:i:s').'     '.$attribute.': '.$value;
+            }
+        }
     }
 
     public function __construct($debug = false)
@@ -101,18 +112,7 @@ class PricingModel
          * *****************************************************
          */
         $this->response['errors'] = [];
-
-        $this->models = [
-            'std' => '0',
-            'domestic' => '1',
-            'fedex' => '2',
-            'ups' => '3',
-            'tnt' => '4',
-            'dhl' => '5',
-            'cwide' => '6',
-            'xdp' => '7',
-            'domestic2' => '8',
-        ];
+        $this->response['charges'] = [];
 
         // Calculate Fuel Surcharge on the following charge codes
         $this->fuelChargeCodes = ['ADH', 'BRO', 'COR', 'DISC', 'DTP', 'EAS', 'ESS','FRT', 'FUEL', 'ICE', 'LIA', 'LPS', 'MIS', 'OOA', 'OSP', 'OWP', 'RAS', 'RES'];
@@ -130,25 +130,13 @@ class PricingModel
         $this->upperMaxGirth = 419;         // LPS & MAX
 
         $this->weightConv = [
-            'lb' => [
-                'kg' => 0.453592,
-                'lb' => 1,
-            ],
-            'kg' => [
-                'lb' => 2.20462,
-                'kg' => 1,
-            ],
+            'lb' => ['kg' => 0.453592,'lb' => 1,],
+            'kg' => ['lb' => 2.20462,'kg' => 1,],
         ];
 
         $this->dimConv = [
-            'in' => [
-                'lb' => 1,
-                'kg' => 0.45359237,
-            ],
-            'cm' => [
-                'lb' => 2.2046333,
-                'kg' => 1,
-            ],
+            'in' => ['lb' => 1,'kg' => 0.45359237,],
+            'cm' => ['lb' => 2.2046333,'kg' => 1,],
         ];
     }
 
@@ -164,26 +152,13 @@ class PricingModel
      */
     public function price($shipment, $rate, $priceType)
     {
-        $this->response['debug'] = [];
+        $this->preprocess($shipment, $rate, $priceType);
 
-        // Save Shipment details
-        $this->shipment = $shipment;
-        $this->priceType = $priceType;
-        $this->service = Service::find($shipment['service_id']);
-        $this->company = Company::find($shipment['company_id']);
-        $this->shipDate = date('Y-m-d', strtotime($this->shipment['ship_date']));
-
-        $this->log("PriceType: $priceType");
-        $this->log('ServiceId: '.$shipment['service_id']);
-
-        // Save Rate Header
-        $this->rate = $rate;
         if (empty($rate)) {
             $this->log('Rate not defined');
             $this->response['errors'][] = 'Unable to identify '.$this->priceType.' Rate';
         } else {
             $this->log('Using Rate: '.$this->rate['id'].' - '.$this->rate['description']);
-            $this->model = $this->models[$this->rate['model']];
 
             // Get Pricing zone
             $this->getZone();
@@ -214,6 +189,24 @@ class PricingModel
         return $this->response;
     }
 
+    public function preprocess($shipment, $rate, $priceType)
+    {
+        $this->response['debug'] = [];
+
+        // Save Shipment details
+        $this->shipment = $shipment;
+        $this->priceType = $priceType;
+        $this->service = Service::find($shipment['service_id']);
+        $this->company = Company::find($shipment['company_id']);
+        $this->shipDate = date('Y-m-d', strtotime($this->shipment['ship_date']));
+
+        // Save Rate Header
+        $this->rate = $rate;
+
+        $this->log("PriceType: $priceType");
+        $this->log('ServiceId: '.$shipment['service_id']);
+    }
+
     /**
      * Identify the correct pricing zone.
      *
@@ -224,31 +217,29 @@ class PricingModel
         $pricingZones = new PricingZones();
 
         // Get appropriate zone for the rate model
-        $this->log('Find Zone using');
-        $this->log('company_id: '.$this->shipment['company_id']);
-        $this->log('   sender_country_code: '.$this->shipment['sender_country_code']);
-        $this->log('   sender_postcode: '.$this->shipment['sender_postcode']);
-        $this->log('   service_code : '.$this->shipment['service_code']);
-        $this->log('   recipient_country_code: '.$this->shipment['recipient_country_code']);
-        $this->log('   recipient_postcode: '.$this->shipment['recipient_postcode']);
-        $this->log('   model: '.$this->model);
-        $zone = $pricingZones->getZone($this->shipment, $this->models[$this->rate['model']]);
-        $zoneType = ($this->priceType == 'Sales') ? 'sale_zone' : 'cost_zone';
+        $this->log('Find Zone using '.$this->model, [
+            'sender_country_code'    => $this->shipment['sender_country_code'],
+            'sender_country_code'    => $this->shipment['sender_country_code'],
+            'sender_postcode'        => $this->shipment['sender_postcode'],
+            'service_code'           => $this->shipment['service_code'],
+            'recipient_country_code' => $this->shipment['recipient_country_code'],
+            'recipient_postcode'     => $this->shipment['recipient_postcode'],
+        ]);
 
-        if (empty($zone->$zoneType)) {
-            $error = 'Unable to identify '.$this->priceType.' Zone';
-            $this->log($error);
-            $this->response['errors'][] = $error;
+        $zoneType = ($this->priceType == 'Sales') ? 'sale_zone' : 'cost_zone';
+        $zone = $pricingZones->getZone($this->shipment, $this->model);
+        if ($zone) {
+            $this->zone = (isset($zone->$zoneType)) ? $zone->$zoneType : null;
+            $this->log('Using '.$this->priceType.' Zone: '.$this->zone);
 
             return;
         }
 
-        if ($this->priceType == 'Sales') {
-            $this->zone = (isset($zone->sale_zone)) ? $zone->sale_zone : null;
-        } else {
-            $this->zone = (isset($zone->cost_zone)) ? $zone->cost_zone : null;
-        }
-        $this->log('Using '.$this->priceType.' Zone: '.$this->zone);
+        $error = 'Unable to identify '.$this->priceType.' Zone';
+        $this->log($error);
+        $this->response['errors'][] = $error;
+
+        return;
     }
 
     /**
@@ -259,12 +250,6 @@ class PricingModel
      */
     public function getPackagingType($pkgNo = 0)
     {
-
-        // Temporary fix to treat "BOX" as "CTN" for pricing purposes
-        // May be removed when legacy system disabled
-        if ($this->shipment['packages'][$pkgNo]['packaging_code'] == 'BOX') {
-            $this->shipment['packages'][$pkgNo]['packaging_code'] = 'CTN';
-        }
 
         // Identify Shipment Package type for pricing
         $packageType = $this->company->getPackagingTypes($this->shipment['mode_id'])
@@ -302,9 +287,11 @@ class PricingModel
         $this->calcChargeableWeights();
 
         $this->chargeableWeight = max($this->shipment['weight'], $this->shipment['volumetric_weight']);
-        $this->log('Act Wgt: '.$this->shipment['weight']);
-        $this->log('Vol Wgt: '.$this->shipment['volumetric_weight']);
-        $this->log('Chargeable: '.$this->chargeableWeight);
+        $this->log('Calc Chargeable Weight', [
+            'Act Wgt: ' => $this->shipment['weight'],
+            'Vol Wgt: ' => $this->shipment['volumetric_weight'],
+            'Chargeable: ' => $this->chargeableWeight,
+        ]);
 
         if ($this->chargeableWeight == 0) {
             $this->response['errors'][] = 'Chargable weight must be greater than 0';
@@ -329,10 +316,10 @@ class PricingModel
                 $dimRate = $this->dimConv[$this->shipment['dims_uom']][$this->rate['weight_units']];
 
                 if ($this->isLPSPackage($package)) {
-                    $this->log('LPS Package so weight min 40kgs');
+                    $this->log('LPS Package - min weight is 40kgs');
                     $minPkgWeight = 40 * $wgRate;
                 } else {
-                    $this->log('Not LPS Package so no min weight');
+                    $this->log('Not LPS Package - no min weight');
                     $minPkgWeight = 0;
                 }
 
@@ -346,12 +333,14 @@ class PricingModel
 
                 // Convert weight into same unit as the rate sheet
                 $pkgVolWt = $pkgVolWt * $dimRate;
-                $this->log('Pkg Vol Weight in rate units: '.$pkgVolWt);
 
                 $this->shipment['weight'] += max($minPkgWeight, $package['weight'] * $wgRate);
                 $this->shipment['volumetric_weight'] += max($minPkgWeight, $pkgVolWt);
-                $this->log('Package Weight: '.$this->shipment['weight']);
-                $this->log('Package Volume: '.$this->shipment['volumetric_weight']);
+                $this->log('CalcChargeableWeights', [
+                    'Pkg Vol Weight in rate units: ' => $pkgVolWt,
+                    'Package Weight: ' => $this->shipment['weight'],
+                    'Package Volume: ' => $this->shipment['volumetric_weight'],
+                ]);
             } else {
 
                 // If Dims not present stop calculation
@@ -438,11 +427,11 @@ class PricingModel
             if ($charge['value'] < $this->surchargeDetails->min) {
                 $charge['value'] = $this->surchargeDetails->min;
             }
-            $this->log(
-                "Surcharge $code : Cons val ".$this->surchargeDetails->consignment_rate
-                .' + wght val '.$this->chargeableWeight * $this->surchargeDetails->weight_rate
-                .' + pkg val '.$packages * $this->surchargeDetails->package_rate
-            );
+            $this->log('Surcharge '.$code.':', [
+                "Cons val " => $this->surchargeDetails->consignment_rate,
+                'Wght val ' => $this->chargeableWeight * $this->surchargeDetails->weight_rate,
+                'Pkg val ' => $packages * $this->surchargeDetails->package_rate,
+            ]);
             $this->addSurcharge($charge);
         } else {
             $this->log('No surcharge applicable');
@@ -903,23 +892,28 @@ class PricingModel
         // Get Package Type
         $this->getPackagingType();
         $packagingType = (empty($this->packagingType)) ? 'Unknown' : $this->packagingType.'(s)';
-        $this->log("Using Packaging type of $packagingType");
 
         // Get Rate Details for this Packaging Type/zone/pieces/weight
-        $this->log('Looking for Rate for');
-        $this->log('   CompanyId: '.$this->shipment['company_id']);
-        $this->log('   RateId: '.$this->rate['id']);
-        $this->log('   ServiceId: '.$this->shipment['service_id']);
-        $this->log('   Recipient Type: '.$this->shipment['recipient_type']);
-        $this->log('   Packaging Type: '.$this->packagingType);
-        $this->log('   Pieces: '.$this->shipment['pieces']);
-        $this->log('   Chargable Weight: '.$this->chargeableWeight);
-        $this->log('   Zone: '.$this->zone);
-        $this->log('   ShipDate: '.$this->shipment['ship_date']);
+        $this->log('Searching for Rate for', [
+            'Company_id'         => $this->shipment['company_id'],
+            'RateId: '           => $this->rate['id'],
+            'ServiceId: '        => $this->shipment['service_id'],
+            'Recipient Type: '   => $this->shipment['recipient_type'],
+            'Packaging Type: '   => $this->packagingType,
+            'Pieces: '           => $this->shipment['pieces'],
+            'Chargable Weight: ' => $this->chargeableWeight,
+            'Zone: '             => $this->zone,
+            'ShipDate: '         => $this->shipment['ship_date'],
+        ]);
+
         $currentRateLine = $this->getRateDetails($this->shipment['company_id'], $this->rate['id'], $this->shipment['service_id'], $this->shipment['recipient_type'], $this->packagingType, $this->shipment['pieces'], $this->chargeableWeight, $this->zone, $this->shipment['ship_date']);
         if ($currentRateLine) {
             $result = ['charge' => 0, 'break_point' => 0];
-            $charge = ['code' => 'FRT', 'description' => $this->shipment['pieces'].' '.$packagingType.' to Area '.strtoupper($this->zone), 'value' => 0];
+            $charge = [
+                'code' => 'FRT',
+                'description' => $this->shipment['pieces'].' '.$packagingType.' to Area '.strtoupper($this->zone),
+                'value' => 0
+            ];
 
             /*
              * ******************************************************
@@ -1191,7 +1185,7 @@ class PricingModel
          * Calculate Discount if applicable
          * ***************************************
          */
-        if (isset($this->response['charges'])) {
+        if (! empty($this->response['charges'])) {
             foreach ($this->response['charges'] as $charge) {
 
                 // If charge is one that we are looking for
