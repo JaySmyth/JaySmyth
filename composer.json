@@ -10,7 +10,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/dshannon997/tcpdi"
+            "url": "https://github.com/dshannon-ifs/tcpdi"
         }
     ],
     "require": {
