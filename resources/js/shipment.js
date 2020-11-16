@@ -621,13 +621,36 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
 
     }
 
+    /**
+     * Check that the contents of each package has been specified by the user.
+     * Alerts the user if action is required.
+     *
+     * @returns {Boolean}
+     */
+    function validateBilling() {
+
+        // Collect shipemnts must have an account number
+        if ($('#bill_shipping').val() === 'recipient' && $('#bill_shipping_account').val() == '') {
+            swal({
+                title: "Billing",
+                text: "You must specify the Recipients account number with the Carrier to be selected",
+                type: "error"
+            });
+
+            return false;
+        }
+
+        return true;
+
+    }
+
 
     $('#button-proceed').click(function () {
 
         $('#sender-panel-validator').val(0);
         $('#recipient-panel-validator').val(0);
 
-        if ($("#create-shipment").valid() && validateContents()) {
+        if ($("#create-shipment").valid() && validateContents() && validateBilling()) {
             setTotals();
             getServices();
             setSummaryValues();
