@@ -342,7 +342,7 @@ class Shipment extends Model
                 break;
             // DHL
             case 5:
-                $url = "http://www.dhl.co.uk/en/express/tracking.html?AWB=$this->carrier_tracking_number&brand=DHL";
+                $url = "https://mydhl.express.dhl/gb/en/tracking.html#/results?id=$this->carrier_tracking_number";
                 break;
             // USPS
             case 11:
