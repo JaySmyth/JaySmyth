@@ -545,7 +545,7 @@ class FedexAPI extends CarrierBase
         }
 
         // Company has paperless trade enabled and shipment is not domestic
-        if ($data['company_id'] == 333) {
+        if (in_array($data['company_id'], [333, 92, 314, 448])) {
             if (Company::find($data['company_id'])->plt_enabled && ! isDomestic($data['sender_country_code'], $data['recipient_country_code'])) {
                 $msgGroups[] = 'ETD'; // Electronic Trade Documents
                 $data        = $this->setElement($data, 'etd_indicator', 'Y');
