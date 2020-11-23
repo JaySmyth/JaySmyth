@@ -762,7 +762,7 @@ class Shipment extends Model
         if ($ukDomestic) {
 
             // XDP
-            if ($this->carrier_id = 16) {
+            if ($this->carrier_id == 16) {
                 return 72;
             }
 
