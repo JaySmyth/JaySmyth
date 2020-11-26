@@ -21,6 +21,7 @@ class CarrierAPI
     private $carrier;
     private $consignment;
     private $companyServices;
+    private $mode;
 
     /**
      * Accepts Shipment details and returns all services
@@ -41,6 +42,9 @@ class CarrierAPI
         return $this->companyServices->getAvailableServices();
     }
 
+    /**
+     * @param  string  $mode
+     */
     private function setEnvironment($mode = '')
     {
         // if mode is defined then use it
@@ -64,6 +68,9 @@ class CarrierAPI
         }
     }
 
+    /**
+     *
+     */
     private function setCompanyServices()
     {
         $this->companyServices = new CompanyServices();
@@ -89,6 +96,9 @@ class CarrierAPI
             : $this->generateErrors($response, $errors);
     }
 
+    /**
+     * @return DHL\type|PrimaryFreight\type|TNT\type|mixed
+     */
     private function sendShipment()
     {
         // Send shipment data to Carrier
@@ -109,6 +119,12 @@ class CarrierAPI
         return $response;
     }
 
+    /**
+     * @param $response
+     * @param $charges
+     *
+     * @return mixed
+     */
     private function setResponsePricingFields($response, $charges)
     {
         $response['pricing'] = [];
@@ -122,6 +138,12 @@ class CarrierAPI
         return $response;
     }
 
+    /**
+     * @param $charges
+     * @param $response
+     *
+     * @return false|string
+     */
     private function writeShipment($charges, $response)
     {
         $this->consignment->setPricingFields($charges);
@@ -248,13 +270,20 @@ class CarrierAPI
             $shipment->createCollectionRequest();
         } catch (Exception $e) {
             Mail::to(config('mail.error'))->queue(new GenericError('WebClient DB Error', $e->getMessage().' on line '.$e->getLine()."\r\n\r\n".json_encode($this->consignment->data)));
-            // Return null to signify problem
-            return;
+
+            // Return false to signify problem
+            return false;
         }
 
         return $shipment;
     }
 
+    /**
+     * @param $response
+     * @param $shipmentCreated
+     *
+     * @return mixed
+     */
     private function completeResponse($response, $shipmentCreated)
     {
         if (strtolower($this->mode) == 'test' || $shipmentCreated) {
@@ -271,6 +300,12 @@ class CarrierAPI
         return $response;
     }
 
+    /**
+     * @param $response
+     * @param $errors
+     *
+     * @return mixed
+     */
     private function generateErrors($response, $errors)
     {
         if (is_array($errors)) {
@@ -395,6 +430,8 @@ class CarrierAPI
                 abort(404);
             }
         }
+
+        return null;
     }
 
     /**
