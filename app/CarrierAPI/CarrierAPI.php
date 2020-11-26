@@ -3,15 +3,12 @@
 namespace App\CarrierAPI;
 
 use App;
-use App\CarrierAPI\APIShipment;
-use App\CarrierAPI\Carrier;
-use App\CarrierAPI\Pdf;
+use App\Mail\GenericError;
 use App\Models\Shipment;
 use App\Pricing\Facades\Pricing;
 use DB;
 use Exception;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
 use TCPDI;
 
 /**
@@ -29,20 +26,42 @@ class CarrierAPI
      * Accepts Shipment details and returns all services
      * that are available and appropriate for the shipment.
      *
-     * @param type $shipment
-     * @param string $mode Used by APIController to overide mode
+     * @param  type  $shipment
+     * @param  string  $mode  Used by APIController to overide mode
      *
      * @return array of available services
      */
     public function getAvailableServices($data, $mode = '')
     {
-        $availableServicesArray = [];
         $this->setEnvironment($mode);
         $this->consignment = new Consignment($data);
         $this->consignment->checkAddresses();
         $this->setCompanyServices();
 
         return $this->companyServices->getAvailableServices();
+    }
+
+    private function setEnvironment($mode = '')
+    {
+        // if mode is defined then use it
+        $env_mode = ($mode > '') ? $mode : App::environment();
+
+        // If Environment variable set to Production, then change mode
+        switch (strtoupper($env_mode)) {
+            case 'PRODUCTION':
+            case 'TESTING':
+                $this->mode = 'production';
+                break;
+
+            case 'LOCAL':
+            case 'TEST':
+                $this->mode = 'test';
+                break;
+
+            default:
+                dd('Unknown Mode : *'.$env_mode.'*');
+                break;
+        }
     }
 
     private function setCompanyServices()
@@ -54,7 +73,7 @@ class CarrierAPI
     /**
      * Creates Shipment with Carrier and updates tables.
      *
-     * @param string $mode Used by APIController to overide mode
+     * @param  string  $mode  Used by APIController to overide mode
      *
      * @return response
      */
@@ -63,93 +82,53 @@ class CarrierAPI
         $response = [];
         $this->setEnvironment($mode);
         $this->consignment = new Consignment($data);
-        $apiShipment = new APIShipment();                                       // Shipment object with validation rules etc.
-        $errors = $apiShipment->validateShipment($this->consignment->data);
+        $apiShipment       = new APIShipment();                                       // Shipment object with validation rules etc.
+        $errors            = $apiShipment->validateShipment($this->consignment->data);
 
         return (empty($errors)) ? $this->sendShipment()
-                                : $this->generateErrors($response, $errors);
+            : $this->generateErrors($response, $errors);
     }
 
-    /**
-     * Delete Shipment function.
-     *
-     * @param type $this->consignment->data
-     * @param string $mode Used by APIController to overide mode
-     *
-     * @return string
-     */
-    public function deleteShipment($mode = '')
+    private function sendShipment()
     {
-        $response = [];
-        $this->setEnvironment($mode);
+        // Send shipment data to Carrier
+        $this->carrier = Carrier::getInstanceOf($this->consignment->data['carrier_code'], $this->mode);
+        $response      = $this->carrier->createShipment($this->consignment->data);
+        if (empty($response['errors'])) {
+            $charges  = Pricing::price($this->consignment->data);
+            $response = $this->setResponsePricingFields($response, $charges);
 
-        // Identify Shipment
-        $shipment = Shipment::where('company_id', $this->consignment->data['company_id'])
-                ->where('token', $this->consignment->data['shipment_token'])
-                ->first();
-        if ($shipment) {
-            if ($shipment->isCancellable()) {
-                $this->carrier = Carrier::getInstanceOf($shipment->carrier->code, $this->mode);     // Create Carrier Object
-                $response = $this->carrier->deleteShipment($shipment);                              // Send Shipment to Carrier
+            // Write shipment, charges and carrier Response to Database
+            $shipment        = $this->writeShipment($charges, $response);
+            $shipmentCreated = (isset($shipment) && $shipment) ? true : false;
 
-                if ($response['errors'] == []) {
-                    $shipment->setCancelled($this->consignment->data['user_id']);
-                }
-            } else {
-                $response['errors'][] = 'Shipment cannot be cancelled';
-            }
-        } else {
-            $response['errors'][] = 'Shipment not found';
+            // Add Carrier Consignment details to IFS response
+            $response = $this->completeResponse($response, $shipmentCreated);
         }
 
         return $response;
     }
 
-    /**
-     * Generates a commercial invoice.
-     *
-     * @param   string  $token      Shipment identifier.
-     * @param   array   $parameters An array of options for customising invoice.
-     * @param   string  $size       Size of the PDF document required (accepts codes defined in print formats table).
-     * @param   string  $output     Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
-     *
-     * @return  mixed
-     */
-    public function getCommercialInvoice($token, $parameters = [], $size = 'A4', $output = 'S')
+    private function setResponsePricingFields($response, $charges)
     {
-        $pdf = new Pdf($size, $output);
+        $response['pricing'] = [];
+        if ( ! $this->consignment->isCollect() && empty($charges['errors'])) {
+            $response['pricing']['charges']    = $charges['sales'];
+            $response['pricing']['vat_code']   = $charges['sales_vat_code'];
+            $response['pricing']['vat_amount'] = $charges['sales_vat_amount'];
+            $response['pricing']['total_cost'] = $charges['shipping_charge'] + $charges['sales_vat_amount'];
+        }
 
-        return $pdf->createCommercialInvoice($token, $parameters);
+        return $response;
     }
 
-    /**
-     * Generates a CN22.
-     *
-     * @param   string  $token      Shipment identifier.
-     * @param   string  $output     Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
-     *
-     * @return  mixed
-     */
-    public function getCN22($token, $output = 'S')
+    private function writeShipment($charges, $response)
     {
-        $pdf = new Pdf('6X4', $output);
+        $this->consignment->setPricingFields($charges);
+        $this->consignment->addCarrierResponse($response);                      // Add package barcodes and tracking details etc
+        $this->consignment->setShipmentToken();                                 // Get unique random token to identify Shipment
 
-        return $pdf->createCN22($token);
-    }
-
-    /**
-     * Create a despatch note.
-     *
-     * @param type $token
-     * @param type $size
-     * @param type $output
-     * @return type
-     */
-    public function getDespatchNote($token, $size = 'A4', $output = 'S')
-    {
-        $pdf = new Pdf($size, $output);
-
-        return $pdf->createDespatchNote($token);
+        return $this->addShipment();
     }
 
     /**
@@ -163,17 +142,10 @@ class CarrierAPI
         $this->consignment->preProcessAddShipment();
 
 
-        /*
-         * ******************************************************************
-         * Transaction bracket updates so that all complete or none complete
-         * ******************************************************************
-         */
-        // DB::beginTransaction();
-
         try {
             if (isset($this->consignment->data['shipment_id']) && is_numeric($this->consignment->data['shipment_id'])) {
                 // Shipment exists (saved) so update it
-                $shipment = Shipment::find($this->consignment->data['shipment_id']);
+                $shipment                                      = Shipment::find($this->consignment->data['shipment_id']);
                 $this->consignment->data['consignment_number'] = $shipment->consignment_number; // hack
                 $shipment->update($this->consignment->data);
             } else {
@@ -213,7 +185,7 @@ class CarrierAPI
              */
             foreach ($this->consignment->data['label_base64'] as $label) {
                 $shipment->label()->create([
-                    'base64' => $label['base64'],
+                    'base64'      => $label['base64'],
                     'shipment_id' => $shipment->id,
                 ]);
             }
@@ -274,45 +246,29 @@ class CarrierAPI
              * Create a collection request for the transport department
              */
             $shipment->createCollectionRequest();
-
-            /*
-             * ******************************************
-             * Successful so commit all updates
-             * ******************************************
-             */
-            // DB::Commit();
         } catch (Exception $e) {
-
-            /*
-             * ******************************************
-             * Encountered error so rollback transactions
-             * ******************************************
-             */
-            // DB::rollBack();
-
-
-            // Build email
-            $to = config('mail.error');
-            $subject = 'WebClient DB Error - '.$to;
-            $message = 'Web Client failed to insert shipment '."\r\n\r\n".
-                    'App\CarrierAPI\CarrierAPI.php : '."\r\n\r\n".
-                    'Function addShipment() : '."\r\n\r\n".
-                    'IFS Consignment Number : '.$this->consignment->data['consignment_number']."\r\n\r\n".
-                    'Carrier Consignment Number : '.$this->consignment->data['carrier_consignment_number']."\r\n\r\n".
-                    'Error : '.$e->getMessage().' on line '.$e->getLine()."\r\n\r\n".
-                    json_encode($this->consignment->data);
-            $headers = 'From: noreply@antrim.ifsgroup.com'."\r\n".
-                    'Reply-To: it@antrim.ifsgroup.com'."\r\n".
-                    'X-Mailer: PHP/'.phpversion();
-
-            mail($to, $subject, $message, $headers);
-
-            dd('Error : '.$e->getMessage().' on line '.$e->getLine());
-
-            return; // Return null to signify problem
+            Mail::to(config('mail.error'))->queue(new GenericError('WebClient DB Error', $e->getMessage().' on line '.$e->getLine()."\r\n\r\n".json_encode($this->consignment->data)));
+            // Return null to signify problem
+            return;
         }
 
         return $shipment;
+    }
+
+    private function completeResponse($response, $shipmentCreated)
+    {
+        if (strtolower($this->mode) == 'test' || $shipmentCreated) {
+            // Everything good so return token, consignment number and tracking URL for shipment
+            $response['ifs_consignment_number'] = $this->consignment->data['consignment_number'];
+            $response['token']                  = $this->consignment->data['token'];
+            $response['tracking_url']           = config('app.url').'/tracking/'.$this->consignment->data['token'];
+        } else {
+            // Problem saving details - so return and error
+            $response['errors'][]                  = 'System Error (IT Support Notified)';
+            $response['label_base64'][0]['base64'] = '';
+        }
+
+        return $response;
     }
 
     private function generateErrors($response, $errors)
@@ -328,120 +284,80 @@ class CarrierAPI
         return $response;
     }
 
-    private function setEnvironment($mode = '')
+    /**
+     * Delete Shipment function.
+     *
+     * @param  type  $this  ->consignment->data
+     * @param  string  $mode  Used by APIController to overide mode
+     *
+     * @return string
+     */
+    public function deleteShipment($mode = '')
     {
+        $response = [];
+        $this->setEnvironment($mode);
 
-        // if mode is defined then use it
-        $env_mode = ($mode > '') ? $mode : App::environment();
+        // Identify Shipment
+        $shipment = Shipment::where('company_id', $this->consignment->data['company_id'])
+                            ->where('token', $this->consignment->data['shipment_token'])
+                            ->first();
+        if ($shipment) {
+            if ($shipment->isCancellable()) {
+                $this->carrier = Carrier::getInstanceOf($shipment->carrier->code, $this->mode);     // Create Carrier Object
+                $response      = $this->carrier->deleteShipment($shipment);                              // Send Shipment to Carrier
 
-        // If Environment variable set to Production, then change mode
-        switch (strtoupper($env_mode)) {
-
-            case 'PRODUCTION':
-            case 'TESTING':
-                $this->mode = 'production';
-                break;
-
-            case 'LOCAL':
-            case 'TEST':
-                $this->mode = 'test';
-                break;
-
-            default:
-                dd('Unknown Mode : *'.$env_mode.'*');
-                break;
-        }
-    }
-
-    private function sendShipment()
-    {
-        // Send shipment data to Carrier
-        $this->carrier = Carrier::getInstanceOf($this->consignment->data['carrier_code'], $this->mode);
-        $response = $this->carrier->createShipment($this->consignment->data);
-        if (empty($response['errors'])) {
-            $charges = Pricing::price($this->consignment->data);
-            $response = $this->setResponsePricingFields($response, $charges);
-
-            // Write shipment, charges and carrier Response to Database
-            $shipment = $this->writeShipment($charges, $response);
-            $shipmentCreated = (isset($shipment) && $shipment) ? true : false;
-
-            // Add Carrier Consignment details to IFS response
-            $response = $this->completeResponse($response, $shipmentCreated);
-        }
-
-        return $response;
-    }
-
-    private function completeResponse($response, $shipmentCreated)
-    {
-        if (strtolower($this->mode) == 'test' || $shipmentCreated) {
-
-            // Everything good so return token, consignment number and tracking URL for shipment
-            $response['ifs_consignment_number'] = $this->consignment->data['consignment_number'];
-            $response['token'] = $this->consignment->data['token'];
-            $response['tracking_url'] = config('app.url').'/tracking/'.$this->consignment->data['token'];
+                if ($response['errors'] == []) {
+                    $shipment->setCancelled($this->consignment->data['user_id']);
+                }
+            } else {
+                $response['errors'][] = 'Shipment cannot be cancelled';
+            }
         } else {
-
-            // Problem saving details - so return and error
-            $response['errors'][] = 'System Error (IT Support Notified)';
-            $response['label_base64'][0]['base64'] = '';
-        }
-
-        return $response;
-    }
-
-    /*
-    * ****************************
-    * Add Shipment to Database and
-    * return shipment as response
-    * ****************************
-    */
-    private function writeShipment($charges, $response)
-    {
-        $this->consignment->setPricingFields($charges);
-        $this->consignment->addCarrierResponse($response);                      // Add package barcodes and tracking details etc
-        $this->consignment->setShipmentToken();                                 // Get unique random token to identify Shipment
-
-        return $this->addShipment();
-    }
-
-    private function setResponsePricingFields($response, $charges)
-    {
-        $response['pricing'] = [];
-        if (! $this->consignment->isCollect() && empty($charges['errors'])) {
-            $response['pricing']['charges'] = $charges['sales'];
-            $response['pricing']['vat_code'] = $charges['sales_vat_code'];
-            $response['pricing']['vat_amount'] = $charges['sales_vat_amount'];
-            $response['pricing']['total_cost'] = $charges['shipping_charge'] + $charges['sales_vat_amount'];
+            $response['errors'][] = 'Shipment not found';
         }
 
         return $response;
     }
 
     /**
-     * Takes an unaltered PDF from a carrier and returns it in the size requested
-     * with the addition of printing/folding instructions for A4/LETTER sizes.
+     * Generates a commercial invoice.
      *
-     * @param   mixed   $shipment   Loaded shipment model or shipment identifier.
-     * @param   string  $size       Size of the PDF document required (accepts codes defined in print formats table).
-     * @param   string  $output     Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
+     * @param  string  $token  Shipment identifier.
+     * @param  array  $parameters  An array of options for customising invoice.
+     * @param  string  $size  Size of the PDF document required (accepts codes defined in print formats table).
+     * @param  string  $output  Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
      *
      * @return  mixed
      */
-    private function getLabel($shipment, $size = 'A4', $output = 'S', $encoded = true, $labelType = '')
+    public function getCommercialInvoice($token, $parameters = [], $size = 'A4', $output = 'S')
     {
         $pdf = new Pdf($size, $output);
 
-        return $pdf->createLabel($shipment, $encoded, $labelType);
+        return $pdf->createCommercialInvoice($token, $parameters);
+    }
+
+    /**
+     * Create a despatch note.
+     *
+     * @param  type  $token
+     * @param  type  $size
+     * @param  type  $output
+     *
+     * @return type
+     */
+    public function getDespatchNote($token, $size = 'A4', $output = 'S')
+    {
+        $pdf = new Pdf($size, $output);
+
+        return $pdf->createDespatchNote($token);
     }
 
     /**
      * Get a batch of labels.
      *
-     * @param   mixed   $shipment_id   Loaded shipment model or shipment identifier.
-     * @param   string  $size       Size of the PDF document required (accepts codes defined in print formats table).
-     * @param   string  $output     Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
+     * @param  mixed  $shipment_id  Loaded shipment model or shipment identifier.
+     * @param  string  $size  Size of the PDF document required (accepts codes defined in print formats table).
+     * @param  string  $output  Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
      *
      * @return  mixed
      */
@@ -453,19 +369,17 @@ class CarrierAPI
             $doc->setPrintFooter(false);
             $hasContent = false;
             foreach ($shipments as $shipment) {
-
                 // Get PDF string for this shipment
                 $originalPdf = $this->getLabel($shipment, $size, 'S', false, $labelType);
 
                 if ($originalPdf != 'not found') {
                     $hasContent = true;
-                    $pageCount = $doc->setSourceData($originalPdf);
+                    $pageCount  = $doc->setSourceData($originalPdf);
 
                     // Import Page by Page
                     for ($page = 0; $page < $pageCount; $page++) {
-
                         // Import PDF page to working area as Image and get size
-                        $tpl = $doc->importPage($page + 1);
+                        $tpl             = $doc->importPage($page + 1);
                         $originalPdfSize = $doc->getTemplateSize($tpl);
 
                         // Add a blank page to the document, then add content as a Template
@@ -481,5 +395,22 @@ class CarrierAPI
                 abort(404);
             }
         }
+    }
+
+    /**
+     * Takes an unaltered PDF from a carrier and returns it in the size requested
+     * with the addition of printing/folding instructions for A4/LETTER sizes.
+     *
+     * @param  mixed  $shipment  Loaded shipment model or shipment identifier.
+     * @param  string  $size  Size of the PDF document required (accepts codes defined in print formats table).
+     * @param  string  $output  Valid values are (D) - download, (S) - base64 string, (I) - inline browser. *** All external API calls should use (S). Therefor param 3 should not be publicly available ***
+     *
+     * @return  mixed
+     */
+    private function getLabel($shipment, $size = 'A4', $output = 'S', $encoded = true, $labelType = '')
+    {
+        $pdf = new Pdf($size, $output);
+
+        return $pdf->createLabel($shipment, $encoded, $labelType);
     }
 }
