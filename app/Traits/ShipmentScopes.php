@@ -598,8 +598,10 @@ trait ShipmentScopes
                      ->isInternational()
                      ->where('carrier_id', 2)
                      ->where('etd', false)
-                     ->whereNotIn('status_id', [1, 7])
-                     ->where('shipments.created_at', '>=', now()->subWeek())
+                     ->where('received', true)
+                     ->where('delivered', false)
+                     ->whereIn('status_id', [3, 14])
+                     ->where('shipments.created_at', '>=', now()->subWeeks(2))
                      ->where('companies.plt_enabled', true)
                      ->where('manifest_id', '>', 1);
     }
