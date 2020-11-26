@@ -245,14 +245,6 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
             $shipment['recipient_name'] = '.';
         }
 
-        if (empty($shipment['bill_shipping_account']) && strtolower($shipment['bill_shipping']) == 'sender') {
-            $shipment['bill_shipping_account'] = Service::find($shipment['service_id'])->account;
-        }
-
-        if (empty($shipment['bill_tax_duty_account']) && strtolower($shipment['bill_tax_duty']) == 'sender') {
-            $shipment['bill_tax_duty_account'] = Service::find($shipment['service_id'])->account;
-        }
-
         if (isset($shipment['alcohol']['quantity']) && $shipment['alcohol']['quantity'] > 0) {
             $shipment['errors'][] = 'Carrier does not accept Alcohol';
         }
@@ -326,11 +318,8 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
         $shipment = $this->preProcess($shipment);
 
         $errors = $this->validateShipment($shipment);
-
         if (empty($errors)) {
-
-            // UPS settings
-            $this->initCarrier($shipment);
+            $this->initCarrier();
             $upsShipment = $this->BuildUPSShipment($shipment);
             $reply = $this->sendMessageToCarrier($upsShipment, 'create_shipment');
 
