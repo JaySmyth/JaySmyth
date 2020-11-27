@@ -89,8 +89,8 @@ class CarrierAPI
         $response = [];
         $this->setEnvironment($mode);
         $this->consignment = new Consignment($data);
-        $apiShipment       = new APIShipment();                                       // Shipment object with validation rules etc.
-        $errors            = $apiShipment->validateShipment($this->consignment->data);
+        $apiShipment = new APIShipment();                                       // Shipment object with validation rules etc.
+        $errors = $apiShipment->validateShipment($this->consignment->data);
 
         return (empty($errors)) ? $this->sendShipment()
             : $this->generateErrors($response, $errors);
@@ -103,13 +103,13 @@ class CarrierAPI
     {
         // Send shipment data to Carrier
         $this->carrier = Carrier::getInstanceOf($this->consignment->data['carrier_code'], $this->mode);
-        $response      = $this->carrier->createShipment($this->consignment->data);
+        $response = $this->carrier->createShipment($this->consignment->data);
         if (empty($response['errors'])) {
-            $charges  = Pricing::price($this->consignment->data);
+            $charges = Pricing::price($this->consignment->data);
             $response = $this->setResponsePricingFields($response, $charges);
 
             // Write shipment, charges and carrier Response to Database
-            $shipment        = $this->writeShipment($charges, $response);
+            $shipment = $this->writeShipment($charges, $response);
             $shipmentCreated = (isset($shipment) && $shipment) ? true : false;
 
             // Add Carrier Consignment details to IFS response
@@ -129,8 +129,8 @@ class CarrierAPI
     {
         $response['pricing'] = [];
         if ( ! $this->consignment->isCollect() && empty($charges['errors'])) {
-            $response['pricing']['charges']    = $charges['sales'];
-            $response['pricing']['vat_code']   = $charges['sales_vat_code'];
+            $response['pricing']['charges'] = $charges['sales'];
+            $response['pricing']['vat_code'] = $charges['sales_vat_code'];
             $response['pricing']['vat_amount'] = $charges['sales_vat_amount'];
             $response['pricing']['total_cost'] = $charges['shipping_charge'] + $charges['sales_vat_amount'];
         }
@@ -167,7 +167,7 @@ class CarrierAPI
         try {
             if (isset($this->consignment->data['shipment_id']) && is_numeric($this->consignment->data['shipment_id'])) {
                 // Shipment exists (saved) so update it
-                $shipment                                      = Shipment::find($this->consignment->data['shipment_id']);
+                $shipment = Shipment::find($this->consignment->data['shipment_id']);
                 $this->consignment->data['consignment_number'] = $shipment->consignment_number; // hack
                 $shipment->update($this->consignment->data);
             } else {
@@ -207,7 +207,7 @@ class CarrierAPI
              */
             foreach ($this->consignment->data['label_base64'] as $label) {
                 $shipment->label()->create([
-                    'base64'      => $label['base64'],
+                    'base64' => $label['base64'],
                     'shipment_id' => $shipment->id,
                 ]);
             }
@@ -289,11 +289,11 @@ class CarrierAPI
         if (strtolower($this->mode) == 'test' || $shipmentCreated) {
             // Everything good so return token, consignment number and tracking URL for shipment
             $response['ifs_consignment_number'] = $this->consignment->data['consignment_number'];
-            $response['token']                  = $this->consignment->data['token'];
-            $response['tracking_url']           = config('app.url').'/tracking/'.$this->consignment->data['token'];
+            $response['token'] = $this->consignment->data['token'];
+            $response['tracking_url'] = config('app.url').'/tracking/'.$this->consignment->data['token'];
         } else {
             // Problem saving details - so return and error
-            $response['errors'][]                  = 'System Error (IT Support Notified)';
+            $response['errors'][] = 'System Error (IT Support Notified)';
             $response['label_base64'][0]['base64'] = '';
         }
 
@@ -334,12 +334,12 @@ class CarrierAPI
 
         // Identify Shipment
         $shipment = Shipment::where('company_id', $this->consignment->data['company_id'])
-                            ->where('token', $this->consignment->data['shipment_token'])
-                            ->first();
+            ->where('token', $this->consignment->data['shipment_token'])
+            ->first();
         if ($shipment) {
             if ($shipment->isCancellable()) {
                 $this->carrier = Carrier::getInstanceOf($shipment->carrier->code, $this->mode);     // Create Carrier Object
-                $response      = $this->carrier->deleteShipment($shipment);                              // Send Shipment to Carrier
+                $response = $this->carrier->deleteShipment($shipment);                              // Send Shipment to Carrier
 
                 if ($response['errors'] == []) {
                     $shipment->setCancelled($this->consignment->data['user_id']);
@@ -409,12 +409,12 @@ class CarrierAPI
 
                 if ($originalPdf != 'not found') {
                     $hasContent = true;
-                    $pageCount  = $doc->setSourceData($originalPdf);
+                    $pageCount = $doc->setSourceData($originalPdf);
 
                     // Import Page by Page
                     for ($page = 0; $page < $pageCount; $page++) {
                         // Import PDF page to working area as Image and get size
-                        $tpl             = $doc->importPage($page + 1);
+                        $tpl = $doc->importPage($page + 1);
                         $originalPdfSize = $doc->getTemplateSize($tpl);
 
                         // Add a blank page to the document, then add content as a Template

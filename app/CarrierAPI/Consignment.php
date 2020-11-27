@@ -35,7 +35,7 @@ class Consignment
      */
     public function __construct($shipment)
     {
-        $this->data    = $shipment;
+        $this->data = $shipment;
         $this->company = Company::find($this->data['company_id']);
         $this->preProcess();
     }
@@ -64,7 +64,7 @@ class Consignment
             $this->setAnsiStateCode('sender');
             $this->setAnsiStateCode('recipient');
             $this->data['country_of_destination'] = $this->data['recipient_country_code'];
-            $this->data['route_id']               = 1;
+            $this->data['route_id'] = 1;
             $this->setCustomsCurrency();
             $this->setSpecialInstructions();
             $this->setShipmentDates();
@@ -122,8 +122,8 @@ class Consignment
     private function setDepartmentId()
     {
         // Identify Department
-        $department_code             = identifyDepartment($this->data);
-        $department                  = Department::where('code', $department_code)->first();
+        $department_code = identifyDepartment($this->data);
+        $department = Department::where('code', $department_code)->first();
         $this->data['department_id'] = ($department) ? $department->id : null;
     }
 
@@ -131,14 +131,14 @@ class Consignment
     {
         $service = Service::find($this->data['service_id']);
         if ($service) {
-            $this->data['carrier_id']         = $service->carrier_id;
-            $this->data['carrier_code']       = $service->carrier->code;
-            $this->data['service_code']       = $service->code;
+            $this->data['carrier_id'] = $service->carrier_id;
+            $this->data['carrier_code'] = $service->carrier->code;
+            $this->data['service_code'] = $service->code;
             $this->data['volumetric_divisor'] = $service->volumetric_divisor;
         } else {
-            $this->data['carrier_id']         = '';
-            $this->data['carrier_code']       = '';
-            $this->data['service_code']       = '';
+            $this->data['carrier_id'] = '';
+            $this->data['carrier_code'] = '';
+            $this->data['service_code'] = '';
             $this->data['volumetric_divisor'] = '';
         }
     }
@@ -182,7 +182,7 @@ class Consignment
                 $invalidFormat = ! preg_match($service->account_number_regex, $this->data[$account_type.'_account']);
                 if ($invalidFormat) {
                     $this->data[$account_type.'_account'] = '';
-                    $accountSpecified                     = false;
+                    $accountSpecified = false;
                 }
             }
 
@@ -222,7 +222,7 @@ class Consignment
             $service = $this->company
                 ->getServicesForMode($this->data['mode_id'])
                 ->where('code', $this->data['service_code'])
-                ->where('carrier_id', (string)$this->data['carrier_id']) // Carrier_id needs to be typecast to string
+                ->where('carrier_id', (string) $this->data['carrier_id']) // Carrier_id needs to be typecast to string
                 ->first();
         }
 
@@ -235,12 +235,12 @@ class Consignment
         if (isset($this->data['ship_reason']) && $this->data['ship_reason'] == 'documents') {
             // Documents Only shipment
             $this->data['documents_description'] = 'Documents Only';
-            $this->data['goods_description']     = '';
-            $this->data['contents']              = null;
+            $this->data['goods_description'] = '';
+            $this->data['contents'] = null;
 
             // Countries that require minimum 1 USD customs value for docs shipments
             if (in_array($this->data['recipient_country_code'], ['NZ', 'AM', 'AU', 'AZ', 'BY', 'CA', 'CN', 'CZ', 'GE', 'JP', 'KG', 'MD', 'PH', 'RU', 'SK', 'UZ', 'VE', 'KR', 'KW', 'RO'])) {
-                $this->data['customs_value']               = 1;
+                $this->data['customs_value'] = 1;
                 $this->data['customs_value_currency_code'] = 'USD';
             }
         } else {
@@ -316,7 +316,7 @@ class Consignment
         }
 
         // Convert Collection date into a known format.
-        $date_format                   = getDateFormat($this->data['date_format']);
+        $date_format = getDateFormat($this->data['date_format']);
         $this->data['collection_date'] = Carbon::createFromformat($date_format, $this->data['collection_date'], $localisation->time_zone)->format('Y-m-d');
 
         // Set the ship date.
@@ -332,9 +332,9 @@ class Consignment
      */
     private function doPackageLevelProcessing()
     {
-        $dims              = [];
+        $dims = [];
         $dryIceTotalWeight = 0;
-        $cnt               = 0;
+        $cnt = 0;
         $volumetric_weight = 0;
         foreach ($this->data['packages'] as $package) {
             $this->doPackageProcessing($cnt);
@@ -381,9 +381,9 @@ class Consignment
     {
         // Ensure all dims are integers
         $this->data['packages'][$cnt]['length'] = ceil($this->data['packages'][$cnt]['length']);
-        $this->data['packages'][$cnt]['width']  = ceil($this->data['packages'][$cnt]['width']);
+        $this->data['packages'][$cnt]['width'] = ceil($this->data['packages'][$cnt]['width']);
         $this->data['packages'][$cnt]['height'] = ceil($this->data['packages'][$cnt]['height']);
-        $this->data['packages'][$cnt]['index']  = $cnt + 1;
+        $this->data['packages'][$cnt]['index'] = $cnt + 1;
 
         // Calc Volumetric weight
         $this->data['packages'][$cnt]['volumetric_weight'] = calcVolume(
@@ -431,15 +431,15 @@ class Consignment
     public function addCarrierResponse($response)
     {
         // Add Shipment level
-        $this->data['route_id']                   = $response['route_id'];
-        $this->data['consignment_number']         = $response['ifs_consignment_number'];
+        $this->data['route_id'] = $response['route_id'];
+        $this->data['consignment_number'] = $response['ifs_consignment_number'];
         $this->data['carrier_consignment_number'] = $response['consignment_number'];
-        $this->data['carrier_tracking_number']    = $response['consignment_number'];
+        $this->data['carrier_tracking_number'] = $response['consignment_number'];
 
         // Add Carrier Tracking number and Barcode for each package
         for ($i = 0; $i < $response['pieces']; $i++) {
             $this->data['packages'][$i]['carrier_tracking_number'] = $response['packages'][$i]['carrier_tracking_code'];
-            $this->data['packages'][$i]['barcode']                 = $response['packages'][$i]['barcode'];
+            $this->data['packages'][$i]['barcode'] = $response['packages'][$i]['barcode'];
         }
 
         $this->data['label_base64'] = $response['label_base64'];
@@ -455,11 +455,11 @@ class Consignment
         $getNewToken = true;
 
         while ($getNewToken) {
-            $token    = Str::random(12);
+            $token = Str::random(12);
             $shipment = Shipment::where('token', $token)->first();
             if ( ! isset($shipment)) {
                 $this->data['token'] = $token;
-                $getNewToken         = false;
+                $getNewToken = false;
             }
         }
     }
@@ -472,21 +472,21 @@ class Consignment
     public function setPricingFields($charges = [])
     {
         if ($charges == []) {
-            $this->data['quoted']          = null;
-            $this->data['shipping_cost']   = null;
+            $this->data['quoted'] = null;
+            $this->data['shipping_cost'] = null;
             $this->data['shipping_charge'] = null;
-            $this->data['fuel_cost']       = null;
-            $this->data['fuel_charge']     = null;
-            $this->data['cost_currency']   = 'GBP';
-            $this->data['sales_currency']  = 'GBP';
+            $this->data['fuel_cost'] = null;
+            $this->data['fuel_charge'] = null;
+            $this->data['cost_currency'] = 'GBP';
+            $this->data['sales_currency'] = 'GBP';
         } else {
-            $this->data['quoted']          = json_encode($charges);
-            $this->data['shipping_cost']   = $charges['shipping_cost'];
+            $this->data['quoted'] = json_encode($charges);
+            $this->data['shipping_cost'] = $charges['shipping_cost'];
             $this->data['shipping_charge'] = $charges['shipping_charge'];
-            $this->data['fuel_cost']       = $charges['fuel_cost'];
-            $this->data['fuel_charge']     = $charges['fuel_charge'];
-            $this->data['cost_currency']   = $charges['cost_currency'];
-            $this->data['sales_currency']  = $charges['sales_currency'];
+            $this->data['fuel_cost'] = $charges['fuel_cost'];
+            $this->data['fuel_charge'] = $charges['fuel_charge'];
+            $this->data['cost_currency'] = $charges['cost_currency'];
+            $this->data['sales_currency'] = $charges['sales_currency'];
         }
     }
 
@@ -497,16 +497,16 @@ class Consignment
     public function preProcessAddShipment()
     {
         if ( ! empty($this->data['alcohol'])) {
-            $this->data['alcohol_type']      = (isset($this->data['alcohol']['type'])) ? $this->data['alcohol']['type'] : '';
+            $this->data['alcohol_type'] = (isset($this->data['alcohol']['type'])) ? $this->data['alcohol']['type'] : '';
             $this->data['alcohol_packaging'] = (isset($this->data['alcohol']['packaging'])) ? $this->data['alcohol']['packaging'] : '';
-            $this->data['alcohol_volume']    = (isset($this->data['alcohol']['volume'])) ? $this->data['alcohol']['volume'] : '';
-            $this->data['alcohol_quantity']  = (isset($this->data['alcohol']['quantity'])) ? $this->data['alcohol']['quantity'] : '';
+            $this->data['alcohol_volume'] = (isset($this->data['alcohol']['volume'])) ? $this->data['alcohol']['volume'] : '';
+            $this->data['alcohol_quantity'] = (isset($this->data['alcohol']['quantity'])) ? $this->data['alcohol']['quantity'] : '';
         }
 
         if ( ! empty($this->data['dry_ice'])) {
-            $this->data['dry_ice_flag']               = (isset($this->data['dry_ice']['flag'])) ? $this->data['dry_ice']['flag'] : '';
+            $this->data['dry_ice_flag'] = (isset($this->data['dry_ice']['flag'])) ? $this->data['dry_ice']['flag'] : '';
             $this->data['dry_ice_weight_per_package'] = (isset($this->data['dry_ice']['weight_per_package'])) ? $this->data['dry_ice']['weight_per_package'] : '';
-            $this->data['dry_ice_total_weight']       = (isset($this->data['dry_ice']['total_weight'])) ? $this->data['dry_ice']['total_weight'] : '';
+            $this->data['dry_ice_total_weight'] = (isset($this->data['dry_ice']['total_weight'])) ? $this->data['dry_ice']['total_weight'] : '';
         }
 
         if ( ! isset($this->data['collection_route']) || empty($this->data['collection_route'])) {
