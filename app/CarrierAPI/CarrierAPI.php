@@ -128,7 +128,7 @@ class CarrierAPI
     private function setResponsePricingFields($response, $charges)
     {
         $response['pricing'] = [];
-        if ( ! $this->consignment->isCollect() && empty($charges['errors'])) {
+        if (! $this->consignment->isCollect() && empty($charges['errors'])) {
             $response['pricing']['charges'] = $charges['sales'];
             $response['pricing']['vat_code'] = $charges['sales_vat_code'];
             $response['pricing']['vat_amount'] = $charges['sales_vat_amount'];

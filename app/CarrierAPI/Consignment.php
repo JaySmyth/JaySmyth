@@ -113,7 +113,7 @@ class Consignment
         // Add any missing but required indexes
         $requiredKeys = ['sender_address2', 'recipient_address2'];
         foreach ($requiredKeys as $key) {
-            if ( ! array_key_exists($key, $this->data)) {
+            if (! array_key_exists($key, $this->data)) {
                 $this->data[$key] = null;
             }
         }
@@ -146,7 +146,7 @@ class Consignment
     private function setIncoTerms()
     {
         // Set IncoTerms if possible
-        if ( ! isset($this->data['terms_of_sale']) || empty($this->data['terms_of_sale'])) {
+        if (! isset($this->data['terms_of_sale']) || empty($this->data['terms_of_sale'])) {
             if ($this->data['bill_tax_duty'] == 'sender') {
                 $this->data['terms_of_sale'] = 'ddp';
             }
@@ -188,7 +188,7 @@ class Consignment
 
             // If Bill Sender and account empty then complete from service
             if ($this->data[$account_type] == 'sender' && ! $accountSpecified) {
-                if ( ! empty($service->pivot->account)) {
+                if (! empty($service->pivot->account)) {
                     // Use Customers own account if defined
                     $this->data[$account_type.'_account'] = $service->pivot->account;
                 } else {
@@ -250,7 +250,7 @@ class Consignment
             // If Commodity set then use first commodity description
             if (isset($this->data['contents'][0]['description']) && $this->data['contents'][0]['description'] > '') {
                 $this->data['goods_description'] = $this->data['contents'][0]['description'];
-            } elseif ( ! isset($this->data['goods_description']) || empty($this->data['goods_description'])) {
+            } elseif (! isset($this->data['goods_description']) || empty($this->data['goods_description'])) {
                 $this->data['goods_description'] = 'Miscellaneous Goods';
             }
         }
@@ -268,14 +268,14 @@ class Consignment
 
     private function setSenderTelephone()
     {
-        if ( ! isset($this->data['sender_telephone']) || empty($this->data['sender_telephone'])) {
+        if (! isset($this->data['sender_telephone']) || empty($this->data['sender_telephone'])) {
             $this->data['sender_telephone'] = $this->company->telephone;
         }
     }
 
     private function setAnsiStateCode($type)
     {
-        if ( ! isset($this->data[$type.'_state'])) {
+        if (! isset($this->data[$type.'_state'])) {
             $this->data[$type.'_state'] = null;
         }
 
@@ -292,7 +292,7 @@ class Consignment
     private function setCustomsCurrency()
     {
         // If Currency not set then default to Currency for Senders Country
-        if ( ! isset($this->data['customs_value_currency_code']) || empty($this->data['customs_value_currency_code'])) {
+        if (! isset($this->data['customs_value_currency_code']) || empty($this->data['customs_value_currency_code'])) {
             $this->data['customs_value_currency_code'] = Country::where('country_code', $this->data['sender_country_code'])->first()->currency_code;
         }
     }
@@ -300,7 +300,7 @@ class Consignment
     private function setSpecialInstructions()
     {
         // If special_instructions not set then set to empty string
-        if ( ! isset($this->data['special_instructions'])) {
+        if (! isset($this->data['special_instructions'])) {
             $this->data['special_instructions'] = '';
         }
     }
@@ -311,7 +311,7 @@ class Consignment
         $localisation = $this->company->localisation;
 
         // If date format not already set then set it
-        if ( ! isset($this->data['date_format'])) {
+        if (! isset($this->data['date_format'])) {
             $this->data['date_format'] = $localisation->date_format;
         }
 
@@ -360,7 +360,7 @@ class Consignment
         $this->data['max_dimension'] = (count($dims) > 0) ? max($dims) : 0;
 
         // Set Total Volumetric weight
-        if ( ! isset($this->data['volumetric_weight']) || $volumetric_weight > $this->data['volumetric_weight']) {
+        if (! isset($this->data['volumetric_weight']) || $volumetric_weight > $this->data['volumetric_weight']) {
             $this->data['volumetric_weight'] = $volumetric_weight;
         }
 
@@ -457,7 +457,7 @@ class Consignment
         while ($getNewToken) {
             $token = Str::random(12);
             $shipment = Shipment::where('token', $token)->first();
-            if ( ! isset($shipment)) {
+            if (! isset($shipment)) {
                 $this->data['token'] = $token;
                 $getNewToken = false;
             }
@@ -496,20 +496,20 @@ class Consignment
      */
     public function preProcessAddShipment()
     {
-        if ( ! empty($this->data['alcohol'])) {
+        if (! empty($this->data['alcohol'])) {
             $this->data['alcohol_type'] = (isset($this->data['alcohol']['type'])) ? $this->data['alcohol']['type'] : '';
             $this->data['alcohol_packaging'] = (isset($this->data['alcohol']['packaging'])) ? $this->data['alcohol']['packaging'] : '';
             $this->data['alcohol_volume'] = (isset($this->data['alcohol']['volume'])) ? $this->data['alcohol']['volume'] : '';
             $this->data['alcohol_quantity'] = (isset($this->data['alcohol']['quantity'])) ? $this->data['alcohol']['quantity'] : '';
         }
 
-        if ( ! empty($this->data['dry_ice'])) {
+        if (! empty($this->data['dry_ice'])) {
             $this->data['dry_ice_flag'] = (isset($this->data['dry_ice']['flag'])) ? $this->data['dry_ice']['flag'] : '';
             $this->data['dry_ice_weight_per_package'] = (isset($this->data['dry_ice']['weight_per_package'])) ? $this->data['dry_ice']['weight_per_package'] : '';
             $this->data['dry_ice_total_weight'] = (isset($this->data['dry_ice']['total_weight'])) ? $this->data['dry_ice']['total_weight'] : '';
         }
 
-        if ( ! isset($this->data['collection_route']) || empty($this->data['collection_route'])) {
+        if (! isset($this->data['collection_route']) || empty($this->data['collection_route'])) {
             $this->data['collection_route'] = 'ADHOC';
         }
 
