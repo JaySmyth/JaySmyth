@@ -680,7 +680,7 @@ class ImportShipments implements ShouldQueue
 
             case 'cost':
             case 'price':
-                $companyServices = newCompanyServices();
+                $companyServices = new CompanyServices();
                 $services = $companyServices->getCheapestService($availableServices, $carrierChoice);
                 break;
 
