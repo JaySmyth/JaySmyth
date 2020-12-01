@@ -196,6 +196,12 @@ class Consignment
                     $this->data[$account_type.'_account'] = $service->account;
                 }
             }
+
+            if ($this->data[$account_type] == 'recipient' && ! $accountSpecified) {
+                if (!isset($this->data[$account_type.'_account'])) {
+                    $this->data[$account_type.'_account'] = '';
+                }
+            }
         }
     }
 
