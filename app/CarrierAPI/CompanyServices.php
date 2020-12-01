@@ -205,7 +205,7 @@ class CompanyServices
     private function addServiceToList($chosenService = [], $suitableServiceArray = [], $carrierChoice = '')
     {
         if (isset($chosenService[$suitableServiceArray['code']])) {
-            if ($suitableServiceArray[$carrier_choice] < $chosenService[$suitableServiceArray['code']][$carrierChoice]) {
+            if ($suitableServiceArray[$carrierChoice] < $chosenService[$suitableServiceArray['code']][$carrierChoice]) {
 
                 // This Service cheaper than Previous ones
                 $chosenService[$suitableServiceArray['code']] = $suitableServiceArray;
