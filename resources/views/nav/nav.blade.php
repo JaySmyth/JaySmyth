@@ -93,16 +93,11 @@
                     @include('nav.partials.ifs')
                 @else
                     @include('nav.partials.customer')
-                @endif
 
-                @if(Auth::user()->hasRole('ifsa'))
                     <li class="nav-item">
-                        <button type="button" class="btn btn-primary ml-2" data-toggle="modal"
-                                data-target="#feedback_modal">Feedback
-                        </button>
+                        <button type="button" class="btn btn-primary ml-2" data-toggle="modal" data-target="#feedback_modal">Feedback</button>
                     </li>
                 @endif
-
             </ul>
 
             <ul class="navbar-nav mr-sm-1">
