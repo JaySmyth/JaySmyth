@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Carrier;
 use App\CarrierAPI\Facades\CarrierAPI;
+use App\CarrierAPI\CarrierService;
 use App\Models\Country;
 use App\Models\Department;
 use App\Models\Postcode;
@@ -679,7 +680,8 @@ class ImportShipments implements ShouldQueue
 
             case 'cost':
             case 'price':
-                $services = CarrierAPI::getCheapestService($availableServices, $carrierChoice);
+                $companyServices = newCompanyServices();
+                $services = $companyServices->getCheapestService($availableServices, $carrierChoice);
                 break;
 
             default:
