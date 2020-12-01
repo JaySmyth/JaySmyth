@@ -680,7 +680,7 @@ class FedexAPI extends CarrierBase
                         case 'bill_tax_duty':
                             if ($value > '') {
                                 $msgData[$this->fedex->fldno['bill_tax_duty']]            = $this->fedex->paymentType[$value];
-                                $msgData[$this->fedex->fldno['bill_tax_duty_account']]    = (!empty($data['bill_tax_duty_account'])) ? $data['bill_tax_duty_account'] : null;
+                                $msgData[$this->fedex->fldno['bill_tax_duty_account']]    = $data['bill_tax_duty_account'];
                                 $msgData[$this->fedex->fldno['bill_tax_duty_to_country']] = $this->getPayorCountry($data, $value);
                             }
                             break;
