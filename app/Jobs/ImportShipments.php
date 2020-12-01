@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Carrier;
 use App\CarrierAPI\Facades\CarrierAPI;
-use App\CarrierAPI\CompanyService;
+use App\CarrierAPI\CompanyServices;
 use App\Models\Country;
 use App\Models\Department;
 use App\Models\Postcode;
