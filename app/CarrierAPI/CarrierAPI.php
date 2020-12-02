@@ -45,26 +45,30 @@ class CarrierAPI
     /**
      * @param  string  $mode
      */
-    private function setEnvironment($mode = '')
+    public function setEnvironment($mode = '')
     {
         // if mode is defined then use it
         $env_mode = ($mode > '') ? $mode : App::environment();
+        try {
+            // If Environment variable set to Production, then change mode
+            switch (strtoupper($env_mode)) {
+                case 'PRODUCTION':
+                case 'TESTING':
+                    $this->mode = 'production';
+                    break;
 
-        // If Environment variable set to Production, then change mode
-        switch (strtoupper($env_mode)) {
-            case 'PRODUCTION':
-            case 'TESTING':
-                $this->mode = 'production';
-                break;
+                case 'LOCAL':
+                case 'TEST':
+                    $this->mode = 'test';
+                    break;
 
-            case 'LOCAL':
-            case 'TEST':
-                $this->mode = 'test';
-                break;
-
-            default:
-                dd('Unknown Mode : *'.$env_mode.'*');
-                break;
+                default:
+                    dd('Unknown Mode : *'.$env_mode.'*');
+                    break;
+            }
+        } catch (Exception $e) {
+            Mail::to(config('mail.error'))->queue(new GenericError('CarrierAPi Error Data', $e->getMessage().' on line '.$e->getLine()."\r\n\r\n".json_encode($env_mode)));
+            $this->mode = 'production';
         }
     }
 
