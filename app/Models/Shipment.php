@@ -654,6 +654,15 @@ class Shipment extends Model
     }
 
     /**
+     * A shipment has one ETD log.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function etdLog(){
+        return $this->hasOne(EtdLog::class);
+    }
+
+    /**
      * A shipment is cancellable.
      *
      * @return bool
