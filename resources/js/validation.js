@@ -120,10 +120,6 @@ $("#create-shipment").validate({
             });
         }
 
-alert($(element).is(":hidden"));
-alert($('#customs-panel-validator').val());
-
-
         if (($(element).attr('id') =='eori') && $(element).is(":hidden") && $('#invoice-panel-validator').val() == 0 ){
 
             $('#invoice-panel-validator').val(1);
