@@ -893,19 +893,6 @@ class PricingModel
         $this->getPackagingType();
         $packagingType = (empty($this->packagingType)) ? 'Unknown' : $this->packagingType.'(s)';
 
-        // Get Rate Details for this Packaging Type/zone/pieces/weight
-        $this->log('Searching for Rate for', [
-            'Company_id'         => $this->shipment['company_id'],
-            'RateId: '           => $this->rate['id'],
-            'ServiceId: '        => $this->shipment['service_id'],
-            'Recipient Type: '   => $this->shipment['recipient_type'],
-            'Packaging Type: '   => $this->packagingType,
-            'Pieces: '           => $this->shipment['pieces'],
-            'Chargable Weight: ' => $this->chargeableWeight,
-            'Zone: '             => $this->zone,
-            'ShipDate: '         => $this->shipment['ship_date'],
-        ]);
-
         $currentRateLine = $this->getRateDetails($this->shipment['company_id'], $this->rate['id'], $this->shipment['service_id'], $this->shipment['recipient_type'], $this->packagingType, $this->shipment['pieces'], $this->chargeableWeight, $this->zone, $this->shipment['ship_date']);
         if ($currentRateLine) {
             $result = ['charge' => 0, 'break_point' => 0];
@@ -916,26 +903,19 @@ class PricingModel
             ];
 
             /*
-             * ******************************************************
-             *  Special treatment for all non Fedex per kg cost rates
-             * ******************************************************
+             * *********************************************
+             *  If pricing segment is weight based,
+             *  calc values of previous segments (if any)
+             * *********************************************
              */
-            if ($this->shipment['carrier_id'] != '2' || $this->priceType == 'Sales') {
+            if ($currentRateLine->weight_rate > 0) {
 
-                /*
-                 * *********************************************
-                 *  If pricing segment is weight based,
-                 *  calc values of previous segments (if any)
-                 * *********************************************
-                 */
-                if ($currentRateLine->weight_rate > 0) {
-
-                    // Recursively price all per kg break points
-                    $result = $this->getPrevSegmentCharge($currentRateLine);
-                    $charge['value'] = $result['charge'];
-                    $this->log($charge['description'].' - '.$charge['value']);
-                }
+                // Recursively price all per kg break points
+                $result = $this->getPrevSegmentCharge($currentRateLine);
+                $charge['value'] = $result['charge'];
+                $this->log($charge['description'].' - '.$charge['value']);
             }
+
             /*
              * *********************************************
              * Calc Charges for this segment
@@ -1147,6 +1127,19 @@ class PricingModel
     {
         $rateDetail = new RateDetail();
         $rateDetail->debug = $this->debug;
+
+        $this->log('Searching for Rate for', [
+            'Company_id'         => $companyId,
+            'RateId: '           => $rateId,
+            'ServiceId: '        => $serviceId,
+            'Recipient Type: '   => $recipientType,
+            'Packaging Type: '   => $packagingType,
+            'Pieces: '           => $pieces,
+            'Chargable Weight: ' => $chargeableWeight,
+            'Zone: '             => $zone,
+            'ShipDate: '         => $shipDate,
+        ]);
+
 
         // Get residential Rate Details for this Packaging Type/zone/pieces/weight
         $rateDetail = $rateDetail->getRate(
