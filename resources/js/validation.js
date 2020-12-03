@@ -84,6 +84,9 @@ $("#create-shipment").validate({
         export_reason: {
             required: true,
         },
+        eori: {
+            required: true,
+        },
     },
     highlight: function (element, errorClass) {
 
@@ -102,7 +105,9 @@ $("#create-shipment").validate({
             });
         }
 
-        if (/recipient_/i.test($(element).attr('id')) && $(element).is(":hidden") && $('#recipient-panel-validator').val() == 0 && $('#sender-panel-validator').val() == 0) {
+        if (
+            /recipient_/i.test($(element).attr('id')) && $(element).is(":hidden") && $('#recipient-panel-validator').val() == 0 && $('#sender-panel-validator').val() == 0) {
+
             $('#recipient-panel-validator').val(1);
 
             $('#panel-sender').hide();
@@ -110,6 +115,24 @@ $("#create-shipment").validate({
 
             swal({
                 title: 'Recipient Details Required!',
+                text: 'Please complete the highlighted fields before trying to proceed.',
+                type: 'error'
+            });
+        }
+
+alert($(element).is(":hidden"));
+alert($('#customs-panel-validator').val());
+
+
+        if (($(element).attr('id') =='eori') && $(element).is(":hidden") && $('#invoice-panel-validator').val() == 0 ){
+
+            $('#invoice-panel-validator').val(1);
+
+            $('#panel-details').hide();
+            $('#panel-invoice').show();
+
+            swal({
+                title: 'EORI Number Required!',
                 text: 'Please complete the highlighted fields before trying to proceed.',
                 type: 'error'
             });

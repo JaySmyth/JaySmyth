@@ -24,6 +24,7 @@
 
     {!! Form::hidden('sender-panel-validator', 0, array('id' => 'sender-panel-validator')) !!}
     {!! Form::hidden('recipient-panel-validator', 0, array('id' => 'recipient-panel-validator')) !!}
+    {!! Form::hidden('invoice-panel-validator', 0, array('id' => 'invoice-panel-validator')) !!}
 
     {!! Form::Open(['id' => 'create-shipment', 'url' => 'shipments', 'class' => 'form-compact-xs', 'autocomplete' => 'off']) !!}
 

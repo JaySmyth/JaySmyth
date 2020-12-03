@@ -649,6 +649,7 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
 
         $('#sender-panel-validator').val(0);
         $('#recipient-panel-validator').val(0);
+        $('#invoice-panel-validator').val(0);
 
         if ($("#create-shipment").valid() && validateContents() && validateBilling()) {
             setTotals();
