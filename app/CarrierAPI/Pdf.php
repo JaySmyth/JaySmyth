@@ -267,7 +267,7 @@ class Pdf
             }
 
             // If not a document shipment and a customs entry is required
-            if ($shipment->ship_reason != 'documents') {
+            if ($shipment->ship_reason != 'documents' && !isDomestic($shipment->sender_country_code, $shipment->recipient_country_code)) {
 
                 // Add Commercial Invoice unless request is for a master label only (A4 only)
                 if ((strtoupper($labelType) != 'MASTER') && $this->size == 'A4') {
