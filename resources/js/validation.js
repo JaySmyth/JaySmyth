@@ -86,6 +86,7 @@ $("#create-shipment").validate({
         },
         eori: {
             required: true,
+            minlength: 12
         },
     },
     highlight: function (element, errorClass) {
@@ -129,7 +130,7 @@ $("#create-shipment").validate({
 
             swal({
                 title: 'EORI Number Required!',
-                text: 'Please complete the highlighted fields before trying to proceed.',
+                text: 'Please complete the highlighted fields before trying to proceed. See https://www.gov.uk/eori for more info.',
                 type: 'error'
             });
         }

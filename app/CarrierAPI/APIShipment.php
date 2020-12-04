@@ -535,7 +535,7 @@ class APIShipment
             $rules['contents.*.unit_weight'] = 'numeric|greater_than_value:0';
 
             if (strtoupper($shipment['sender_country_code']) == 'GB' && ! isUkDomestic(strtoupper($shipment['recipient_country_code']))) {
-                //$rules['eori'] = 'required|string|max:14';
+                //$rules['eori'] = 'required|string|min:12|max:14';
             }
         }
 
