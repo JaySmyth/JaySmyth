@@ -85,8 +85,8 @@ $("#create-shipment").validate({
             required: true,
         },
         eori: {
-            required: true,
-            minlength: 12
+            //required: true,
+           // minlength: 12
         },
     },
     highlight: function (element, errorClass) {
