@@ -133,6 +133,8 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
                 $this->pdf->Text($x, $y += 4.1, strtoupper(getCountry($this->shipment['recipient_country_code'])));
             }
 
+            $this->pdf->Text($x, $y += 4.1, 'Tel: ' . $this->shipment['recipient_telephone']);
+
             $this->pdf->SetLineWidth(0.3);
             $this->pdf->Line(65, 90, 65, 130); //vertical
 
