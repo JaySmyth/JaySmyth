@@ -97,9 +97,9 @@ class ServiceRules
     {
 
         // Check Account number known if billed to shipper
-        if (! $this->accountNumberKnown($shipment, $serviceDetails)) {
-            return false;
-        }
+        //if (! $this->accountNumberKnown($shipment, $serviceDetails)) {
+        //    return false;
+        //}
 
         // Check Service valid for this customer to this country
         if (! $this->country_filter($shipment, $serviceDetails)) {
