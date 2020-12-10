@@ -13,6 +13,7 @@ use App\Models\CompanyPackagingType;
 use App\Models\Country;
 use App\Models\IfsNdPostcode;
 use App\Models\PackagingType;
+use App\Models\Service;
 
 /**
  * Description of ServiceRules.
@@ -94,6 +95,11 @@ class ServiceRules
 
     private function doChecks($shipment, $serviceDetails)
     {
+
+        // Check Account number known if billed to shipper
+        if (! $this->accountNumberKnown($shipment, $serviceDetails)) {
+            return false;
+        }
 
         // Check Service valid for this customer to this country
         if (! $this->country_filter($shipment, $serviceDetails)) {
@@ -204,7 +210,7 @@ class ServiceRules
 
         // Fields to check
         $checklist = ['carrier_code', 'code', 'sender_country_codes', 'recipient_country_codes', 'sender_postcode_regex', 'recipient_postcode_regex', 'packaging_types', 'min_weight', 'max_weight', 'max_pieces', 'max_dimension', 'max_girth', 'max_customs_value', 'hazardous',
-            'dry_ice', 'alcohol', 'broker', 'eu', 'non_eu', 'account_number_regex', ];
+            'dry_ice', 'alcohol', 'broker', 'eu', 'non_eu', 'account_number_regex'];
 
         foreach ($checklist as $test) {
             if ($this->debug) {
@@ -517,7 +523,7 @@ class ServiceRules
                 $result = true;
             }
         }
-        
+
         return ($requiredResult == $result);
     }
 
@@ -543,7 +549,18 @@ class ServiceRules
         }
 
         if (strlen($shipment['bill_shipping_account']) > 0 && strlen($shipment['bill_tax_duty_account']) == 0) {
-            return preg_match($serviceDetails['account_number_regex'], $shipment['bill_shipping_account']);
+            $inTheCorrectFormat = preg_match($serviceDetails['account_number_regex'], $shipment['bill_shipping_account']);
+            if ($inTheCorrectFormat) {
+                // If Fedex and Sender pays Freight make sure it is one of our account numbers
+                if ($shipment['bill_shipping'] = 'shipper' && $shipment['carrier_id'] == '2') {
+                    $service = Service::where('account', $shipment['bill_shipping_account']) ->first();
+                    if (! empty($service)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         if (strlen($shipment['bill_tax_duty_account']) > 0 && strlen($shipment['bill_shipping_account']) == 0) {
@@ -551,6 +568,19 @@ class ServiceRules
         }
 
         return preg_match($serviceDetails['account_number_regex'], $shipment['bill_shipping_account']) && preg_match($serviceDetails['account_number_regex'], $shipment['bill_tax_duty_account']);
+    }
+
+    private function accountNumberKnown($shipment, $serviceDetails)
+    {
+        // If Sender pays Freight make sure it is one of our account numbers
+        if ($shipment['bill_shipping'] == 'sender') {
+            $service = Service::where('account', $shipment['bill_shipping_account']) ->first();
+            if (empty($service)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function packaging_types($shipment, $serviceDetails)

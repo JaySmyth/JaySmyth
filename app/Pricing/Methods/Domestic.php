@@ -143,7 +143,7 @@ class Domestic extends PricingModel
             $this->log('Packaging Type: '.$this->packagingType);
 
             if (isset($this->rateDetail->first) && isset($this->rateDetail->others) && isset($this->rateDetail->notional_weight)) {
-                $this->log('Calc Charge for 1st Piece');
+                $this->log('Calc Charge for 1st Piece of '.$pieces);
 
                 // Calc Charge for 1st piece
                 if ($this->rateDetail->first > 0) {
@@ -159,10 +159,12 @@ class Domestic extends PricingModel
 
                 // Rate has notional package charge so check to see if it applies
                 if (isset($this->rateDetail->notional_weight) && $this->rateDetail->notional_weight > 0) {
-
+                    $this->log('Calc Notional Pkg: '.$this->rateDetail->notional_weight);
                     // Calculate how many notional packages there are and price accordingly
                     $notionalPackages = ceil($chargeableWeight / round($this->rateDetail->notional_weight, 2)) - $pieces;
+                    $this->log($notionalPackages.' Notional Pkg(s) found ');
                     if ($notionalPackages > 0) {
+                        $this->log('Rate: '.json_encode($this->rateDetail));
                         if ($this->rateDetail->notional > 0) {
 
                             // Price notional packages

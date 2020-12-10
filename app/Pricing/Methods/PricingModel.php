@@ -488,11 +488,11 @@ class PricingModel
     {
 
         // Domestic Surcharge Codes
-        $surchargeCodes = 'ADH,COL,EAS,MAX,RAS,OOA,RES';
+        $surchargeCodes = 'ADH,COL,EAS,MAX,RAS,OOA,RES,ESS';
 
         // If Intl shipment add additional Intl only Surcharge codes
         if (! isDomestic($this->shipment['sender_country_code'], $this->shipment['recipient_country_code'])) {
-            $surchargeCodes .= ',ADG,EQT,IDG,ICE,DTP,BRO,ESS';
+            $surchargeCodes .= ',ADG,EQT,IDG,ICE,DTP,BRO';
         }
 
         $surcharges = explode(',', $surchargeCodes);
@@ -532,7 +532,7 @@ class PricingModel
             $this->fedexESS();
         }
         // TNT
-        if (in_array($this->shipment['service_id'], [21,36,37,54,55])) {
+        if (in_array($this->shipment['service_id'], [21,36,37,54,55,80])) {
             $this->fedexESS();
         }
         // UPS
