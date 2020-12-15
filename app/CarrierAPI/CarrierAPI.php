@@ -67,7 +67,7 @@ class CarrierAPI
                     break;
             }
         } catch (Exception $e) {
-            Mail::to(config('mail.error'))->queue(new GenericError('CarrierAPi Error Data', $e->getMessage().' on line '.$e->getLine()."\r\n\r\n".json_encode($env_mode)));
+            Mail::to('it@antrim.ifsgroup.com')->queue(new GenericError('CarrierAPi Error Data', $e->getMessage().' on line '.$e->getLine()."\r\n\r\n".json_encode($env_mode)));
             $this->mode = 'production';
         }
     }
@@ -273,7 +273,7 @@ class CarrierAPI
              */
             $shipment->createCollectionRequest();
         } catch (Exception $e) {
-            Mail::to(config('mail.error'))->queue(new GenericError('WebClient DB Error', $e->getMessage().' on line '.$e->getLine()."\r\n\r\n".json_encode($this->consignment->data)));
+            Mail::to('it@antrim.ifsgroup.com')->queue(new GenericError('WebClient DB Error', $e->getMessage().' on line '.$e->getLine()."\r\n\r\n".json_encode($this->consignment->data)));
 
             // Return false to signify problem
             return false;
