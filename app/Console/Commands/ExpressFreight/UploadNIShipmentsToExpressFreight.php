@@ -123,7 +123,7 @@ class UploadNIShipmentsToExpressFreight extends Command
                 $shipment->recipient_state,
                 $shipment->recipient_postcode,
                 'North Ireland',
-                $shipment->special_instructions,
+                str_replace('"', '', $shipment->special_instructions),
                 $shipment->recipient_telephone,
                 $shipment->pieces,
                 $shipment->weight,
@@ -143,7 +143,7 @@ class UploadNIShipmentsToExpressFreight extends Command
             // Remove any commas
             $line = array_map(
                 function ($str) {
-                    return str_replace(',', '', $str);
+                    return preg_replace('/[[:^print:]]/', '', trim(str_replace(',', '', $str)));
                 },
                 $line
             );

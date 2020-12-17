@@ -108,7 +108,7 @@ class UploadShipmentsToExpressFreight extends Command
                 // Remove any commas
                 $line = array_map(
                     function ($str) {
-                        return str_replace(',', '', $str);
+                        return preg_replace('/[[:^print:]]/', '', trim(str_replace(',', '', $str)));
                     },
                     $line
                 );
