@@ -51,8 +51,8 @@ class UploadNIShipmentsToExpressFreight extends Command
     {
         parent::__construct();
 
-        $this->fileName = 'exp_ni_' . time() . '.csv';
-        $this->filePath = '/home/expressfreight/manifests/ni/' . $this->fileName;
+        $this->fileName = 'exp_ni_'.time().'.csv';
+        $this->filePath = '/home/expressfreight/manifests/ni/'.$this->fileName;
     }
 
     /**
@@ -63,21 +63,20 @@ class UploadNIShipmentsToExpressFreight extends Command
     public function handle()
     {
         // Load shipments that have been received at IFS
-        $this->shipments = \App\Models\Shipment::whereCarrierId(15)->whereReceived(1)->whereReceivedSent(0)->whereNotIn('status_id', [1, 7])->get();
+        $this->shipments = \App\Models\Shipment::whereCarrierId(15)->whereReceived(1)->whereCsvUploaded(0)->whereNotIn('status_id', [1, 7])->get();
 
         if ($this->shipments->count() > 0) {
-
             // Create the file to upload
             $this->createFile();
 
-            Mail::to('ASteenson@expressfreight.co.uk')->cc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight NI Manifest (' . $this->shipments->count() . ' shipments)', 'Please see attached file', $this->filePath));
+            Mail::to('ASteenson@expressfreight.co.uk')->cc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight NI Manifest ('.$this->shipments->count().' shipments)', 'Please see attached file', $this->filePath));
         }
     }
 
     /**
      * Create a file in the temp directory.
      *
-     * @param type $shipment
+     * @param  type  $shipment
      */
     private function createFile()
     {
@@ -117,7 +116,7 @@ class UploadNIShipmentsToExpressFreight extends Command
                 $shipment->carrier_consignment_number,
                 $shipment->ship_date->format('d/m/Y'),
                 $shipment->recipient_name,
-                $shipment->recipient_company_name . ' - ' . $shipment->recipient_address1,
+                $shipment->recipient_company_name.' - '.$shipment->recipient_address1,
                 $shipment->recipient_address2,
                 $shipment->recipient_city,
                 $shipment->recipient_state,
@@ -148,13 +147,15 @@ class UploadNIShipmentsToExpressFreight extends Command
                 $line
             );
 
-            fputcsv($handle, $line);
+            if (fputcsv($handle, $line)) {
+                $shipment->received_sent = true;
+                $shipment->source = $this->fileName;
+                $shipment->save();
 
-            $shipment->received_sent = true;
-            $shipment->source = $this->fileName;
-            $shipment->save();
-
-            $shipment->log('Uploaded to Express Freight');
+                $shipment->log('Uploaded to Express Freight');
+            } else {
+                Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight NI - failed to add shipment to csv', $shipment->carrier_consignment_number));
+            }
 
         endforeach;
 
