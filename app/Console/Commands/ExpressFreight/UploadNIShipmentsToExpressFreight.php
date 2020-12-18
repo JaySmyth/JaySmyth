@@ -148,7 +148,7 @@ class UploadNIShipmentsToExpressFreight extends Command
             );
 
             if (fputcsv($handle, $line)) {
-                $shipment->received_sent = true;
+                $shipment->csv_uploaded = true;
                 $shipment->source = $this->fileName;
                 $shipment->save();
 

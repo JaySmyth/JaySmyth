@@ -122,7 +122,7 @@ class UploadShipmentsToExpressFreight extends Command
 
             endforeach;
 
-            $shipment->received_sent = true;
+            $shipment->csv_uploaded = true;
             $shipment->source = $this->fileName;
             $shipment->save();
 
