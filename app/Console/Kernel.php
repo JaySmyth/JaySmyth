@@ -144,8 +144,8 @@ class Kernel extends ConsoleKernel
          * Express Freight
          */
         $schedule->command('ifs:reset-express-freight-consignment-number-sequence')->dailyAt('01:00');
-        $schedule->command('ifs:upload-shipments-to-express-freight')->weekdays()->dailyAt('17:45');
-        $schedule->command('ifs:upload-ni-shipments-to-express-freight')->weekdays()->dailyAt('17:45');
+        $schedule->command('ifs:upload-shipments-to-express-freight')->weekdays()->dailyAt('18:00');
+        $schedule->command('ifs:upload-ni-shipments-to-express-freight')->weekdays()->dailyAt('18:00');
         $schedule->command('ifs:process-express-freight-tracking')->weekdays()->hourly()->between('08:00', '20:00');
 
         /*

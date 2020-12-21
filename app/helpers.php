@@ -741,6 +741,18 @@ function isDomestic($senderCountryCode, $recipientCountryCode)
 }
 
 /**
+ * NI Shipment - BT to BT postcode.
+ *
+ * @param $senderPostcode
+ * @param $recipientPostcode
+ *
+ * @return bool
+ */
+function isNiShipment($senderPostcode, $recipientPostcode){
+    return substr(strtoupper($senderPostcode), 0, 2) == 'BT' && substr(strtoupper($senderPostcode), 0, 2) === substr(strtoupper($recipientPostcode, 0, 2));
+}
+
+/**
  * Convert y/n to boolean.
  *
  * @param string $value
