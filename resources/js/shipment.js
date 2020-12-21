@@ -144,7 +144,7 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
         dateFormat: 'dd-mm-yy',
         beforeShowDay: $.datepicker.noWeekends,
         minDate: 0,
-        maxDate: "+2w",
+        maxDate: "+4w",
     });
 
     if ($("#collection_date").val() == '') {
