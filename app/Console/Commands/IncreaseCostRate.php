@@ -183,12 +183,13 @@ class IncreaseCostRate extends Command
 
     protected function checkRateId()
     {
-        if ($this->rate) {
+        if (! empty($this->rateId)) {
             return;
         }
 
-        $this->error('  Invalid RateId.                                                                     ');
+        $this->error('  Invalid RateId. '.$this->rate.'                                                       ');
         $this->error = true;
+        exit();
     }
 
     protected function closeError()
