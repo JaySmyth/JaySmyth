@@ -116,6 +116,9 @@ class Pricing
 
             // Do we need to send pricing debug info
             $this->debug = ($company->carrier_choice == 'debug') ? true : false;
+
+            // Set pricing offset
+            $this->shipment['ship_date'] = Carbon::parse($this->shipment['ship_date'])->addDays($company->pricing_date_offset)->format('Y-m-d');
         }
     }
 

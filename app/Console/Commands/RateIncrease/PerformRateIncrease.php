@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\RateIncrease;
 
 use App\Models\DomesticRate;
 use App\Models\RateDetail;
