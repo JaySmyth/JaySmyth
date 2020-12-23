@@ -13,6 +13,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
+        Commands\RateIncrease\RecalcNiRates::class,
         Commands\Brexit\UpgradeDhlEsxService::class,
         Commands\Maintenance\CancelOldShipments::class,
         Commands\Maintenance\ClearUpTrackingEvents::class,
@@ -56,8 +57,8 @@ class Kernel extends ConsoleKernel
         Commands\ProcessScsCollectionRequests::class,
         Commands\SendTrackingNumbers::class,
         Commands\ProcessVendorvillageOrders::class,
-        Commands\IncreaseCostRate::class,
-        Commands\PerformRateIncrease::class,
+        Commands\RateIncrease\IncreaseCostRate::class,
+        Commands\RateIncrease\PerformRateIncrease::class,
         Commands\UpdateShopify::class,
         Commands\LogScanningKpis::class,
         Commands\TntTotalVolume::class,
