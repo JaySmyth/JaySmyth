@@ -749,7 +749,9 @@ function isDomestic($senderCountryCode, $recipientCountryCode)
  * @return bool
  */
 function isNiShipment($senderPostcode, $recipientPostcode){
-    return substr(strtoupper($senderPostcode), 0, 2) == 'BT' && substr(strtoupper($senderPostcode), 0, 2) === substr(strtoupper($recipientPostcode, 0, 2));
+
+    return substr(strtoupper($senderPostcode), 0, 2) == 'BT' && substr(strtoupper($senderPostcode), 0, 2) === substr(strtoupper($recipientPostcode), 0, 2);
+
 }
 
 /**
