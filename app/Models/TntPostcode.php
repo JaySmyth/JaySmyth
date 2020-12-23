@@ -20,7 +20,7 @@ class TntPostcode extends Model
 
         // Postcode found, return the code
         if ($tntPostcode) {
-            return $tntPostcode->postcode_from;
+            return $tntPostcode->postcode;
         }
 
         // No exact match for town, so try similarity to account for typo
@@ -38,7 +38,7 @@ class TntPostcode extends Model
             if ($simularity > 85) {
                 $result[] = [
                     'simularity' => $simularity,
-                    'postcode_from' => $postcode->postcode_from,
+                    'postcode' => $postcode->postcode,
                 ];
             }
         }
@@ -52,7 +52,7 @@ class TntPostcode extends Model
             // Get the result with the highest simularity
             $result = last($result);
 
-            return $result['postcode_from'];
+            return $result['postcode'];
         }
     }
 }
