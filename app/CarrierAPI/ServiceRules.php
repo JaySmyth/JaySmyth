@@ -233,9 +233,37 @@ class ServiceRules
             }
         }
 
+        $serviceHeld = $this->isServiceHeld($shipment, $serviceDetails);
+        if ($serviceHeld) {
+            return false;
+        }
+
         return true;
     }
 
+    private function isServiceHeld($shipment, $serviceDetails)
+    {
+
+        // Patch to disable specific services between dates (Inclusive)
+        $today = date('Y-m-d');
+        $heldService = [
+            '22' => ['startHold' => '2020-12-21', 'endHold' => '2021-01-04'],
+            '24' => ['startHold' => '2020-12-21', 'endHold' => '2021-01-04'],
+        ];
+        if (isset($heldService[$serviceDetails['id']])) {
+            if ($today >= $heldService[$serviceDetails['id']]['startHold'] && $today <= $heldService[$serviceDetails['id']]['endHold']) {
+                return true;
+            }
+
+            if (isset($shipment['collection_date'])) {
+                if ($shipment['collection_date'] >= $heldService[$serviceDetails['id']]['startHold'] && $shipment['collection_date'] <= $heldService[$serviceDetails['id']]['endHold']) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
     /*
      * ***********************************
      * Perform any necessary preprocessing
@@ -553,7 +581,7 @@ class ServiceRules
             if ($inTheCorrectFormat) {
                 // If Fedex and Sender pays Freight make sure it is one of our account numbers
                 if ($shipment['bill_shipping'] = 'shipper' && $shipment['carrier_id'] == '2') {
-                    $service = Service::where('account', $shipment['bill_shipping_account']) ->first();
+                    $service = Service::where('account', $shipment['bill_shipping_account'])->first();
                     if (! empty($service)) {
                         return true;
                     }
@@ -574,7 +602,7 @@ class ServiceRules
     {
         // If Sender pays Freight make sure it is one of our account numbers
         if ($shipment['bill_shipping'] == 'sender') {
-            $service = Service::where('account', $shipment['bill_shipping_account']) ->first();
+            $service = Service::where('account', $shipment['bill_shipping_account'])->first();
             if (empty($service)) {
                 return false;
             }

@@ -15,7 +15,7 @@ class PerformRateIncrease extends Command
      *
      * @var string
      */
-    protected $signature = 'ifs:perform-rate-increase {percentage?}';
+    protected $signature = 'ifs:perform-rate-increase {percentage?} {mode?}';
 
     /**
      * The console command description.
@@ -30,6 +30,15 @@ class PerformRateIncrease extends Command
      * @var decimal
      */
     protected $increasePercentage = 0;
+
+    /**
+     * Mode of transport to be updated
+     * (A)ll (D)omestic (I)nternational
+     *
+     * @var string
+     */
+    protected $mode = 'A';
+    protected $modeDesc = [];
 
     /**
      * Date rate effective from.
@@ -50,7 +59,7 @@ class PerformRateIncrease extends Command
      *
      * @var string
      */
-    protected $contactEmail = 'it@antrim.ifsgroup.com';
+    protected $contactEmail = 'gmcb@antrim.ifsgroup.com';
 
     /**
      * Create a new command instance.
@@ -60,6 +69,8 @@ class PerformRateIncrease extends Command
     public function __construct()
     {
         parent::__construct();
+
+        $this->modeDesc = ['A' => 'all', 'D' => 'domestic', 'I' => 'international'];
 
         if (empty($this->fromDate)) {
             $this->fromDate = date('Y-m-d', strtotime('first day of january next year'));
@@ -76,19 +87,47 @@ class PerformRateIncrease extends Command
      */
     public function handle()
     {
+        $this->mode = strtoupper($this->argument('mode'));
         $this->increasePercentage = $this->argument('percentage');
+        $this->checkMode();
         $this->checkPercentage();
         $this->checkAbleToIncrease();
         $multiplier = 1 + $this->increasePercentage / 100;
 
         $this->info('');
-        $this->info('Increasing all rates by '.$this->increasePercentage.'%');
+        $this->info('Increasing rates by '.$this->increasePercentage.'%');
         $this->info('Please wait, this may take a while...');
-        $this->increaseDomesticRates($multiplier);
-        $this->increaseIntlRates($multiplier);
+
+        if (in_array($this->mode, ["A","D"])) {
+            echo "Increase Domestic Rates\n";
+            $this->increaseDomesticRates($multiplier);
+        }
+
+        if (in_array($this->mode, ["A","I"])) {
+            echo "Increase International Rates\n";
+            $this->increaseIntlRates($multiplier);
+        }
+
         $this->info('Rates Increased Successfully');
         $this->info('');
         $this->createEmail();
+    }
+
+    /**
+     * Check mode
+     *
+     */
+    protected function checkMode()
+    {
+        if (in_array($this->mode, ['A','D','I'])) {
+            return true;
+        }
+
+        $blank = '                                                          ';
+        $this->error($blank);
+        $this->error('  Invalid Mode.                                           ');
+        $this->error($blank);
+        exit();
     }
 
     /**
@@ -96,18 +135,20 @@ class PerformRateIncrease extends Command
      */
     protected function checkAbleToIncrease()
     {
-        $rates = DomesticRate::where('rate_id', '>=', '500')
-                ->where('to_date', '>', $this->fromDate)
-                ->first();
-        if ($rates) {
-            $this->unableToApplyIncrease('domestic_rates');
+        if (in_array($this->mode, ["A","D"])) {
+            $rates = DomesticRate::where('rate_id', '>=', '500')->where('to_date', '>', $this->fromDate)->first();
+            if ($rates) {
+                $this->unableToApplyIncrease('domestic_rates');
+            }
         }
 
-        $rates = RateDetail::where('rate_id', '>=', '500')
+        if (in_array($this->mode, ["A","I"])) {
+            $rates = RateDetail::where('rate_id', '>=', '500')
                 ->where('to_date', '>', $this->fromDate)
                 ->first();
-        if ($rates) {
-            $this->unableToApplyIncrease(' rate_details ');
+            if ($rates) {
+                $this->unableToApplyIncrease(' rate_details ');
+            }
         }
     }
 
@@ -129,22 +170,24 @@ class PerformRateIncrease extends Command
     protected function checkPercentage()
     {
         if (is_numeric($this->increasePercentage)) {
-            if ($this->increasePercentage > 0 && $this->increasePercentage < 5) {
+            if ($this->increasePercentage > 0 && $this->increasePercentage < 6) {
                 return;
             }
         }
 
-        $blank = '                                                          ';
+        $blank = '                                                                 ';
         $this->error($blank);
-        $this->error('  Invalid Percentage.                                     ');
+        $this->error('  Invalid Percentage.                                            ');
         $this->error($blank);
-        $this->error('  Please enter command in the following format            ');
+        $this->error('  Please enter command in the following format                   ');
         $this->error($blank);
-        $this->error('      php artisan ifs:perform-rate-increase {percentage}  ');
+        $this->error('      php artisan ifs:perform-rate-increase {percentage} {mode}  ');
         $this->error($blank);
-        $this->error('  e.g.                                                    ');
+        $this->error('  e.g.                                                           ');
         $this->error($blank);
-        $this->error('      php artisan ifs:perform-rate-increase 3.5           ');
+        $this->error('      php artisan ifs:perform-rate-increase 3.5 A                ');
+        $this->error($blank);
+        $this->error('      Where mode is (A)ll, (D)omestic or (I)nternational         ');
         $this->error($blank);
         exit();
     }
@@ -205,7 +248,7 @@ class PerformRateIncrease extends Command
         $subject = 'Courier Rate Increase';
 
         // Build Message text
-        $message = 'Please note that all customer rates have been increased by '.$this->increasePercentage.'%';
+        $message = 'Please note that '.$this->modeDesc[$this->mode].' customer rates have been increased by '.$this->increasePercentage.'%';
         $message .= ' effective '.$this->fromDate.'. These rates will remain active until '.$this->toDate." unless further changes are applied.\n\n";
 
         mail($this->contactEmail, $subject, $message);
