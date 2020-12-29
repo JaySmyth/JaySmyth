@@ -682,10 +682,10 @@ class FedexAPI extends CarrierBase
                             break;
 
                         case 'IRS_EIN_EORI':
-                                if (! empty($data['eori'])) {
-                                    $msgData[$this->fedex->fldno['IRS_EIN_EORI']]         = $data['eori'];
-                                    $msgData[$this->fedex->fldno['sender_id_type']]       = 'O';
-                                }
+                            if (! empty($data['eori'])) {
+                                $msgData[$this->fedex->fldno['IRS_EIN_EORI']]             = $data['eori'];
+                                $msgData[$this->fedex->fldno['sender_id_type']]           = 'O';
+                            }
                             break;
 
                         case 'bill_tax_duty':
