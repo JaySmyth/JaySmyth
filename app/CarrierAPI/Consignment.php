@@ -58,6 +58,7 @@ class Consignment
             $this->data['depot_id'] = $this->company->depot_id;
             $this->setCarrierAndService();
             $this->setIncoTerms();
+            $this->setEoriNumber();
             $this->setDescOfContents();
             $this->setCommodityUOM();
             $this->setSenderTelephone();
@@ -105,6 +106,13 @@ class Consignment
                     $this->data['recipient_country_code'] = $countryCodes[$prefix];
                 }
             }
+        }
+    }
+
+    private function setEoriNumber()
+    {
+        if (empty($this->data['eori'])) {
+            $this->data['eori'] = (empty($this->company->eori)) ? '000000000000' : $this->company->eori;
         }
     }
 

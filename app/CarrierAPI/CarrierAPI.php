@@ -92,7 +92,7 @@ class CarrierAPI
     {
         $response = [];
         $this->setEnvironment($mode);
-        $this->consignment = new Consignment($data);
+        $this->consignment = new Consignment($data);                            // Build Consignment and default missing items
         $apiShipment = new APIShipment();                                       // Shipment object with validation rules etc.
         $errors = $apiShipment->validateShipment($this->consignment->data);
 

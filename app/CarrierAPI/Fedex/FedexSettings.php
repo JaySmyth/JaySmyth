@@ -137,7 +137,8 @@ class FedexSettings
         $this->fieldDefs[] = 'Pre_Assign_TxIDs/1222/GENERAL/0/0'; // NOT IN USE YET
         $this->fieldDefs[] = 'OriginID1/1084/GENERAL/0/0';
         $this->fieldDefs[] = 'TxID/1123/GENERAL/0/0'; // ??
-        $this->fieldDefs[] = 'IRS_EIN/1139/IRSEIN/0/0'; // ??
+        $this->fieldDefs[] = 'IRS_EIN_EORI/1139/IRSEINEORI/0/0'; // ??
+        $this->fieldDefs[] = 'sender_id_type/1352/IRSEINEORI/0/0'; // ??
         $this->fieldDefs[] = 'custom_label_flag/1660/MANUAL/0/0';
         $this->fieldDefs[] = 'Barcode_2D/3064/RESPONSE/0/0'; // ??
         $this->fieldDefs[] = 'signature_required/2399/GENERAL/0/0';

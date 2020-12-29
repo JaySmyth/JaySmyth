@@ -152,7 +152,7 @@ class FedexAPI extends CarrierBase
 
             $string = '';
             $i      = 0;
-            while ( ! preg_match('/"99,""/', $string)) {
+            while (! preg_match('/"99,""/', $string)) {
                 $char   = socket_read($socket, 1);
                 $string .= $char;
             }
@@ -206,7 +206,7 @@ class FedexAPI extends CarrierBase
 
                 // If Valid Field no - PreProcess Data
                 if ($fieldNoAbs > 0) {
-                    if ( ! isset($reply[$fieldNoAbs])) {
+                    if (! isset($reply[$fieldNoAbs])) {
                         $reply[$fieldNoAbs] = '';
                     }
                     $fieldData          = $this->multiplier($fieldNoAbs, $fieldData, 'decode');
@@ -358,7 +358,7 @@ class FedexAPI extends CarrierBase
         // Find Senders Fedex Account
         $service = Company::find($shipment['company_id'])->services()->where('service_id', $shipment['service_id'])->where('carrier_id', '2')->first();
 
-        if ( ! empty($service)) {
+        if (! empty($service)) {
             if ($service->pivot->account > '') {
                 $shipment['sender_account'] = $service->pivot->account;
             } else {
@@ -367,7 +367,7 @@ class FedexAPI extends CarrierBase
         }
 
         // Catch instance where above code not setting account - needs looked at
-        if ( ! isset($shipment['sender_account'])) {
+        if (! isset($shipment['sender_account'])) {
             if (strtoupper($shipment['service_code']) == 'UK48') {
                 $shipment['sender_account'] = 811732648;
             } else {
@@ -462,7 +462,7 @@ class FedexAPI extends CarrierBase
         // Check each Package is valid for this Carrier
         $cnt = 1;
         foreach ($packages as $package) {
-            if ( ! isset($this->fedex->packageTypes[$package['packaging_code']])) {
+            if (! isset($this->fedex->packageTypes[$package['packaging_code']])) {
                 $errors[] = "packages.$cnt.packaging_code is invalid for carrier.";
             }
             $cnt++;
@@ -475,7 +475,7 @@ class FedexAPI extends CarrierBase
     {
         $cnt     = 1;
         $options = $this->getData($shipment, 'options');
-        if ( ! empty($options)) {
+        if (! empty($options)) {
             foreach ($options as $option) {
                 $errors = $this->validateOption($errors, $option, $shipment);
             }
@@ -506,7 +506,7 @@ class FedexAPI extends CarrierBase
     private function validateCargoOption($errors, $shipment)
     {
         $hazardCode = $this->getData($shipment, 'hazardous');
-        if ( ! ($hazardCode == 'E' || ((intval($hazardCode) >= 1) && (intval($hazardCode) <= 9)))) {
+        if (! ($hazardCode == 'E' || ((intval($hazardCode) >= 1) && (intval($hazardCode) <= 9)))) {
             $errors[] = 'CARGO option for DG Shipments only';
         }
 
@@ -532,9 +532,13 @@ class FedexAPI extends CarrierBase
         $msgGroups[] = 'OPTION';   // Always output OPTION
         $msgGroups[] = 'PRINTER';  // Output Package level details
 
-        if ( ! empty($this->getData($data, 'broker.city'))) {
+        if (! empty($this->getData($data, 'broker.city'))) {
             $msgGroups[] = 'BROKER'; // Broker Select Option enabled
             $data        = $this->setElement($data, 'broker_select', 'Y');
+        }
+
+        if (! empty($this->getData($data, 'eori'))) {
+            $msgGroups[] = 'IRSEINEORI'; // EORI Option enabled
         }
 
         if ($this->getData($data, 'ship_reason') == 'documents' || $this->getData($data, 'documents_flag') == 'Y') {
@@ -607,7 +611,7 @@ class FedexAPI extends CarrierBase
                                 $msgData[$this->fedex->fldno['documents_description']] = '0';
                             }
 
-                            if ( ! isset($msgData['79-1']) || empty($msgData['79-1'])) {
+                            if (! isset($msgData['79-1']) || empty($msgData['79-1'])) {
                                 $msgData['79-1'] = 'Documentation/ No Commercial Value';
                             }
                             break;
@@ -675,6 +679,13 @@ class FedexAPI extends CarrierBase
                                 $msgData[$this->fedex->fldno['bill_shipping_account']]    = $data['bill_shipping_account'];
                                 $msgData[$this->fedex->fldno['bill_shipping_to_country']] = $this->getPayorCountry($data, $value);
                             }
+                            break;
+
+                        case 'IRS_EIN_EORI':
+                                if (! empty($data['eori'])) {
+                                    $msgData[$this->fedex->fldno['IRS_EIN_EORI']]         = $data['eori'];
+                                    $msgData[$this->fedex->fldno['sender_id_type']]       = 'O';
+                                }
                             break;
 
                         case 'bill_tax_duty':
@@ -817,7 +828,7 @@ class FedexAPI extends CarrierBase
         }
 
         // Finally add any options
-        if ( ! empty($this->getData($data, 'options'))) {
+        if (! empty($this->getData($data, 'options'))) {
             $msgData = $this->addOptions($msgData, $this->getData($data, 'options'));
         }
 
@@ -884,7 +895,7 @@ class FedexAPI extends CarrierBase
         $finished = false;
         $msg      = '';
         foreach ($arrData as $arrKey => $arrValue) {
-            if ( ! empty($arrValue) && $arrValue != '!') {
+            if (! empty($arrValue) && $arrValue != '!') {
                 $fldNoAbs = $this->getFldNo($arrKey);
                 $value    = $this->multiplier($fldNoAbs, $arrValue, 'encode');
                 $msg      = $msg.$arrKey.',"'.$value.'"';
@@ -898,7 +909,7 @@ class FedexAPI extends CarrierBase
     {
         $response = $this->generateSuccess();
 
-        if ( ! isset($reply['664'])) {
+        if (! isset($reply['664'])) {
             $response['errors'][] = 'Failed to generate barcode: please verify recipient address and postcode';
 
             return $response;

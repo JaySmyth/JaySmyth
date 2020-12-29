@@ -244,12 +244,6 @@ class DHL
      */
     protected function shipmentRequest()
     {
-        $eori = (! empty($this->shipment['eori'])) ? $this->shipment['eori'] : $this->company->eori;
-
-        if (strlen($eori) == 0) {
-            $eori = '000000000000';
-        }
-
         $this->request = [
             'ShipmentRequest' => [
                 'RequestedShipment' => [
@@ -280,7 +274,7 @@ class DHL
                             'Address' => $this->addAddress('sender'),
                             'RegistrationNumbers' => [
                                 'RegistrationNumber' => [
-                                    'Number' => $eori,
+                                    'Number' => $this->shipment['eori'] ?? '000000000000',
                                     'NumberTypeCode' => 'EIN',
                                     'NumberIssuerCountryCode' => $this->shipment['sender_country_code'],
                                 ],
