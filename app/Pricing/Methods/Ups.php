@@ -49,6 +49,16 @@ class Ups extends PricingModel
         $this->model = 3;
     }
 
+    // Charge Customs Fee for Non Doc shipments to/from the EU
+    public function isEUC()
+    {
+        if ($this->shipment['ship_reason'] == 'documents') {
+            return false;
+        }
+
+        return isUkEu($this->shipment['sender_country_code'], $this->shipment['recipient_country_code']);
+    }
+
     public function isRAS()
     {
 

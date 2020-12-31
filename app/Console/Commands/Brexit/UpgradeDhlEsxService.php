@@ -70,17 +70,21 @@ class UpgradeDhlEsxService extends Command
     {
         $ids = [];
         $data = $service->toArray();
-        $data['carrier_name'] = 'DHL Express Worldwide (NonDoc)';
-        $data['carrier_code'] = 'WPX';
-        $data['parameters'] = 'P,P';
-        $data['doc'] = '0';
-        $data['nondoc'] = '1';
+
+        // Modify existing service
         $service->carrier_name = 'DHL Express Worldwide (Docs)';
         $service->carrier_code = 'DOC';
         $service->parameters = 'D,D';
         $service->doc = 1;
         $service->nondoc = '0';
         $service->save();
+
+        // Create new service
+        $data['carrier_name'] = 'DHL Express Worldwide (NonDoc)';
+        $data['carrier_code'] = 'WPX';
+        $data['parameters'] = 'P,P';
+        $data['doc'] = '0';
+        $data['nondoc'] = '1';
         $newService = Service::create($data);
 
         return $newService->id;

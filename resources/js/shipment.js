@@ -844,16 +844,21 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
 
     function isUkDomestic() {
 
-        var domesticCountries = ['GB', 'IE'];
-        var countryCode = $('#recipient_country_code').val();
+        var senderCountryCode = $('#sender_country_code').val();
+        var senderPostcode = $('#sender_postcode').val();
+        var recipientCountryCode = $('#recipient_country_code').val();
+        var recipientPostcode = $('#recipient_postcode').val();
         var companyId = $('#company_id').val();
 
         if (companyId == "1015" && countryCode == "IE") {
             return false;
         }
 
-        if ($.inArray(countryCode, domesticCountries) !== -1) {
-            return true;
+        // Domestic - goods originating in NI to UK mainland or NI local
+        if (senderCountryCode == "GB" && recipientCountryCode == "GB") {
+            if (senderPostcode.startsWith("BT")) {
+                return true;
+            }
         }
 
         return false;

@@ -487,12 +487,12 @@ class PricingModel
     public function calcStdSurcharges()
     {
 
-        // Domestic Surcharge Codes
+        // Universal Surcharge Codes
         $surchargeCodes = 'ADH,COL,EAS,MAX,RAS,OOA,RES,ESS';
 
         // If Intl shipment add additional Intl only Surcharge codes
         if (! isDomestic($this->shipment['sender_country_code'], $this->shipment['recipient_country_code'])) {
-            $surchargeCodes .= ',ADG,EQT,IDG,ICE,DTP,BRO';
+            $surchargeCodes .= ',ADG,EQT,EUC,IDG,ICE,DTP,BRO';
         }
 
         $surcharges = explode(',', $surchargeCodes);
@@ -516,6 +516,12 @@ class PricingModel
 
     // Address Correction
     public function isCOR()
+    {
+        return false;
+    }
+
+    // Charge Customs Fee for Non Doc shipments to/from the EU
+    public function isEUC()
     {
         return false;
     }

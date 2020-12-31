@@ -45,6 +45,16 @@ class Dhl extends PricingModel
         $this->model = 5;
     }
 
+    // Charge Customs Fee for Non Doc shipments to/from the EU
+    public function isEUC()
+    {
+        if ($this->shipment['ship_reason'] == 'documents') {
+            return false;
+        }
+
+        return isUkEu($this->shipment['sender_country_code'], $this->shipment['recipient_country_code']);
+    }
+
     /**
      * Gets the Packaging Type of the current package
      * and set this->packagingType to the IFS equivalent.

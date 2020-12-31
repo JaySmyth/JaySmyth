@@ -658,7 +658,8 @@ class Shipment extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function etdLog(){
+    public function etdLog()
+    {
         return $this->hasOne(EtdLog::class);
     }
 
@@ -853,17 +854,21 @@ class Shipment extends Model
      */
     public function hasCommercialInvoice()
     {
-        if ($this->status->code == 'saved') {
+        if ($this->status->code == 'saved' || $this->status->code == 'cancelled') {
             return false;
         }
 
-        $viableDepartments = ['IFCEX', 'IFFAX'];
-
-        if ((in_array($this->department->code, $viableDepartments) || in_array($this->recipient_country_code, ['GG', 'JE'])) && $this->status->code != 'cancelled') {
+        if (in_array($this->department->code, ['IFCEX', 'IFFAX'])) {
             return true;
         }
 
-        return false;
+        if ($this->sender_country_code == 'GB' && $this->recipient_country_code == 'GB') {
+            if (substr($this->sender_postcode, 0, 2) =='BT') {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

@@ -35,6 +35,26 @@ function formatUkPostcode($postcode)
     }
 }
 
+function isUkEu($senderCountryCode, $recipientCountryCode)
+{
+    $senderEu = Country::where('country_code', $senderCountryCode)->first()->eu;
+    $recipientEu = Country::where('country_code', $recipientCountryCode)->first()->eu;
+
+    if ($senderCountryCode=="GB" && $recipientCountryCode=="GB") {
+        return false;
+    }
+
+    if ($senderEu && strtoupper($recipientCountryCode) == "GB") {
+        return true;
+    }
+
+    if ($recipientEu && strtoupper($senderCountryCode) == "GB") {
+        return true;
+    }
+
+    return false;
+}
+
 /**
  * Dump out data for debugging.
  *
@@ -700,7 +720,7 @@ function isJoined($query, $table)
  */
 function getUkDomesticCountries()
 {
-    return ['GB', 'IE', 'GG', 'JE', 'IM'];
+    return ['GB', 'GG', 'JE', 'IM'];
 }
 
 /**
@@ -748,10 +768,9 @@ function isDomestic($senderCountryCode, $recipientCountryCode)
  *
  * @return bool
  */
-function isNiShipment($senderPostcode, $recipientPostcode){
-
+function isNiShipment($senderPostcode, $recipientPostcode)
+{
     return substr(strtoupper($senderPostcode), 0, 2) == 'BT' && substr(strtoupper($senderPostcode), 0, 2) === substr(strtoupper($recipientPostcode), 0, 2);
-
 }
 
 /**
@@ -1008,11 +1027,11 @@ function getTimezone($countryCode, $state = false, $city = false)
 function calcVat($countryCode, $valueOfGoods, $vatExempt)
 {
 
-    // Is Recipient country in the EU
+    // If Recipient country is GB or in the EU
     $eu = Country::where('country_code', $countryCode)->first()->eu;
-    if ($eu) {
+    if (strtoupper($countryCode) == 'GB' || $eu) {
 
-        // Recipient is in EU, or we are shipping to Channel Islands
+        // Recipient is in EU, GB or we are shipping to Channel Islands
         if ($vatExempt || $countryCode == 'JE' || $countryCode == 'GG') {
 
             // Goods are Exempt
@@ -1056,6 +1075,7 @@ function customsEntryRequired($senderCountryCode, $recipientCountryCode)
     }
 
     // Check if Both Countries in the EU
+    /*
     $fromEU = false;
     $toEU = false;
     $country = App\Models\Country::where('country_code', $senderCountryCode)->first();
@@ -1071,6 +1091,7 @@ function customsEntryRequired($senderCountryCode, $recipientCountryCode)
     if ($fromEU && $toEU) {
         return false;
     }
+    */
 
     return true;
 }
