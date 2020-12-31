@@ -114,7 +114,7 @@ class UpgradeDhlEsxService extends Command
 
     protected function duplicateDiscounts($companyId, $oldServiceId, $newServiceId)
     {
-        $today = date('Y-m-d');
+        $today = '2021-01-05';
         $discounts = RateDiscount::where('company_id', $companyId)->where('service_id', $oldServiceId)->where('to_date', '>', $today)->get();
         foreach ($discounts as $discount) {
             $data = $discount->toArray();
