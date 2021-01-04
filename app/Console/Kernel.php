@@ -64,7 +64,8 @@ class Kernel extends ConsoleKernel
         Commands\TntTotalVolume::class,
         Commands\GetTracking::class,
         Commands\DispatchEasypostTrackers::class,
-        Commands\UploadFedExCommercialInvoices::class
+        Commands\UploadFedExCommercialInvoices::class,
+        Commands\RepriceShipments::class
     ];
 
     /**
