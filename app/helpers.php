@@ -760,6 +760,22 @@ function isDomestic($senderCountryCode, $recipientCountryCode)
     return false;
 }
 
+
+/**
+ * @param $countryCode
+ *
+ * @return mixed
+ */
+function isEu($countryCode)
+{
+    $country = Country::where('country_code', $countryCode)->first();
+
+    if($country){
+        return $country->eu;
+    }
+
+}
+
 /**
  * NI Shipment - BT to BT postcode.
  *
