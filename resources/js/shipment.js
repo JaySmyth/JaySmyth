@@ -847,10 +847,9 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
         var senderCountryCode = $('#sender_country_code').val();
         var senderPostcode = $('#sender_postcode').val();
         var recipientCountryCode = $('#recipient_country_code').val();
-        var recipientPostcode = $('#recipient_postcode').val();
         var companyId = $('#company_id').val();
 
-        if (companyId == "1015" && countryCode == "IE") {
+        if (companyId == "1015" && recipientCountryCode == "IE") {
             return false;
         }
 
