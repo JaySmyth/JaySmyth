@@ -13,7 +13,7 @@ class RepriceShipments extends Command
      *
      * @var string
      */
-    protected $signature = 'ifs:reprice-shipments {--companyId=} {--today} {--test}';
+    protected $signature = 'ifs:reprice-shipments {--companyId=} {--test}';
 
     /**
      * The console command description.
@@ -58,25 +58,26 @@ class RepriceShipments extends Command
         $this->info("Found ".$shipments->count()." shipments for repricing");
 
         if ($this->confirm('Do you wish to continue?')) {
-
             foreach ($shipments as $shipment) {
-
                 $this->info($shipment->consignment_number);
-
-                if ($this->option('today')) {
-                    $shipment->ship_date = now();
-                }
 
                 $this->line("ORIGINAL: charge:".$shipment->shipping_charge);
                 $this->line("ORIGINAL: cost:".$shipment->shipping_cost);
                 $this->info('Repricing...');
 
+                $originalShipDate = $shipment->ship_date;
+                $shipment->ship_date = now();
+
                 $shipment->price($savePricing);
+
+                if(!$this->option('test')){
+                    $shipment->ship_date = $originalShipDate;
+                    $shipment->save();
+                }
 
                 $this->line("REPRICED: charge:".$shipment->shipping_charge);
                 $this->line("REPRICED: cost:".$shipment->shipping_cost."\n");
             }
-
         }
 
         $this->info('Finished');
