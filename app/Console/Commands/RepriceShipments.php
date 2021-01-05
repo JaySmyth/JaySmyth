@@ -41,9 +41,9 @@ class RepriceShipments extends Command
      */
     public function handle()
     {
-        if($this->option('startDate')) {
+        if ($this->option('startDate')) {
             $startDate = Carbon::parse($this->option('startDate'));
-            $this->info('Start date: ' . $startDate->format('d-M-Y'));
+            $this->info('Start date: '.$startDate->format('d-M-Y'));
         } else {
             $startDate = now()->subDay()->startOfDay();
             $this->line('No start date specified, starting yesterday');
@@ -51,7 +51,7 @@ class RepriceShipments extends Command
 
         $shipments = Shipment::whereNull('invoice_run_id')->where('ship_date', '>=', $startDate)->whereNotIn('status_id', [1, 7]);
 
-        if($this->option('companyId')){
+        if ($this->option('companyId')) {
             $company = Company::findOrFail($this->option('companyId'));
 
             $this->info("\nRepricing shipments for ".$company->company_name);
@@ -78,7 +78,7 @@ class RepriceShipments extends Command
 
                 $shipment->price($savePricing);
 
-                if(!$this->option('test')){
+                if (! $this->option('test')) {
                     $shipment->ship_date = $originalShipDate;
                     $shipment->save();
                 }
