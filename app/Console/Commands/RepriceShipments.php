@@ -46,7 +46,7 @@ class RepriceShipments extends Command
 
         $savePricing = $this->option('test') ? false : true;
 
-        $query = Shipment::where('company_id', $company->id)->whereNull('invoice_run_id')->whereNotIn('status_id', [1, 7])->orderBy('id', 'asc');
+        $query = Shipment::where('company_id', $company->id)->whereNull('invoice_run_id')->where('received', true)->where('ship_date', '>=', now()->subMonth())->whereNotIn('status_id', [1, 7])->orderBy('id', 'asc');
 
         if ($this->option('test')) {
             $query->limit(4);
