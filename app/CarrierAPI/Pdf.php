@@ -913,13 +913,6 @@ class Pdf
             }
         }
 
-        if (isEu($shipment->recipient_country_code)) {
-            $this->pdf->SetTextColor(255, 0, 0);
-            $this->pdf->SetFont($this->font, 'B', 8);
-            $this->pdf->Text(5, 216, 'The exporter of the products covered by this document declares that, except where otherwise');
-            $this->pdf->Text(5, 220, 'clearly indicated, these products are of UK/EU preferential origin.');
-        }
-
         $this->pdf->SetTextColor(000, 0, 0);
         $this->pdf->SetFont($this->font, '', 10);
         $this->pdf->Text(149, 223, $shipment->customs_value);
