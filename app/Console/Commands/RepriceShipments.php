@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Company;
 use App\Models\Shipment;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class RepriceShipments extends Command
@@ -13,7 +14,7 @@ class RepriceShipments extends Command
      *
      * @var string
      */
-    protected $signature = 'ifs:reprice-shipments {--companyId=} {--test}';
+    protected $signature = 'ifs:reprice-shipments {--startDate=} {--companyId=} {--test}';
 
     /**
      * The console command description.
@@ -40,25 +41,32 @@ class RepriceShipments extends Command
      */
     public function handle()
     {
-        $company = Company::findOrFail($this->option('companyId'));
+        if($this->option('startDate')) {
+            $startDate = Carbon::parse($this->option('startDate'));
+            $this->info('Start date: ' . $startDate->format('d-M-Y'));
+        } else {
+            $startDate = now()->subDay()->startOfDay();
+            $this->line('No start date specified, starting yesterday');
+        }
 
-        $this->info("\nRepricing shipments for ".$company->company_name);
+        $shipments = Shipment::whereNull('invoice_run_id')->where('ship_date', '>=', $startDate)->whereNotIn('status_id', [1, 7]);
+
+        if($this->option('companyId')){
+            $company = Company::findOrFail($this->option('companyId'));
+
+            $this->info("\nRepricing shipments for ".$company->company_name);
+
+            $shipments->where('company_id', $company->id);
+        }
 
         $savePricing = $this->option('test') ? false : true;
 
-        $query = Shipment::where('company_id', $company->id)->whereNull('invoice_run_id')->where('ship_date', '>=', now()->startOfYear())->whereNotIn('status_id', [1, 7])->orderBy('id', 'asc');
-
         if ($this->option('test')) {
-            //$query->limit(4);
             $this->info("Test mode - pricing changes will NOT be saved\n");
         }
 
-        $shipments = $query->get();
-
-        $this->info("Found ".$shipments->count()." shipments for repricing");
-
         if ($this->confirm('Do you wish to continue?')) {
-            foreach ($shipments as $shipment) {
+            foreach ($shipments->orderBy('id', 'asc')->cursor() as $shipment) {
                 $this->info($shipment->consignment_number);
 
                 $this->line("ORIGINAL: charge:".$shipment->shipping_charge);
