@@ -49,7 +49,7 @@ class RepriceShipments extends Command
             $this->line('No start date specified, starting yesterday');
         }
 
-        $shipments = Shipment::where('company_id', '!=', 965)->whereNull('invoice_run_id')->where('ship_date', '>=', $startDate)->whereNotIn('status_id', [1, 7]);
+        $shipments = Shipment::whereNull('invoice_run_id')->where('ship_date', '>=', $startDate)->whereNotIn('status_id', [1, 7]);
 
         if ($this->option('companyId')) {
             $company = Company::findOrFail($this->option('companyId'));
