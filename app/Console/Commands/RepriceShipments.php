@@ -42,32 +42,42 @@ class RepriceShipments extends Command
     {
         $company = Company::findOrFail($this->option('companyId'));
 
-        $this->info('Repricing shipments for '.$company->company_name);
+        $this->info("\nRepricing shipments for ".$company->company_name);
 
         $savePricing = $this->option('test') ? false : true;
 
-        if($this->option('test')){
-            $this->info('Test mode - pricing changes will not be saved');
+        $query = Shipment::where('company_id', $company->id)->whereNull('invoice_run_id')->whereNotIn('status_id', [1, 7])->orderBy('id', 'asc');
+
+        if ($this->option('test')) {
+            $query->limit(4);
+            $this->info("Test mode - limiting to 4 records - pricing changes will NOT be saved\n");
         }
 
-        foreach (Shipment::where('company_id', $company->id)->whereNull('invoice_run_id')->whereNotIn('status_id', [1, 7])->orderBy('id', 'asc')->cursor() as $shipment) {
-            $this->info("\n\n".$shipment->consignment_number);
+        $shipments = $query->get();
 
-            if ($this->option('today')) {
-                $this->info('Setting ship date to today');
-                $shipment->ship_date = now();
+        $this->info("Found ".$shipments->count()." shipments for repricing");
+
+        if ($this->confirm('Do you wish to continue?')) {
+
+            foreach ($shipments as $shipment) {
+
+                $this->info($shipment->consignment_number);
+
+                if ($this->option('today')) {
+                    $shipment->ship_date = now();
+                }
+
+                $this->line("ORIGINAL: charge:".$shipment->shipping_charge);
+                $this->line("ORIGINAL: cost:".$shipment->shipping_cost);
+                $this->info('Repricing...');
+
+                $shipment->price($savePricing);
+
+                $this->line("REPRICED: charge:".$shipment->shipping_charge);
+                $this->line("REPRICED: cost:".$shipment->shipping_cost."\n");
             }
 
-            $this->line("Shipping charge:" . $shipment->shipping_charge);
-            $this->line("Shipping cost:" . $shipment->shipping_cost);
-            $this->info('Repricing...');
-
-            $shipment->price($savePricing);
-
-            $this->line("Shipping charge:" . $shipment->shipping_charge);
-            $this->line("Shipping cost:" . $shipment->shipping_cost);
         }
-
 
         $this->info('Finished');
     }
