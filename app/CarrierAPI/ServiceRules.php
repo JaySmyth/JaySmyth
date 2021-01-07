@@ -247,10 +247,10 @@ class ServiceRules
         // Patch to disable specific services between dates (Inclusive)
         $today = date('Y-m-d');
         $heldService = [
-            '22' => ['startHold' => '2020-12-21', 'endHold' => '2021-01-07'],
-            '24' => ['startHold' => '2020-12-21', 'endHold' => '2021-01-07'],
-            '26' => ['startHold' => '2021-01-01', 'endHold' => '2021-01-07'],   // Release after DHL Service upgrade
-            '57' => ['startHold' => '2021-01-01', 'endHold' => '2021-01-07'],   // Release after DHL Service upgrade
+         //   '22' => ['startHold' => '2020-12-21', 'endHold' => '2021-01-07'],
+         //   '24' => ['startHold' => '2020-12-21', 'endHold' => '2021-01-07'],
+         //   '26' => ['startHold' => '2021-01-01', 'endHold' => '2021-01-07'],   // Release after DHL Service upgrade
+         //   '57' => ['startHold' => '2021-01-01', 'endHold' => '2021-01-07'],   // Release after DHL Service upgrade
         ];
         if (isset($heldService[$serviceDetails['id']])) {
             if ($today >= $heldService[$serviceDetails['id']]['startHold'] && $today <= $heldService[$serviceDetails['id']]['endHold']) {
