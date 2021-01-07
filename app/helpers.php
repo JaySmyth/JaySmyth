@@ -789,6 +789,11 @@ function isNiShipment($senderPostcode, $recipientPostcode)
     return substr(strtoupper($senderPostcode), 0, 2) == 'BT' && substr(strtoupper($senderPostcode), 0, 2) === substr(strtoupper($recipientPostcode), 0, 2);
 }
 
+
+function niToEu($senderPostcode, $recipientCountryCode){
+    return substr(strtoupper($senderPostcode), 0, 2) == 'BT' && isEu($recipientCountryCode);
+}
+
 /**
  * Convert y/n to boolean.
  *

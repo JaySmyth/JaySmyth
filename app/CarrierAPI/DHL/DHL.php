@@ -185,7 +185,7 @@ class DHL
      */
     protected function getContent()
     {
-        if ((strtolower($this->shipment['ship_reason']) == 'documents') || $this->isWithinEu) {
+        if ((strtolower($this->shipment['ship_reason']) == 'documents') || niToEu($this->shipment['sender_postcode'], $this->shipment['recipient_country_code'])) {
             return 'DOCUMENTS';
         }
 

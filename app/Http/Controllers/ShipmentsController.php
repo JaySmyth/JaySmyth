@@ -1049,9 +1049,7 @@ class ShipmentsController extends Controller
      */
     public function test(Request $request)
     {
-        foreach ([' bt43de', 'bt43de ', ' bt4 3de ', 'bt412nq', 'bt4', 'sw134fr', 'bt41 2nq'] as $postcode) {
-            echo formatUkPostcode($postcode).'<br>';
-        }
+        dd(niToEu('bt4 3de', 'ie'));
     }
 
 
