@@ -20,7 +20,6 @@ class DHL
     protected $request;
     protected $serviceType;
     protected $client;
-    protected $isWithinEu;
     protected $rateRequest;
     protected $pltAvailable = false;
     protected $mode;
@@ -38,9 +37,6 @@ class DHL
 
         // Company
         $this->company = Company::find($this->shipment['company_id']);
-
-        // Boolean
-        $this->isWithinEu = isWithinEu($this->shipment['sender_country_code'], $this->shipment['recipient_country_code']);
 
         // Get Service Product codes
         $productCodes = explode(',', Service::find($shipment['service_id'])->parameters);
@@ -185,7 +181,7 @@ class DHL
      */
     protected function getContent()
     {
-        if ((strtolower($this->shipment['ship_reason']) == 'documents') || niToEu($this->shipment['sender_postcode'], $this->shipment['recipient_country_code'])) {
+        if ((strtolower($this->shipment['ship_reason']) == 'documents') || niToEu($this->shipment['sender_postcode'], $this->shipment['recipient_country_code']) || strtoupper($this->shipment['recipient_country_code']) == 'GB') {
             return 'DOCUMENTS';
         }
 
