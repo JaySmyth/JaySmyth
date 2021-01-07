@@ -58,7 +58,7 @@ class ShipmentsController extends Controller
     {
         $this->authorize(new Shipment);
         $company = null;
-        $user    = null;
+        $user = null;
 
         if ($request->company) {
             $company = Company::findOrFail($request->company);
@@ -78,31 +78,31 @@ class ShipmentsController extends Controller
         // Default results to "today" for IFS staff to limit large result set
         if ($request->user()->hasIfsRole() && strlen($request->filter) < 5 && ! $request->date_from && ! $request->date_to && ! $request->company && ! $request->user && ! $request->scs_job_number) {
             $request->date_from = Carbon::today();
-            $request->date_to   = Carbon::today();
+            $request->date_to = Carbon::today();
         }
 
         $query = Shipment::select('shipments.*')
-                         ->orderBy('created_at', 'DESC')
-                         ->orderBy('shipments.id', 'DESC')
-                         ->filter($request->filter)
-                         ->hasScsJobNumber($request->scs_job_number)
-                         ->hasManifestNumber($request->manifest_number)
-                         ->hasMode($request->mode)
-                         ->hasCompany($request->company)
-                         ->hasStatus($request->status)
-                         ->hasSource($request->source)
-                         ->hasDestination($request->destination)
-                         ->hasRecipientType($request->recipient_type)
-                         ->hasPieces($request->pieces)
-                         ->hasService($request->service)
-                         ->traffic($request->traffic)
-                         ->hasCarrier($request->carrier)
-                         ->shipDateBetween($request->date_from, $request->date_to)
-                         ->createdBy($request->user)
-                         ->recipientFilter($request->recipient_filter)
-                         ->restrictCompany($request->user()->getAllowedCompanyIds())
-                         ->restrictMode($request->user()->getAllowedModeIds())
-                         ->with('service', 'status', 'department', 'mode', 'company', 'depot');
+            ->orderBy('created_at', 'DESC')
+            ->orderBy('shipments.id', 'DESC')
+            ->filter($request->filter)
+            ->hasScsJobNumber($request->scs_job_number)
+            ->hasManifestNumber($request->manifest_number)
+            ->hasMode($request->mode)
+            ->hasCompany($request->company)
+            ->hasStatus($request->status)
+            ->hasSource($request->source)
+            ->hasDestination($request->destination)
+            ->hasRecipientType($request->recipient_type)
+            ->hasPieces($request->pieces)
+            ->hasService($request->service)
+            ->traffic($request->traffic)
+            ->hasCarrier($request->carrier)
+            ->shipDateBetween($request->date_from, $request->date_to)
+            ->createdBy($request->user)
+            ->recipientFilter($request->recipient_filter)
+            ->restrictCompany($request->user()->getAllowedCompanyIds())
+            ->restrictMode($request->user()->getAllowedModeIds())
+            ->with('service', 'status', 'department', 'mode', 'company', 'depot');
 
         if ($request->has('received')) {
             $query->where('received', $request->received);
@@ -178,10 +178,10 @@ class ShipmentsController extends Controller
         $packages = null !== old('packages') ? old('packages') : [
             0 => [
                 'packaging_code' => '',
-                'weight'         => '',
-                'length'         => '',
-                'width'          => '',
-                'height'         => ''
+                'weight' => '',
+                'length' => '',
+                'width' => '',
+                'height' => ''
             ]
         ];
         $contents = null !== old('contents') ? old('contents') : [];
@@ -191,8 +191,8 @@ class ShipmentsController extends Controller
             $companyId = null !== old('company_id') ? old('company_id') : Auth::user()->company_id;
         }
 
-        $company      = Company::findOrFail($companyId);
-        $packaging    = $company->getPackagingTypes($mode->id)->pluck('description', 'code');
+        $company = Company::findOrFail($companyId);
+        $packaging = $company->getPackagingTypes($mode->id)->pluck('description', 'code');
         $localisation = $company->localisation;
 
         return compact('packages', 'contents', 'packaging', 'localisation');
@@ -294,24 +294,24 @@ class ShipmentsController extends Controller
             // Flatten the multi-dimensional array into 1D array using dot notation
             $values = Arr::dot($values);
 
-            $shipment->recipient_name         = $request->recipient_name;
+            $shipment->recipient_name = $request->recipient_name;
             $shipment->recipient_company_name = $request->recipient_company_name;
-            $shipment->recipient_city         = $request->recipient_city;
+            $shipment->recipient_city = $request->recipient_city;
             $shipment->recipient_country_code = $request->recipient_country_code;
-            $shipment->pieces                 = $request->pieces;
-            $shipment->shipment_reference     = $request->shipment_reference;
-            $shipment->user_id                = $request->user()->id;
-            $shipment->company_id             = $request->company_id;
-            $shipment->mode_id                = $request->mode_id;
-            $shipment->collection_date        = Carbon::parse($request->collection_date);
-            $shipment->ship_date              = Carbon::parse($request->collection_date);
-            $shipment->form_values            = json_encode($values);
-            $shipment->status_id              = 1;
-            $shipment->depot_id               = 1;
-            $shipment->route_id               = 1;
-            $shipment->department_id          = 1;
-            $shipment->carrier_id             = 1;
-            $shipment->service_id             = 1;
+            $shipment->pieces = $request->pieces;
+            $shipment->shipment_reference = $request->shipment_reference;
+            $shipment->user_id = $request->user()->id;
+            $shipment->company_id = $request->company_id;
+            $shipment->mode_id = $request->mode_id;
+            $shipment->collection_date = Carbon::parse($request->collection_date);
+            $shipment->ship_date = Carbon::parse($request->collection_date);
+            $shipment->form_values = json_encode($values);
+            $shipment->status_id = 1;
+            $shipment->depot_id = 1;
+            $shipment->route_id = 1;
+            $shipment->department_id = 1;
+            $shipment->carrier_id = 1;
+            $shipment->service_id = 1;
 
             // New shipment (not an update), set the consignment number
             if ($shipment->save() && ! is_numeric($request->shipment_id)) {
@@ -353,19 +353,19 @@ class ShipmentsController extends Controller
         $this->authorize(new Shipment);
 
         $dateFrom = new Carbon($request->date_from);
-        $dateTo   = new Carbon($request->date_to);
+        $dateTo = new Carbon($request->date_to);
 
         $shipments = Shipment::orderBy('created_at', 'DESC')
-                             ->orderBy('shipments.id', 'DESC')
-                             ->whereNull('supplied_volumetric_weight')
-                             ->filter($request->filter)
-                             ->hasMode($request->mode)
-                             ->hasDepot($request->depot)
-                             ->hasService($request->service)
-                             ->hasCompany($request->company)
-                             ->shipDateBetween($dateFrom, $dateTo)
-                             ->with('service', 'packages', 'company')
-                             ->paginate(50);
+            ->orderBy('shipments.id', 'DESC')
+            ->whereNull('supplied_volumetric_weight')
+            ->filter($request->filter)
+            ->hasMode($request->mode)
+            ->hasDepot($request->depot)
+            ->hasService($request->service)
+            ->hasCompany($request->company)
+            ->shipDateBetween($dateFrom, $dateTo)
+            ->with('service', 'packages', 'company')
+            ->paginate(50);
 
         return view('shipments.update_dims', compact('shipments'));
     }
@@ -395,23 +395,23 @@ class ShipmentsController extends Controller
                 }
             }
 
-            $weight           = 0;
+            $weight = 0;
             $volumetricWeight = 0;
-            $packages         = [];
+            $packages = [];
 
             foreach ($shipment->packages as $package) {
                 if (! $shipment->supplied_weight || ! $shipment->supplied_volumetric_weight) {
-                    $package->supplied_length            = $package->length;
-                    $package->supplied_width             = $package->width;
-                    $package->supplied_height            = $package->height;
-                    $package->supplied_weight            = $package->weight;
+                    $package->supplied_length = $package->length;
+                    $package->supplied_width = $package->width;
+                    $package->supplied_height = $package->height;
+                    $package->supplied_weight = $package->weight;
                     $package->supplied_volumetric_weight = $package->volumetric_weight;
                 }
 
-                $package->length            = $array['packages'][$package->index]['length'];
-                $package->width             = $array['packages'][$package->index]['width'];
-                $package->height            = $array['packages'][$package->index]['height'];
-                $package->weight            = $array['packages'][$package->index]['weight'];
+                $package->length = $array['packages'][$package->index]['length'];
+                $package->width = $array['packages'][$package->index]['width'];
+                $package->height = $array['packages'][$package->index]['height'];
+                $package->weight = $array['packages'][$package->index]['weight'];
                 $package->volumetric_weight = calcVolume(
                     $package->length,
                     $package->width,
@@ -419,7 +419,7 @@ class ShipmentsController extends Controller
                     $shipment->volumetric_divisor
                 );
 
-                $weight           += $package->weight;
+                $weight += $package->weight;
                 $volumetricWeight += $package->volumetric_weight;
 
                 $packages[] = $package->toArray();
@@ -427,25 +427,25 @@ class ShipmentsController extends Controller
             }
 
             if (! $shipment->supplied_weight || ! $shipment->supplied_volumetric_weight) {
-                $shipment->supplied_weight            = $shipment->weight;
+                $shipment->supplied_weight = $shipment->weight;
                 $shipment->supplied_volumetric_weight = $shipment->volumetric_weight;
             }
 
-            $shipment->weight            = $weight;
+            $shipment->weight = $weight;
             $shipment->volumetric_weight = $volumetricWeight;
 
             // Build Shipment array for repricing
-            $shipmentArray             = $shipment->toArray();
+            $shipmentArray = $shipment->toArray();
             $shipmentArray['packages'] = $packages;
 
             // Reprice Shipment with new dims etc.
-            $pricing                   = new Pricing();
-            $price                     = $pricing->price($shipmentArray, $shipmentArray['service_id']);
-            $shipment->quoted          = json_encode($price);
+            $pricing = new Pricing();
+            $price = $pricing->price($shipmentArray, $shipmentArray['service_id']);
+            $shipment->quoted = json_encode($price);
             $shipment->shipping_charge = $price['shipping_charge'];
-            $shipment->shipping_cost   = $price['shipping_cost'];
-            $shipment->cost_currency   = $price['cost_currency'];
-            $shipment->sales_currency  = $price['sales_currency'];
+            $shipment->shipping_cost = $price['shipping_cost'];
+            $shipment->cost_currency = $price['cost_currency'];
+            $shipment->sales_currency = $price['sales_currency'];
 
             $shipment->save();
 
@@ -611,10 +611,10 @@ class ShipmentsController extends Controller
 
         // Build an array of any dynamic parameters we have been passed
         $parameters = [
-            'type'                 => $request->type,
+            'type' => $request->type,
             'ultimate_destination' => $request->ultimate_destination,
-            'comments'             => $request->comments,
-            'incoterm'             => $request->incoterm,
+            'comments' => $request->comments,
+            'incoterm' => $request->incoterm,
         ];
 
         // Call the API for invoice
@@ -656,8 +656,8 @@ class ShipmentsController extends Controller
         // Validate the request
         $this->validate($request, ['import_config_id' => 'required|numeric', 'file' => 'required'], [
             'import_config_id.required' => 'Please select an upload profile.',
-            'file.mimes'                => 'Not a valid CSV file - please check for unsupported characters',
-            'file.required'             => 'Please select a file to upload.'
+            'file.mimes' => 'Not a valid CSV file - please check for unsupported characters',
+            'file.required' => 'Please select a file to upload.'
         ]);
 
         // Upload the file to the temp directory
@@ -748,18 +748,18 @@ class ShipmentsController extends Controller
         }
 
         $shipments = Shipment::orderBy('ship_date', 'DESC')
-                             ->filter($request->filter)
-                             ->hasCompany($request->company)
-                             ->shipDateBetween($request->date_from, $request->date_to)
-                             ->hasMode(1)
-                             ->where('service_id', '<>', 4)
-                             ->whereReceived(1)
-                             ->whereIn('status_id', $status)
-                             ->traffic($request->traffic)
-                             ->hasService($request->service)
-                             ->restrictCompany($request->user()->getAllowedCompanyIds())
-                             ->with('service')
-                             ->paginate(250);
+            ->filter($request->filter)
+            ->hasCompany($request->company)
+            ->shipDateBetween($request->date_from, $request->date_to)
+            ->hasMode(1)
+            ->where('service_id', '<>', 4)
+            ->whereReceived(1)
+            ->whereIn('status_id', $status)
+            ->traffic($request->traffic)
+            ->hasService($request->service)
+            ->restrictCompany($request->user()->getAllowedCompanyIds())
+            ->with('service')
+            ->paginate(250);
 
         return Excel::download(new ExceptionsExport($shipments), 'exceptions.xlsx');
     }
@@ -776,10 +776,10 @@ class ShipmentsController extends Controller
         $this->authorize('viewAny', new Shipment);
 
         $shipments = Shipment::orderBy('ship_date', 'DESC')
-                             ->hasCompany($request->company)
-                             ->hasStatus('pre_transit')
-                             ->restrictCompany($request->user()->getAllowedCompanyIds())
-                             ->get();
+            ->hasCompany($request->company)
+            ->hasStatus('pre_transit')
+            ->restrictCompany($request->user()->getAllowedCompanyIds())
+            ->get();
 
         $pdf = new Pdf($request->user()->localisation->document_size, 'D');
 
@@ -809,10 +809,10 @@ class ShipmentsController extends Controller
         $shipments = $this->search($request, false, false);
 
         $shipments = $shipments->whereNotIn('status_id', [1, 7])
-                               ->whereNotIn('carrier_id', [9, 10, 11, 12, 13])
-                               ->where('legacy', '!=', 1)
-                               ->where('on_hold', 0)
-                               ->sortBy('route_id');
+            ->whereNotIn('carrier_id', [9, 10, 11, 12, 13])
+            ->where('legacy', '!=', 1)
+            ->where('on_hold', 0)
+            ->sortBy('route_id');
 
         $printFormatCode = 'A4';
 
@@ -820,7 +820,7 @@ class ShipmentsController extends Controller
             $printFormatCode = $request->user()->printFormat->code;
         }
 
-        $pdf  = new Pdf($printFormatCode, 'D');
+        $pdf = new Pdf($printFormatCode, 'D');
         $docs = $pdf->createShippingDocs($shipments, strtoupper($labelType));
 
         return $this->docResponse($docs);
@@ -836,13 +836,13 @@ class ShipmentsController extends Controller
     public function batchedCommercialInvoicesBySourcePdf($source)
     {
         $shipments = Shipment::orderBy('shipments.id')
-                             ->notEu()
-                             ->notDomestic()
-                             ->notUkDomestic()
-                             ->whereSource($source)
-                             ->get();
+            ->notEu()
+            ->notDomestic()
+            ->notUkDomestic()
+            ->whereSource($source)
+            ->get();
 
-        $pdf  = new Pdf('A4', 'D');
+        $pdf = new Pdf('A4', 'D');
         $docs = $pdf->createShippingDocs($shipments, 'INVOICE');
 
         return $this->docResponse($docs);
@@ -856,11 +856,11 @@ class ShipmentsController extends Controller
     public function todaysLabels(Request $request)
     {
         $shipments = Shipment::orderBy('id', 'desc')
-                             ->groupBy('source')
-                             ->restrictCompany($request->user()->getAllowedCompanyIds())
-                             ->restrictMode($request->user()->getAllowedModeIds())
-                             ->whereBetween('created_at', [Carbon::today()->startOfDay(), Carbon::today()->endOfDay()])
-                             ->paginate(50);
+            ->groupBy('source')
+            ->restrictCompany($request->user()->getAllowedCompanyIds())
+            ->restrictMode($request->user()->getAllowedModeIds())
+            ->whereBetween('created_at', [Carbon::today()->startOfDay(), Carbon::today()->endOfDay()])
+            ->paginate(50);
 
         return view('shipments.todays_labels', compact('shipments'));
     }
@@ -975,8 +975,8 @@ class ShipmentsController extends Controller
 
             if ($shipment) {
                 $shipment->consignment_number = nextAvailable('CONSIGNMENT');
-                $shipment->sender_state       = getStateCode($shipment->sender_country_code, $shipment->sender_state);
-                $shipment->recipient_state    = getStateCode(
+                $shipment->sender_state = getStateCode($shipment->sender_country_code, $shipment->sender_state);
+                $shipment->recipient_state = getStateCode(
                     $shipment->recipient_country_code,
                     $shipment->recipient_state
                 );
@@ -1036,7 +1036,7 @@ class ShipmentsController extends Controller
     {
         $shipments = Shipment::orderBy('shipments.id')->whereSource($source)->get();
 
-        $pdf  = new Pdf('A4', 'D');
+        $pdf = new Pdf('A4', 'D');
         $docs = $pdf->createShippingDocs($shipments, 'DESPATCH');
 
         return $this->docResponse($docs);
@@ -1049,7 +1049,9 @@ class ShipmentsController extends Controller
      */
     public function test(Request $request)
     {
-        dd(niToEu('bt4 3de', 'ie'));
+        $shipment = Shipment::find(1435531);
+        $price = $shipment->price(false, true);
+        dd($price);
     }
 
 
@@ -1087,7 +1089,7 @@ class ShipmentsController extends Controller
 
         // Original pricing
         $originalQuoted = json_decode($shipment->quoted, true);
-        $shipmentId     = $shipment->id;
+        $shipmentId = $shipment->id;
 
         $shipment->reset();
 
@@ -1101,10 +1103,10 @@ class ShipmentsController extends Controller
             $packages[] = [
                 "dry_ice_weight" => 0,
                 "packaging_code" => 'CTN',
-                "weight"         => $package['weight'],
-                "length"         => $package['length'],
-                "width"          => $package['width'],
-                "height"         => $package['height'],
+                "weight" => $package['weight'],
+                "length" => $package['length'],
+                "width" => $package['width'],
+                "height" => $package['height'],
             ];
         }
 
@@ -1112,80 +1114,80 @@ class ShipmentsController extends Controller
 
         foreach ($shipment->contents as $content) {
             $contents[] = [
-                "description"            => $content->description,
-                "product_code"           => $content->product_code,
-                "currency_code"          => $content->currency_code,
+                "description" => $content->description,
+                "product_code" => $content->product_code,
+                "currency_code" => $content->currency_code,
                 "country_of_manufacture" => $content->country_of_manufacture,
-                "manufacturer"           => $content->manufacturer,
-                "uom"                    => $content->uom,
-                "commodity_code"         => $content->commodity_code,
-                "harmonized_code"        => $content->harmonized_code,
-                "quantity"               => $content->quantity,
-                "unit_weight"            => $content->unit_weight,
-                "unit_value"             => $content->unit_value,
+                "manufacturer" => $content->manufacturer,
+                "uom" => $content->uom,
+                "commodity_code" => $content->commodity_code,
+                "harmonized_code" => $content->harmonized_code,
+                "quantity" => $content->quantity,
+                "unit_weight" => $content->unit_weight,
+                "unit_value" => $content->unit_value,
             ];
         }
 
         $data = [
-            "shipment_id"                       => $shipment->id,
-            "user_id"                           => $shipment->user_id,
-            "print_formats_id"                  => $shipment->print_formats_id,
-            "mode"                              => "courier",
-            "mode_id"                           => "1",
-            "dims_uom"                          => $shipment->dims_uom,
-            "weight_uom"                        => $shipment->weight_uom,
-            "date_format"                       => "dd-mm-yyyy",
-            "currency_code"                     => $shipment->customs_value_currency_code,
-            "weight"                            => $shipment->weight,
-            "service_id"                        => $request->service,
-            "customs_value"                     => $shipment->customs_value,
-            "customs_value_currency_code"       => $shipment->customs_value_currency_code,
-            "sender_name"                       => $shipment->sender_name,
-            "sender_company_name"               => $shipment->sender_company_name,
-            "sender_type"                       => $shipment->sender_type,
-            "sender_address1"                   => $shipment->sender_address1,
-            "sender_address2"                   => $shipment->sender_address2,
-            "sender_address3"                   => $shipment->sender_address3,
-            "sender_city"                       => $shipment->sender_city,
-            "sender_country_code"               => $shipment->sender_country_code,
-            "sender_state"                      => $shipment->sender_state,
-            "sender_postcode"                   => $shipment->sender_postcode,
-            "sender_telephone"                  => $shipment->sender_telephone,
-            "sender_email"                      => $shipment->sender_email,
-            "company_id"                        => $shipment->company_id,
-            "recipient_name"                    => $shipment->recipient_name,
-            "recipient_company_name"            => $shipment->recipient_company_name,
-            "recipient_type"                    => $shipment->recipient_type,
-            "recipient_address1"                => $shipment->recipient_address1,
-            "recipient_address2"                => $shipment->recipient_address2,
-            "recipient_address3"                => $shipment->recipient_address3,
-            "recipient_city"                    => $shipment->recipient_city,
-            "recipient_country_code"            => $shipment->recipient_country_code,
-            "recipient_state"                   => $shipment->recipient_state,
-            "recipient_postcode"                => $shipment->recipient_postcode,
-            "recipient_telephone"               => $shipment->recipient_telephone,
-            "recipient_email"                   => $shipment->recipient_email,
-            "recipient_account_number"          => $shipment->recipient_account_number,
-            "pieces"                            => $shipment->pieces,
-            "shipment_reference"                => $shipment->shipment_reference,
-            "ship_reason"                       => $shipment->ship_reason,
-            "collection_date"                   => now()->addDay()->format('d-m-Y'),
-            "hazardous"                         => $shipment->hazardous,
-            "special_instructions"              => $shipment->special_instructions,
-            "bill_shipping"                     => $shipment->bill_shipping,
-            "bill_tax_duty"                     => $shipment->bill_tax_duty,
-            "bill_shipping_account"             => $shipment->bill_shipping_account,
-            "bill_tax_duty_account"             => $shipment->bill_tax_duty_account,
-            "invoice_type"                      => $shipment->invoice_type,
-            "terms_of_sale"                     => $shipment->terms_of_sale,
-            "eori"                              => $shipment->eori,
+            "shipment_id" => $shipment->id,
+            "user_id" => $shipment->user_id,
+            "print_formats_id" => $shipment->print_formats_id,
+            "mode" => "courier",
+            "mode_id" => "1",
+            "dims_uom" => $shipment->dims_uom,
+            "weight_uom" => $shipment->weight_uom,
+            "date_format" => "dd-mm-yyyy",
+            "currency_code" => $shipment->customs_value_currency_code,
+            "weight" => $shipment->weight,
+            "service_id" => $request->service,
+            "customs_value" => $shipment->customs_value,
+            "customs_value_currency_code" => $shipment->customs_value_currency_code,
+            "sender_name" => $shipment->sender_name,
+            "sender_company_name" => $shipment->sender_company_name,
+            "sender_type" => $shipment->sender_type,
+            "sender_address1" => $shipment->sender_address1,
+            "sender_address2" => $shipment->sender_address2,
+            "sender_address3" => $shipment->sender_address3,
+            "sender_city" => $shipment->sender_city,
+            "sender_country_code" => $shipment->sender_country_code,
+            "sender_state" => $shipment->sender_state,
+            "sender_postcode" => $shipment->sender_postcode,
+            "sender_telephone" => $shipment->sender_telephone,
+            "sender_email" => $shipment->sender_email,
+            "company_id" => $shipment->company_id,
+            "recipient_name" => $shipment->recipient_name,
+            "recipient_company_name" => $shipment->recipient_company_name,
+            "recipient_type" => $shipment->recipient_type,
+            "recipient_address1" => $shipment->recipient_address1,
+            "recipient_address2" => $shipment->recipient_address2,
+            "recipient_address3" => $shipment->recipient_address3,
+            "recipient_city" => $shipment->recipient_city,
+            "recipient_country_code" => $shipment->recipient_country_code,
+            "recipient_state" => $shipment->recipient_state,
+            "recipient_postcode" => $shipment->recipient_postcode,
+            "recipient_telephone" => $shipment->recipient_telephone,
+            "recipient_email" => $shipment->recipient_email,
+            "recipient_account_number" => $shipment->recipient_account_number,
+            "pieces" => $shipment->pieces,
+            "shipment_reference" => $shipment->shipment_reference,
+            "ship_reason" => $shipment->ship_reason,
+            "collection_date" => now()->addDay()->format('d-m-Y'),
+            "hazardous" => $shipment->hazardous,
+            "special_instructions" => $shipment->special_instructions,
+            "bill_shipping" => $shipment->bill_shipping,
+            "bill_tax_duty" => $shipment->bill_tax_duty,
+            "bill_shipping_account" => $shipment->bill_shipping_account,
+            "bill_tax_duty_account" => $shipment->bill_tax_duty_account,
+            "invoice_type" => $shipment->invoice_type,
+            "terms_of_sale" => $shipment->terms_of_sale,
+            "eori" => $shipment->eori,
             "ultimate_destination_country_code" => $shipment->ultimate_destination_country_code,
-            "commercial_invoice_comments"       => $shipment->commercial_invoice_comments,
-            "insurance_value"                   => $shipment->insurance_value,
-            "lithium_batteries"                 => $shipment->lithium_batteries,
-            "packages"                          => $packages,
-            "contents"                          => $contents,
-            "goods_description"                 => $shipment->goods_description
+            "commercial_invoice_comments" => $shipment->commercial_invoice_comments,
+            "insurance_value" => $shipment->insurance_value,
+            "lithium_batteries" => $shipment->lithium_batteries,
+            "packages" => $packages,
+            "contents" => $contents,
+            "goods_description" => $shipment->goods_description
         ];
 
         $response = CarrierAPI::createShipment($data);
@@ -1205,23 +1207,23 @@ class ShipmentsController extends Controller
             $newQuoted = json_decode($shipment->quoted, true);
 
             // Update newQuoted array with previous values
-            $newQuoted['shipping_charge']  = $originalQuoted['shipping_charge'];
-            $newQuoted['fuel_charge']      = $originalQuoted['fuel_charge'];
+            $newQuoted['shipping_charge'] = $originalQuoted['shipping_charge'];
+            $newQuoted['fuel_charge'] = $originalQuoted['fuel_charge'];
             $newQuoted['sales_vat_amount'] = $originalQuoted['sales_vat_amount'];
-            $newQuoted['sales_vat_code']   = $originalQuoted['sales_vat_code'];
-            $newQuoted['sales_currency']   = $originalQuoted['sales_currency'];
-            $newQuoted['sales']            = $originalQuoted['sales'];
-            $newQuoted['sales_debug']      = $originalQuoted['sales_debug'];
-            $newQuoted['sales_detail']     = $originalQuoted['sales_detail'];
-            $newQuoted['sales_zone']       = $originalQuoted['sales_zone'];
-            $newQuoted['sales_model']      = $originalQuoted['sales_model'];
-            $newQuoted['sales_rate_id']    = $originalQuoted['sales_rate_id'];
-            $newQuoted['sales_packaging']  = $originalQuoted['sales_packaging'];
+            $newQuoted['sales_vat_code'] = $originalQuoted['sales_vat_code'];
+            $newQuoted['sales_currency'] = $originalQuoted['sales_currency'];
+            $newQuoted['sales'] = $originalQuoted['sales'];
+            $newQuoted['sales_debug'] = $originalQuoted['sales_debug'];
+            $newQuoted['sales_detail'] = $originalQuoted['sales_detail'];
+            $newQuoted['sales_zone'] = $originalQuoted['sales_zone'];
+            $newQuoted['sales_model'] = $originalQuoted['sales_model'];
+            $newQuoted['sales_rate_id'] = $originalQuoted['sales_rate_id'];
+            $newQuoted['sales_packaging'] = $originalQuoted['sales_packaging'];
 
             // Update Shipment record
             $shipment->shipping_charge = $newQuoted['shipping_charge'];
-            $shipment->fuel_charge     = $newQuoted['fuel_charge'];
-            $shipment->sales_currency  = $newQuoted['sales_currency'];
+            $shipment->fuel_charge = $newQuoted['fuel_charge'];
+            $shipment->sales_currency = $newQuoted['sales_currency'];
 
             // Set the json quote field
             $shipment->quoted = json_encode($newQuoted);
