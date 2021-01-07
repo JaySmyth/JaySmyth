@@ -390,6 +390,11 @@ class FedexAPI extends CarrierBase
             $shipment['sender_postcode'] = 'XY35';
         }
 
+        // Don't send recipient email to FedEx for certain companies
+        if (in_array($shipment['company_id'], [508, 608])) {
+            $shipment['recipient_email'] = null;
+        }
+
         // Setup Package Types
         $this->fedex->packageTypes = Company::find($shipment['company_id'])
                                             ->buildPackageTypesArray($shipment['mode_id'], 'FEDEX');
