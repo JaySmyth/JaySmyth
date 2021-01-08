@@ -906,7 +906,7 @@ class Shipment extends Model
         }
 
         if ($this->tracking) {
-            if ($this->tracking->first()->estimated_delivery_date) {
+            if (!empty($this->tracking->first()->estimated_delivery_date)) {
                 return $this->tracking->first()->estimated_delivery_date->timezone($timezone)->format($format);
             }
         }
