@@ -204,9 +204,16 @@ class ImportMultifreightFiles extends Command
                 switch (count($this->keyFields[$this->fileType])) {
 
                     case 1:
-                        $this->table::firstOrCreate([
-                            $this->keyFields[$this->fileType][0] => $row[$this->keyFields[$this->fileType][0]],
-                        ])->update($row);
+
+                        if(!empty($row['job_id'])){
+
+                            $this->table::firstOrCreate([
+                                $this->keyFields[$this->fileType][0] => $row[$this->keyFields[$this->fileType][0]],
+                            ])->update($row);
+
+                        } else {
+                            Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Import Multifreight Files: job_id is null', false, false, $this->directory.$file));
+                        }
 
                         break;
 
