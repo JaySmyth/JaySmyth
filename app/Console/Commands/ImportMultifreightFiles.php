@@ -212,7 +212,7 @@ class ImportMultifreightFiles extends Command
                             ])->update($row);
 
                         } else {
-                            Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Import Multifreight Files: job_id is null', false, false, $this->directory.$file));
+                            Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Import Multifreight Files: job_id is null', $this->directory.$file));
                         }
 
                         break;
