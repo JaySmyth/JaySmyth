@@ -846,10 +846,11 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
 
         var senderCountryCode = $('#sender_country_code').val();
         var senderPostcode = $('#sender_postcode').val();
+        var recipientPostcode = $('#recipient_postcode').val();
         var recipientCountryCode = $('#recipient_country_code').val();
         var companyId = $('#company_id').val();
 
-        if (companyId == "1015" && recipientCountryCode == "IE") {
+        if (companyId == "1015" && (recipientCountryCode == "IE" || recipientPostcode.startsWith("BT"))) {
             return false;
         }
 
