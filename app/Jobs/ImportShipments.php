@@ -600,7 +600,7 @@ class ImportShipments implements ShouldQueue
         $commodity = false;
 
         // If this section is not required then return
-        if (customsEntryRequired($this->row['sender_country_code'], $this->row['recipient_country_code'])) {
+        if (customsEntryRequired($this->row['sender_country_code'], $this->row['recipient_country_code'], $this->row['sender_postcode'], $this->row['recipient_postcode'], $this->company->id)) {
             if (empty($this->row['product_code'])) {
                 $this->errors[] = 'Product code required for this destination';
 
@@ -635,7 +635,7 @@ class ImportShipments implements ShouldQueue
             $this->row['contents'][0]['weight_uom'] = $commodity->weight_uom;
         }
 
-        if (! $commodity && customsEntryRequired($this->row['sender_country_code'], $this->row['recipient_country_code'])) {
+        if (! $commodity && customsEntryRequired($this->row['sender_country_code'], $this->row['recipient_country_code'], $this->row['sender_postcode'], $this->row['recipient_postcode'], $this->company->id)) {
             $this->errors[] = 'Product code not found';
         }
     }

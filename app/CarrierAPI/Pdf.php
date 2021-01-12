@@ -574,7 +574,7 @@ class Pdf
             default:
                 $this->packageLabelRequired = true;
                 if ($shipment->company->master_label) {
-                    $this->masterLabelRequired = customsEntryRequired($shipment->sender_country_code, $shipment->recipient_country_code);
+                    $this->masterLabelRequired = customsEntryRequired($shipment->sender_country_code, $shipment->recipient_country_code, $shipment->sender_postcode, $shipment->recipient_postcode, $shipment->company_id);
                     $this->masterLabelRequired = true;
                 } else {
                     $this->masterLabelRequired = false;

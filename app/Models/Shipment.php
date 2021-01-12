@@ -863,6 +863,16 @@ class Shipment extends Model
             return true;
         }
 
+        // Blind company LT - sender postcode is always BT (although shipped from GB)
+        if ($this->company_id == 1015 && substr(strtoupper($this->recipient_postcode), 0, 2) == 'BT') {
+            return true;
+        }
+
+        // GB to NI
+        if (isGbToNi($this->sender_country_code, $this->recipient_country_code, $this->sender_postcode, $this->recipient_postcode)) {
+            return true;
+        }
+
         if ($this->sender_country_code == 'GB' && $this->recipient_country_code == 'GB') {
             if (substr($this->sender_postcode, 0, 2) == 'BT') {
                 return false;

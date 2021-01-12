@@ -58,8 +58,8 @@ function isUkEu($senderCountryCode, $recipientCountryCode)
 /**
  * Dump out data for debugging.
  *
- * @param type $data
- * @param type $msg
+ * @param  type  $data
+ * @param  type  $msg
  */
 function display($data, $msg = '')
 {
@@ -85,7 +85,8 @@ function inc(&$var, $value)
 /**
  * Un-dot a flattened array.
  *
- * @param array $array
+ * @param  array  $array
+ *
  * @return array
  */
 function array_undot($array)
@@ -119,8 +120,9 @@ function trimData($data)
 /**
  * Get specific routing value for a given postcode.
  *
- * @param type $postcode
- * @param type $day
+ * @param  type  $postcode
+ * @param  type  $day
+ *
  * @return type
  */
 function getRouteValue($postcode, $value = 'collection_route', $day = 1)
@@ -135,8 +137,9 @@ function getRouteValue($postcode, $value = 'collection_route', $day = 1)
 /**
  * Get collection settings for a postcode.
  *
- * @param type $postcode
- * @param type $day
+ * @param  type  $postcode
+ * @param  type  $day
+ *
  * @return type
  */
 function getRouting($postcode, $day = false)
@@ -184,8 +187,9 @@ function getCountryCode($string)
 /**
  * Get ANSI state code from given country/state.
  *
- * @param type $countryCode
- * @param type $state
+ * @param  type  $countryCode
+ * @param  type  $state
+ *
  * @return type
  */
 function getStateCode($countryCode, $state)
@@ -202,7 +206,8 @@ function getStateCode($countryCode, $state)
 /**
  * Get verbose invoice type.
  *
- * @param type $type
+ * @param  type  $type
+ *
  * @return string
  */
 function verboseInvoiceType($type)
@@ -220,7 +225,8 @@ function verboseInvoiceType($type)
 /**
  * Get verbose invoice type.
  *
- * @param type $type
+ * @param  type  $type
+ *
  * @return string
  */
 function verboseImportExport($importExport)
@@ -238,7 +244,8 @@ function verboseImportExport($importExport)
 /**
  * Get verbose invoice type.
  *
- * @param type $type
+ * @param  type  $type
+ *
  * @return string
  */
 function verboseCollectionDelivery($value)
@@ -286,8 +293,9 @@ function getCarrierName($carrierId)
 /**
  * Get pickup time.
  *
- * @param string $countryCode
- * @param string $postcode
+ * @param  string  $countryCode
+ * @param  string  $postcode
+ *
  * @return string
  */
 function getPickupTime($countryCode, $postcode)
@@ -301,9 +309,9 @@ function getPickupTime($countryCode, $postcode)
  * This function will return an array that can be used to populate a select drop down.
  * The function can be called directly from within a blade view.
  *
- * @param string dropDown   the dropdown to generate
- * @param string prepend    prepend to the array with a default value
- * @param int modeID    mode specific results
+ * @param  string dropDown   the dropdown to generate
+ * @param  string prepend    prepend to the array with a default value
+ * @param  int modeID    mode specific results
  *
  * @return array
  */
@@ -366,7 +374,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             break;
         case 'departments':
             $result = App\Models\Department::select('id', DB::raw('CONCAT(name, " (", code, ")") AS department'))
-                    ->orderBy('department')->pluck('department', 'id');
+                ->orderBy('department')->pluck('department', 'id');
             break;
         case 'surchargeCategories':
             $result = App\Models\Surcharge::select('name', 'id')->pluck('name', 'id');
@@ -420,7 +428,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
         case 'serviceIds':
             // $result = App\Models\Service::select('carrier_name', 'id')->orderBy('carrier_name')->pluck('carrier_name', 'id');
             $result = App\Models\Service::select('id', DB::raw('CONCAT(name, "/ ", carrier_name) AS carrier_name'))
-                    ->orderBy('carrier_name')->pluck('carrier_name', 'id');
+                ->orderBy('carrier_name')->pluck('carrier_name', 'id');
             break;
         case 'shipReasons':
             $result = App\Models\ShipReason::orderBy('id')->pluck('description', 'code');
@@ -430,7 +438,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             break;
         case 'vehicles':
             $result = App\Models\Vehicle::select('id', DB::raw('CONCAT(registration, " (", type, ")") AS vehicle'))
-                    ->orderBy('vehicle')->pluck('vehicle', 'id');
+                ->orderBy('vehicle')->pluck('vehicle', 'id');
             break;
         case 'drivers':
             $result = App\Models\Driver::select('name', 'id')->whereEnabled(1)->orderBy('name')->pluck('name', 'id');
@@ -537,7 +545,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             break;
         case 'standardSalesRates':
             $result = App\Models\Rate::where('rate_type', 's')->where('id', '<', '1000')
-                    ->orderBy('description')->pluck('description', 'id');
+                ->orderBy('description')->pluck('description', 'id');
             break;
         case 'scsChargeCodes':
 
@@ -601,7 +609,8 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
 /**
  * Return an array of dates.
  *
- * @param string $format
+ * @param  string  $format
+ *
  * @return array
  */
 function getDates($start = '-6 months', $finish = '+3 months', $format = 'd-m-Y')
@@ -624,7 +633,8 @@ function getDates($start = '-6 months', $finish = '+3 months', $format = 'd-m-Y'
 /**
  * Return an arrray of times.
  *
- * @param type $interval
+ * @param  type  $interval
+ *
  * @return array
  */
 function getTimes($interval = 1)
@@ -642,7 +652,8 @@ function getTimes($interval = 1)
 /**
  * Gets verbose address type.
  *
- * @param type $type
+ * @param  type  $type
+ *
  * @return string
  */
 function getAddressType($type)
@@ -724,29 +735,26 @@ function getUkDomesticCountries()
 }
 
 /**
- * Determines if a shipment is classified as UK domestic.
+ * Determine if a country code is UK domestic.
  *
- * @param type $recipientCountryCode
+ * @param  type  $recipientCountryCode
+ *
  * @return bool
  */
-function isUkDomestic($recipientCountryCode)
+function isUkDomestic($countryCode)
 {
-    if (in_array($recipientCountryCode, getUkDomesticCountries())) {
-        return true;
-    }
-
-    return false;
+    return in_array(strtoupper($countryCode), getUkDomesticCountries());
 }
 
 /**
  * Determines if a shipment is classified as domestic.
  *
- * @param type $recipientCountryCode
+ * @param  type  $recipientCountryCode
+ *
  * @return bool
  */
 function isDomestic($senderCountryCode, $recipientCountryCode)
 {
-
     // Shipping within the same country
     if ($senderCountryCode == $recipientCountryCode) {
         return true;
@@ -762,6 +770,8 @@ function isDomestic($senderCountryCode, $recipientCountryCode)
 
 
 /**
+ * Determine if a country id within the EU.
+ *
  * @param $countryCode
  *
  * @return mixed
@@ -770,10 +780,9 @@ function isEu($countryCode)
 {
     $country = Country::where('country_code', $countryCode)->first();
 
-    if($country){
+    if ($country) {
         return $country->eu;
     }
-
 }
 
 /**
@@ -789,15 +798,48 @@ function isNiShipment($senderPostcode, $recipientPostcode)
     return substr(strtoupper($senderPostcode), 0, 2) == 'BT' && substr(strtoupper($senderPostcode), 0, 2) === substr(strtoupper($recipientPostcode), 0, 2);
 }
 
-
-function niToEu($senderPostcode, $recipientCountryCode){
+/**
+ * Shipment from NI to EU.
+ *
+ * @param $senderPostcode
+ * @param $recipientCountryCode
+ *
+ * @return bool
+ */
+function isNiToEu($senderPostcode, $recipientCountryCode)
+{
     return substr(strtoupper($senderPostcode), 0, 2) == 'BT' && isEu($recipientCountryCode);
+}
+
+
+/**
+ * GB to NI shipment.
+ *
+ * @param $senderCountryCode
+ * @param $recipientCountryCode
+ * @param $senderPostcode
+ * @param $recipientPostcode
+ *
+ * @return bool
+ */
+function isGbToNi($senderCountryCode, $recipientCountryCode, $senderPostcode, $recipientPostcode)
+{
+    // Shipping within the UK
+    if (isUkDomestic($senderCountryCode) && strtoupper($recipientCountryCode) == 'GB') {
+        // Sender postcode not BT - recipient postcode is BT
+        if (substr(strtoupper($senderPostcode), 0, 2) != 'BT' && substr(strtoupper($recipientPostcode), 0, 2) == 'BT') {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /**
  * Convert y/n to boolean.
  *
- * @param string $value
+ * @param  string  $value
+ *
  * @return bool
  */
 function yesNoToBoolean($value)
@@ -812,7 +854,8 @@ function yesNoToBoolean($value)
 /**
  * convert boolean to y/n.
  *
- * @param mixed $value
+ * @param  mixed  $value
+ *
  * @return string
  */
 function booleanToYn($value)
@@ -830,7 +873,8 @@ function booleanToYn($value)
  * or array to UTF-8 encoding and returns the same
  * datatype as received.
  *
- * @param mixed $data (string or array)
+ * @param  mixed  $data  (string or array)
+ *
  * @return mixed in UTF-8 encoding
  */
 function convertToUTF8($data)
@@ -856,6 +900,7 @@ function convertToUTF8($data)
  * Calculate the checksum digit from provided number.
  *
  * @param $number
+ *
  * @return int
  */
 function mod10CheckDigit($number)
@@ -888,6 +933,7 @@ function mod10CheckDigit($number)
  * Calculate the modulo 11 check digit from provided number.
  *
  * @param $number
+ *
  * @return int
  */
 function mod11CheckDigit($number)
@@ -934,6 +980,7 @@ function mod11CheckDigit($number)
  * Checks the checksum digit from provided number.
  *
  * @param $number
+ *
  * @return bool
  */
 function checkMod10($number)
@@ -944,7 +991,8 @@ function checkMod10($number)
 /**
  * Convert snake case to space separated words.
  *
- * @param string $value
+ * @param  string  $value
+ *
  * @return string
  */
 function snakeCaseToWords($value)
@@ -956,8 +1004,9 @@ function snakeCaseToWords($value)
  * Return carbon instance from a string or timestamp. Defaults to current timestamp if
  * the datetime cannot be parsed.
  *
- * @param type $datetime
- * @param type $timezone
+ * @param  type  $datetime
+ * @param  type  $timezone
+ *
  * @return Carbon
  */
 function toCarbon($datetime)
@@ -979,8 +1028,9 @@ function toCarbon($datetime)
  * Return carbon instance from a string or timestamp. Defaults to current timestamp if
  * the datetime cannot be parsed.
  *
- * @param type $datetime
- * @param type $timezone
+ * @param  type  $datetime
+ * @param  type  $timezone
+ *
  * @return Carbon
  */
 function gmtToCarbonUtc($datetime)
@@ -996,9 +1046,10 @@ function gmtToCarbonUtc($datetime)
  * a single timezone. For countries with multiple timezones, a best guess is made. Could be developed
  * further for more accuracy using a city/region lookup. Defaults to "Europe/London".
  *
- * @param type $countryCode
- * @param type $state
- * @param type $city (currently not used)
+ * @param  type  $countryCode
+ * @param  type  $state
+ * @param  type  $city  (currently not used)
+ *
  * @return string
  */
 function getTimezone($countryCode, $state = false, $city = false)
@@ -1040,9 +1091,10 @@ function getTimezone($countryCode, $state = false, $city = false)
  * Determine what VAT is liable and return the
  * amount and relevant vat_code.
  *
- * @param string $countryCode
- * @param decimal $valueOfGoods
- * @param bool $vatExempt
+ * @param  string  $countryCode
+ * @param  decimal  $valueOfGoods
+ * @param  bool  $vatExempt
+ *
  * @return string
  */
 function calcVat($countryCode, $valueOfGoods, $vatExempt)
@@ -1054,7 +1106,6 @@ function calcVat($countryCode, $valueOfGoods, $vatExempt)
 
         // Recipient is in EU, GB or we are shipping to Channel Islands
         if ($vatExempt || $countryCode == 'JE' || $countryCode == 'GG') {
-
             // Goods are Exempt
             $vatDetails['vat_amount'] = 0;
             $vatDetails['vat_code'] = 'Z';
@@ -1071,7 +1122,6 @@ function calcVat($countryCode, $valueOfGoods, $vatExempt)
             }
         }
     } else {
-
         // No VAT due
         $vatDetails['vat_amount'] = 0;
         $vatDetails['vat_code'] = 'Z';
@@ -1081,14 +1131,29 @@ function calcVat($countryCode, $valueOfGoods, $vatExempt)
 }
 
 /**
- * @param type $senderCountry_code
- * @param type $recipientCountryCode
+ * Determine if customs entry required.
+ *
+ * @param $senderCountryCode
+ * @param $recipientCountryCode
+ * @param $senderPostcode
+ * @param $recipientPostcode
+ *
  * @return bool
  */
-function customsEntryRequired($senderCountryCode, $recipientCountryCode)
+function customsEntryRequired($senderCountryCode, $recipientCountryCode, $senderPostcode, $recipientPostcode, $companyId = null)
 {
     $senderCountryCode = getCountryCode($senderCountryCode);
     $recipientCountryCode = getCountryCode($recipientCountryCode);
+
+    // Blind company LT - sender postcode is always BT (although shipped from GB)
+    if ($companyId == 1015 && substr(strtoupper($recipientPostcode), 0, 2) == 'BT') {
+        return true;
+    }
+
+    // GB to NI
+    if (isGbToNi($senderCountryCode, $recipientCountryCode, $senderPostcode, $recipientPostcode)) {
+        return true;
+    }
 
     // If Shipping within the same country
     if ($senderCountryCode == $recipientCountryCode) {
@@ -1122,6 +1187,7 @@ function customsEntryRequired($senderCountryCode, $recipientCountryCode)
  *
  * @param $senderCountryCode
  * @param $recipientCountryCode
+ *
  * @return bool
  */
 function isWithinEu($senderCountryCode, $recipientCountryCode)
@@ -1139,7 +1205,7 @@ function isWithinEu($senderCountryCode, $recipientCountryCode)
 /**
  * Identify direction of travel.
  *
- * @param type $shipment
+ * @param  type  $shipment
  *
  * @return string Direction
  */
@@ -1150,16 +1216,16 @@ function identifyDirection($shipment)
     // Shipper and Recipient in UK
     if ($shipment['sender_country_code'] == $shipment['recipient_country_code'] && $shipment['sender_country_code'] == 'GB') {
         if ((substr($shipment['sender_postcode'], 0, 2) == 'BT') && (substr(
-            $shipment['recipient_postcode'],
-            0,
-            2
-        ) == 'BT')) {
+                    $shipment['recipient_postcode'],
+                    0,
+                    2
+                ) == 'BT')) {
             $direction = 'internal';
         } elseif ((substr($shipment['sender_postcode'], 0, 2) == 'BT') && (substr(
-            $shipment['recipient_postcode'],
-            0,
-            2
-        ) != 'BT')) {
+                    $shipment['recipient_postcode'],
+                    0,
+                    2
+                ) != 'BT')) {
             $direction = 'export';
         } else {
             $direction = 'import';
@@ -1176,9 +1242,10 @@ function identifyDirection($shipment)
 }
 
 /**
- * @param type $homeCountry
- * @param type $fromCountry
- * @param type $toCountry
+ * @param  type  $homeCountry
+ * @param  type  $fromCountry
+ * @param  type  $toCountry
+ *
  * @return string
  */
 function getDirection($homeCountry, $fromCountry, $toCountry)
@@ -1195,7 +1262,8 @@ function getDirection($homeCountry, $fromCountry, $toCountry)
 }
 
 /**
- * @param type $shipment
+ * @param  type  $shipment
+ *
  * @return string
  */
 function identifyDepartment($shipment)
@@ -1207,7 +1275,6 @@ function identifyDepartment($shipment)
     }
 
     switch ($shipment['mode']) {
-
         case 'courier':
             if (isUkDomestic($shipment['sender_country_code']) && isUkDomestic($shipment['recipient_country_code'])) {
                 return $direction == 'import' ? 'IFCUK' : 'IFCUK';
@@ -1249,8 +1316,9 @@ function identifyDepartment($shipment)
 /**
  * Obtain value from json encoded data.
  *
- * @param string $json
- * @param string $key
+ * @param  string  $json
+ * @param  string  $key
+ *
  * @return mixed
  */
 function getValueFromJson($json, $key)
@@ -1265,8 +1333,9 @@ function getValueFromJson($json, $key)
 /**
  * * Determines what CSS class to use for shipment tracking progress.
  *
- * @param type $progress
- * @param type $percentage
+ * @param  type  $progress
+ * @param  type  $percentage
+ *
  * @return string
  */
 function getTrackingState($progress, $percentage)
@@ -1283,7 +1352,8 @@ function getTrackingState($progress, $percentage)
 /**
  * Determines what colour to use for the progress bar on the tracking page.
  *
- * @param type $statusCode
+ * @param  type  $statusCode
+ *
  * @return string
  */
 function getProgressBarColour($statusCode)
@@ -1314,7 +1384,8 @@ function getProgressBarColour($statusCode)
  * Get Next available number in a sequence,
  * locking records to prevent duplication.
  *
- * @param type $sequenceType
+ * @param  type  $sequenceType
+ *
  * @return Next Available number
  */
 function nextAvailable($sequenceType)
@@ -1343,9 +1414,9 @@ function nextAvailable($sequenceType)
 /**
  * Write a csv file to given path.
  *
- * @param type $path
- * @param type $data
- * @param type $mode
+ * @param  type  $path
+ * @param  type  $data
+ * @param  type  $mode
  */
 function writeCsv($path, $data, $mode = 'w', $delimiter = ',')
 {
@@ -1365,7 +1436,8 @@ function writeCsv($path, $data, $mode = 'w', $delimiter = ',')
 /**
  * An array of excel column names.
  *
- * @param int $numberOfColumns
+ * @param  int  $numberOfColumns
+ *
  * @return array
  */
 function getExcelColumNames($numberOfColumns = 52)
@@ -1584,13 +1656,13 @@ function convertLegacyDepot($depot)
 /**
  * needs correct service Ids applied.
  *
- * @param type $service
+ * @param  type  $service
+ *
  * @return int
  */
 function convertLegacyService($service, $gateway)
 {
     switch ($gateway) {
-
         case 'FXRS':
             switch ($service) {
                 case '01':
@@ -1680,7 +1752,7 @@ function convertCurrencies($fromCurrency, $toCurrency, $value)
 
     $base = $currency->where('code', strtoupper($fromCurrency))->first();
     $dest = $currency->where('code', strtoupper($toCurrency))->first();
-    $newValue = number_format(($value * $dest->rate)/ $base->rate, 2);
+    $newValue = number_format(($value * $dest->rate) / $base->rate, 2);
 
     return $newValue;
 }
@@ -1730,7 +1802,8 @@ function convertLegacyCreatedAt($createdAt, $shipDate)
 /**
  * Convert legacy gateway to a carrier ID.
  *
- * @param type $gateway
+ * @param  type  $gateway
+ *
  * @return int
  */
 function legacyGatewayToCarrierId($gateway)
@@ -1764,8 +1837,9 @@ function legacyGatewayToCarrierId($gateway)
 /**
  * Get manifest id.
  *
- * @param type $manifestNumber
- * @param type $domestic
+ * @param  type  $manifestNumber
+ * @param  type  $domestic
+ *
  * @return type
  */
 function convertLegacyManifestNumber($manifestNumber, $domestic)
@@ -1791,7 +1865,8 @@ function convertLegacyManifestNumber($manifestNumber, $domestic)
 /**
  * Consolidate charges.
  *
- * @param type $charges
+ * @param  type  $charges
+ *
  * @return string
  */
 function consolidateCharges($charges)
@@ -1826,7 +1901,8 @@ function consolidateCharges($charges)
 /**
  * Sets specific shipment fields as upper/ lowercase as required.
  *
- * @param type $shipment
+ * @param  type  $shipment
+ *
  * @return type
  */
 function fixShipmentCase($shipment)
@@ -1901,13 +1977,13 @@ function calcDiscPercentage($currentVal, $uploadedVal)
 /**
  * Log changes to Rates Tables.
  *
- * @param type $userId
- * @param type $companyId
- * @param type $serviceId
- * @param type $rateId
- * @param type $directory
- * @param type $fileName
- * @param type $action
+ * @param  type  $userId
+ * @param  type  $companyId
+ * @param  type  $serviceId
+ * @param  type  $rateId
+ * @param  type  $directory
+ * @param  type  $fileName
+ * @param  type  $action
  */
 function logRateChange($userId, $companyId, $serviceId, $rateId, $directory = '', $fileName = '', $action = '')
 {
@@ -1925,8 +2001,9 @@ function logRateChange($userId, $companyId, $serviceId, $rateId, $directory = ''
 }
 
 /**
- * @param type $sql
- * @param type $params
+ * @param  type  $sql
+ * @param  type  $params
+ *
  * @return SQL_String
  */
 function rawToSql($sql, $params = [])
@@ -1941,7 +2018,6 @@ function rawToSql($sql, $params = [])
 
 function girth($length, $width, $height)
 {
-
     // Sort dims so we can identify the longest
     $dims = [$length, $width, $height];
     sort($dims);
@@ -1952,7 +2028,8 @@ function girth($length, $width, $height)
 /**
  * Integer to string representation of day.
  *
- * @param int $day
+ * @param  int  $day
+ *
  * @return string
  */
 function intToDay($day)
@@ -1998,7 +2075,6 @@ function buildTestUser($userId = '', $roleName = '', $companyId = '')
     // Identify supplied role or die with error
     $role = \App\Models\Role::where('name', $roleName)->first();
     if ($role) {
-
         // Add default company and links
         if ($companyId > '') {
             $user->companies()->detach();
