@@ -570,12 +570,12 @@ class PricingModel
         $description = ($this->shipDate >= '2020-11-02') ? 'Peak season surcharge' : 'Emergency Situation Surcharge';
 
         // If after date of increase amend as required
-        if ($this->shipDate >= '2020-11-02') {
-            if (in_array(strtoupper($this->shipment['recipient_country_code']), ['US','CA'])) {
-                $kgCost = .43;
-                $kgSales = .43;
-            }
-        }
+        //if ($this->shipDate >= '2020-11-02') {
+        //    if (in_array(strtoupper($this->shipment['recipient_country_code']), ['US','CA'])) {
+        //        $kgCost = .43;
+         //       $kgSales = .43;
+        //    }
+       // }
 
         // Do the actual calculation
         $chargeableWeight = round($this->chargeableWeight * 2)/2;
