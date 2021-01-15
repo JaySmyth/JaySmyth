@@ -69,15 +69,15 @@ class DHL
         // Sending from the mainland, change the product code
         if (! isBtPostcode($this->shipment['sender_postcode']) && isUkDomestic($this->shipment['sender_country_code'])) {
             if ($this->serviceType == 'U' && strtolower($this->shipment['ship_reason']) == 'documents') {
-                $this->serviceType == 'D';
+                $this->serviceType = 'D';
             }
 
             if ($this->serviceType == 'U' && strtolower($this->shipment['ship_reason']) != 'documents') {
-                $this->serviceType == 'P';
+                $this->serviceType = 'P';
             }
 
             if ($this->serviceType == 'W') {
-                $this->serviceType == 'H';
+                $this->serviceType = 'H';
             }
         }
     }
