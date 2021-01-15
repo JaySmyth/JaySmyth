@@ -795,7 +795,7 @@ function isEu($countryCode)
  */
 function isNiShipment($senderPostcode, $recipientPostcode)
 {
-    return substr(strtoupper($senderPostcode), 0, 2) == 'BT' && substr(strtoupper($senderPostcode), 0, 2) === substr(strtoupper($recipientPostcode), 0, 2);
+    return isBtPostcode($senderPostcode) && substr(strtoupper($senderPostcode), 0, 2) === substr(strtoupper($recipientPostcode), 0, 2);
 }
 
 /**
@@ -808,7 +808,7 @@ function isNiShipment($senderPostcode, $recipientPostcode)
  */
 function isNiToEu($senderPostcode, $recipientCountryCode)
 {
-    return substr(strtoupper($senderPostcode), 0, 2) == 'BT' && isEu($recipientCountryCode);
+    return isBtPostcode($senderPostcode) && isEu($recipientCountryCode);
 }
 
 
@@ -827,12 +827,23 @@ function isGbToNi($senderCountryCode, $recipientCountryCode, $senderPostcode, $r
     // Shipping within the UK
     if (isUkDomestic($senderCountryCode) && strtoupper($recipientCountryCode) == 'GB') {
         // Sender postcode not BT - recipient postcode is BT
-        if (substr(strtoupper($senderPostcode), 0, 2) != 'BT' && substr(strtoupper($recipientPostcode), 0, 2) == 'BT') {
+        if (!isBtPostcode($senderPostcode) && isBtPostcode($recipientPostcode)) {
             return true;
         }
     }
 
     return false;
+}
+
+/**
+ * Check if postcode starts with BT.
+ *
+ * @param $postcode
+ *
+ * @return bool
+ */
+function isBtPostcode($postcode){
+    return substr(strtoupper(trim($postcode)), 0, 2) == 'BT';
 }
 
 /**

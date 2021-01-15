@@ -6,7 +6,6 @@ use App\Models\Company;
 use App\Models\Service;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use function GuzzleHttp\Psr7\str;
 use Illuminate\Support\Arr;
 
 class DHL
@@ -38,10 +37,7 @@ class DHL
         // Company
         $this->company = Company::find($this->shipment['company_id']);
 
-        // Get Service Product codes
-        $productCodes = explode(',', Service::find($shipment['service_id'])->parameters);
-
-        $this->serviceType = (isset($productCodes[0])) ? $productCodes[0] : null;
+        $this->setServiceType();
 
         // Define the environment
         switch ($this->mode) {
@@ -60,6 +56,30 @@ class DHL
 
         // New Guzzle client
         $this->client = new Client(['auth' => [$this->username, $this->password]]);
+    }
+
+
+    protected function setServiceType()
+    {
+        // Get Service Product codes
+        $productCodes = explode(',', Service::find($this->shipment['service_id'])->parameters);
+
+        $this->serviceType = (isset($productCodes[0])) ? $productCodes[0] : null;
+
+        // Sending from the mainland, change the product code
+        if (! isBtPostcode($this->shipment['sender_postcode']) && isUkDomestic($this->shipment['sender_country_code'])) {
+            if ($this->serviceType == 'U' && strtolower($this->shipment['ship_reason']) == 'documents') {
+                $this->serviceType == 'D';
+            }
+
+            if ($this->serviceType == 'U' && strtolower($this->shipment['ship_reason']) != 'documents') {
+                $this->serviceType == 'P';
+            }
+
+            if ($this->serviceType == 'W') {
+                $this->serviceType == 'H';
+            }
+        }
     }
 
     /**
@@ -218,9 +238,9 @@ class DHL
     /**
      * Create a transaction log.
      *
-     * @param type $type
-     * @param type $direction
-     * @param type $msg
+     * @param  type  $type
+     * @param  type  $direction
+     * @param  type  $msg
      */
     protected function log($type, $direction, $msg)
     {
@@ -324,6 +344,7 @@ class DHL
      * Add address element.
      *
      * @param $type
+     *
      * @return array
      */
     protected function addAddress($type)
@@ -452,6 +473,7 @@ class DHL
      * Convert UOM to DHL spec.
      *
      * @param $uom
+     *
      * @return string
      */
     protected function convertToDhlUom($uom)

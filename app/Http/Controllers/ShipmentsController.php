@@ -1049,9 +1049,7 @@ class ShipmentsController extends Controller
      */
     public function test(Request $request)
     {
-        $shipment = Shipment::find(1435531);
-        $price = $shipment->price(false, true);
-        dd($price);
+     dd(isGbToNi('gb', 'gb', 'ad', 'at'));
     }
 
 
