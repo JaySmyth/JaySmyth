@@ -569,7 +569,7 @@ class ServiceRules
 
     private function recipient_postcode_regex($shipment, $serviceDetails)
     {
-        return preg_match($serviceDetails['recipient_postcode_regex'], $shipment['recipient_postcode']);
+        return preg_match($serviceDetails['recipient_postcode_regex'], $shipment['recipient_postcode'] ?? '');
     }
 
     private function account_number_regex($shipment, $serviceDetails)
