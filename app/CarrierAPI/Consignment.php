@@ -222,7 +222,8 @@ class Consignment
     {
         // Identify Service
         if (isset($this->data['service_id']) && $this->data['service_id'] > "") {
-            $service = Service::find($this->data['service_id']);
+            // Get Company Service and Pivot data also
+            $service = $this->company->getServicesForMode($this->data['mode_id'])->where('id', $this->data['service_id'])->first();
         } else {
             // If Service not known yet use the first service defined for that Carrier - Review as not safe.
             Mail::to('it@antrim.ifsgroup.com')->send(
