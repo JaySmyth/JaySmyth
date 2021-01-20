@@ -842,7 +842,8 @@ function isGbToNi($senderCountryCode, $recipientCountryCode, $senderPostcode, $r
  *
  * @return bool
  */
-function isBtPostcode($postcode){
+function isBtPostcode($postcode)
+{
     return substr(strtoupper(trim($postcode)), 0, 2) == 'BT';
 }
 
@@ -1227,16 +1228,16 @@ function identifyDirection($shipment)
     // Shipper and Recipient in UK
     if ($shipment['sender_country_code'] == $shipment['recipient_country_code'] && $shipment['sender_country_code'] == 'GB') {
         if ((substr($shipment['sender_postcode'], 0, 2) == 'BT') && (substr(
-                    $shipment['recipient_postcode'],
-                    0,
-                    2
-                ) == 'BT')) {
+            $shipment['recipient_postcode'],
+            0,
+            2
+        ) == 'BT')) {
             $direction = 'internal';
         } elseif ((substr($shipment['sender_postcode'], 0, 2) == 'BT') && (substr(
-                    $shipment['recipient_postcode'],
-                    0,
-                    2
-                ) != 'BT')) {
+            $shipment['recipient_postcode'],
+            0,
+            2
+        ) != 'BT')) {
             $direction = 'export';
         } else {
             $direction = 'import';
@@ -1287,11 +1288,16 @@ function identifyDepartment($shipment)
 
     switch ($shipment['mode']) {
         case 'courier':
+            // Is it an NI to IE shipment
+            if (isBtPostcode($shipment['sender_postcode']) && strtoupper($shipment['recipient_country_code']) == 'IE') {
+                return $direction == 'import' ? 'IFCUK' : 'IFCUK';
+            }
+            // Is it a Domestic Shipment
             if (isUkDomestic($shipment['sender_country_code']) && isUkDomestic($shipment['recipient_country_code'])) {
                 return $direction == 'import' ? 'IFCUK' : 'IFCUK';
-            } else {
-                return $direction == 'import' ? 'IFCIM' : 'IFCEX';
             }
+            // Must be an International Shipment
+            return $direction == 'import' ? 'IFCIM' : 'IFCEX';
             break;
 
         case 'seafreight':
