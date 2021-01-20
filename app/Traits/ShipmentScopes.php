@@ -500,7 +500,6 @@ trait ShipmentScopes
 
     public function scopeUninvoiced($query)
     {
-
         // Exclude IFS Demo accounts and Unit Test Account
         $excludedCompanies = ['57', '508', '849', '707'];
 
@@ -518,8 +517,8 @@ trait ShipmentScopes
             ->where('shipments.id', '>', 1222316)
             ->whereNotIn('companies.id', $excludedCompanies)
             ->where(function ($query) {
-                return $query->whereIn('status_id', ["4","5","6"])
-                         ->orWhere('manifest_id', '>', 1);
+                return $query->whereIn('status_id', ["4", "5", "6"])
+                    ->orWhere('manifest_id', '>', 1);
             });
     }
 
@@ -580,6 +579,18 @@ trait ShipmentScopes
         }
     }
 
+    /**
+     * Shipment from GB to Northern Ireland.
+     *
+     */
+    public function scopeIsGbToNi($query)
+    {
+        return $query->where('sender_postcode', 'NOT LIKE', 'BT%')
+            ->where('recipient_postcode', 'LIKE', 'BT%')
+            ->whereIn('sender_country_code', getUkDomesticCountries())
+            ->where('recipient_country_code', 'GB');
+    }
+
 
     /**
      * FedEx shipments that require commercial invoice upload (ETD).
@@ -590,20 +601,25 @@ trait ShipmentScopes
      */
     public function scopeNeedsFedExEtd($query)
     {
-        if ( ! isJoined($query, 'companies')) {
+        if (! isJoined($query, 'companies')) {
             $query->join('companies', 'shipments.company_id', '=', 'companies.id');
         }
 
         return $query->select('shipments.id', 'carrier_consignment_number')
-                     ->isInternational()
-                     ->where('carrier_id', 2)
-                     ->where('etd', false)
-                     ->where('received', true)
-                     ->where('delivered', false)
-                     ->whereIn('status_id', [3, 14])
-                     ->where('shipments.created_at', '>=', now()->subWeeks(2))
-                     ->where('companies.plt_enabled', true)
-                     ->where('manifest_id', '>', 1);
+            ->where(function ($query) {
+                $query->isInternational()
+                    ->orWhere(function ($query) {
+                        $query->isGbToNi();
+                    });
+            })
+            ->where('carrier_id', 2)
+            ->where('etd', false)
+            ->where('received', true)
+            ->where('delivered', false)
+            ->whereIn('status_id', [3, 14])
+            ->where('shipments.created_at', '>=', now()->subWeeks(2))
+            ->where('companies.plt_enabled', true)
+            ->where('manifest_id', '>', 1);
     }
 
 }

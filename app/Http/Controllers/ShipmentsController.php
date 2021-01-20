@@ -1049,7 +1049,8 @@ class ShipmentsController extends Controller
      */
     public function test(Request $request)
     {
-     dd(isGbToNi('gb', 'gb', 'ad', 'at'));
+     $shipments = Shipment::needsFedExEtd()->limit(5)->get();
+     dd($shipments);
     }
 
 
