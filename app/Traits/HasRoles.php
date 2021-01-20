@@ -497,7 +497,7 @@ trait HasRoles
 
     public function isConfigured()
     {
-        if ($this->hasEnabledCompanies() && $this->primary_role) {
+        if ($this->hasEnabledCompanies() && $this->primary_role && $this->enabled) {
             if ($this->hasRole('cudv') || $this->hasRole('ifsc')) {
                 return true;
             }

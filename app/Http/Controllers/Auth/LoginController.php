@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Jenssegers\Agent\Agent;
 
 class LoginController extends Controller
@@ -41,19 +40,6 @@ class LoginController extends Controller
     }
 
     /**
-     * Override getCredentials method to include account enabled check.
-     *
-     * @param  array  $data
-     * @return User
-     */
-    public function getCredentials($request)
-    {
-        $credentials = $request->only($this->loginUsername(), 'password');
-
-        return Arr::add($credentials, 'enabled', '1');
-    }
-
-    /**
      * Override authenticated method to check user config.
      */
     public function authenticated(Request $request, $user)
@@ -79,14 +65,14 @@ class LoginController extends Controller
         $this->logout($request);
 
         return redirect('/login')->withErrors([
-                    'config' => 'Sorry, account not configured. Please contact IFS.',
+            'config' => 'Sorry, account not configured. Please contact IFS.',
         ]);
     }
 
     /**
      * Update the last login timestamp.
      *
-     * @param type $user
+     * @param  type  $user
      */
     private function updateLastLogin($request, $user)
     {
@@ -103,17 +89,11 @@ class LoginController extends Controller
     /**
      * Flash any notification messages to the user.
      *
-     * @param type $param
+     * @param  type  $param
      */
     private function flashMessages($user)
     {
-        // Check for dated browser (IFS staff only)
-        if (stristr($user->browser, 'IE ') && $user->hasIfsRole()) {
-            flash()->warning('Dated browser detected', 'We recommend switching to the latest version of Firefox or Microsoft Edge.', true);
-        }
-
         foreach ($user->getMessages() as $message) {
-
             // If sticky OR not previously viewed by the user, display the message
             if ($message->sticky || (! $message->sticky && $message->users()->where('user_id', $user->id)->count() == 0)) {
                 flash()->info($message->title, $message->message, true, true);
