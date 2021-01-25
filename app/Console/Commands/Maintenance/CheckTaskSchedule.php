@@ -19,7 +19,7 @@ class CheckTaskSchedule extends Command
      *
      * @var string
      */
-    protected $description = 'Sends a test email at 9am / 2pm';
+    protected $description = 'Sends a test email at 9am / 3pm';
 
     /**
      * Create a new command instance.
