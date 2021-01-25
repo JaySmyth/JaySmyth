@@ -88,39 +88,39 @@ class UploadFiles extends Command
             // Clear the log
             $this->log = [];
 
-        // Clear the IDs
-        $this->idsSent = [];
+            // Clear the IDs
+            $this->idsSent = [];
 
-        // Write the data to be uploaded to a temp file
-        if (! $tempFile = $this->writeFile($fileUpload)) {
-            // If no data then skip gracefully to next upload
-            if (is_null($tempFile)) {
-                $fileUpload->setNextUpload();
+            // Write the data to be uploaded to a temp file
+            if (! $tempFile = $this->writeFile($fileUpload)) {
+                // If no data then skip gracefully to next upload
+                if (is_null($tempFile)) {
+                    $fileUpload->setNextUpload();
+                    continue;
+                }
+
+                // Update logs, timestamps and send error email if required
+                $this->finishJob($fileUpload);
                 continue;
             }
 
-            // Update logs, timestamps and send error email if required
-            $this->finishJob($fileUpload);
-            continue;
-        }
+            $this->log('Created temp file: '.$tempFile);
 
-        $this->log('Created temp file: ' . $tempFile);
+            // Connect to the remote host
+            if (! $connection = $this->connect($fileUpload->fileUploadHost)) {
+                $this->log('Failed to connect', 'error');
+                $this->finishJob($fileUpload);
+                continue;
+            }
 
-        // Connect to the remote host
-        if (! $connection = $this->connect($fileUpload->fileUploadHost)) {
-            $this->log('Failed to connect', 'error');
-            $this->finishJob($fileUpload);
-            continue;
-        }
+            // Generate a filename for the file to be uploaded
+            $filename = $this->getFilename($fileUpload);
 
-        // Generate a filename for the file to be uploaded
-        $filename = $this->getFilename($fileUpload);
+            // Upload the file to the remote host
+            $result = $this->upload($filename, $tempFile, $connection);
 
-        // Upload the file to the remote host
-        $result = $this->upload($filename, $tempFile, $connection);
-
-        // Log the results to database and set next upload time
-        $this->finishJob($fileUpload, $result, $tempFile);
+            // Log the results to database and set next upload time
+            $this->finishJob($fileUpload, $result, $tempFile);
 
         endforeach;
     }
@@ -128,16 +128,17 @@ class UploadFiles extends Command
     /**
      * Generate the file to upload and save to local temp directory.
      *
-     * @param type $fileUpload
+     * @param  type  $fileUpload
+     *
      * @return string
      */
     protected function writeFile($fileUpload)
     {
         $data = false;
-        $method = 'get' . ucfirst($fileUpload->type);
+        $method = 'get'.ucfirst($fileUpload->type);
 
         if (! method_exists($this, $method)) {
-            $this->log('Invalid type - ' . $fileUpload->type, 'error');
+            $this->log('Invalid type - '.$fileUpload->type, 'error');
 
             return false;
         }
@@ -154,7 +155,7 @@ class UploadFiles extends Command
         }
 
         if (is_array($data) && count($data) > 0) {
-            $this->log(count($data) . ' records to upload');
+            $this->log(count($data).' records to upload');
 
             // Add a heading row if required
             if ($fileUpload->fileUploadHost->heading_row) {
@@ -163,7 +164,7 @@ class UploadFiles extends Command
             }
 
             return writeCsv(
-                storage_path() . '/app/temp/' . time() . Str::random(3) . '.csv',
+                storage_path().'/app/temp/'.time().Str::random(3).'.csv',
                 $data,
                 'w',
                 $fileUpload->fileUploadHost->csv_delimiter
@@ -176,8 +177,8 @@ class UploadFiles extends Command
     /**
      * Output messages and save to array.
      *
-     * @param string $message
-     * @param string $method
+     * @param  string  $message
+     * @param  string  $method
      */
     protected function log($message, $method = 'info')
     {
@@ -190,8 +191,9 @@ class UploadFiles extends Command
      *
      * @param $method
      * @param $records
-     * @param string $timezone
-     * @param bool $verbose
+     * @param  string  $timezone
+     * @param  bool  $verbose
+     *
      * @return array
      */
     protected function getExportArray($method, $records, $timezone = 'Europe/London', $verbose = true)
@@ -206,7 +208,8 @@ class UploadFiles extends Command
     /**
      * Get a shipment array for excel export.
      *
-     * @param type $shipments
+     * @param  type  $shipments
+     *
      * @return type
      */
     protected function getTrackingExportArray($trackingEvents, $timezone = 'Europe/London')
@@ -219,10 +222,10 @@ class UploadFiles extends Command
                 'Consignment Number' => $tracking->shipment->consignment_number,
                 'Carrier Consignment Number' => $tracking->shipment->carrier_consignment_number,
                 'Shipment Reference' => $tracking->shipment->shipment_reference,
-                'Recipient' => ($tracking->shipment->company_name) ? $tracking->shipment->company_name . ', ' . $tracking->shipment->recipient_name : $tracking->shipment->recipient_name,
+                'Recipient' => ($tracking->shipment->company_name) ? $tracking->shipment->company_name.', '.$tracking->shipment->recipient_name : $tracking->shipment->recipient_name,
                 'City' => $tracking->shipment->recipient_city,
                 'Pieces' => $tracking->shipment->pieces,
-                'Weight' => $tracking->shipment->weight . strtoupper($tracking->shipment->weight_uom),
+                'Weight' => $tracking->shipment->weight.strtoupper($tracking->shipment->weight_uom),
                 'Volume' => $tracking->shipment->volumetric_weight,
                 'Ship Date' => $tracking->shipment->ship_date->timezone($timezone)->format('d-m-Y'),
                 'Service' => $tracking->shipment->service->code,
@@ -240,7 +243,8 @@ class UploadFiles extends Command
     /**
      * Get a shipment array for excel export.
      *
-     * @param type $shipments
+     * @param  type  $shipments
+     *
      * @return type
      */
     protected function getShipmentExportArray($shipments, $timezone = 'Europe/London', $verbose = true)
@@ -255,7 +259,7 @@ class UploadFiles extends Command
                     'Carrier Consignment Number' => $shipment->carrier_consignment_number,
                     'Shipment Reference' => $shipment->shipment_reference,
                     'Pieces' => $shipment->pieces,
-                    'Weight' => $shipment->weight . strtoupper($shipment->weight_uom),
+                    'Weight' => $shipment->weight.strtoupper($shipment->weight_uom),
                     'Volume' => $shipment->volumetric_weight,
                     'Sender Name' => $shipment->sender_name,
                     'Sender Company Name' => $shipment->sender_company_name,
@@ -286,7 +290,7 @@ class UploadFiles extends Command
                     'Status' => $shipment->status->name,
                     'POD Signature' => $shipment->pod_signature,
                     'Delivery Date' => $shipment->getDeliveryDate('d-m-Y H:i'),
-                    'Tracking' => url('/tracking/' . $shipment->token),
+                    'Tracking' => url('/tracking/'.$shipment->token),
                 ];
             } else {
                 $data[] = [
@@ -294,7 +298,7 @@ class UploadFiles extends Command
                     'Carrier Consignment Number' => $shipment->carrier_consignment_number,
                     'Shipment Reference' => $shipment->shipment_reference,
                     'Pieces' => $shipment->pieces,
-                    'Weight' => $shipment->weight . strtoupper($shipment->weight_uom),
+                    'Weight' => $shipment->weight.strtoupper($shipment->weight_uom),
                     'Volume' => $shipment->volumetric_weight,
                     'Date Created' => $shipment->created_at->timezone($timezone)->format('d-m-Y'),
                     'Ship Date' => $shipment->ship_date->timezone($timezone)->format('d-m-Y'),
@@ -303,7 +307,7 @@ class UploadFiles extends Command
                     'Status' => $shipment->status->name,
                     'POD Signature' => $shipment->pod_signature,
                     'Delivery Date' => $shipment->getDeliveryDate('d-m-Y H:i'),
-                    'Tracking' => url('/tracking/' . $shipment->token),
+                    'Tracking' => url('/tracking/'.$shipment->token),
                 ];
             }
 
@@ -315,7 +319,7 @@ class UploadFiles extends Command
     /**
      * Log the upload results, send failure email or update last_upload timestamp.
      *
-     * @param type $param
+     * @param  type  $param
      */
     protected function finishJob($fileUpload, $uploaded = false, $tempFile = false)
     {
@@ -343,20 +347,21 @@ class UploadFiles extends Command
             $fileUpload->setNextUpload();
 
             // Update "sent" flag on records after successful transfer
-            $this->model->whereIn('id', $this->idsSent)->update([$fileUpload->type . '_sent' => 1]);
+            $this->model->whereIn('id', $this->idsSent)->update([$fileUpload->type.'_sent' => 1]);
         }
     }
 
     /**
      * Upload file to host.
      *
-     * @param type $filePath
-     * @param type $host
+     * @param  type  $filePath
+     * @param  type  $host
+     *
      * @return type
      */
     protected function connect($host)
     {
-        $this->log('Connecting to remote host: ' . $host->host . ':' . $host->port);
+        $this->log('Connecting to remote host: '.$host->host.':'.$host->port);
 
         switch ($host->sftp) {
             case 1:
@@ -393,7 +398,7 @@ class UploadFiles extends Command
 
                 // Check connection was made
                 if ((! $connection) || (! $loginResult)) {
-                    $this->log('Unable to connect to FTP host -> ' . $host->host, 'error');
+                    $this->log('Unable to connect to FTP host -> '.$host->host, 'error');
 
                     return false;
                 }
@@ -405,15 +410,16 @@ class UploadFiles extends Command
     /**
      * Generate a filename.
      *
-     * @param type $fileUpload
+     * @param  type  $fileUpload
+     *
      * @return string
      */
     protected function getFilename($fileUpload)
     {
-        $fileName = $fileUpload->type . '_' . date('d_m_y', time()) . '_' . time() . $fileUpload->id . '.csv';
+        $fileName = $fileUpload->type.'_'.date('d_m_y', time()).'_'.time().$fileUpload->id.'.csv';
 
         if ($fileUpload->upload_directory) {
-            $fileName = $fileUpload->upload_directory . '/' . $fileName;
+            $fileName = $fileUpload->upload_directory.'/'.$fileName;
         }
 
         return $fileName;
@@ -422,8 +428,9 @@ class UploadFiles extends Command
     /**
      * Upload file to host.
      *
-     * @param type $filePath
-     * @param type $host
+     * @param  type  $filePath
+     * @param  type  $host
+     *
      * @return type
      */
     protected function upload($filename, $tempFile, $connection)
@@ -443,13 +450,19 @@ class UploadFiles extends Command
             return $result;
         }
 
-        /*
-         * Standard FTP.
-         */
-        $result = ftp_put($connection, $filename, $tempFile, FTP_BINARY);
 
-        // Close the connection
-        ftp_close($connection);
+        /*
+        * Standard FTP.
+        */
+        try {
+            $result = ftp_put($connection, $filename, $tempFile, FTP_BINARY);
+            ftp_close($connection);
+            $this->log("UPLOAD SUCCESS: $filename");
+        } catch (\Exception $exc) {
+            $this->log($exc->getMessage(), 'error');
+
+            return false;
+        }
 
         return $result;
     }
@@ -457,7 +470,8 @@ class UploadFiles extends Command
     /**
      * POD - get an array of shipment data. Shipments delivered but POD not sent.
      *
-     * @param type $criteria
+     * @param  type  $criteria
+     *
      * @return array
      */
     protected function getPod($companyId)
@@ -470,7 +484,8 @@ class UploadFiles extends Command
     /**
      * POD - get an array of shipment data. Shipments delivered but POD not sent.
      *
-     * @param type $criteria
+     * @param  type  $criteria
+     *
      * @return array
      */
     protected function getReceived($companyId)
@@ -486,7 +501,8 @@ class UploadFiles extends Command
     /**
      * Shipments created (ignore saved/cancelled shipments).
      *
-     * @param type $criteria
+     * @param  type  $criteria
+     *
      * @return array
      */
     protected function getCreated($companyId)
@@ -503,6 +519,7 @@ class UploadFiles extends Command
      * Tracking events that have not been sent.
      *
      * @param $companyId
+     *
      * @return mixed
      */
     protected function getTracking($companyId)
@@ -521,6 +538,7 @@ class UploadFiles extends Command
      * Exceptions that have not been sent.
      *
      * @param $companyId
+     *
      * @return mixed
      */
     protected function getException($companyId)
