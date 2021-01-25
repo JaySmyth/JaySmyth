@@ -38,6 +38,6 @@ class CheckTaskSchedule extends Command
      */
     public function handle()
     {
-        Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Check task schedule - ran at 9:02am / 2pm', 'Server date: ' . date('d-m-Y H:i:s', time())));
+        Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Check task schedule - ran at 9:02am / 3pm', 'Server date: ' . date('d-m-Y H:i:s', time())));
     }
 }
