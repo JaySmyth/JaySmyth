@@ -41,6 +41,6 @@ class CheckTaskSchedule extends Command
     {
         Log::channel('single')->info('Started CheckTaskSchedule');
 
-        //Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Check task schedule - ran at 9:02am / 3pm', 'Server date: ' . date('d-m-Y H:i:s', time())));
+        Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Check task schedule - ran at 9:02am / 3pm', 'Server date: ' . date('d-m-Y H:i:s', time())));
     }
 }
