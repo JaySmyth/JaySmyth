@@ -6,6 +6,7 @@ use App\Models\Package;
 use App\Models\ScanningKpi;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class LogScanningKpis extends Command
@@ -55,6 +56,8 @@ class LogScanningKpis extends Command
      */
     public function handle()
     {
+        Log::channel('single')->info('Started LogScanningKpis');
+
         $startDate = ($this->option('start-date')) ? Carbon::parse($this->option('start-date')) : Carbon::today()->modify('last weekday');
         $finishDate = Carbon::today()->modify('last weekday');
 
@@ -69,6 +72,8 @@ class LogScanningKpis extends Command
         }
 
         $this->info('Finished');
+
+        Log::channel('single')->info('Finished LogScanningKpis');
     }
 
     /**

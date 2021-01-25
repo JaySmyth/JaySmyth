@@ -4,6 +4,7 @@ namespace App\Console\Commands\Maintenance;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class CheckTaskSchedule extends Command
 {
@@ -38,6 +39,8 @@ class CheckTaskSchedule extends Command
      */
     public function handle()
     {
-        Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Check task schedule - ran at 9:02am / 3pm', 'Server date: ' . date('d-m-Y H:i:s', time())));
+        Log::channel('single')->info('Started CheckTaskSchedule');
+
+        //Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Check task schedule - ran at 9:02am / 3pm', 'Server date: ' . date('d-m-Y H:i:s', time())));
     }
 }
