@@ -15,7 +15,7 @@ class LogScanningKpis extends Command
      *
      * @var string
      */
-    protected $signature = 'ifs:log-scanning-kpis {--start-date=}';
+    protected $signature = 'ifs:log-scanning-kpis {--start-date=} {--test}';
 
     /**
      * The console command description.
@@ -117,22 +117,34 @@ class LogScanningKpis extends Command
             }
         }
 
-        // Insert or update KPI
-        ScanningKpi::firstOrCreate(['date' => $date])->update([
-            'expected' => $totals['expected'],
-            'collection' => $totals['collection'],
-            'collection_percentage' => ($totals['expected'] > 0 && $totals['collection'] > 0) ? round((100 / $totals['expected']) * $totals['collection'], 1) : 0,
-            'receipt' => $totals['receipt'],
-            'receipt_percentage' => ($totals['expected'] > 0 && $totals['receipt'] > 0) ? round((100 / $totals['expected']) * $totals['receipt'], 1) : 0,
-            'route' => $totals['route'],
-            'route_percentage' => ($totals['expected'] > 0 && $totals['route'] > 0) ? round((100 / $totals['expected']) * $totals['route'], 1) : 0,
-            'receipt_missed' => $totals['receipt_missed'],
-            'route_missed' => $totals['route_missed'],
-        ]);
+
+        if(! $this->option('test')){
+
+            // Insert or update KPI
+            ScanningKpi::firstOrCreate(['date' => $date])->update([
+                'expected' => $totals['expected'],
+                'collection' => $totals['collection'],
+                'collection_percentage' => ($totals['expected'] > 0 && $totals['collection'] > 0) ? round((100 / $totals['expected']) * $totals['collection'], 1) : 0,
+                'receipt' => $totals['receipt'],
+                'receipt_percentage' => ($totals['expected'] > 0 && $totals['receipt'] > 0) ? round((100 / $totals['expected']) * $totals['receipt'], 1) : 0,
+                'route' => $totals['route'],
+                'route_percentage' => ($totals['expected'] > 0 && $totals['route'] > 0) ? round((100 / $totals['expected']) * $totals['route'], 1) : 0,
+                'receipt_missed' => $totals['receipt_missed'],
+                'route_missed' => $totals['route_missed'],
+            ]);
+        }
+
+
 
         // Only send the email when start date option has not been supplied
         if (! $this->option('start-date')) {
-            Mail::to($this->recipient)->cc($this->cc)->send(new \App\Mail\MissedScans($receiptMissed, $routeMissed, 'Missed Scans (receipt: '.$totals['receipt_missed'].' / route: '.$totals['route_missed'].') - '.$date->format('d-m-y')));
+
+            if($this->option('test')){
+                Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\MissedScans($receiptMissed, $routeMissed, 'Missed Scans (receipt: '.$totals['receipt_missed'].' / route: '.$totals['route_missed'].') - '.$date->format('d-m-y')));
+            } else {
+                Mail::to($this->recipient)->cc($this->cc)->send(new \App\Mail\MissedScans($receiptMissed, $routeMissed, 'Missed Scans (receipt: '.$totals['receipt_missed'].' / route: '.$totals['route_missed'].') - '.$date->format('d-m-y')));
+            }
+
         }
     }
 }
