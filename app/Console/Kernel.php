@@ -23,6 +23,7 @@ class Kernel extends ConsoleKernel
         Commands\Maintenance\CorrectStatusOnTransportJobs::class,
         Commands\Maintenance\CleanAddressTable::class,
         Commands\Maintenance\CheckForUnprocessedUploads::class,
+        Commands\Maintenance\CheckTaskSchedule::class,
         Commands\PurchaseInvoices\ImportFedexPurchaseInvoices::class,
         Commands\PurchaseInvoices\ImportUpsPurchaseInvoices::class,
         Commands\PurchaseInvoices\ImportDhlPurchaseInvoices::class,
@@ -65,7 +66,7 @@ class Kernel extends ConsoleKernel
         Commands\GetTracking::class,
         Commands\DispatchEasypostTrackers::class,
         Commands\UploadFedExCommercialInvoices::class,
-        Commands\RepriceShipments::class
+        Commands\RepriceShipments::class,
     ];
 
     /**
