@@ -510,7 +510,7 @@ class UploadFiles extends Command
         $this->model = new Tracking();
 
         return Tracking::select('tracking.*')
-            ->where('datetime', '>=', now()->subWeek())
+            ->where('datetime', '>=', now()->subMonth())
             ->whereTrackingSent(0)
             ->where('shipments.company_id', $companyId)
             ->join('shipments', 'tracking.shipment_id', '=', 'shipments.id')
