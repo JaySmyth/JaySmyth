@@ -58,6 +58,8 @@ class LogScanningKpis extends Command
     {
         Log::channel('single')->info('Started LogScanningKpis');
 
+        Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Started LogScanningKpis', 'Server date: ' . date('d-m-Y H:i:s', time())));
+
         $startDate = ($this->option('start-date')) ? Carbon::parse($this->option('start-date')) : Carbon::today()->modify('last weekday');
         $finishDate = Carbon::today()->modify('last weekday');
 
