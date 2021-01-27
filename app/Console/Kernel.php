@@ -23,7 +23,6 @@ class Kernel extends ConsoleKernel
         Commands\Maintenance\CorrectStatusOnTransportJobs::class,
         Commands\Maintenance\CleanAddressTable::class,
         Commands\Maintenance\CheckForUnprocessedUploads::class,
-        Commands\Maintenance\CheckTaskSchedule::class,
         Commands\PurchaseInvoices\ImportFedexPurchaseInvoices::class,
         Commands\PurchaseInvoices\ImportUpsPurchaseInvoices::class,
         Commands\PurchaseInvoices\ImportDhlPurchaseInvoices::class,
@@ -84,8 +83,6 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:empty-temp-storage')->dailyAt('05:30');
         $schedule->command('ifs:delete-old-log-entries')->dailyAt('07:20');
         $schedule->command('ifs:check-for-unprocessed-uploads')->hourly();
-        $schedule->command('ifs:check-task-schedule')->dailyAt('09:02');
-        $schedule->command('ifs:check-task-schedule')->dailyAt('15:00');
 
         /*
          * Purchase Invoice imports
