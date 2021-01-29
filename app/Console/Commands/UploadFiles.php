@@ -455,7 +455,7 @@ class UploadFiles extends Command
         * Standard FTP.
         */
         try {
-            $result = ftp_put($connection, $filename, $tempFile, FTP_ASCII);
+            $result = ftp_put($connection, $filename, $tempFile, FTP_BINARY);
             ftp_close($connection);
             $this->log("UPLOAD SUCCESS: $filename");
         } catch (\Exception $exc) {
