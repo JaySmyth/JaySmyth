@@ -89,7 +89,7 @@ class TransendOrderImport implements ShouldQueue
                 $this->transportJob->setToSent();
                 $this->transportJob->log('Transend Import Successful', ($this->actionIndicator == 'D') ? 'Cancel Job' : null, $reply);
             } else {
-                // Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Transend Order Import Failed ('.$this->transportJob->number.')', $reply['RequestError'].' - JSON: '.$jsonData));
+                Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Transend Order Import Failed ('.$this->transportJob->number.')', $reply['RequestError'].' - JSON: '.$jsonData));
             }
         } catch (GuzzleException $exc) {
             if ($exc->hasResponse()) {
