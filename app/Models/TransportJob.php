@@ -537,7 +537,7 @@ class TransportJob extends Model
     {
         // Deliveries, use company name and postcode
         if ($this->type == 'd') {
-            return strtoupper(substr($this->to_company_name, 0, 3).'00'.preg_replace('/\s+/', '', $this->to_postcode).'-001');
+            return str_replace(' ', '-', strtoupper(substr($this->to_company_name, 0, 3).'00'.preg_replace('/\s+/', '', $this->to_postcode).'-001'));
         }
 
         // Collections with known SCS code
@@ -546,6 +546,6 @@ class TransportJob extends Model
         }
 
         // Collections where SCS code isn't known, use company name and postcode
-        return strtoupper(substr($this->from_company_name, 0, 3).'00'.preg_replace('/\s+/', '', $this->from_postcode).'-002');
+        return str_replace(' ', '-', strtoupper(substr($this->from_company_name, 0, 3).'00'.preg_replace('/\s+/', '', $this->from_postcode).'-002'));
     }
 }
