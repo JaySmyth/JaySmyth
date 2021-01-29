@@ -186,7 +186,7 @@ class TransendOrderImport implements ShouldQueue
 
         // Deliveries, use company name and postcode
         if ($this->transportJob->type == 'd') {
-            return strtoupper(substr($this->transportJob->to_company_name, 0, 3).'00'.preg_replace('/\s+/', '', $this->transportJob->to_postcode).'-001');
+            return str_replace(' ', '-', strtoupper(substr($this->transportJob->to_company_name, 0, 3).'00'.preg_replace('/\s+/', '', $this->transportJob->to_postcode).'-001'));
         }
 
         // Collections with known SCS code
@@ -195,7 +195,7 @@ class TransendOrderImport implements ShouldQueue
         }
 
         // Collections where SCS code isn't known, use company name and postcode
-        return strtoupper(substr($this->transportJob->from_company_name, 0, 3).'00'.preg_replace('/\s+/', '', $this->transportJob->from_postcode).'-002');
+        return str_replace(' ', '-', strtoupper(substr($this->transportJob->from_company_name, 0, 3).'00'.preg_replace('/\s+/', '', $this->transportJob->from_postcode).'-002'));
     }
 
     /**
