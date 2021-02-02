@@ -61,11 +61,11 @@ class SendJobs extends Command
             if ($this->sendToTransend($job)) {
                 $this->info('Sending ' . $job->number . ' to transend');
 
-                dispatch(new \App\Jobs\TransendOrderImport($job));
-
                 // Set the queued flag on the transport job
                 $job->queued = true;
                 $job->save();
+
+                dispatch(new \App\Jobs\TransendOrderImport($job));
 
                 $message = ($job->is_resend) ? 'Re-sent to transend (' . $job->transend_route . ')' : 'Sent to transend (' . $job->transend_route . ')';
 
