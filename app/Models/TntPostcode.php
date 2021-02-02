@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class TntPostcode extends Model
 {
@@ -14,7 +15,7 @@ class TntPostcode extends Model
      *
      * @return string
      */
-    public function getPostcode($countryCode, $town)
+    public function getPostcode($countryCode, $town, $county)
     {
         $tntPostcode = $this->whereCountryCode($countryCode)->whereTown($town)->first();
 
@@ -35,7 +36,7 @@ class TntPostcode extends Model
             similar_text(strtoupper($postcode->town), strtoupper($town), $simularity);
 
             // Disregard anything with a simularity of less than 80%
-            if ($simularity > 85) {
+            if ($simularity > 90) {
                 $result[] = [
                     'simularity' => $simularity,
                     'postcode' => $postcode->postcode,
@@ -53,6 +54,16 @@ class TntPostcode extends Model
             $result = last($result);
 
             return $result['postcode'];
+        }
+
+        $county = Str::afterLast($county, ' ');
+
+        // Try a match at county level
+        $tntPostcode = $this->where('town', 'LIKE', 'ALL OTHER COUNTY '.$county.'%')->first();
+
+        // Postcode found, return the code
+        if ($tntPostcode) {
+            return $tntPostcode->postcode;
         }
     }
 }

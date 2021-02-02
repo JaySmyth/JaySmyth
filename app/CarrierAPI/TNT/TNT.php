@@ -329,7 +329,7 @@ class TNT
     {
         $tntPostcode = new \App\Models\TntPostcode();
 
-        $postcode = $tntPostcode->getPostcode($this->shipment['recipient_country_code'], $this->shipment['recipient_city']);
+        $postcode = $tntPostcode->getPostcode($this->shipment['recipient_country_code'], $this->shipment['recipient_city'], $this->shipment['recipient_state']);
 
         if ($postcode) {
             return $postcode;
