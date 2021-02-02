@@ -55,13 +55,17 @@ class SendJobs extends Command
         $this->setRoutes();
 
         // Load the jobs
-        $jobs = \App\Models\TransportJob::whereSent(0)->whereCompleted(0)->get();
+        $jobs = \App\Models\TransportJob::whereSent(0)->whereCompleted(0)->whereQueued(0)->get();
 
         foreach ($jobs as $job) :
             if ($this->sendToTransend($job)) {
                 $this->info('Sending ' . $job->number . ' to transend');
 
                 dispatch(new \App\Jobs\TransendOrderImport($job));
+
+                // Set the queued flag on the transport job
+                $job->queued = true;
+                $job->save();
 
                 $message = ($job->is_resend) ? 'Re-sent to transend (' . $job->transend_route . ')' : 'Sent to transend (' . $job->transend_route . ')';
 

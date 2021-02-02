@@ -96,6 +96,9 @@ class TransendOrderImport implements ShouldQueue
                 Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\JobFailed('Transend Order Import GuzzleException ('.$this->transportJob->number.')', Psr7\str($exc->getResponse()).' - JSON: '.$jsonData));
             }
         }
+
+        $this->transportJob->queued = false;
+        $this->transportJob->save();
     }
 
     /**
