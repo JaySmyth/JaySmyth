@@ -67,9 +67,6 @@ class UpdateStagnantShipments extends Command
                         case 'failure':
                         case 'available_for_pickup':
                             $shipment->setStatus($lastEvent->status, 0, false, false);
-
-                        default:
-                            $shipment->setStatus('unknown', 0, false, false);
                             break;
                     }
                 }
