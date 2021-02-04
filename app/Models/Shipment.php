@@ -1137,15 +1137,6 @@ class Shipment extends Model
                     'timezone' => getTimezone($this->recipient_country_code, $this->recipient_state, $this->recipient_city),
                 ];
 
-            case 'unknown':
-                return [
-                    'city' => null,
-                    'state' => null,
-                    'country_code' => null,
-                    'postcode' => null,
-                    'timezone' => getTimezone($this->recipient_country_code, $this->recipient_state, $this->recipient_city),
-                ];
-
             default:
                 return [
                     'city' => $this->depot->city,
