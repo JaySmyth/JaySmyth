@@ -67,7 +67,7 @@ class ImportExpressFreightPurchaseInvoices extends Command
 
         $this->sftpDirectory = '/home/expressfreight/invoices/';
         $this->archiveDirectory = 'archive';
-        $this->fields = ['Invoice Number', 'Invoice Date', 'Consignment Number', 'Return', 'Dispatch Date', 'City', 'Type', 'No.', 'Description', 'Quantity', 'Consignee', 'Unit of Measure Code', 'Fuel Surcharge Amount', 'Line Amount Excl. VAT', 'Deferral Code', 'Consignment2', 'Post Code'];
+        $this->fields = ['Invoice Number', 'Invoice Date', 'Consignment Number', 'Return', 'Dispatch Date', 'City', 'Type', 'No.', 'Description', 'Quantity', 'Weight', 'Consignee', 'Unit of Measure Code', 'Fuel Surcharge Amount', 'Line Amount Excl. VAT', 'Deferral Code', 'Consignment2', 'Post Code'];
     }
 
     /**
@@ -149,7 +149,7 @@ class ImportExpressFreightPurchaseInvoices extends Command
                     $purchaseInvoiceLine->pieces = $row['Quantity'];
                     $purchaseInvoiceLine->weight = ($shipment) ? $shipment->weight : null;
                     $purchaseInvoiceLine->weight_uom = 'kg';
-                    $purchaseInvoiceLine->billed_weight = ($shipment) ? $shipment->weight : null;
+                    $purchaseInvoiceLine->billed_weight = $row['Weight'];
                     $purchaseInvoiceLine->pod_signature = ($shipment) ? $shipment->pod_signature : null;
                     $purchaseInvoiceLine->save();
 
