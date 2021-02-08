@@ -136,6 +136,7 @@
                             <a class="dropdown-item" href="{{url('/jobs')}}">Job Queue</a>
                             <a class="dropdown-item" href="{{url('/logs')}}">Logs</a>
                             <a class="dropdown-item" href="{{url('/messages')}}">Messages</a>
+                            <a class="dropdown-item" href="{{url('/service-messages')}}">Service Messages</a>
                             <a class="dropdown-item" href="{{url('/processes')}}">Process Monitor</a>
                             <a class="dropdown-item" href="{{url('/roles')}}">Roles</a>
                             <a class="dropdown-item" href="{{url('/shipment-uploads')}}">Shipment Uploads</a>

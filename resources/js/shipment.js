@@ -781,6 +781,7 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
     });
 
     $(document).on('click', '.service', function () {
+        displayAnyServiceMessages($(this).attr('id'));
         selectService($(this).attr('id'));
     });
 
@@ -1653,6 +1654,7 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
                         serviceId = $('#select-service-body').find('.service').first().attr('id');
                     }
 
+                    displayAnyServiceMessages(serviceId);
                     selectService(serviceId);
                 }
 
@@ -1725,6 +1727,23 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
         div.empty();
         div.append('<span class="far fa-check-square text-success" aria-hidden="true"></span>');
     }
+
+    function displayAnyServiceMessages(serviceId) {
+
+        $.ajax({
+            type: "GET",
+            url: "/service/message/" + serviceId,
+            cache: false,
+            success: function (response) {
+                if (response['title'] && response['message']) {
+                    title = response['title'];
+                    message = response['message'];
+                    swal(title, message, 'info');
+                }
+            }
+        });
+    }
+
 
     /**
      *

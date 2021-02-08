@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddIndexesToXdpEasTable extends Migration
+class CreateServiceMessageUserTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,11 @@ class AddIndexesToXdpEasTable extends Migration
      */
     public function up()
     {
-        Schema::table('xdp_eas', function (Blueprint $table) {
-            $table->index(['postcode']);
-
+        Schema::create('service_message_user', function (Blueprint $table) {
+            $table->id();
+            $table->integer('service_message_id');
+            $table->integer('user_id');
+            $table->timestamps();
         });
     }
 
@@ -26,9 +28,6 @@ class AddIndexesToXdpEasTable extends Migration
      */
     public function down()
     {
-        Schema::table('xdp_eas', function (Blueprint $table) {
-            $table->dropIndex(['postcode']);
-
-        });
+        Schema::dropIfExists('service_message_user');
     }
 }

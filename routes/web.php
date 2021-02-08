@@ -23,6 +23,7 @@ Route::post('feedback-modal', 'FeedbackController');
 
 Route::get('addresses/autocomplete', 'AddressesController@autocomplete');
 Route::post('services/available', 'ServicesController@available');
+Route::get('service/message/{id}', 'ServicesController@serviceMessage');
 
 Route::get('preferences', 'PreferencesController@getPreferences');
 Route::put('preferences', 'PreferencesController@setPreferences');
@@ -502,7 +503,8 @@ Route::get('company-rate/{company}/{service}/{discount?}/{date?}', 'RateControll
   |--------------------------------------------------------------------------
  */
 
-Route::resource('messages', 'MessagesController');
+ Route::resource('messages', 'MessagesController');
+ Route::resource('service-messages', 'ServiceMessagesController');
 
 /*
   |--------------------------------------------------------------------------

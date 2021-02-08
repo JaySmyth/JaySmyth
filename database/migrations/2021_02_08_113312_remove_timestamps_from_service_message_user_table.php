@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddIndexesToXdpEasTable extends Migration
+class RemoveTimestampsFromServiceMessageUserTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,8 @@ class AddIndexesToXdpEasTable extends Migration
      */
     public function up()
     {
-        Schema::table('xdp_eas', function (Blueprint $table) {
-            $table->index(['postcode']);
-
+        Schema::table('service_message_user', function (Blueprint $table) {
+            $table->dropTimestamps();
         });
     }
 
@@ -26,9 +25,8 @@ class AddIndexesToXdpEasTable extends Migration
      */
     public function down()
     {
-        Schema::table('xdp_eas', function (Blueprint $table) {
-            $table->dropIndex(['postcode']);
-
+        Schema::table('service_message_user', function (Blueprint $table) {
+            $table->timestamps();
         });
     }
 }

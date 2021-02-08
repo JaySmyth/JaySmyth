@@ -1,0 +1,56 @@
+@extends('layouts.app')
+
+@section('content')
+
+@include('partials.title', ['title' => 'messages', 'results'=> $messages, 'create' => 'message'])
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th class="text-center">Depots</th>
+            <th>Valid From</th>
+            <th>Valid To</th>
+            <th>Type</th>
+            <th>Target</th>
+            <th class="text-center">Status</th>
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($messages as $message)
+        <tr>
+            <td><a href="{{ url('/service-messages', $message->id) }}">{{$message->title}}</a></td>
+            <td class="text-center">
+                $message->service->depot->code
+            </td>
+            <td>{{$message->valid_from}}</td>
+            <td>{{$message->valid_to}}</td>
+            <td>
+                @if($message->sticky)
+                Sticky
+                @else
+                Display Once
+                @endif
+            </td>
+            <td>
+                @if($message->ifs_only)
+                IFS Staff Only
+                @else
+                All Users
+                @endif
+            </td>
+            <td class="text-center">@if($message->enabled)<span class="text-success">Enabled</span>@else<span class="text-danger">Disabled</span>@endif</td>
+            <td class="text-center">
+                <a href="{{ url('/service-messages/' . $message->id . '/edit') }}" title="Edit message"><span class="fas fa-edit ml-sm-2" aria-hidden="true"></span></a>
+                <a href="{{ url('/service-messages/' . $message->id . '/delete') }}" title="Delete message"><span class="fas fa-times ml-sm-2" aria-hidden="true"></span></a>
+            </td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
+
+@include('partials.no_results', ['title' => 'messages', 'results'=> $messages])
+@include('partials.pagination', ['results'=> $messages])
+
+@endsection
