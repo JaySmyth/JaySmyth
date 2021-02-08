@@ -63,15 +63,17 @@ class ServicesController extends Controller
                 ->first();
             if ($message) {
                 $user = Auth::User();
-                if ($message->sticky || (! $message->sticky && $message->users()->where('user_id', $user->id)->count() == 0)) {
-                    if ($message->ifs_only && !$user->hasIfsRole()) {
-                        return;
+                if ($message->enabled) {
+                    if ($message->sticky || (! $message->sticky && $message->users()->where('user_id', $user->id)->count() == 0)) {
+                        if ($message->ifs_only && !$user->hasIfsRole()) {
+                            return;
+                        }
+
+                        // Insert a record to indicate that the message has been view by the user
+                        $message->users()->syncWithoutDetaching($user->id);
+
+                        return $message;
                     }
-
-                    // Insert a record to indicate that the message has been view by the user
-                    $message->users()->syncWithoutDetaching($user->id);
-
-                    return $message;
                 }
             }
         }
