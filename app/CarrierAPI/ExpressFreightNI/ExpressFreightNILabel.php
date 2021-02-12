@@ -172,8 +172,8 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
             $y = 138;
             $this->pdf->SetFont($this->font, 'B', 12);
             $this->pdf->Text($x, $y, 'IFS CONSIGNMENT#: '.$this->data['ifs_consignment_number']);
-            $this->pdf->SetFont($this->font, 'B', 10);
-            $this->pdf->Text($x, $y+5, 'SHIPPER REF: '.$this->shipment['shipment_reference']);
+            $this->pdf->SetFont($this->font, 'B', 9);
+            $this->pdf->Text($x, $y+7, 'REFERENCE: '.$this->shipment['shipment_reference']);
             $pkg++;
         }
 
