@@ -3,6 +3,7 @@
 namespace App\CarrierAPI\ExpressFreight;
 
 use App\CarrierAPI\ExpressFreight\ExpressFreightLabel;
+use App\Models\Shipment;
 use App\Models\TransactionLog;
 
 /**
@@ -107,7 +108,13 @@ class ExpressFreightAPI extends \App\CarrierAPI\CarrierBase
      */
     public function addAdditionalInfo($shipment)
     {
-        $data['consignment_number'] = nextAvailable('CONSIGNMENT');                     // Generate an IFS Consignment Number
+
+        if(!empty($shipment['shipment_id'])){
+            $data['consignment_number'] = Shipment::find($shipment['shipment_id'])->consignment_number;
+        } else {
+            $data['consignment_number'] = nextAvailable('CONSIGNMENT');                     // Generate an IFS Consignment Number
+        }
+
         $data['pieces'] = $shipment['pieces'];
 
         for ($i = 0; $i < $data['pieces']; $i++) {

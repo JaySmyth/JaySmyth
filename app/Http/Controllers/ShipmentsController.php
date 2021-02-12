@@ -980,6 +980,7 @@ class ShipmentsController extends Controller
                     $shipment->recipient_country_code,
                     $shipment->recipient_state
                 );
+                $shipment->eori = $shipment->company->eori;
                 $shipment->save();
 
                 return response()->json($shipment, 201);
