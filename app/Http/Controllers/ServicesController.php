@@ -8,8 +8,10 @@ use App\CarrierAPI\Facades\CarrierAPI;
 use App\Models\Company;
 use App\Models\Country;
 use App\Models\Service;
+use App\Models\ServiceMessage;
 use Illuminate\Http\Request;
 use Response;
+use Auth;
 
 class ServicesController extends Controller
 {
@@ -44,6 +46,37 @@ class ServicesController extends Controller
         }
 
         return view('service.show', compact('service'));
+    }
+
+    /**
+     * @param
+     * @return
+     */
+    public function serviceMessage($id, Request $request)
+    {
+        $today = date('Y-m-d');
+        $service = Service::findOrFail($id);
+        if ($service && $request->ajax()) {
+            $message = ServiceMessage::where('service_id', $id)
+                ->where('valid_from', '<=', $today)
+                ->where('valid_to', '>=', $today)
+                ->first();
+            if ($message) {
+                $user = Auth::User();
+                if ($message->enabled) {
+                    if ($message->sticky || (! $message->sticky && $message->users()->where('user_id', $user->id)->count() == 0)) {
+                        if ($message->ifs_only && !$user->hasIfsRole()) {
+                            return;
+                        }
+
+                        // Insert a record to indicate that the message has been view by the user
+                        $message->users()->syncWithoutDetaching($user->id);
+
+                        return $message;
+                    }
+                }
+            }
+        }
     }
 
     /**

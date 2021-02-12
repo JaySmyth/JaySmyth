@@ -21,6 +21,16 @@ class Service extends Model
     }
 
     /**
+     * A service belongs to a depot.
+     *
+     * @return
+     */
+    public function depot()
+    {
+        return $this->belongsTo(\App\Models\Depot::class);
+    }
+
+    /**
      * A service has one carrier.
      *
      * @return
