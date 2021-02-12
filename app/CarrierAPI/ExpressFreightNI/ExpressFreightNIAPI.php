@@ -111,7 +111,7 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
     public function addAdditionalInfo($shipment)
     {
         if(!empty($shipment['shipment_id'])){
-            $data['consignment_number'] = Shipment::find($shipment['id'])->consignment_number;
+            $data['consignment_number'] = Shipment::find($shipment['shipment_id'])->consignment_number;
         } else {
             $data['consignment_number'] = nextAvailable('CONSIGNMENT');                     // Generate an IFS Consignment Number
         }
