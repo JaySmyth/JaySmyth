@@ -331,14 +331,14 @@ class CarrierAPI
      *
      * @return string
      */
-    public function deleteShipment($mode = '')
+    public function deleteShipment($data = [], $mode = '')
     {
         $response = [];
         $this->setEnvironment($mode);
 
         // Identify Shipment
-        $shipment = Shipment::where('company_id', $this->consignment->data['company_id'])
-            ->where('token', $this->consignment->data['shipment_token'])
+        $shipment = Shipment::where('company_id', $data['company_id'])
+            ->where('token', $data['shipment_token'])
             ->first();
         if ($shipment) {
             if ($shipment->isCancellable()) {
@@ -346,7 +346,7 @@ class CarrierAPI
                 $response = $this->carrier->deleteShipment($shipment);                              // Send Shipment to Carrier
 
                 if ($response['errors'] == []) {
-                    $shipment->setCancelled($this->consignment->data['user_id']);
+                    $shipment->setCancelled($data['user_id']);
                 }
             } else {
                 $response['errors'][] = 'Shipment cannot be cancelled';
