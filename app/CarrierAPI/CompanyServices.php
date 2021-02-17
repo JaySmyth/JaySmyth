@@ -25,6 +25,8 @@ class CompanyServices
 
     public function getAvailableServices()
     {
+        $availableServicesArray = [];
+
         // Check Company is enabled
         if ($this->company->enabled) {
 
