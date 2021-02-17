@@ -472,6 +472,9 @@ class ImportShipments implements ShouldQueue
     private function setPackageWeight($pkgWeight = 0)
     {
         $total_weight = 0;
+        if ($pkgWeight<0.5) {
+            $pkgWeight = 0.5;
+        }
         for ($i = 0; $i < $this->row['pieces']; $i++) {
             if ($pkgWeight > 0) {
 
