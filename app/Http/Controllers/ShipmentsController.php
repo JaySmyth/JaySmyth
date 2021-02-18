@@ -12,6 +12,7 @@ use App\Jobs\LogScanningKpis;
 use App\Models\Company;
 use App\Models\Mode;
 use App\Models\Shipment;
+use App\Models\Tracking;
 use App\Models\TransactionLog;
 use App\Models\User;
 use App\Pricing\Pricing;
@@ -1090,6 +1091,25 @@ class ShipmentsController extends Controller
         // Original pricing
         $originalQuoted = json_decode($shipment->quoted, true);
         $shipmentId = $shipment->id;
+
+        // Create Tracking event
+        $tracking = Tracking::firstOrCreate([
+            'message' => $request->reason,
+            'status' => 'pre_transit',
+            'datetime' => date('Y-m-d H:i:s'),
+            'local_datetime' => date('Y-m-d H:i:s'),
+            'carrier' => 'ifs',
+            'city' => 'Antrim',
+            'state' => 'Antrim',
+            'country_code' => 'GB',
+            'postcode' => 'BT41 4QE',
+            'tracker_id' => Str::random(12),
+            'source' => 'ifs',
+            'estimated_delivery_date' => null,
+            'local_estimated_delivery_date' => null,
+            'user_id' => $request->user()->id,
+            'shipment_id' => $shipment->id,
+        ]);
 
         $shipment->reset();
 
