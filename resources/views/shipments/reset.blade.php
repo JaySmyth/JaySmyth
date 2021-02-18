@@ -31,7 +31,7 @@
                     </label>
 
                     <div class="col-sm-6">
-                        {!! Form::select('service',  [16 => ' UPS UK24', 27 => 'DHL Worldwide Express (NonDoc)', 76 => 'XDP UK48', 19 => 'FedEx UK'], old('service'), array('class' => 'form-control')) !!}
+                        {!! Form::select('service',  [16 => ' UPS UK24', 27 => 'DHL Worldwide Express (NonDoc)', 76 => 'XDP UK48', 19 => 'FedEx UK'], old('service') ?? '76', array('class' => 'form-control')) !!}
 
                         @if ($errors->has('service'))
                             <span class="form-text"><strong>{{ $errors->first('service') }}</strong></span>
@@ -46,7 +46,7 @@
                     </label>
 
                     <div class="col-sm-6">
-                        {!! Form::select('reprice',  ['' => 'Please select', 0 => 'Keep original sales', 1 => 'Recalculate sales'], old('reprice'), array('class' => 'form-control')) !!}
+                        {!! Form::select('reprice',  ['' => 'Please select', 0 => 'Keep original sales', 1 => 'Recalculate sales'], old('reprice') ?? "1", array('class' => 'form-control')) !!}
 
                         @if ($errors->has('reprice'))
                             <span class="form-text"><strong>{{ $errors->first('reprice') }}</strong></span>

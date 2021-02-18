@@ -1050,8 +1050,8 @@ class ShipmentsController extends Controller
      */
     public function test(Request $request)
     {
-     $shipments = Shipment::needsFedExEtd()->limit(5)->get();
-     dd($shipments);
+        $shipments = Shipment::needsFedExEtd()->limit(5)->get();
+        dd($shipments);
     }
 
 
@@ -1236,10 +1236,11 @@ class ShipmentsController extends Controller
         // Notify user and redirect
         flash()->info('Shipment Reset!');
 
+
         if ($request->redirect) {
-            return redirect($request->redirect);
+            return redirect($request->redirect)->with('token', $shipment->token);
         }
 
-        return redirect("shipments");
+        return redirect("reports/dims/4");
     }
 }

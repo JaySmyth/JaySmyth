@@ -35,12 +35,12 @@
 
         <div class="form-group">
             <label for="month">Service</label>
-            {!! Form::select('service', dropDown('services', 'All Services'), Request::get('service'), array('class' => 'form-control')) !!}   
+            {!! Form::select('service', dropDown('services', 'All Services'), Request::get('service'), array('class' => 'form-control')) !!}
         </div>
 
         <div class="form-group">
             <label for="month">Shipper</label>
-            {!! Form::select('company', dropDown('enabledSites', 'All Shippers'), Request::get('company'), array('class' => 'form-control')) !!}  
+            {!! Form::select('company', dropDown('enabledSites', 'All Shippers'), Request::get('company'), array('class' => 'form-control')) !!}
         </div>
 
         <button type="submit" class="btn btn-primary mt-3">Update Report</button>
@@ -52,7 +52,7 @@
     <main class="col-sm-10 ml-sm-auto" role="main">
 
         @if(Request::get('date_from'))
-        @section('toolbar')   
+        @section('toolbar')
         <a href="{{ url('/shipments/download-dims?' . Request::getQueryString()) }}" title="Download Results"><span class="fas fa-cloud-download-alt fa-lg" aria-hidden="true"></span></a>
         @endsection
         @endif
@@ -67,12 +67,13 @@
                     <th>Carrier Ref</th>
                     <th>Shipper</th>
                     <th class="text-center">Dest.</th>
-                    <th class="text-center">Service</th>                
+                    <th class="text-center">Service</th>
                     <th class="text-center">Status</th>
                     <th class="text-right">Pieces</th>
                     <th class="text-right">Weight</th>
                     <th class="text-right">Volumetric</th>
                     <th class="text-center">Packages</th>
+                    <th class="text-center">Reset</th>
                 </tr>
             </thead>
             <tbody>
@@ -94,7 +95,19 @@
                         @foreach ($shipment->packages as $package)
                         {{$package->length}}{{$shipment->dims_uom}} x {{$package->width}}{{$shipment->dims_uom}} x {{$package->height}}{{$shipment->dims_uom}}<br>
                         @endforeach
-                    </td>                
+                    </td>
+                    <td class="align-middle text-center">
+                        @if(Auth::user()->hasIfsRole())
+                            <!--
+                            @if($shipment->isResetable()) -->
+                                <a href="{{ url('/shipments/' . $shipment->id . '/reset') }}" title="Reset Shipment"><span class="fas fa-backspace ml-sm-2" aria-hidden="true"></span></a>
+                            <!--
+                            @else
+                                <span class="fas fa-backspace ml-sm-2 faded" aria-hidden="true" title="Reset Shipment (unavailable)"></span>
+                            @endif
+                        -->
+                        @endif
+                    </td>
                 </tr>
                 @else
                 <tr class="bg-danger text-white">
@@ -107,7 +120,8 @@
                     <td colspan="7">&nbsp;</td>
                     <th scope="row" class="text-right">{{number_format($shipments->sum('pieces'))}}</td>
                     <th scope="row" class="text-right">{{number_format($shipments->sum('weight'), 2)}}</td>
-                    <th scope="row" class="text-right">{{number_format($shipments->sum('volumetric_weight'), 2)}}</td>                                                               
+                    <th scope="row" class="text-right">{{number_format($shipments->sum('volumetric_weight'), 2)}}</td>
+                    <td>&nbsp;</td>
                     <td>&nbsp;</td>
                 </tr>
             </tbody>
