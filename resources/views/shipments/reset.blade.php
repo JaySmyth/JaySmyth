@@ -54,6 +54,23 @@
                     </div>
                 </div>
 
+                <div class="form-group row{{ $errors->has('reason') ? ' has-danger' : '' }} mb-4">
+
+                    <label class="col-sm-4  col-form-label">
+                        Reason for change: <abbr title="This information is required.">*</abbr>
+                    </label>
+
+                    <div class="col-sm-12">
+                        <input type="text" class="form-control" size="75" name="reason"
+                            value="Booked incorrect service - over 100cm - non conveyable - switched to UKNC"
+                        >
+
+                        @if ($errors->has('reason'))
+                            <span class="form-text"><strong>{{ $errors->first('reason') }}</strong></span>
+                        @endif
+                    </div>
+                </div>
+
 
                 <h6 class="mt-4">Package Dimensions and Weights</h6>
                 <table class="table table-striped table-bordered table-sm mb-5">
