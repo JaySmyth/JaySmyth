@@ -122,7 +122,7 @@ class Package extends Model
         $message = ($carrierScan) ? $message.' (carrier scan)' : $message;
 
         if($carrierScan){
-            $location = 'shipper';
+            $location = 'sender';
         }
 
         $this->shipment->addTracking('received', $dateReceived, $userId, $message, $location);

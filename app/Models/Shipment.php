@@ -916,7 +916,7 @@ class Shipment extends Model
         }
 
         if ($this->tracking) {
-            if (!empty($this->tracking->first()->estimated_delivery_date)) {
+            if (! empty($this->tracking->first()->estimated_delivery_date)) {
                 return $this->tracking->first()->estimated_delivery_date->timezone($timezone)->format($format);
             }
         }
@@ -1126,6 +1126,15 @@ class Shipment extends Model
                     'country_code' => $this->company->country_code,
                     'postcode' => $this->company->postcode,
                     'timezone' => $this->company->localisation->time_zone,
+                ];
+
+            case 'sender':
+                return [
+                    'city' => $this->sender_city,
+                    'state' => $this->sender_state,
+                    'country_code' => $this->sender_country_code,
+                    'postcode' => $this->sender_postcode,
+                    'timezone' => getTimezone($this->sender_country_code, $this->sender_state, $this->sender_city),
                 ];
 
             case 'destination':
