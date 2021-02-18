@@ -3,7 +3,6 @@
 namespace App\CarrierAPI\UPS;
 
 use App\Models\Carrier;
-use App\CarrierAPI\UPS\UPSLabel;
 use App\Models\PackagingType;
 use App\Models\Service;
 use App\Models\TransactionLog;
@@ -20,8 +19,110 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
      *  Carrier Specific Variable declarations
      */
 
-    private $account;
     public $mode;
+    private $account;
+
+    /**
+     * Accepts the Shipment detail array and calcs
+     * The correct Global Product code to return.
+     *
+     * @param  array  $shipment
+     *
+     * @return string Global Product Code
+     */
+    public function getGPC($shipment)
+    {
+        $service_code = $this->getServiceCode($shipment);
+        if (isset($this->svc['service'][$service_code])) {
+            $service_details = $this->svc['service'][$service_code];
+
+            return $service_details['gpc'];
+        }
+    }
+
+    /**
+     * Accepts the Shipment detail array and calcs
+     * The correct Local Product code to return.
+     *
+     * @param  array  $shipment
+     *
+     * @return string Local Product Code
+     */
+    public function getLPC($shipment)
+    {
+        $service_code = $this->getServiceCode($shipment);
+        if (isset($this->svc['service'][$service_code])) {
+            $service_details = $this->svc['service'][$service_code];
+
+            return $service_details['lpc'];
+        }
+    }
+
+    public function createShipment($shipment)
+    {
+        $response = [];
+        $shipment = $this->preProcess($shipment);
+
+        $errors = $this->validateShipment($shipment);
+        if (empty($errors)) {
+            $this->initCarrier();
+            $upsShipment = $this->BuildUPSShipment($shipment);
+            $reply = $this->sendMessageToCarrier($upsShipment, 'create_shipment');
+
+            // Check for errors
+            if (isset($reply['errors'])) {
+                // Request unsuccessful - return errors
+                return $this->generateErrorResponse($response, $reply['errors']);
+            } else {
+                // Request successful -  Calc Routing
+                $route_id = $this->calc_routing($shipment);
+
+                //                      Prepare Response
+                $response = $this->createShipmentResponse($reply, $shipment['service_code'], $route_id);
+
+                return $response;
+            }
+        } else {
+            return $this->generateErrorResponse($response, $errors);
+        }
+    }
+
+    public function preProcess($shipment)
+    {
+        // UPS does not like '&' characters so replace with '+'
+        $shipment = json_decode(str_replace('&', '+', json_encode($shipment)), true);
+
+        if (empty($shipment['recipient_company_name'])) {
+            $shipment['recipient_company_name'] = $shipment['recipient_name'];
+            $shipment['recipient_name'] = '.';
+        }
+
+        if (isset($shipment['alcohol']['quantity']) && $shipment['alcohol']['quantity'] > 0) {
+            $shipment['errors'][] = 'Carrier does not accept Alcohol';
+        }
+
+        return $shipment;
+    }
+
+    public function validateShipment($shipment)
+    {
+        $errors = [];
+
+        // $rules['bill_shipping'] = 'required|in:sender';
+        // $rules['bill_tax_duty'] = 'nullable|in:sender';
+        $rules['bill_shipping_account'] = 'required|alpha_num:6';
+        $rules['bill_tax_duty_account'] = 'nullable|alpha_num:6';
+        $rules['alcohol'] = 'not_supported';
+        $rules['dry_ice'] = 'not_supported';
+        $rules['hazardous'] = 'not_supported';
+        $rules['insurance_value'] = 'not_supported';
+        $rules['lithium_batteries'] = 'not_supported';
+
+        // Validate Shipment using the rules
+        $errors = $this->applyRules($rules, $shipment);
+
+        return $errors;
+    }
 
     public function initCarrier()
     {
@@ -69,43 +170,8 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
         }
     }
 
-    /**
-     * Accepts the Shipment detail array and calcs
-     * The correct Global Product code to return.
-     *
-     * @param array $shipment
-     * @return string Global Product Code
-     */
-    public function getGPC($shipment)
-    {
-        $service_code = $this->getServiceCode($shipment);
-        if (isset($this->svc['service'][$service_code])) {
-            $service_details = $this->svc['service'][$service_code];
-
-            return $service_details['gpc'];
-        }
-    }
-
-    /**
-     * Accepts the Shipment detail array and calcs
-     * The correct Local Product code to return.
-     *
-     * @param array $shipment
-     * @return string Local Product Code
-     */
-    public function getLPC($shipment)
-    {
-        $service_code = $this->getServiceCode($shipment);
-        if (isset($this->svc['service'][$service_code])) {
-            $service_details = $this->svc['service'][$service_code];
-
-            return $service_details['lpc'];
-        }
-    }
-
     public function buildUPSShipment($shipment)
     {
-
         // Test a ShipmentRequest using UPS XML API
         $upsShipment = new Shipment();
 
@@ -117,7 +183,11 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
         $shipperAddress = $shipper->getAddress();
         $shipperAddress->setAddressLine1($shipment['sender_address1']);
         $shipperAddress->setAddressLine2($shipment['sender_address2']);
-        $shipperAddress->setAddressLine3($shipment['sender_address3']);
+
+        if (isset($shipment['sender_address3'])) {
+            $shipperAddress->setAddressLine3($shipment['sender_address3']);
+        }
+
         $shipperAddress->setPostalCode($shipment['sender_postcode']);
         $shipperAddress->setCity($shipment['sender_city']);
         // $shipperAddress->setStateProvinceCode($shipment['sender_state']);
@@ -131,7 +201,11 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
         $address = new \Ups\Entity\Address();
         $address->setAddressLine1($shipment['sender_address1']);
         $address->setAddressLine2($shipment['sender_address2']);
-        $address->setAddressLine3($shipment['sender_address3']);
+
+        if (isset($shipment['sender_address3'])) {
+            $address->setAddressLine3($shipment['sender_address3']);
+        }
+
         $address->setPostalCode($shipment['sender_postcode']);
         $address->setCity($shipment['sender_city']);
         // $address->setStateProvinceCode($shipment['sender_state']);
@@ -149,7 +223,7 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
         $address = new \Ups\Entity\Address();
         $address->setAddressLine1($shipment['recipient_address1']);
         $address->setAddressLine2($shipment['recipient_address2']);
-        $address->setAddressLine3(!empty($shipment['recipient_address3']) ? $shipment['recipient_address3'] : null);
+        $address->setAddressLine3(! empty($shipment['recipient_address3']) ? $shipment['recipient_address3'] : null);
         $address->setPostalCode($shipment['recipient_postcode']);
         $address->setCity($shipment['recipient_city']);
         if (in_array($shipment['recipient_country_code'], ['US', 'CA'])) {
@@ -161,7 +235,7 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
         $shipTo->setCompanyName($shipment['recipient_company_name']);
         $shipTo->setAttentionName($shipment['recipient_name']);
         $shipTo->setCompanyName($shipment['recipient_company_name']);
-        $shipTo->setEmailAddress(!empty($shipment['recipient_email']) ? $shipment['recipient_email'] : null);
+        $shipTo->setEmailAddress(! empty($shipment['recipient_email']) ? $shipment['recipient_email'] : null);
         $shipTo->setPhoneNumber($shipment['recipient_telephone']);
         $upsShipment->setShipTo($shipTo);
 
@@ -181,7 +255,6 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
 
         // Add Packages
         foreach ($shipment['packages'] as $package) {
-
             // Add Package
             $upsPackage = new \Ups\Entity\Package();
             $upsPackage->getPackagingType()->setCode(\Ups\Entity\PackagingType::PT_PACKAGE);
@@ -235,43 +308,6 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
         return $upsShipment;
     }
 
-    public function preProcess($shipment)
-    {
-        // UPS does not like '&' characters so replace with '+'
-        $shipment = json_decode(str_replace('&', '+', json_encode($shipment)), true);
-
-        if (empty($shipment['recipient_company_name'])) {
-            $shipment['recipient_company_name'] = $shipment['recipient_name'];
-            $shipment['recipient_name'] = '.';
-        }
-
-        if (isset($shipment['alcohol']['quantity']) && $shipment['alcohol']['quantity'] > 0) {
-            $shipment['errors'][] = 'Carrier does not accept Alcohol';
-        }
-
-        return $shipment;
-    }
-
-    public function validateShipment($shipment)
-    {
-        $errors = [];
-
-        // $rules['bill_shipping'] = 'required|in:sender';
-        // $rules['bill_tax_duty'] = 'nullable|in:sender';
-        $rules['bill_shipping_account'] = 'required|alpha_num:6';
-        $rules['bill_tax_duty_account'] = 'nullable|alpha_num:6';
-        $rules['alcohol'] = 'not_supported';
-        $rules['dry_ice'] = 'not_supported';
-        $rules['hazardous'] = 'not_supported';
-        $rules['insurance_value'] = 'not_supported';
-        $rules['lithium_batteries'] = 'not_supported';
-
-        // Validate Shipment using the rules
-        $errors = $this->applyRules($rules, $shipment);
-
-        return $errors;
-    }
-
     private function sendMessageToCarrier($upsShipment, $labelSpecification)
     {
         $labelSpecification = new \Ups\Entity\ShipmentRequestLabelSpecification('GIF');
@@ -312,47 +348,9 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
         return $response;
     }
 
-    public function createShipment($shipment)
-    {
-        $response = [];
-        $shipment = $this->preProcess($shipment);
-
-        $errors = $this->validateShipment($shipment);
-        if (empty($errors)) {
-            $this->initCarrier();
-            $upsShipment = $this->BuildUPSShipment($shipment);
-            $reply = $this->sendMessageToCarrier($upsShipment, 'create_shipment');
-
-            // Check for errors
-            if (isset($reply['errors'])) {
-
-                // Request unsuccessful - return errors
-                return $this->generateErrorResponse($response, $reply['errors']);
-            } else {
-
-                // Request successful -  Calc Routing
-                $route_id = $this->calc_routing($shipment);
-
-                //                      Prepare Response
-                $response = $this->createShipmentResponse($reply, $shipment['service_code'], $route_id);
-
-                return $response;
-            }
-        } else {
-            return $this->generateErrorResponse($response, $errors);
-        }
-    }
-
     private function calc_routing($shipment)
     {
         return 1;
-    }
-
-    private function generatePdf($data, $serviceCode = '')
-    {
-        $label = new UPSLabel(null, $serviceCode, $data);
-
-        return $label->create();
     }
 
     private function createShipmentResponse($reply, $serviceCode, $route_id, $imageType = 'PDF', $labelSize = '6X4')
@@ -366,7 +364,6 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
         $response['volumetric_divisor'] = getVolumetricDivisor('UPS', $serviceCode);       // From Helper functions
 
         if (isset($reply['PackageResults']['TrackingNumber'])) {
-
             // Single Piece
             $response['packages'][0]['sequence_number'] = 1;
             $response['packages'][0]['carrier_tracking_code'] = $reply['PackageResults']['TrackingNumber'];
@@ -374,7 +371,6 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
             $awbs[] = $response['packages'][0]['carrier_tracking_code'];
             $response['pieces'] = 1;
         } else {
-
             // Multiple Pieces
             $i = 0;
             foreach ($reply['PackageResults'] as $packageResult) {
@@ -395,5 +391,12 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
         $response['label_base64'][0]['base64'] = $this->generatePDF($reply, $serviceCode);
 
         return $response;
+    }
+
+    private function generatePdf($data, $serviceCode = '')
+    {
+        $label = new UPSLabel(null, $serviceCode, $data);
+
+        return $label->create();
     }
 }
