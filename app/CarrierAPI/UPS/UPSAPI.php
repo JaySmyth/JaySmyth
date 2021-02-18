@@ -179,7 +179,8 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
         $shipper = $upsShipment->getShipper();
         $shipper->setShipperNumber($shipment['bill_shipping_account']);
         $shipper->setName($shipment['sender_company_name']);
-        $shipper->setAttentionName($shipment['sender_name']);
+        $shipper->setAttentionName(! empty($shipment['sender_name']) ? $shipment['sender_name'] : null);
+
         $shipperAddress = $shipper->getAddress();
         $shipperAddress->setAddressLine1($shipment['sender_address1']);
         $shipperAddress->setAddressLine2($shipment['sender_address2']);
@@ -213,7 +214,7 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
         $shipFrom = new \Ups\Entity\ShipFrom();
         $shipFrom->setAddress($address);
         $shipFrom->setName($shipment['sender_company_name']);
-        $shipFrom->setAttentionName($shipment['sender_name']);
+        $shipFrom->setAttentionName(! empty($shipment['sender_name']) ? $shipment['sender_name'] : null);
         $shipFrom->setCompanyName($shipment['sender_company_name']);
         $shipFrom->setEmailAddress($shipment['sender_email']);
         $shipFrom->setPhoneNumber($shipment['sender_telephone']);
