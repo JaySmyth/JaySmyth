@@ -62,7 +62,7 @@
 
                     <div class="col-sm-12">
                         <input type="text" class="form-control" size="75" name="reason"
-                            value="Booked incorrect service - over 100cm - non conveyable - switched to UKNC"
+                            value="Booked on incorrect service - over 100cm - non conveyable - switched to UKNC"
                         >
 
                         @if ($errors->has('reason'))
