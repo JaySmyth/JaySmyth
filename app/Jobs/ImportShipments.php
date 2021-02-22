@@ -839,7 +839,7 @@ class ImportShipments implements ShouldQueue
      */
     protected function getCustomsValue()
     {
-        $customsValue = (empty($this->row['customs_value']) || $this->row['customs_value'] < 1 || empty($this->row['customs_value'])) ? $this->importConfig->default_customs_value : trim($this->row['customs_value']);
+        $customsValue = (empty($this->row['customs_value']) || $this->row['customs_value'] < 1 || empty($this->row['customs_value'])) ? $this->importConfig->default_customs_value : trim(round($this->row['customs_value']));
 
         if (! is_numeric($customsValue)) {
             return (float) str_replace(' ', '.', $customsValue);

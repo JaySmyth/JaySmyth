@@ -357,7 +357,10 @@ class DHL
         ];
 
         if (! empty($this->shipment[$type.'_address2'])) {
-            $address['StreetLines2'] = $this->shipment[$type.'_address2'];
+            $addressLine = trim($this->shipment[$type.'_address2']);
+            if (strlen($addressLine) > 2) {
+                $address['StreetLines2'] = $addressLine;
+            }
         }
 
         if (! empty($this->shipment[$type.'_address3'])) {
