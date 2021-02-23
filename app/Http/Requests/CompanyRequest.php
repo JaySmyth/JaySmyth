@@ -39,7 +39,7 @@ class CompanyRequest extends Request
             'notes' => 'nullable|max:255',
             'company_code' => 'alpha|unique',
             'scs_code' => 'required|size:7',
-            'eori' => 'nullable|size:14',
+            'eori' => 'required|size:14',
             'group_account' => 'nullable|max:10',
             'vat_exempt' => 'required|boolean',
             'enabled' => 'boolean',

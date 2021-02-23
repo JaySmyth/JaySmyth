@@ -191,7 +191,7 @@ $("#commodity-form").validate({
         },
         harmonized_code: {
             required: true,
-            minlength: 6,
+            minlength: 10,
             digits: true
         },
         uom: {
