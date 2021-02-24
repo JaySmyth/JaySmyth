@@ -201,7 +201,7 @@ class DHL
      */
     protected function getContent()
     {
-        if ((strtolower($this->shipment['ship_reason']) == 'documents') || isNiToEu($this->shipment['sender_postcode'], $this->shipment['recipient_country_code']) || strtoupper($this->shipment['recipient_country_code']) == 'GB') {
+        if ((strtolower($this->shipment['ship_reason']) == 'documents') || isNiToEu($this->shipment['sender_postcode'], $this->shipment['recipient_country_code']) || isUkDomestic($this->shipment['recipient_country_code'])) {
             return 'DOCUMENTS';
         }
 
