@@ -29,14 +29,14 @@ class LogScanningKpis extends Command
      *
      * @var string
      */
-    protected $recipient = 'scharlton@antrim.ifsgroup.com';
+    protected $recipient = 'transport@antrim.ifsgroup.com';
 
     /**
      * Default cc.
      *
      * @var string
      */
-    protected $cc = ['transport@antrim.ifsgroup.com', 'shaunf@antrim.ifsgroup.com', 'it@antrim.ifsgroup.com', 'ghanna@antrim.ifsgroup.com'];
+    protected $cc = ['ghanna@antrim.ifsgroup.com', 'shaunf@antrim.ifsgroup.com', 'it@antrim.ifsgroup.com'];
 
     /**
      * Create a new command instance.
@@ -118,7 +118,7 @@ class LogScanningKpis extends Command
         }
 
 
-        if(! $this->option('test')){
+        if (! $this->option('test')) {
 
             // Insert or update KPI
             ScanningKpi::firstOrCreate(['date' => $date])->update([
@@ -138,13 +138,11 @@ class LogScanningKpis extends Command
 
         // Only send the email when start date option has not been supplied
         if (! $this->option('start-date')) {
-
-            if($this->option('test')){
+            if ($this->option('test')) {
                 Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\MissedScans($receiptMissed, $routeMissed, 'Missed Scans (receipt: '.$totals['receipt_missed'].' / route: '.$totals['route_missed'].') - '.$date->format('d-m-y')));
             } else {
                 Mail::to($this->recipient)->cc($this->cc)->send(new \App\Mail\MissedScans($receiptMissed, $routeMissed, 'Missed Scans (receipt: '.$totals['receipt_missed'].' / route: '.$totals['route_missed'].') - '.$date->format('d-m-y')));
             }
-
         }
     }
 }
