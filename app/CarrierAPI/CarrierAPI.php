@@ -342,12 +342,13 @@ class CarrierAPI
             ->first();
         if ($shipment) {
             if ($shipment->isCancellable()) {
+                // Attempt to notify the Carrier of the cancellation
                 $this->carrier = Carrier::getInstanceOf($shipment->carrier->code, $this->mode);     // Create Carrier Object
                 $response = $this->carrier->deleteShipment($shipment);                              // Send Shipment to Carrier
 
-                if ($response['errors'] == []) {
-                    $shipment->setCancelled($data['user_id']);
-                }
+                // Ignore any carrier errors
+                $response['errors'] = [];
+                $shipment->setCancelled($data['user_id']);
             } else {
                 $response['errors'][] = 'Shipment cannot be cancelled';
             }
