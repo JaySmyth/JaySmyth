@@ -534,7 +534,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             $result = [
                 'pre_transit' => 'Pre-Transit', 'received' => 'Received', 'in_transit' => 'In Transit',
                 'out_for_delivery' => 'Out For Delivery', 'delivered' => 'Delivered', 'on_hold' => 'On Hold',
-                'failure' => 'Failure', 'return_to_sender' => 'Return To Sender',
+                'failure' => 'Failure', 'return_to_sender' => 'Return To Sender', 'rts_complete' => 'RTS Complete'
             ];
             break;
         case 'jobType':
