@@ -82,7 +82,7 @@ class APIResponse
         ];
     }
 
-    public function respondCreatedShipment($reply, $version)
+    public function respondCreatedShipment($reply = [], $version)
     {
         $this->version = $version;
         if ($reply['errors'] == []) {
@@ -95,7 +95,7 @@ class APIResponse
         }
     }
 
-    public function respondDeletedShipment($reply = '', $version = '')
+    public function respondDeletedShipment($reply = [], $version = '')
     {
         $this->version = $version;
         if ($reply['errors'] == []) {
