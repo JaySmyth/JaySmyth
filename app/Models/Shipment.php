@@ -1515,7 +1515,7 @@ class Shipment extends Model
      */
     public function isHighlighted()
     {
-        if ($this->isActive() && $this->status->code == 'pre_transit' && $this->depot->code == 'ANT' && ! $this->originatesFromBtPostcode()) {
+        if ($this->isActive() && $this->status_id == 2 && $this->depot->code == 'ANT' && ! $this->originatesFromBtPostcode()) {
             return true;
         }
 
