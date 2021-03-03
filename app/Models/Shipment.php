@@ -1030,10 +1030,19 @@ class Shipment extends Model
 
         // Only update if we have been given a valid status and the shipment is not currently set to this status
         // Also, dont update the status if currently RTS or Delivered - GMcNicholl 25-09-2018 17:54
-        if ($status && $this->status_id != $status->id && ! in_array($this->status_id, ['6', '9'])) {
-            // Change the status on the shipment record
-            $this->status_id = $status->id;
-            $this->save();
+        if ($status && $this->status_id != $status->id) {
+
+            // If not Delivered or RTS change the status on the shipment record
+            if (! in_array($this->status_id, ['6', '9', '18'])) {
+                $this->status_id = $status->id;
+                $this->save();
+            } else {
+                // if RTS and now RTS Complete change the status
+                if ($this->status_id == '9' && $status->id == "18") {
+                    $this->status_id = $status->id;
+                    $this->save();
+                }
+            }
 
             // Add a tracking event for this status change
             if ($withTrackingEvent) {
@@ -1303,6 +1312,15 @@ class Shipment extends Model
         }
     }
 
+    /**
+     * Cancel a shipment. Makes API call, sets status and cancels collection request.
+     *
+     * @param  int  $userId
+     */
+    public function setRtsComplete($userId = 0)
+    {
+        $this->setStatus('rts_complete', $userId);
+    }
     /**
      * Determine if shipment originates from BT postcode.
      *
