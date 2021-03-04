@@ -1032,15 +1032,21 @@ class Shipment extends Model
         // Also, dont update the status if currently RTS or Delivered - GMcNicholl 25-09-2018 17:54
         if ($status && $this->status_id != $status->id) {
 
-            // If not Delivered or RTS change the status on the shipment record
-            if (! in_array($this->status_id, ['6', '9', '18'])) {
+            // If not yet shipped and requested status is "no goods received"
+            if ($this->status_id == '18' && in_array($this->status_id, ['1', '2'])) {
                 $this->status_id = $status->id;
                 $this->save();
             } else {
                 // if RTS and now RTS Complete change the status
-                if ($this->status_id == '9' && $status->id == "18") {
+                if ($this->status_id == '9' && $status->id == "19") {
                     $this->status_id = $status->id;
                     $this->save();
+                } else {
+                    // If not Delivered or RTS change the status on the shipment record
+                    if (! in_array($this->status_id, ['6', '9', '19'])) {
+                        $this->status_id = $status->id;
+                        $this->save();
+                    }
                 }
             }
 
