@@ -52,6 +52,6 @@ Route::post('rf', 'RfController@server');
   | Catch any invalid routes
   |--------------------------------------------
  */
-Route::get('{all}', 'ApiController@notSupported');
-Route::post('{all}', 'ApiController@notSupported');
-Route::delete('{all}', 'ApiController@notSupported');
+Route::get('{all}', 'APIController@notSupported');
+Route::post('{all}', 'APIController@notSupported');
+Route::delete('{all}', 'APIController@notSupported');
