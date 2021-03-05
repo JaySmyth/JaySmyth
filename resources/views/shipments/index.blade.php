@@ -210,7 +210,7 @@
                 @endif
 
                 <td>
-                    @if($shipment->status->code == 'saved')
+                    @if(isset($shipment->status->code) && $shipment->status->code == 'saved')
                         <a href="{{url('/shipments/' . $shipment->id . '/edit') }}" class="consignment-number">{{$shipment->consignment_number}}</a>
                     @else
                         <a href="{{ url('/shipments', $shipment->id) }}" class="consignment-number">{{$shipment->consignment_number}}</a>
@@ -218,10 +218,10 @@
                 </td>
 
                 <td>
-                    @if($shipment->status->code == 'saved')
+                    @if(isset($shipment->status->code) && $shipment->status->code == 'saved')
                         <span class="text-muted"><i>Unknown</i></span>
                     @else
-                        {{$shipment->carrier_consignment_number}}
+                        {{$shipment->carrier_consignment_number ?? ''}}
                     @endif
                 </td>
 
@@ -269,7 +269,7 @@
 
                 <td>{{$shipment->ship_date->timezone(Auth::user()->time_zone)->format(Auth::user()->date_format)}}</td>
                 <td class="text-center">
-                    @if($shipment->status->code == 'saved')
+                    @if(isset($shipment->status->code) && $shipment->status->code == 'saved')
                         <span class="text-muted"><i>Unknown</i></span>
                     @else
                         <span class="text-uppercase badge badge-secondary" data-placement="bottom" data-toggle="tooltip" data-original-title="{{$shipment->service->name ?? 'Unknown'}}">{{$shipment->service->code ?? ''}}</span>
@@ -285,7 +285,7 @@
                     @endif
                 </td>
                 <td class="text-center text-nowrap">
-                    <span class="status {{$shipment->status->code}}" data-placement="bottom" data-toggle="tooltip" data-original-title="{{$shipment->status->description}}">{{$shipment->status->name}}</span>
+                    <span class="status {{$shipment->status->code ?? ''}}" data-placement="bottom" data-toggle="tooltip" data-original-title="{{$shipment->status->description}}">{{$shipment->status->name}}</span>
                 </td>
                 <td class="text-center text-nowrap">
                     <!-- Cancel shipment - only enable if active shipment and not yet received -->
@@ -318,10 +318,12 @@
                     @endif
 
                 <!-- Only enable the print labels icon if the shipment has not yet been collected OR an IFS user -->
-                    @if($shipment->status->code == 'pre_transit' || Auth::user()->hasIfsRole() && $shipment->status->code != 'saved')
-                        <a href="{{$shipment->print_url}}" title="Print Label" class="print"><span class="fas fa-print ml-sm-2" aria-hidden="true"></span></a>
-                    @else
-                        <span class="fas fa-print ml-sm-2 faded" aria-hidden="true" title="Print Label (unavailable)"></span>
+                    @if(isset($shipment->status->code))
+                        @if($shipment->status->code == 'pre_transit' || Auth::user()->hasIfsRole() && $shipment->status->code != 'saved')
+                            <a href="{{$shipment->print_url}}" title="Print Label" class="print"><span class="fas fa-print ml-sm-2" aria-hidden="true"></span></a>
+                        @else
+                            <span class="fas fa-print ml-sm-2 faded" aria-hidden="true" title="Print Label (unavailable)"></span>
+                        @endif
                     @endif
                 </td>
 
