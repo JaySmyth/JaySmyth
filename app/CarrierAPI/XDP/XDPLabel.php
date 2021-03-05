@@ -25,9 +25,6 @@ class XDPLabel extends \App\CarrierAPI\CarrierLabel
         // Set the source data and get the number of pages in the PDF
         $pageCount = $this->pdf->setSourceData(base64_decode($this->data));
 
-        // Add Master Label (XDP puts at Start)
-        $this->importPageFromTemplate(1, 1, 7);
-
         // Add Package Labels
         for ($pageNumber = 1; $pageNumber <= $pageCount; $pageNumber++) {
             $this->importPageFromTemplate($pageNumber, 1, 7);
