@@ -343,7 +343,7 @@ class APIController extends Controller
                     $this->input['data']['errors'] = [];
                     $this->input['data']['user_id'] = $userId;                   // Retrieve authenticated User
                     $this->input['data']['company_id'] = $company->id;
-                    $this->input['data']['ifs_consignment_number'] = '10004556445';
+                    $this->input['data']['ifs_consignment_number'] = $ifsConsignmentNumber;
 
                     // Return Success
                     return;
@@ -731,16 +731,16 @@ class APIController extends Controller
         if ($this->input['data']['user_id'] == 'UnAuthorized' || $this->input['data']['company_id'] == 'UnAuthorized') {
 
             // Authentication Failed
-            $response = APIResponse::respondUnauthorized();
+            return APIResponse::respondUnauthorized();
         } else {
             if ($this->mode == 'test') {
                 $reply = [
-                    'errors' => '',
+                    'errors' => [],
                     'consignment_number' => $ifsConsignmentNumber,
                     'carrier' => 'IFS',
                 ];
 
-                $response = APIResponse::respondDeletedShipment($reply, $version); // Reformat response for API user
+                return APIResponse::respondDeletedShipment($reply, $version); // Reformat response for API user
             } else {
 
                 // Check User is authorized to cancel this shipment
@@ -762,14 +762,12 @@ class APIController extends Controller
                     } else {
                         $reply['carrier'] = '';
                     }
-                    $response = APIResponse::respondDeletedShipment($reply, $version); // Reformat response for API user
+                    return APIResponse::respondDeletedShipment($reply, $version); // Reformat response for API user
                 } else {
-                    $response = APIResponse::respondNotFound();                     // Reformat response for API user
+                    return APIResponse::respondNotFound();                     // Reformat response for API user
                 }
             }
         }
-
-        return $response;
     }
 
     public function labelTest()
@@ -970,7 +968,6 @@ class APIController extends Controller
         $company = Company::where('company_code', $request->get('company_code'))->where('enabled', 1)->first();
 
         if ($company && $request->user()->getAllowedCompanyIds()->contains($company->id)) {
-
             $user = $request->user();
 
             return response()->json([
