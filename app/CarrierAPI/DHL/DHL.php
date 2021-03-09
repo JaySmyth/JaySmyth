@@ -458,7 +458,7 @@ class DHL
                     'CommodityCode' => $commodityCode,
                     'ItemNumber' => $i,
                     'Quantity' => $content['quantity'],
-                    'QuantityUnitOfMeasurement' => $this->convertToDhlUom($content['uom']),
+                    'QuantityUnitOfMeasurement' => $this->convertToDhlUom($content),
                     'ItemDescription' => substr(trim($content['description']), 0, 35),
                     'UnitPrice' => round($content['unit_value'], 2),
                     'NetWeight' => round($content['unit_weight'] * $content['quantity'], 2),
@@ -486,8 +486,14 @@ class DHL
      *
      * @return string
      */
-    protected function convertToDhlUom($uom)
+    protected function convertToDhlUom($content)
     {
+        if (isset($content['uom'])) {
+            $uom = $content['uom'];
+        } else {
+            $uom = 'EA';
+        }
+
         switch (strtoupper($uom)) {
             case 'CG':
                 // Centigram
