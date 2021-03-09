@@ -98,7 +98,7 @@ class APIResponse
     public function respondDeletedShipment($reply = [], $version = '')
     {
         $this->version = $version;
-        if ($reply['errors'] == []) {
+        if (empty($reply['errors'])) {
             return $this->setStatusCode(200)->respond([
                         'meta' => $this->getHeaders(),
                         'data' => $reply,
