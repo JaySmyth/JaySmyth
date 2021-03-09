@@ -31,7 +31,7 @@
                     </label>
 
                     <div class="col-sm-6">
-                        {!! Form::select('service',  [16 => ' UPS UK24', 27 => 'DHL Worldwide Express (NonDoc)', 81 => 'DHL Worldwide Express EU (NonDoc)', 76 => 'XDP UK48', 19 => 'FedEx UK'], old('service') ?? '76', array('class' => 'form-control')) !!}
+                        {!! Form::select('service',  [16 => ' UPS UK24', 27 => 'DHL Worldwide Express (NonDoc)', 81 => 'DHL Worldwide Express EU (NonDoc)', 22 => 'DHL Economy Select (NonDoc)', 76 => 'XDP UK48', 19 => 'FedEx UK'], old('service') ?? '76', array('class' => 'form-control')) !!}
 
                         @if ($errors->has('service'))
                             <span class="form-text"><strong>{{ $errors->first('service') }}</strong></span>
