@@ -140,6 +140,7 @@
                             <a class="dropdown-item" href="{{url('/processes')}}">Process Monitor</a>
                             <a class="dropdown-item" href="{{url('/roles')}}">Roles</a>
                             <a class="dropdown-item" href="{{url('/shipment-uploads')}}">Shipment Uploads</a>
+                            <a class="dropdown-item" href="{{url('/shipments/status-upload')}}">Bulk Status Upload</a>
                         </div>
                     </li>
                 @endif

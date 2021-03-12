@@ -393,6 +393,14 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
                 ->where('id', '<', 13)->pluck('name', 'id')->toArray();
             $result = Arr::add($result, 'S', 'Shipped (All except cancelled)');
             break;
+        case 'statusCodes':
+            $result = [
+                'no_goods' => 'No goods received',
+                'cancelled' => 'Cancelled',
+                'return_to_sender' => 'Return to sender',
+                'rts_complete' => 'Return to sender complete',
+            ];
+            break;
         case 'uoms':
             $result = App\Models\Uom::select('name', 'code')->orderBy('name')->pluck('name', 'code');
             break;
