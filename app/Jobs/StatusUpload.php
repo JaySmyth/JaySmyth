@@ -196,9 +196,9 @@ class StatusUpload implements ShouldQueue
 
         // Update Status
         if ($this->status->code == 'cancelled') {
-            $this->shipment->setCancelled(183);
+            $this->shipment->setCancelled($this->user->id);
         } else {
-            $this->shipment->setStatus($this->status->code, 183);
+            $this->shipment->setStatus($this->status->code, $this->user->id);
         }
 
         // If no errors, return true

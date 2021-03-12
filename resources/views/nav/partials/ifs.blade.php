@@ -98,6 +98,10 @@
         @can('view_customs_entry')<a class="dropdown-item" href="{{url('/customs-entries')}}" class="right-border">Customs Entries</a>@endcan
         @can('view_quotation')<a class="dropdown-item" href="{{url('/quotations')}}" class="right-border">Quotations</a>@endcan
 
+        @if(Auth::user()->hasRole('ifsa') || Auth::user()->hasRole('ifsm'))
+        <a class="dropdown-item" href="{{url('/shipments/status-upload')}}">Bulk Status Upload</a>
+        @endif
+
         @can('create_user')
         <div class="dropdown-divider"></div>
         @endcan
