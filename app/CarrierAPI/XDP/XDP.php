@@ -29,7 +29,7 @@ class XDP
         switch ($mode) {
             case 'test':
                 $this->username = 'XDP123';
-                $this->password = '1b4D7if8';
+                $this->password = '8iu7ewK3';
                 break;
 
             default:
@@ -68,7 +68,7 @@ class XDP
         }
 
         // Provided by the end user
-        if ( ! empty($this->shipment['bill_shipping_account'])) {
+        if (! empty($this->shipment['bill_shipping_account'])) {
             return $this->shipment['bill_shipping_account'];
         }
 
@@ -98,7 +98,7 @@ class XDP
         $this->log('REPLY-1', 'I', $result);
 
         // Obtain the XML portion of the string returned
-        if ( ! $xml = $this->getXmlResult($result)) {
+        if (! $xml = $this->getXmlResult($result)) {
             return $reply['errors'][] = 'Invalid reply from carrier. Please try again.';
         }
 
@@ -203,7 +203,7 @@ class XDP
             return $this->shipment['goods_description'];
         }
 
-        if ( ! empty($this->shipment['contents'])) {
+        if (! empty($this->shipment['contents'])) {
             foreach ($this->shipment['contents'] as $content) {
                 return $content['description'];
             }
@@ -254,7 +254,7 @@ class XDP
         curl_setopt($ch, CURLOPT_URL, $this->xdp_connect_url);                // set url to post to
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        if ( ! empty($header)) {
+        if (! empty($header)) {
             curl_setopt($ch, CURLOPT_HEADER, 1);            // CURL to output header
             curl_setopt($ch, CURLOPT_HTTPHEADER, $header);  // Header for CURL to output
         } else {
@@ -358,7 +358,7 @@ class XDP
         curl_setopt($ch, CURLOPT_URL, $this->xdp_label_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-        if (( ! empty(trim($this->username))) && ( ! empty(trim($this->password)))) {
+        if ((! empty(trim($this->username))) && (! empty(trim($this->password)))) {
             curl_setopt($ch, CURLOPT_USERPWD, $this->username.':'.$this->password);
         }
 
