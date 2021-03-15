@@ -395,10 +395,10 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             break;
         case 'statusCodes':
             $result = [
-                'no_goods' => 'No goods received',
-                'cancelled' => 'Cancelled',
-                'return_to_sender' => 'Return to sender',
-                'rts_complete' => 'Return to sender complete',
+                'pre_transit' => 'Pre-Transit', 'no_goods' => 'No Goods Received', 'cancelled' => 'Shipment Cancelled', 'received' => 'Goods Received', 'in_transit' => 'In Transit',
+                'out_for_delivery' => 'Out For Delivery', 'delivered' => 'Delivered', 'on_hold' => 'On Hold',
+                'failure' => 'Failure', 'return_to_sender' => 'Return To Sender',
+                'rts_complete' => 'RTS Complete'
             ];
             break;
         case 'uoms':
@@ -537,14 +537,6 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             break;
         case 'importConfigs':
             $result = Auth::user()->getImportConfigs()->pluck('company_name', 'id');
-            break;
-        case 'statusCodes':
-            $result = [
-                'pre_transit' => 'Pre-Transit', 'no_goods' => 'No Goods Received', 'received' => 'Goods Received', 'in_transit' => 'In Transit',
-                'out_for_delivery' => 'Out For Delivery', 'delivered' => 'Delivered', 'on_hold' => 'On Hold',
-                'failure' => 'Failure', 'return_to_sender' => 'Return To Sender',
-                'rts_complete' => 'RTS Complete'
-            ];
             break;
         case 'jobType':
             $result = ['c' => 'Collection', 'd' => 'Delivery'];
