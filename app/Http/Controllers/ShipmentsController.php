@@ -9,6 +9,7 @@ use App\Exports\ExceptionsExport;
 use App\Exports\ShipmentsExport;
 use App\Jobs\ImportShipments;
 use App\Jobs\LogScanningKpis;
+use App\Jobs\StatusUpload;
 use App\Models\Company;
 use App\Models\Mode;
 use App\Models\Shipment;
@@ -691,6 +692,80 @@ class ShipmentsController extends Controller
             storage_path('app/'.$filename),
             $request->import_config_id,
             $request->user()
+        ))->onQueue('import');
+
+        // Notify user and redirect
+        flash()->info('File Uploaded!', 'Please check your email for results.', true);
+
+        return back();
+    }
+
+    /**
+     * Display upload shipments form.
+     *
+     * @param  Request  $request
+     *
+     * @return type
+     */
+    public function statusUpload()
+    {
+        $this->authorize(new Shipment);
+
+        return view('shipments.status_upload');
+    }
+
+    /**
+     * Process uploaded shipment file.
+     *
+     * @param  Request  $request
+     *
+     * @return type
+     */
+    public function storeStatusUpload(Request $request)
+    {
+        $this->authorize('upload', new Shipment);
+
+        // Validate the request
+        $this->validate($request, [
+            'status_code' => 'required|in:' . implode(',', array_keys(dropdown('statusCodes'))),
+            'file' => 'required'
+        ], [
+            'status_code.required' => 'Please select an upload profile.',
+            'file.mimes' => 'Not a valid CSV file - please check for unsupported characters',
+            'file.required' => 'Please select a file to upload.'
+        ]);
+
+        // Upload the file to the temp directory
+        $path = $request->file('file')->storeAs('temp', 'original_'.Str::random(12).'.csv');
+
+        // Generate a filename (hash generated from file contents)
+        $filename = 'temp/'.md5_file(storage_path('app/'.$path)).'.csv';
+
+        // Check that this file has not already been uploaded
+        if (Storage::exists($filename)) {
+            // Delete the duplicate
+            Storage::delete($path);
+
+            flash()->error('File already uploaded!');
+
+            return back();
+        }
+
+        // Rename the temp upload to the hashed filename
+        Storage::move($path, $filename);
+
+        // Check that the file was uploaded successfully
+        if (! Storage::disk('local')->exists($filename)) {
+            flash()->error('Problem Uploading!', 'Unable to upload file. Please try again.');
+
+            return back();
+        }
+
+        $user = User::find($request->user()->id);
+        dispatch(new StatusUpload(
+            storage_path('app/'.$filename),
+            $request->status_code,
+            $user
         ))->onQueue('import');
 
         // Notify user and redirect

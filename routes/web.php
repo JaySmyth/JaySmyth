@@ -56,7 +56,9 @@ Route::get('shipments/download', 'ShipmentsController@download');
 Route::get('shipments/download-dims', 'ShipmentsController@downloadDims');
 Route::get('shipments/download-exceptions', 'ShipmentsController@downloadExceptions');
 Route::get('shipments/upload', 'ShipmentsController@upload');
-Route::post('shipments/upload', 'ShipmentsController@storeupload');
+Route::post('shipments/upload', 'ShipmentsController@storeUpload');
+Route::get('shipments/status-upload', 'ShipmentsController@statusUpload');
+Route::post('shipments/status-upload', 'ShipmentsController@storeStatusUpload');
 Route::get('label/{token}', 'ShipmentsController@label');
 Route::get('labels/{token}/{userid}', 'ShipmentsController@labels');
 
