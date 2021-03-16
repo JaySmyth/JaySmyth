@@ -2,13 +2,14 @@
 
 namespace App\Jobs;
 
-use App\Models\Carrier;
-use App\CarrierAPI\Facades\CarrierAPI;
 use App\CarrierAPI\CompanyServices;
+use App\CarrierAPI\Facades\CarrierAPI;
+use App\Models\Carrier;
 use App\Models\Country;
 use App\Models\Department;
 use App\Models\Postcode;
 use App\Models\Service;
+use App\Models\Shipment;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
@@ -42,9 +43,9 @@ class ImportShipments implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param string $path
-     * @param int $importConfigId
-     * @param User $user
+     * @param  string  $path
+     * @param  int  $importConfigId
+     * @param  User  $user
      *
      * @return void
      */
@@ -164,8 +165,8 @@ class ImportShipments implements ShouldQueue
     /**
      * Process a row read from the uploaded file.
      *
-     * @param type $rowNumber
-     * @param type $data
+     * @param  type  $rowNumber
+     * @param  type  $data
      *
      * @return void
      */
@@ -181,13 +182,15 @@ class ImportShipments implements ShouldQueue
 
         // Too many lines in the CSV file
         if ($this->failedMaxRows) {
-            $this->setRowFailed($rowNumber, [0 => 'Too many lines in CSV file. Max permitted: ' . $this->maxRows . ' lines']);
+            $this->setRowFailed($rowNumber, [0 => 'Too many lines in CSV file. Max permitted: '.$this->maxRows.' lines']);
+
             return false;
         }
 
         // Invalid number of fields, return false
         if (count($data) != count($this->fields)) {
             $this->setRowFailed($rowNumber, [0 => 'Invalid number of fields detected. Detected '.count($data).' fields. '.count($this->fields).' required']);
+
             return false;
         }
 
@@ -261,14 +264,18 @@ class ImportShipments implements ShouldQueue
             return false;
         }
 
-        if ($this->shipmentExists()) {
-            $this->setRowFailed($rowNumber, [0 => 'Shipment already exists']);
+        if (! empty($this->row['save_only'])) {
+            $result = $this->saveShipment($this->row);
+        } else {
+            if ($this->shipmentExists()) {
+                $this->setRowFailed($rowNumber, [0 => 'Shipment already exists']);
 
-            return false;
+                return false;
+            }
+
+            // Call the api to create shipment
+            $result = CarrierAPI::createShipment($this->row);
         }
-
-        // Call the api to create shipment
-        $result = CarrierAPI::createShipment($this->row);
 
         // If no errors, return false and add to error array
         if (! isset($result['errors']) || $result['errors'] == []) {
@@ -285,7 +292,7 @@ class ImportShipments implements ShouldQueue
     /**
      * Read one line at a time and create an array of field names and values.
      *
-     * @param type $data
+     * @param  type  $data
      *
      * @return void
      */
@@ -310,8 +317,8 @@ class ImportShipments implements ShouldQueue
     /**
      * Add a row to failed results.
      *
-     * @param type $rowNumber
-     * @param type $errors
+     * @param  type  $rowNumber
+     * @param  type  $errors
      *
      * @return void
      */
@@ -409,6 +416,24 @@ class ImportShipments implements ShouldQueue
     }
 
     /**
+     * Ensure numeric customs value.
+     *
+     * @param $customsValue
+     *
+     * @return float
+     */
+    protected function getCustomsValue()
+    {
+        $customsValue = (empty($this->row['customs_value']) || $this->row['customs_value'] < 1 || empty($this->row['customs_value'])) ? $this->importConfig->default_customs_value : trim(round($this->row['customs_value']));
+
+        if (! is_numeric($customsValue)) {
+            return (float) str_replace(' ', '.', $customsValue);
+        }
+
+        return $customsValue;
+    }
+
+    /**
      * Builds package array since Package details cannot be set
      * Using a one line per shipment import.
      */
@@ -439,28 +464,22 @@ class ImportShipments implements ShouldQueue
          */
         // Has User supplied Package Dims
         if ($this->packageDimsSupplied($this->row)) {
-
             // Use Supplied Dims
             $this->setPackageDims($this->row);
         } else {
-
             // If Default dims defined for package type
             if ($packaging && $this->packageDimsSupplied($packaging->toArray())) {
-
                 // Use Default Package Dims
                 $this->calcDimsUsingPackaging($packaging);
             } else {
-
                 // If supplied, use Total Shipment Volumetric Weight to apportion across packages
                 if (isset($this->row['volumetric_weight']) && $this->row['volumetric_weight'] > 0) {
                     $this->calcDimsUsingWeight($this->row['volumetric_weight']);
                 } else {
-
                     // If supplied, use Total Shipment Actual Weight to apportion across packages
                     if (isset($this->row['weight']) && $this->row['weight'] > 0) {
                         $this->calcDimsUsingWeight($this->row['weight']);
                     } else {
-
                         // Packaging type not defined
                         $this->errors[] = 'Unable to calculate volumetric weight';
                     }
@@ -472,22 +491,19 @@ class ImportShipments implements ShouldQueue
     private function setPackageWeight($pkgWeight = 0)
     {
         $total_weight = 0;
-        if ($pkgWeight<0.5) {
+        if ($pkgWeight < 0.5) {
             $pkgWeight = 0.5;
         }
         for ($i = 0; $i < $this->row['pieces']; $i++) {
             if ($pkgWeight > 0) {
-
                 // Set package weight to PackageType weight and calc Shipment Total Weight
                 $this->row['packages'][$i]['weight'] = $pkgWeight;
                 $this->row['weight'] = $pkgWeight * $this->row['pieces'];
             } else {
                 if ($this->row['pieces'] == 1) {
-
                     // If only one piece set to Shipment Weight
                     $this->row['packages'][$i]['weight'] = $this->row['weight'];
                 } else {
-
                     // ensure total of individual package weight equals the record['weight']
                     $calcWeight = ceil(round(($this->row['weight'] - $total_weight) / ($this->row['pieces'] - $i), 2) * 2) / 2;
                     if ($calcWeight < .5) {
@@ -514,7 +530,6 @@ class ImportShipments implements ShouldQueue
      */
     private function packageDimsSupplied($data)
     {
-
         // Check to see if user has supplied dims
         if (isset($data['length']) && isset($data['width']) && isset($data['height'])) {
             if ($data['length'] > 0 && $data['width'] > 0 && $data['height'] > 0) {
@@ -552,10 +567,8 @@ class ImportShipments implements ShouldQueue
     {
         // Do this for each Package
         for ($i = 0; $i < $this->row['pieces']; $i++) {
-
             // If Dims supplied for Packaging type use them
             if ($packaging['length'] > 0 && $packaging['width'] > 0 && $packaging['height'] > 0) {
-
                 // Set dims to PackageType dims
                 $this->setDimsForPackage($i, $packaging['length'], $packaging['width'], $packaging['height']);
             }
@@ -566,7 +579,7 @@ class ImportShipments implements ShouldQueue
      * Sets package weight to supplied package weight or
      * Guesses it from volumetric or actual weight.
      *
-     * @param type $packagingWeight
+     * @param  type  $packagingWeight
      */
     private function calcDimsUsingWeight($totalWeight)
     {
@@ -680,7 +693,6 @@ class ImportShipments implements ShouldQueue
         }
 
         switch ($carrierChoice) {
-
             case 'cost':
             case 'price':
                 $companyServices = new CompanyServices();
@@ -697,6 +709,34 @@ class ImportShipments implements ShouldQueue
         }
 
         return false;
+    }
+
+    protected function saveShipment($row)
+    {
+        $shipment = Shipment::create([
+                'consignment_number' => nextAvailable('CONSIGNMENT'),
+                'form_values' => json_encode($row + ['eori' => $this->company->eori]),
+                'mode_id' => 1,
+                'status_id' => 1,
+                'route_id' => 1,
+                'department_id' => 1,
+                'depot_id' => 1,
+                'service_id' => 1,
+                'ship_date' => now()
+            ] + $row);
+
+        if ($shipment) {
+            return [
+                'ifs_consignment_number' => $shipment->consignment_number,
+                'consignment_number' => $shipment->consignment_number,
+                'carrier' => 'SAVED - Uknown',
+                'tracking_url' => null,
+            ];
+        }
+
+        return [
+            'errors' => [0 => 'Failed to save shipment']
+        ];
     }
 
     /**
@@ -723,8 +763,8 @@ class ImportShipments implements ShouldQueue
     /**
      * Add a row to the successful results.
      *
-     * @param type $rowNumber
-     * @param type $result
+     * @param  type  $rowNumber
+     * @param  type  $result
      *
      * @return void
      */
@@ -756,8 +796,8 @@ class ImportShipments implements ShouldQueue
     /**
      * Create a csv file from an array of rows.
      *
-     * @param array $rows
-     * @param string $fileName
+     * @param  array  $rows
+     * @param  string  $fileName
      *
      * @return void
      */
@@ -819,7 +859,8 @@ class ImportShipments implements ShouldQueue
     /**
      * The job failed to process.
      *
-     * @param Exception $exception
+     * @param  Exception  $exception
+     *
      * @return void
      */
     public function failed($exception)
@@ -829,22 +870,5 @@ class ImportShipments implements ShouldQueue
 
         // Mail end user to notify thenm of an issue
         Mail::to($this->user->email)->cc($this->importConfig->cc_import_results_email ?: [])->bcc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Shipment Upload Failed', 'There was a problem with the file uploaded. Please check the values in the CSV file and try again.', $this->path));
-    }
-
-    /**
-     * Ensure numeric customs value.
-     *
-     * @param $customsValue
-     * @return float
-     */
-    protected function getCustomsValue()
-    {
-        $customsValue = (empty($this->row['customs_value']) || $this->row['customs_value'] < 1 || empty($this->row['customs_value'])) ? $this->importConfig->default_customs_value : trim(round($this->row['customs_value']));
-
-        if (! is_numeric($customsValue)) {
-            return (float) str_replace(' ', '.', $customsValue);
-        }
-
-        return $customsValue;
     }
 }
