@@ -9,6 +9,7 @@
 namespace App\CarrierAPI\Fedex;
 
 use App\Models\Carrier;
+use App\Models\Service;
 use App\Models\CarrierPackagingType;
 
 /**
@@ -41,7 +42,7 @@ class FedexSettings
     public $labelStockType;
     public $logo;
 
-    public function __construct()
+    public function __construct($depotId = 1)
     {
 
         // Supported Options
@@ -64,7 +65,8 @@ class FedexSettings
         $this->carrier = Carrier::where('code', 'fedex')->first();
 
         // Define available services
-        $services = $this->carrier->services;
+        $services = Service::where('carrier_id', $this->carrier->id)->where('depot_id', $depotId)->get();
+
         foreach ($services as $svc) {
             $this->svc[$svc->code] = $svc->carrier_code;
         }

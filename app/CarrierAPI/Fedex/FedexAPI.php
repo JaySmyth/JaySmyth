@@ -58,8 +58,6 @@ class FedexAPI extends CarrierBase
                 ];
                 break;
         }
-
-        $this->fedex = new FedexSettings();
     }
 
     public function validateDeleteShipment($shipment)
@@ -319,6 +317,12 @@ class FedexAPI extends CarrierBase
 
     public function createShipment($shipment)
     {
+        if (isset($shipment['depot_id'])) {
+            $depotId = $shipment['depot_id'];
+        } else {
+            $depotId = '1';
+        }
+        $this->fedex = new FedexSettings($depotId);
         $response = [];
         $shipment = $this->preProcess($shipment);
 
@@ -326,6 +330,7 @@ class FedexAPI extends CarrierBase
         if ($errors != []) {
             return $this->generateErrorResponse($response, $errors);
         } else {
+
             // Build Message
             $message = $this->buildShipmentMsg($shipment);
 
