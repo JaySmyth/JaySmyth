@@ -726,31 +726,32 @@ class Shipment extends Model
         $cutOff = $this->ship_date->addWeekdays($slaInDays)->endOfDay();
 
         if ($this->delivery_date <= $cutOff) {
-            return 'none';
-        }
+            $delay = 'none';
+        } else {
+            $delay = 'carrier';
+            $receiverDelays = [
+                'Alternate delivery requested',
+                'Customer premises closed',
+                'Business closed',
+                'Customer not available',
+                'Future delivery requested',
+                'Incorrect address',
+                'Local delivery restriction',
+                'Refused by recipient',
+                'revised delivery address',
+                'Incorrect recipient address',
+            ];
 
-        $receiverDelays = [
-            'Alternate delivery requested',
-            'Customer premises closed',
-            'Business closed',
-            'Customer not available',
-            'Future delivery requested',
-            'Incorrect address',
-            'Local delivery restriction',
-            'Refused by recipient',
-            'revised delivery address',
-            'Incorrect recipient address',
-        ];
-
-        foreach ($this->tracking as $tracking) {
-            foreach ($receiverDelays as $delay) {
-                if (stristr($tracking->message, $delay)) {
-                    return 'receiver';
+            foreach ($this->tracking as $tracking) {
+                foreach ($receiverDelays as $receiverDelay) {
+                    if (stristr($tracking->message, $receiverDelay)) {
+                        $delay = 'receiver';
+                    }
                 }
             }
         }
 
-        return 'carrier';
+        $this->delay = $delay;
     }
 
     /**
@@ -968,6 +969,7 @@ class Shipment extends Model
         $this->pod_signature = $podSignature;
         $this->pod_image = $podImage;
         $this->delivery_date = toCarbon($deliveryDate);
+        $this->getDelay();  // Check to see if delivery was late and if so was it caused by Carrier or Receiver
         $this->save();
 
         // Set the shipment status to "delivered"

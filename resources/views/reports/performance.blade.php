@@ -78,7 +78,7 @@
                 </tbody>
             </table>
 
-            @foreach(['receiver', 'carrier', 'unknown', 'none'] as $delay)
+            @foreach(['receiver', 'carrier', 'unknown'] as $delay)
 
                 @if(isset($results[$delay]))
                     <h4 class="mb-3" id="{{ $delay }}">Delay - {{ ucfirst($delay) }} <span class="badge badge-pill badge-secondary badge-sm ml-sm-1">{{ count($results[$delay]) }}</span></h4>
