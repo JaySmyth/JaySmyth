@@ -3,7 +3,6 @@
 namespace App\Console\Commands\Maintenance;
 
 use App\Models\Shipment;
-use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class CancelOldShipments extends Command
@@ -41,18 +40,16 @@ class CancelOldShipments extends Command
     {
         $total = 0;
 
-        $cutOff = Carbon::now()->subDays(15)->endOfDay();
-
         /*
          * Cancel shipments before cut off
          */
-        $shipments = Shipment::whereNull('legacy')
-                ->whereReceived(0)
-                ->whereDelivered(0)
-                ->where('ship_date', '<=', $cutOff)
-                ->whereNull('invoice_run_id')
-                ->hasStatus('pre_transit')
-                ->get();
+        $shipments = Shipment::whereReceived(0)
+            ->whereDelivered(0)
+            ->where('created_at', '>', now()->subMonth())
+            ->where('ship_date', '<=', now()->subDays(15)->endOfDay())
+            ->whereNull('invoice_run_id')
+            ->hasStatus('pre_transit')
+            ->get();
 
         foreach ($shipments as $shipment) {
             $shipment->setCancelled(2);
@@ -64,14 +61,13 @@ class CancelOldShipments extends Command
          * Cancel shipments from test companies
          */
         $shipments = Shipment::select('shipments.*')
-                ->join('companies', 'shipments.company_id', '=', 'companies.id')
-                ->where('companies.testing', 1)
-                ->whereNull('shipments.legacy')
-                ->where('received', 0)
-                ->where('delivered', 0)
-                ->whereNull('invoice_run_id')
-                ->hasStatus('pre_transit')
-                ->get();
+            ->join('companies', 'shipments.company_id', '=', 'companies.id')
+            ->where('companies.testing', 1)
+            ->where('received', 0)
+            ->where('delivered', 0)
+            ->whereNull('invoice_run_id')
+            ->hasStatus('pre_transit')
+            ->get();
 
         foreach ($shipments as $shipment) {
             $shipment->setCancelled(2);
