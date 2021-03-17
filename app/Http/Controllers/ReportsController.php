@@ -336,6 +336,10 @@ class ReportsController extends Controller
             ->chunk(500, function ($shipments) use (&$total, &$results) {
                 foreach ($shipments as $shipment) {
                     $total++;
+                    if ($shipment->delay == '') {
+                        $shipment->getDelay();
+                        $shipment->save();
+                    }
                     $results[$shipment->delay][] = $shipment;
                 }
             });
