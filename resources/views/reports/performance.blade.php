@@ -2,6 +2,7 @@
 
 @section('content')
 
+dd("Blade");
     <div class="row">
 
         <div class="col-sm-2 d-none d-sm-block bg-light sidebar">
@@ -78,7 +79,7 @@
                 </tbody>
             </table>
 
-            @foreach(['receiver', 'carrier', 'unknown'] as $delay)
+            @foreach([] as $delay)      <!-- ['receiver', 'carrier', 'unknown'] -->
 
                 @if(isset($results[$delay]))
                     <h4 class="mb-3" id="{{ $delay }}">Delay - {{ ucfirst($delay) }} <span class="badge badge-pill badge-secondary badge-sm ml-sm-1">{{ count($results[$delay]) }}</span></h4>
@@ -103,10 +104,10 @@
                         </thead>
                         <tbody>
 
-                        @foreach($results[$delay] as $shipment)
-
+                        @foreach($results[$delay] as $shipmentId)
+                            <?php $shipment = App\Models\Shipment::find($shipmentId); ?>
                             <tr>
-                                <td><a href="{{ url('/shipments', $shipment->id) }}"
+                                <td><a href="{{ url('/shipments', $shipmentId) }}"
                                        class="consignment-number">{{$shipment->consignment_number}}</a></td>
                                 <td>{{$shipment->ship_date->timezone(Auth::user()->time_zone)->format(Auth::user()->date_format)}}</td>
                                 @if(Auth::user()->hasIfsRole())
@@ -134,7 +135,6 @@
 
 
             @endforeach
-
 
         </main>
 
