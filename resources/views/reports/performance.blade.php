@@ -2,7 +2,6 @@
 
 @section('content')
 
-dd("Blade");
     <div class="row">
 
         <div class="col-sm-2 d-none d-sm-block bg-light sidebar">
