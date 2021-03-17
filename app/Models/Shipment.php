@@ -723,7 +723,7 @@ class Shipment extends Model
     {
         $slaInHours = $this->getSla();
         $slaInDays = $slaInHours / 24;
-        $cutOff = $this->ship_date->addWeekdays($slaInDays)->endOfDay();
+        $cutOff = $this->ship_date->addWeekdays($slaInDays)->endOfDay()->format('Y-m-d H:i:s');
         $delay = 'carrier';
 
         if ($this->delivery_date <= $cutOff) {
