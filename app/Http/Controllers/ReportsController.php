@@ -340,7 +340,7 @@ class ReportsController extends Controller
                         $shipment->getDelay();
                         $shipment->save();
                     }
-                    $results[$shipment->delay][] = $shipment;
+                    $results[$shipment->delay][] = $shipment->id;
                 }
             });
 
