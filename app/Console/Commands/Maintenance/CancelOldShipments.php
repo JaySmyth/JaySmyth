@@ -45,7 +45,7 @@ class CancelOldShipments extends Command
          */
         $shipments = Shipment::whereReceived(0)
             ->whereDelivered(0)
-            ->where('created_at', '>', now()->subMonth())
+            ->where('created_at', '>', now()->subYear())
             ->where('ship_date', '<=', now()->subDays(15)->endOfDay())
             ->whereNull('invoice_run_id')
             ->whereIn('status_id', [2, 11])
