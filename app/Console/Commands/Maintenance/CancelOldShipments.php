@@ -48,7 +48,7 @@ class CancelOldShipments extends Command
             ->where('created_at', '>', now()->subMonth())
             ->where('ship_date', '<=', now()->subDays(15)->endOfDay())
             ->whereNull('invoice_run_id')
-            ->hasStatus('pre_transit')
+            ->whereIn('status_id', [2, 11])
             ->get();
 
         foreach ($shipments as $shipment) {
@@ -66,7 +66,7 @@ class CancelOldShipments extends Command
             ->where('received', 0)
             ->where('delivered', 0)
             ->whereNull('invoice_run_id')
-            ->hasStatus('pre_transit')
+            ->whereIn('status_id', [2, 11])
             ->get();
 
         foreach ($shipments as $shipment) {
