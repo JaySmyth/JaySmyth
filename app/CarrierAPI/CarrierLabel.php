@@ -24,8 +24,8 @@ abstract class CarrierLabel
     protected $font = 'helvetica';
 
     /**
-     * @param type $shipment
-     * @param type $data
+     * @param  type  $shipment
+     * @param  type  $data
      */
     public function __construct($shipment = null, $serviceCode = null, $data = null, $routeId = 1, $splitServiceBox = false)
     {
@@ -58,12 +58,20 @@ abstract class CarrierLabel
     /**
      * Import a page.
      *
-     * @param type $pageNumber
+     * @param  type  $pageNumber
      */
-    protected function importPageFromTemplate($pageNumber, $x=1, $y=1)
+    protected function importPageFromTemplate($pageNumber, $x = 1, $y = 1, $width = null, $height = null)
     {
         $tpl = $this->pdf->importPage($pageNumber);
-        $originalPdfSize = $this->pdf->getTemplateSize($tpl);
+
+        if (is_numeric($width) && is_numeric($height)) {
+            $originalPdfSize = [
+                'w' => $width,
+                'h' => $height
+            ];
+        } else {
+            $originalPdfSize = $this->pdf->getTemplateSize($tpl);
+        }
 
         // Add a blank page
         $this->addPage();
@@ -82,8 +90,8 @@ abstract class CarrierLabel
     /**
      * Insert a base64 image to the PDF.
      *
-     * @param string $base64Image
-     * @param array $options
+     * @param  string  $base64Image
+     * @param  array  $options
      */
     protected function addImage($base64Image, $options)
     {
@@ -93,10 +101,12 @@ abstract class CarrierLabel
         $this->pdf->StopTransform();
     }
 
+
     /**
      * Return the generated PDF.
      *
-     * @param type $output
+     * @param  type  $output
+     *
      * @return type
      */
     protected function output($output = 'S')
@@ -111,7 +121,8 @@ abstract class CarrierLabel
     /**
      * Return TCPDF 1D barcode styling array.
      *
-     * @param type $fontsize
+     * @param  type  $fontsize
+     *
      * @return type array
      */
     protected function getBarcodeStyle($text = true, $fontsize = 10)
@@ -149,7 +160,6 @@ abstract class CarrierLabel
 
     protected function buildServicebox($x, $y, $w, $h, $service, $heading, $fillColour, $textColour)
     {
-
         // Initialize Font and Fill colours
         $this->pdf->SetTextColor($textColour, $textColour, $textColour);
         $this->pdf->SetFillColor($fillColour, $fillColour, $fillColour);
@@ -178,7 +188,6 @@ abstract class CarrierLabel
 
     protected function addLongServiceBox($x, $y, $w, $h, $service)
     {
-
         // Create IFS Service Box
         $this->pdf->SetFillColor(255, 255, 255);
         $this->pdf->SetLineWidth(1);
@@ -199,7 +208,6 @@ abstract class CarrierLabel
 
     protected function removeLogo($x, $y, $w, $h)
     {
-
         // Remove Logo
         $this->pdf->SetXY($x, $y);
         $this->pdf->Cell($w, $h, '', 0, 0, 0, true);

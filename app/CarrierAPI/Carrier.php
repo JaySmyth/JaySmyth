@@ -2,14 +2,12 @@
 
 namespace App\CarrierAPI;
 
-use App\CarrierAPI\CWide\CWideAPI;
 use App\CarrierAPI\DHL\DHLAPI;
-use App\CarrierAPI\DHLGlobalMail\DHLGlobalMailAPI;
+use App\CarrierAPI\DX\DXAPI;
 use App\CarrierAPI\ExpressFreight\ExpressFreightAPI;
 use App\CarrierAPI\ExpressFreightNI\ExpressFreightNIAPI;
 use App\CarrierAPI\Fedex\FedexAPI;
 use App\CarrierAPI\IFS\IFSAPI;
-use App\CarrierAPI\PrimaryFreight\PrimaryFreightAPI;
 use App\CarrierAPI\TNT\TNTAPI;
 use App\CarrierAPI\UPS\UPSAPI;
 use App\CarrierAPI\XDP\XDPAPI;
@@ -30,10 +28,6 @@ class Carrier
         switch (strtolower($instanceType)) {
             case 'fedex':
                 return new FedexAPI($mode);
-                break;
-
-            case 'cwide':
-                return new CWideAPI($mode);
                 break;
 
             case 'xdp':
@@ -60,21 +54,17 @@ class Carrier
                 return new ExpressFreightNIAPI($mode);
                 break;
 
-            case 'pri':
-                return new PrimaryFreightAPI($mode);
-                break;
-
             case 'ifs':
                 return new IFSAPI($mode);
                 break;
 
-            case 'dhlmail':
-                return new DHLGlobalMailAPI($mode);
+            case 'dx':
+                return new DXAPI($mode);
                 break;
 
             default:
                 // Do Nothing
-                dd('Unable to build carrier for : '.strtolower($carrier_code));
+                dd('Unable to build carrier');
                 break;
         }
     }
