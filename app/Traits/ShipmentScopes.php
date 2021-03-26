@@ -514,7 +514,11 @@ trait ShipmentScopes
             ->where('mode_id', 1)
             ->where('companies.legacy_pricing', 0)
             ->where('status_id', '<>', 7)
-            ->where('shipments.id', '>', 1222316)
+            // ->where('shipments.id', '>', 1222316)
+            ->where(function ($query) {
+                return $query->where('shipments.id', "1068787")
+                    ->orWhere('shipments.id', '>', 1222316);
+            })
             ->whereNotIn('companies.id', $excludedCompanies)
             ->where(function ($query) {
                 return $query->whereIn('status_id', ["4", "5", "6"])
@@ -621,5 +625,4 @@ trait ShipmentScopes
             ->where('companies.plt_enabled', true)
             ->where('manifest_id', '>', 1);
     }
-
 }
