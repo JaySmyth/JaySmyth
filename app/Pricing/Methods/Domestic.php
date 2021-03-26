@@ -60,6 +60,8 @@ class Domestic extends PricingModel
             case 'uk48r':
             case 'uk48p':
             case 'uknc':
+            case 'gb24':
+            case 'gb24f':
                 $this->zone = $domesticZones->getZone($this->shipment, $this->model, $this->isReturn());
                 $this->costsRequired = 'Y';
                 break;
