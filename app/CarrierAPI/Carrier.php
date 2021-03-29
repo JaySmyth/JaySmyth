@@ -2,6 +2,7 @@
 
 namespace App\CarrierAPI;
 
+use App\CarrierAPI\CWide\CWideAPI;
 use App\CarrierAPI\DHL\DHLAPI;
 use App\CarrierAPI\DX\DXAPI;
 use App\CarrierAPI\ExpressFreight\ExpressFreightAPI;
@@ -28,6 +29,10 @@ class Carrier
         switch (strtolower($instanceType)) {
             case 'fedex':
                 return new FedexAPI($mode);
+                break;
+
+            case 'cwide':
+                return new CWideAPI($mode);
                 break;
 
             case 'xdp':
