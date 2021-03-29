@@ -110,7 +110,7 @@ class Kernel extends ConsoleKernel
          */
         $schedule->command('ifs:auto-manifest')->weekdays()->everyMinute();
         $schedule->command('ifs:cancel-old-shipments')->dailyAt('07:00');
-        $schedule->command('ifs:delete-saved-shipments')->dailyAt('06:55');
+        //$schedule->command('ifs:delete-saved-shipments')->dailyAt('06:55');
         $schedule->command('ifs:update-stagnant-shipments')->dailyAt('07:05');
         $schedule->command('ifs:process-shipment-uploads')->withoutOverlapping(2);
         $schedule->command('ifs:check-for-duplicate-shipments')->twiceDaily(12, 14);
