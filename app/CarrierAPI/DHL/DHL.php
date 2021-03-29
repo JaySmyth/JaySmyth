@@ -305,6 +305,7 @@ class DHL
                                 'PersonName' => $this->shipment['recipient_name'],
                                 'CompanyName' => (! empty($this->shipment['recipient_company_name'])) ? $this->shipment['recipient_company_name'] : $this->shipment['recipient_name'],
                                 'PhoneNumber' => $this->shipment['recipient_telephone'],
+                                'EmailAddress' => (! empty($this->shipment['recipient_email'])) ? $this->shipment['recipient_email'] : '',
                             ],
                             'Address' => $this->addAddress('recipient'),
                         ],
