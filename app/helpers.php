@@ -390,7 +390,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             break;
         case 'statuses':
             $result = App\Models\Status::select('name', 'id')->where('id', '>', 0)
-                ->where('id', '<', 13)->pluck('name', 'id')->toArray();
+                ->where('id', '<', 13)->orWhere('id', 19)->pluck('name', 'id')->toArray();
             $result = Arr::add($result, 'S', 'Shipped (All except cancelled)');
             break;
         case 'statusCodes':
@@ -828,7 +828,7 @@ function isGbToNi($senderCountryCode, $recipientCountryCode, $senderPostcode, $r
     // Shipping within the UK
     if (isUkDomestic($senderCountryCode) && strtoupper($recipientCountryCode) == 'GB') {
         // Sender postcode not BT - recipient postcode is BT
-        if (!isBtPostcode($senderPostcode) && isBtPostcode($recipientPostcode)) {
+        if (! isBtPostcode($senderPostcode) && isBtPostcode($recipientPostcode)) {
             return true;
         }
     }
@@ -1229,16 +1229,16 @@ function identifyDirection($shipment)
     // Shipper and Recipient in UK
     if ($shipment['sender_country_code'] == $shipment['recipient_country_code'] && $shipment['sender_country_code'] == 'GB') {
         if ((substr($shipment['sender_postcode'], 0, 2) == 'BT') && (substr(
-            $shipment['recipient_postcode'],
-            0,
-            2
-        ) == 'BT')) {
+                    $shipment['recipient_postcode'],
+                    0,
+                    2
+                ) == 'BT')) {
             $direction = 'internal';
         } elseif ((substr($shipment['sender_postcode'], 0, 2) == 'BT') && (substr(
-            $shipment['recipient_postcode'],
-            0,
-            2
-        ) != 'BT')) {
+                    $shipment['recipient_postcode'],
+                    0,
+                    2
+                ) != 'BT')) {
             $direction = 'export';
         } else {
             $direction = 'import';
@@ -1297,6 +1297,7 @@ function identifyDepartment($shipment)
             if (isUkDomestic($shipment['sender_country_code']) && isUkDomestic($shipment['recipient_country_code'])) {
                 return $direction == 'import' ? 'IFCUK' : 'IFCUK';
             }
+
             // Must be an International Shipment
             return $direction == 'import' ? 'IFCIM' : 'IFCEX';
             break;
@@ -1383,11 +1384,6 @@ function getProgressBarColour($statusCode)
             return 'red';
         case 'saved':
             return 'yellow';
-        case 'pre_transit':
-        case'received':
-        case 'in_transit':
-        case 'out_for_delivery':
-            return 'blue';
         case 'on_hold':
         case'return_to_sender':
             return 'orange';
