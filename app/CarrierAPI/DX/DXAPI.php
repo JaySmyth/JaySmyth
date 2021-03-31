@@ -32,6 +32,11 @@ class DXAPI extends \App\CarrierAPI\CarrierBase
 
         $reply = $dx->sendRequest();
 
+        // Request unsuccessful - return errors
+        if (isset($reply['errors']) && count($reply['errors']) > 0) {
+            return $this->generateErrorResponse($response, $reply['errors']);
+        }
+
         // Prepare Response
         $response = $this->createShipmentResponse($reply, $shipment['service_code'], 1, $shipment);
 
@@ -90,10 +95,6 @@ class DXAPI extends \App\CarrierAPI\CarrierBase
     private function createShipmentResponse($reply, $serviceCode, $route_id, $shipment)
     {
         $response = $this->generateSuccess();
-
-        if (! isset($reply['ifs_consignment_number'])) {
-            //Mail::to('it@antrim.ifsgroup.com')->queue(new \App\Mail\GenericError('DX - IFS consignment not set', $reply));
-        }
 
         $response['route_id'] = $route_id;
         $response['carrier'] = 'DX';

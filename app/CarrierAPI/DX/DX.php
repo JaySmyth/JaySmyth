@@ -62,9 +62,9 @@ class DX
         $service = $this->getService();
 
         if (! $service) {
-            $error['ShipmentResponse']['Notification'][0]['Message'] = 'Service unavailable. Please contact Courier.';
+            $reply['errors'][] = 'Service unavailable. Please contact Courier.';
 
-            return $error;
+            return $reply;
         }
 
         // Get an IFS consignment number
