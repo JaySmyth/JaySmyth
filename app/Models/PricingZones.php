@@ -12,7 +12,7 @@ class PricingZones extends Model
      *
      * @return $zone
      */
-    public function getZone($data, $model = '')
+    public function getZone($data, $model = '-1')
     {
         /*
          * ***************************************
@@ -21,14 +21,14 @@ class PricingZones extends Model
          * ***************************************
          */
 
-        if ($model > '') {
-
-            // Request to use specific pricing model
-            $criteria['model_id'] = $model;
-        } else {
+        if ($model == '-1') {
 
             // Use default model for the carrier
             $criteria['model_id'] = $this->carrierModel[$data['carrier_id']];
+        } else {
+
+            // Request to use specific pricing model
+            $criteria['model_id'] = $model;
         }
 
         if (isset($data['ship_date'])) {
