@@ -9,7 +9,6 @@ use Illuminate\Support\Str;
 class DX
 {
     protected $shipment;
-    protected $customerId;
     protected $username;
     protected $password;
     protected $url;
@@ -21,27 +20,19 @@ class DX
 
     public function __construct($shipment, $mode)
     {
-        // Data array passed through
         $this->shipment = $shipment;
-
-        // Set the mode
         $this->mode = $mode;
-
-        $this->url = 'https://despatch-api.thedx.co.uk/DXCKService/';
+        $this->url = config('services.dx.url');
+        $this->user = config('services.dx.user');
+        $this->password = config('services.dx.password');
 
         // Define the environment
         switch ($this->mode) {
             case 'test':
-                $this->customerId = '14337622';
-                $this->username = 'IFSTestAPI';
-                $this->password = '99IfSTesTAPI523';
                 $this->serviceDescription = 'DX Iver Leave Safe, 24 Hour, Leave Safe DX2H, 08:00 - 18:00';
                 break;
 
             default:
-                $this->customerId = '14631619';
-                $this->username = 'IFSProdAPI';
-                $this->password = '88ProdIfSApi48';
                 $this->serviceDescription = 'IFS Global Logistics Signature Box, 24 Hour, Signature, 08:00 - 18:00';
                 break;
         }
@@ -108,7 +99,7 @@ class DX
     {
         $request = [
             'serviceRequest' => [
-                'customerID' => $this->customerId,
+                'customerID' => $this->shipment['bill_shipping_account'],
                 'serviceFeatures' => [
                     [
                         'name' => 'deliveryLocationType',
@@ -127,7 +118,7 @@ class DX
                 ]
             ],
             'serviceHeader' => [
-                'userId' => $this->username,
+                'userId' => $this->user,
                 'password' => $this->password
             ]
         ];
@@ -147,9 +138,11 @@ class DX
         // JSON to array
         $services = json_decode($response, true);
 
-        foreach ($services['Service'] as $service) {
-            if ($service['description'] == $this->serviceDescription) {
-                return $service['legacyService'];
+        if (! empty($services['Service'])) {
+            foreach ($services['Service'] as $service) {
+                if ($service['description'] == $this->serviceDescription) {
+                    return $service['legacyService'];
+                }
             }
         }
 
@@ -183,7 +176,7 @@ class DX
     {
         return [
             'order' => [
-                'customerID' => $this->customerId,
+                'customerID' => $this->shipment['bill_shipping_account'],
                 'orderType' => 'Cons',
                 'sourceSystem' => 'IFS API',
                 'orderStatus' => [
@@ -283,7 +276,7 @@ class DX
                 'labelType' => 'PDF'
             ],
             'serviceHeader' => [
-                'userId' => $this->username,
+                'userId' => $this->user,
                 'password' => $this->password
             ]
         ];

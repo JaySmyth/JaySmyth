@@ -57,4 +57,10 @@ return [
         'url' => env('UPS_API_URL'),
     ],
 
+    'dx' => [
+        'user' => env('DX_API_USER'),
+        'password' => env('DX_API_PASSWORD'),
+        'url' => env('DX_API_URL'),
+    ]
+
 ];
