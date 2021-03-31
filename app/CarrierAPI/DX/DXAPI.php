@@ -3,6 +3,7 @@
 namespace App\CarrierAPI\DX;
 
 use App\Models\Service;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * Description of DXAPI.
@@ -90,6 +91,10 @@ class DXAPI extends \App\CarrierAPI\CarrierBase
     {
         $response = $this->generateSuccess();
 
+        if (! isset($reply['ifs_consignment_number'])) {
+            Mail::to('it@antrim.ifsgroup.com')->queue(new \App\Mail\GenericError('DX - IFS consignment not set', $reply));
+        }
+
         $response['route_id'] = $route_id;
         $response['carrier'] = 'DX';
         $response['ifs_consignment_number'] = $reply['ifs_consignment_number'];
@@ -98,7 +103,7 @@ class DXAPI extends \App\CarrierAPI\CarrierBase
         $response['pieces'] = $shipment['pieces'];
 
         foreach ($reply['packages'] as $i => $package) {
-            $response['packages'][$i]['sequence_number'] = $i +1;
+            $response['packages'][$i]['sequence_number'] = $i + 1;
             $response['packages'][$i]['carrier_tracking_code'] = $package['trackingNumber'];
             $response['packages'][$i]['barcode'] = $package['trackingNumber'];
         }
