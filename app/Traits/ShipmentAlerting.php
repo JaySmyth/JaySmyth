@@ -103,7 +103,7 @@ trait ShipmentAlerting
     private function sendArrangePickup()
     {
         // If sender postcode not "BT", alert the department. This is required so that any mainland pickups can be arranged etc.
-        if (! $this->originatesFromBtPostcode() && strtoupper($this->sender_country_code != 'US')) {
+        if (! $this->originatesFromBtPostcode() && strtoupper($this->sender_country_code != 'US')  && !in_array($this->company_id, [1015])) {
             Mail::to(['courier@antrim.ifsgroup.com','courieruk@antrim.ifsgroup.com'])->queue(new \App\Mail\ArrangePickup($this));
         }
     }
