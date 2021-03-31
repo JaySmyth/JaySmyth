@@ -573,9 +573,9 @@ class PricingModel
         //if ($this->shipDate >= '2020-11-02') {
         //    if (in_array(strtoupper($this->shipment['recipient_country_code']), ['US','CA'])) {
         //        $kgCost = .43;
-         //       $kgSales = .43;
+        //       $kgSales = .43;
         //    }
-       // }
+        // }
 
         // Do the actual calculation
         $chargeableWeight = round($this->chargeableWeight * 2)/2;
@@ -1042,17 +1042,21 @@ class PricingModel
                 ->first();
 
         // Get Rate Details for this Packaging Type/zone/pieces/weight incl discount if exists
-        return $this->getRateDetails(
-            $this->shipment['company_id'],
-            $this->rate['id'],
-            $this->shipment['service_id'],
-            $this->shipment['recipient_type'],
-            $this->packagingType,
-            $this->shipment['pieces'],
-            $rateDetail->break_point,
-            $this->zone,
-            $this->shipment['ship_date']
-        );
+        if ($rateDetail) {
+            return $this->getRateDetails(
+                $this->shipment['company_id'],
+                $this->rate['id'],
+                $this->shipment['service_id'],
+                $this->shipment['recipient_type'],
+                $rateDetail->package_type,
+                $this->shipment['pieces'],
+                $rateDetail->break_point,
+                $this->zone,
+                $this->shipment['ship_date']
+            );
+        } else {
+            return;
+        }
     }
 
     /**
