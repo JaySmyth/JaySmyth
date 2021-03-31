@@ -92,7 +92,7 @@ class DXAPI extends \App\CarrierAPI\CarrierBase
         $response = $this->generateSuccess();
 
         if (! isset($reply['ifs_consignment_number'])) {
-            Mail::to('it@antrim.ifsgroup.com')->queue(new \App\Mail\GenericError('DX - IFS consignment not set', $reply));
+            //Mail::to('it@antrim.ifsgroup.com')->queue(new \App\Mail\GenericError('DX - IFS consignment not set', $reply));
         }
 
         $response['route_id'] = $route_id;
