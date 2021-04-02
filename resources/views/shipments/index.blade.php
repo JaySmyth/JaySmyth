@@ -285,7 +285,7 @@
                     @endif
                 </td>
                 <td class="text-center text-nowrap">
-                    <span class="status {{$shipment->status->code ?? ''}}" data-placement="bottom" data-toggle="tooltip" data-original-title="{{$shipment->status->description}}">{{$shipment->status->name}}</span>
+                    <span class="status {{$shipment->status->code ?? ''}}" data-placement="bottom" data-toggle="tooltip" data-original-title="{{$shipment->status->description ?? ''}}">{{$shipment->status->name ?? ''}}</span>
                 </td>
                 <td class="text-center text-nowrap">
                     <!-- Cancel shipment - only enable if active shipment and not yet received -->

@@ -25,6 +25,9 @@ class XDP
         // Set the correct account number to use
         $this->billShippingAccount = $this->getBillShippingAccount($mode);
 
+        // Get Service Details
+        $service = Service::find($this->shipment['service_id']);
+
         // Define the environment
         switch ($mode) {
             case 'test':
@@ -33,13 +36,13 @@ class XDP
                 break;
 
             default:
-                $this->username = '0D933A';
+                $this->username = $service->account;
                 $this->password = 'VQW58U9H';
                 break;
         }
 
-        // Get the service code
-        $this->shipment['service'] = Service::find($this->shipment['service_id'])->carrier_code;
+        // Get the Services Carrier Code
+        $this->shipment['service'] = $service->carrier_code;
     }
 
     /**
