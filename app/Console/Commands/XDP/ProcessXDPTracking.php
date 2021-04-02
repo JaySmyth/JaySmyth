@@ -301,6 +301,7 @@ class ProcessXDPTracking extends Command
     {
         switch ($row['Status Type']) {
             case 'CREATE':
+            case 'PRINT':
                 return 'pre_transit';
 
             case 'COLLECT':
