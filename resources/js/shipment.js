@@ -855,6 +855,11 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
             return false;
         }
 
+        // NI to IE
+        if (senderPostcode.startsWith("BT") && recipientCountryCode == "IE") {
+            return true;
+        }
+
         // Domestic - goods originating in NI to UK mainland or NI local
         if (senderCountryCode == "GB" && recipientCountryCode == "GB") {
             if (senderPostcode.startsWith("BT")) {
