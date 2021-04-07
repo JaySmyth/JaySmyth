@@ -31,7 +31,7 @@
                     </label>
 
                     <div class="col-sm-6">
-                        {!! Form::select('service',  [16 => ' UPS UK24', 76 => 'XDP UK48', 84 =>'XDP GB24F (Mainland)', 19 => 'FedEx UK'], old('service') ?? '76', array('class' => 'form-control')) !!}
+                        {!! Form::select('service',  [84 =>'XDP GB24F (Mainland)'], old('service') ?? '84', array('class' => 'form-control')) !!}
 
                         @if ($errors->has('service'))
                             <span class="form-text"><strong>{{ $errors->first('service') }}</strong></span>
