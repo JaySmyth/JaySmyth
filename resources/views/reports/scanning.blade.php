@@ -28,6 +28,11 @@
             {!! Form::select('routed', dropDown('boolean', 'All'), Request::get('routed'), array('class' => 'form-control')) !!}
         </div>
 
+        <div class="form-group">
+            <label for="month">Depot</label>
+            {!! Form::select('depot', dropDown('associatedDepots', 'All Depots'), Request::get('depot'), array('class' => 'form-control')) !!}
+        </div>
+
         <button type="submit" class="btn btn-primary mt-3">Update Report</button>
 
         {!! Form::Close() !!}

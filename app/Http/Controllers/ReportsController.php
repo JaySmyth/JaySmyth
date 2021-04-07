@@ -27,7 +27,8 @@ class ReportsController extends Controller
     /**
      * List the available reports.
      *
-     * @param Request $request
+     * @param  Request  $request
+     *
      * @return type
      */
     public function index(Request $request)
@@ -46,8 +47,9 @@ class ReportsController extends Controller
     /**
      * Customs report for FedEx international shipments.
      *
-     * @param Request $request
-     * @param type $id
+     * @param  Request  $request
+     * @param  type  $id
+     *
      * @return type
      */
     public function fedexCustoms(Request $request, $id)
@@ -71,12 +73,12 @@ class ReportsController extends Controller
         $dropdown = [];
 
         foreach ($manifests as $m) {
-            $dropdown[$m->id] = $m->number . ' (' . $m->created_at->timezone($request->user()->time_zone)->format($request->user()->date_format) . ')';
+            $dropdown[$m->id] = $m->number.' ('.$m->created_at->timezone($request->user()->time_zone)->format($request->user()->date_format).')';
         }
 
         $parisShipments = $this->getCustomsReportShipments($report, $request, 'fedexRouteParis');
         $memphisShipments = $this->getCustomsReportShipments($report, $request, 'fedexRouteMemphis');
-        $range = number_format($criteria['customs_value_low'], 2) . 'GBP - ' . number_format($criteria['customs_value_high'], 2) . 'GBP';
+        $range = number_format($criteria['customs_value_low'], 2).'GBP - '.number_format($criteria['customs_value_high'], 2).'GBP';
 
         return view('reports.customs', compact('manifest', 'dropdown', 'report', 'parisShipments', 'memphisShipments', 'range'));
     }
@@ -84,9 +86,10 @@ class ReportsController extends Controller
     /**
      * Load the shipments for the FedEx customs report.
      *
-     * @param type $report
-     * @param type $request
-     * @param type $fedexRoute
+     * @param  type  $report
+     * @param  type  $request
+     * @param  type  $fedexRoute
+     *
      * @return type
      */
     private function getCustomsReportShipments($report, $request, $fedexRoute)
@@ -122,8 +125,9 @@ class ReportsController extends Controller
     /**
      * Shippers report.
      *
-     * @param Request $request
-     * @param type $id
+     * @param  Request  $request
+     * @param  type  $id
+     *
      * @return type
      */
     public function shippers(Request $request, $id)
@@ -162,8 +166,9 @@ class ReportsController extends Controller
     /**
      * Non shippers report.
      *
-     * @param Request $request
-     * @param type $id
+     * @param  Request  $request
+     * @param  type  $id
+     *
      * @return type
      */
     public function nonShippers(Request $request, $id)
@@ -203,8 +208,9 @@ class ReportsController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param type $id
+     * @param  Request  $request
+     * @param  type  $id
+     *
      * @return type
      */
     public function scanning(Request $request, $id)
@@ -224,14 +230,19 @@ class ReportsController extends Controller
             ->select('packages.*')
             ->join('shipments', 'packages.shipment_id', '=', 'shipments.id')
             ->whereBetween('ship_date', [Carbon::parse($date)->startOfDay(), Carbon::parse($date)->endOfDay()])
-            ->where('shipments.depot_id', 1)
             ->whereNotIn('shipments.status_id', [1, 7])
             ->whereNotIn('shipments.service_id', [7, 18, 20, 39, 44, 45, 48, 50])
-            ->where('sender_postcode', 'LIKE', 'BT%')
             ->with('shipment', 'shipment.route', 'shipment.service', 'shipment.company', 'shipment.depot');
 
         if ($request->company) {
             $packages->where('shipments.company_id', $request->company);
+        }
+
+        if ($request->depot) {
+            $packages->where('shipments.depot_id', $request->depot);
+        } else {
+            $packages->where('shipments.depot_id', 1)
+                ->where('sender_postcode', 'LIKE', 'BT%');
         }
 
         if (strlen($request->received) > 0) {
@@ -275,8 +286,9 @@ class ReportsController extends Controller
     /**
      * Dim report.
      *
-     * @param Request $request
-     * @param type $id
+     * @param  Request  $request
+     * @param  type  $id
+     *
      * @return type
      */
     public function dims(Request $request, $id)
@@ -307,8 +319,9 @@ class ReportsController extends Controller
     /**
      * Performance report.
      *
-     * @param Request $request
-     * @param type $id
+     * @param  Request  $request
+     * @param  type  $id
+     *
      * @return type
      */
     public function performance(Request $request, $id)
@@ -345,7 +358,7 @@ class ReportsController extends Controller
             });
 
         foreach (array_keys($results) as $delay) {
-            $results['percentages'][$delay] = round((100 / $total) * count($results[$delay]), 1) . '%';
+            $results['percentages'][$delay] = round((100 / $total) * count($results[$delay]), 1).'%';
         }
 
         return view('reports.performance', compact('report', 'results', 'total'));
@@ -354,8 +367,9 @@ class ReportsController extends Controller
     /**
      * Active shipments report.
      *
-     * @param Request $request
-     * @param type $id
+     * @param  Request  $request
+     * @param  type  $id
+     *
      * @return type
      */
     public function activeShipments(Request $request, $id)
@@ -383,8 +397,9 @@ class ReportsController extends Controller
     /**
      * Exceptions report.
      *
-     * @param Request $request
-     * @param type $id
+     * @param  Request  $request
+     * @param  type  $id
+     *
      * @return type
      */
     public function exceptions(Request $request, $id)
@@ -419,8 +434,9 @@ class ReportsController extends Controller
     /**
      * Active shipments report.
      *
-     * @param Request $request
-     * @param type $id
+     * @param  Request  $request
+     * @param  type  $id
+     *
      * @return type
      */
     public function pod(Request $request, $id)
@@ -445,8 +461,9 @@ class ReportsController extends Controller
     /**
      * Purchase Invoices - unknown jobs.
      *
-     * @param Request $request
-     * @param type $id
+     * @param  Request  $request
+     * @param  type  $id
+     *
      * @return type
      */
     public function unknownJobs(Request $request, $id)
@@ -469,8 +486,8 @@ class ReportsController extends Controller
     /**
      * Shippers per day.
      *
-     * @param Request $request
-     * @param type $id
+     * @param  Request  $request
+     * @param  type  $id
      */
     public function dailyStats(Request $request, $id)
     {
@@ -537,8 +554,9 @@ class ReportsController extends Controller
     /**
      * User's logged in - displays screen resolution and browser info.
      *
-     * @param Request $request
-     * @param type $id
+     * @param  Request  $request
+     * @param  type  $id
+     *
      * @return type
      */
     public function userAgents(Request $request, $id)
@@ -561,8 +579,9 @@ class ReportsController extends Controller
     /**
      * FedEx international receipts - available for manifesting.
      *
-     * @param Request $request
-     * @param type $id
+     * @param  Request  $request
+     * @param  type  $id
+     *
      * @return type
      */
     public function fedexInternationalAvailable(Request $request, $id)
@@ -590,8 +609,9 @@ class ReportsController extends Controller
     /**
      * Margin report.
      *
-     * @param Request $request
-     * @param type $id
+     * @param  Request  $request
+     * @param  type  $id
+     *
      * @return type
      */
     public function margins(Request $request, $id)
@@ -620,8 +640,9 @@ class ReportsController extends Controller
     /**
      * Carrier scans report.
      *
-     * @param Request $request
-     * @param type $id
+     * @param  Request  $request
+     * @param  type  $id
+     *
      * @return type
      */
     public function carrierScans(Request $request, $id)
@@ -641,8 +662,9 @@ class ReportsController extends Controller
     /**
      * Purchase Invoices - unknown jobs.
      *
-     * @param Request $request
-     * @param type $id
+     * @param  Request  $request
+     * @param  type  $id
+     *
      * @return type
      */
     public function purchaseInvoiceLines(Request $request, $id)
@@ -666,8 +688,9 @@ class ReportsController extends Controller
     /**
      * Exceptions report.
      *
-     * @param Request $request
-     * @param type $id
+     * @param  Request  $request
+     * @param  type  $id
+     *
      * @return type
      */
     public function preTransit(Request $request, $id)
@@ -700,8 +723,9 @@ class ReportsController extends Controller
     /**
      * Hazardous / dry ice report.
      *
-     * @param Request $request
-     * @param type $id
+     * @param  Request  $request
+     * @param  type  $id
+     *
      * @return type
      */
     public function hazardous(Request $request, $id)
@@ -737,8 +761,9 @@ class ReportsController extends Controller
     /**
      * Shippers report.
      *
-     * @param Request $request
-     * @param type $id
+     * @param  Request  $request
+     * @param  type  $id
+     *
      * @return type
      */
     public function shipmentsByCarrier(Request $request, $id)
@@ -769,8 +794,9 @@ class ReportsController extends Controller
     /**
      * Collection settings report.
      *
-     * @param Request $request
-     * @param type $id
+     * @param  Request  $request
+     * @param  type  $id
+     *
      * @return type
      */
     public function collectionSettings(Request $request, $id)
@@ -803,8 +829,9 @@ class ReportsController extends Controller
     /**
      * Exceptions report.
      *
-     * @param Request $request
-     * @param type $id
+     * @param  Request  $request
+     * @param  type  $id
+     *
      * @return type
      */
     public function scanningKpis(Request $request, $id)
@@ -849,8 +876,9 @@ class ReportsController extends Controller
     /**
      * Label downloads.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @param $id
+     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function labelDownloads(Request $request, $id)
