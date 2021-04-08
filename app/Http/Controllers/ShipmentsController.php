@@ -83,6 +83,11 @@ class ShipmentsController extends Controller
             $request->date_to = Carbon::today();
         }
 
+        // Non IFS default to a month ago
+        if (!$request->user()->hasIfsRole() && strlen($request->filter) < 5 && ! $request->date_from && ! $request->date_to && ! $request->company && ! $request->user && ! $request->scs_job_number) {
+            $request->date_from = now()->subMonth();
+        }
+
         $query = Shipment::select('shipments.*')
             ->orderBy('created_at', 'DESC')
             ->orderBy('shipments.id', 'DESC')

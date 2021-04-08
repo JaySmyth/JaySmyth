@@ -12,7 +12,7 @@ class DX
     protected $username;
     protected $password;
     protected $url;
-    protected $serviceDescription;
+    protected $serviceDescriptions;
     protected $client;
     protected $mode;
     protected $request;
@@ -29,11 +29,17 @@ class DX
         // Define the environment
         switch ($this->mode) {
             case 'test':
-                $this->serviceDescription = 'DX Iver Leave Safe, 24 Hour, Leave Safe DX2H, 08:00 - 18:00';
+                $this->serviceDescriptions = [
+                    'DX Iver Leave Safe, 24 Hour, Leave Safe DX2H, 08:00 - 18:00',
+                    'DX Iver Leave Safe Rural 48, 2 Day, DXE Third party, 08:00 - 18:00'
+                ];
                 break;
 
             default:
-                $this->serviceDescription = 'IFS Global Logistics Signature Box, 24 Hour, Signature, 08:00 - 18:00';
+                $this->serviceDescriptions = [
+                    'IFS Global Logistics Signature Box, 24 Hour, Signature, 08:00 - 18:00',
+                    'IFS Global Logistics Signature Box Rural 48, 2 Day, DXES Third Party, 08:00 - 18:00'
+                ];
                 break;
         }
 
@@ -140,7 +146,7 @@ class DX
 
         if (! empty($services['Service'])) {
             foreach ($services['Service'] as $service) {
-                if ($service['description'] == $this->serviceDescription) {
+                if (in_array($service['description'], $this->serviceDescriptions)) {
                     return $service['legacyService'];
                 }
             }
