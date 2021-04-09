@@ -216,8 +216,8 @@ class ImportShipments implements ShouldQueue
 
         // Some validation
         $rules = [
-            'recipient_name' => 'required_without:recipient_company_name|min:1|max:35',
-            'recipient_company_name' => 'required_without:recipient_name|min:1|max:35',
+            'recipient_name' => 'required|min:1|max:35',
+            'recipient_company_name' => 'nullable|min:1|max:35',
             'recipient_address1' => 'required|min:1|max:35',
             'recipient_address2' => 'nullable|min:1|max:35',
             'recipient_address3' => 'nullable|min:1|max:35',
