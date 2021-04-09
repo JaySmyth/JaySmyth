@@ -107,6 +107,10 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
 
     });
 
+    $("#sender_postcode, #recipient_postcode").change(function () {
+        isUkDomestic();
+    });
+
     $("#bill_shipping").change(function () {
 
         $("#bill_shipping_account").val('');
