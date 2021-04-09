@@ -851,10 +851,6 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
         var recipientCountryCode = $('#recipient_country_code').val().toUpperCase();
         var companyId = $('#company_id').val();
 
-        if (companyId == "1015" && (recipientCountryCode == "IE" || recipientPostcode.startsWith("BT"))) {
-            return false;
-        }
-
         // NI to IE
         if (senderCountryCode == "GB" && senderPostcode.startsWith("BT") && recipientCountryCode == "IE") {
             return true;
