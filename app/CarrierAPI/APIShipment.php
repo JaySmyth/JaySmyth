@@ -11,7 +11,6 @@ namespace App\CarrierAPI;
 use App\Models\Company;
 use App\Models\CompanyPackagingType;
 use App\Models\Country;
-use App\Models\Currency;
 use App\Models\Postcode;
 use App\Models\Service;
 use App\Rules\DoesNotExist;
@@ -174,7 +173,8 @@ class APIShipment
     /**
      * Function loads Shipment data into class variables.
      *
-     * @param array $shipmentData
+     * @param  array  $shipmentData
+     *
      * @return none Updates $this->errors
      */
     public function load($shipmentData)
@@ -190,7 +190,8 @@ class APIShipment
     /**
      * Function loads Shipment data into class variables.
      *
-     * @param array $shipment
+     * @param  array  $shipment
+     *
      * @return none Updates $this->errors
      */
     public function loadFromJSON($shipmentJSON)
@@ -234,7 +235,6 @@ class APIShipment
             $fieldArray = explode('.', $field);
 
             switch ($fieldArray[0]) {
-
                 case 'bill_shipping':
                 case 'bill_tax_duty':
                     if (isset($billTo[strtolower($this->data[$field])])) {
@@ -357,7 +357,6 @@ class APIShipment
         $dataValidation = Validator::make($data, $rules);
 
         if ($dataValidation->fails()) {
-
             // Return errors as an array
             $errors = $this->buildValidationErrors($dataValidation->errors());
         }
@@ -388,11 +387,9 @@ class APIShipment
         $shipmentValidation = Validator::make($shipment, $rules);
 
         if ($shipmentValidation->fails()) {
-
             // Return errors as an array
             $errors = $this->buildValidationErrors($shipmentValidation->errors());
         } else {
-
             // Do Account Validation
             $errors = $this->checkPayAccounts($shipment, $errors);
 
@@ -478,10 +475,10 @@ class APIShipment
 
         $rules = $this->addPackagingRules($shipment['company_id'], $shipment['mode_id'], $rules);
 
-        $rules['packages.*.weight'] = 'required|numeric|min:.5|max:9999';
-        $rules['packages.*.length'] = 'required|integer|min:.5|max:999';
-        $rules['packages.*.width'] = 'required|integer|min:.5|max:999';
-        $rules['packages.*.height'] = 'required|integer|min:.5|max:999';
+        $rules['packages.*.weight'] = 'required|numeric|min:.1|max:9999';
+        $rules['packages.*.length'] = 'required|integer|min:1|max:999';
+        $rules['packages.*.width'] = 'required|integer|min:1|max:999';
+        $rules['packages.*.height'] = 'required|integer|min:1|max:999';
 
         $rules['special_services'] = 'nullable|exists:special_services,code,company_id';
 
@@ -548,8 +545,9 @@ class APIShipment
     /**
      * Create validation rules for a Contact.
      *
-     * @param string Contact Type
-     * @param array Rules
+     * @param  string Contact Type
+     * @param  array Rules
+     *
      * @return array Validation rules
      */
     public function addContactRules($contactType = 'recipient', $rules = '')
@@ -571,7 +569,8 @@ class APIShipment
      * details for this type of address
      * are optional or mandatory.
      *
-     * @param string $type
+     * @param  string  $type
+     *
      * @return string Either "required" or blank
      */
     public function detailsRequired($type)
@@ -593,8 +592,9 @@ class APIShipment
     /**
      * Create validation rules for an Address.
      *
-     * @param string Address Type
-     * @param array Rules
+     * @param  string Address Type
+     * @param  array Rules
+     *
      * @return array Validation rules
      */
     public function addAddressRules($addressType = 'recipient', $rules = '')
@@ -616,18 +616,17 @@ class APIShipment
     /**
      * Create validation rules for packaging.
      *
-     * @param int Company id
-     * @param int Department id
+     * @param  int Company id
+     * @param  int Department id
+     *
      * @return array Validation rules
      */
     public function addPackagingRules($companyId, $modeId, $rules)
     {
-
         // Check for Company specific packaging (returns a string)
         $packagingTypes = $this->getPackagingTypes($companyId, $modeId);
 
         if (empty($packagingTypes)) {
-
             // No Customer Specific rates defined use defaults
             $packagingTypes = $this->getPackagingTypes(0, $modeId);
         }
@@ -641,8 +640,9 @@ class APIShipment
     /**
      * Get Packaging Types.
      *
-     * @param int Company id
-     * @param int Department id
+     * @param  int Company id
+     * @param  int Department id
+     *
      * @return string of comma separated packaging types
      */
     public function getPackagingTypes($companyId, $modeId)
@@ -652,7 +652,6 @@ class APIShipment
 
     public function checkPayAccounts($shipment, $errors = [])
     {
-
         // Exempt UK Domestic Shipments
         if (isUkDomestic($shipment['sender_country_code']) && isUkDomestic($shipment['recipient_country_code'])) {
             return $errors;
@@ -709,47 +708,25 @@ class APIShipment
         $country = Country::where('country_code', $countryCode)->first();
         if ($country) {
             if ($country->postal_validation > '') {
-
                 // Postal regex defined so check against it
                 return preg_match($country->postal_validation, $postCode);
             } else {
-
                 // No regex defined so return true
                 return true;
             }
         } else {
-
             // Country not valid so fail
             return false;
         }
     }
 
-    public function checkCountryRestrictions($shipment, $errors = [])
-    {
-        # If Shipment to Russia
-        if (strtoupper($shipment['recipient_country_code']) == 'RU') {
-            $value = convertCurrencies(
-                $shipment['customs_value_currency_code'],
-                'EUR',
-                $shipment['customs_value']
-            );
-            if ($value > 200) {
-                $errors[] = 'Customs value exceeds 200 euros';
-            }
-        }
-
-        return $errors;
-    }
-
     public function checkPackageLimits($shipment, $errors = [])
     {
-
         // Determine Service Min/ Max Values
         $this->getServiceLimits($shipment['service_id']);
 
         // Check Packaging is within Carrier defined limits.
         if (count($shipment['packages']) == $shipment['pieces']) {
-
             // Check Number of packages
             if (count($shipment['packages']) > $this->maxAllowedPieces) {
                 $errors[] = "Number of packages exceeds Max allowed - $this->maxAllowedPieces.";
@@ -822,6 +799,23 @@ class APIShipment
                 $this->maxAllowedValue = $service->max_customs_value;
             }
         }
+    }
+
+    public function checkCountryRestrictions($shipment, $errors = [])
+    {
+        # If Shipment to Russia
+        if (strtoupper($shipment['recipient_country_code']) == 'RU') {
+            $value = convertCurrencies(
+                $shipment['customs_value_currency_code'],
+                'EUR',
+                $shipment['customs_value']
+            );
+            if ($value > 200) {
+                $errors[] = 'Customs value exceeds 200 euros';
+            }
+        }
+
+        return $errors;
     }
 
     public function checkCollectionDate($shipment, $errors)
