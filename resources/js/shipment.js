@@ -845,10 +845,10 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
 
     function isUkDomestic() {
 
-        var senderCountryCode = $('#sender_country_code').val();
-        var senderPostcode = $('#sender_postcode').val();
-        var recipientPostcode = $('#recipient_postcode').val();
-        var recipientCountryCode = $('#recipient_country_code').val();
+        var senderCountryCode = $('#sender_country_code').val().toUpperCase();
+        var senderPostcode = $('#sender_postcode').val().toUpperCase();
+        var recipientPostcode = $('#recipient_postcode').val().toUpperCase();
+        var recipientCountryCode = $('#recipient_country_code').val().toUpperCase();
         var companyId = $('#company_id').val();
 
         if (companyId == "1015" && (recipientCountryCode == "IE" || recipientPostcode.startsWith("BT"))) {
@@ -856,13 +856,20 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
         }
 
         // NI to IE
-        if (senderPostcode.startsWith("BT") && recipientCountryCode == "IE") {
+        if (senderCountryCode == "GB" && senderPostcode.startsWith("BT") && recipientCountryCode == "IE") {
             return true;
         }
 
-        // Domestic - goods originating in NI to UK mainland or NI local
+        // Within UK
         if (senderCountryCode == "GB" && recipientCountryCode == "GB") {
-            if (senderPostcode.startsWith("BT")) {
+
+            // NI to NI
+            if (senderPostcode.startsWith("BT") && recipientPostcode.startsWith("BT")) {
+                return true;
+            }
+
+            // NI to Mainland and Mainland to Mainland
+            if (!recipientPostcode.startsWith("BT")) {
                 return true;
             }
         }
