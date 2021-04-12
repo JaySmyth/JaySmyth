@@ -778,8 +778,12 @@ class Shipment extends Model
             }
 
             // UPS GB to NI
-            if ($this->carrier_id == 3 && $dest == 'BT') {
-                return 24;
+            if ($this->carrier_id == 3) {
+                if ($this->service_id == '18') {
+                    return 48;
+                } else {
+                    return 24;
+                }
             }
 
             // NI local deliveries
