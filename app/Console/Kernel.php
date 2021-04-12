@@ -54,6 +54,7 @@ class Kernel extends ConsoleKernel
         Commands\ExpressFreight\UploadNIShipmentsToExpressFreight::class,
         Commands\ExpressFreight\ProcessExpressFreightTracking::class,
         Commands\XDP\ProcessXDPTracking::class,
+        Commands\DX\ProcessDXTracking::class,
         Commands\CheckForDuplicateShipments::class,
         Commands\ProcessScsCollectionRequests::class,
         Commands\SendTrackingNumbers::class,
@@ -72,7 +73,8 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      *
-     * @param Schedule $schedule
+     * @param  Schedule  $schedule
+     *
      * @return void
      */
     protected function schedule(Schedule $schedule)
@@ -156,6 +158,11 @@ class Kernel extends ConsoleKernel
          * XDP
          */
         $schedule->command('ifs:process-xdp-tracking')->hourly();
+
+        /*
+          * DX
+          */
+        $schedule->command('ifs:process-dx-tracking')->hourly();
 
         /*
          * Multifreight
