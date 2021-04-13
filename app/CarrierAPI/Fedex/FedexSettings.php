@@ -322,7 +322,7 @@ class FedexSettings
         }
 
         // Catch non numeric values
-        $value = (is_numeric($value)) ? $value : 0;
+        //$value = (is_numeric($value)) ? $value : 0;
 
         if ($mult > 0 && ! is_numeric($value)) {
             $msg = "uom: $uom, key: $key, value: $value, mode: $mode";
