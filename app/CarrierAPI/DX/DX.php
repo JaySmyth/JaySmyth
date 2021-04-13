@@ -31,14 +31,16 @@ class DX
             case 'test':
                 $this->serviceDescriptions = [
                     'DX Iver Leave Safe, 24 Hour, Leave Safe DX2H, 08:00 - 18:00',
-                    'DX Iver Leave Safe Rural 48, 2 Day, DXE Third party, 08:00 - 18:00'
+                    'DX Iver Leave Safe Rural 48, 2 Day, DXE Third party, 08:00 - 18:00',
+                    'DX Iver Leave Safe Rural 72, 3 Day, DXES Third Party, 08:00 - 18:00'
                 ];
                 break;
 
             default:
                 $this->serviceDescriptions = [
                     'IFS Global Logistics Signature Box, 24 Hour, Signature, 08:00 - 18:00',
-                    'IFS Global Logistics Signature Box Rural 48, 2 Day, DXES Third Party, 08:00 - 18:00'
+                    'IFS Global Logistics Signature Box Rural 48, 2 Day, DXES Third Party, 08:00 - 18:00',
+                    'IFS Global Logistics Signature Box Rural 72, 3 Day, DXES Third Party, 08:00 - 18:00'
                 ];
                 break;
         }
