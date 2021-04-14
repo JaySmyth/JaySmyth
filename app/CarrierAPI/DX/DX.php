@@ -292,6 +292,8 @@ class DX
         ];
     }
 
+
+
     protected function getPieceReferences()
     {
         $items = [];
