@@ -234,7 +234,8 @@ class DX
                                             'type' => 'cdlHeight',
                                             'UOM' => 'CM'
                                         ],
-                                    ]
+                                    ],
+                                    'pieceReferences' => $this->getPieceReferences(),
                                 ]
                             ],
                             'serviceDetails' => [
@@ -292,5 +293,26 @@ class DX
         ];
     }
 
+    protected function getPieceReferences()
+    {
+        $items = [];
+
+        if (! empty($this->shipment['contents'])) {
+            foreach ($this->shipment['contents'] as $content) {
+                $items['attributeList'] [] = [
+                    [
+                        'name' => 'valueOfGoods',
+                        'value' => round($content['unit_value'], 2)
+                    ],
+                    [
+                        'name' => 'commodityCode',
+                        'value' => (! empty($content['harmonized_code'])) ? $content['harmonized_code'] : $content['commodity_code']
+                    ]
+                ];
+            }
+        }
+
+        return $items;
+    }
 
 }
