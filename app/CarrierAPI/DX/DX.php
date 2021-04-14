@@ -237,6 +237,18 @@ class DX
                                             'UOM' => 'CM'
                                         ],
                                     ],
+                                    'pieceReferences' => [
+                                        'attributeList' => [
+                                            0 => [
+                                                'name' => 'valueOfGoods',
+                                                'value' => ($this->shipment['customs_value'] > 0) ? round($this->shipment['customs_value'] / $this->shipment['pieces'], 2) : 0,
+                                            ],
+                                            1 => [
+                                                'name' => 'commodityCode',
+                                                'value' => !empty($this->shipment['contents'][0]['harmonized_code']) ? $this->shipment['contents'][0]['harmonized_code'] : 0000000000,
+                                            ],
+                                        ],
+                                    ],
                                 ]
                             ],
                             'serviceDetails' => [
