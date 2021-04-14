@@ -76,6 +76,8 @@ class DX
             // Build an array to send as json to DX
             $request = $this->getLabelRequest($reply['ifs_consignment_number'], $package, $service);
 
+            //dd($request);
+
             // Log the request
             $this->log('createLabel', 'O', json_encode($request));
 
@@ -234,7 +236,7 @@ class DX
                                             'type' => 'cdlHeight',
                                             'UOM' => 'CM'
                                         ],
-                                    ]
+                                    ],
                                 ]
                             ],
                             'serviceDetails' => [
@@ -248,7 +250,7 @@ class DX
                                         'organisationName' => $this->shipment['recipient_company_name'] ?? null,
                                         'addressLine1' => $this->shipment['recipient_address1'] ?? null,
                                         'addressLine2' => $this->shipment['recipient_address2'] ?? null,
-                                        'addressLine3' => $this->shipment['recipient_address3'] ?? null,
+                                        'addressLine3' => $this->shipment['recipient_city'] ?? null,
                                         'postalCode' => $this->shipment['recipient_postcode'] ?? null,
                                         'country' => [
                                             'countryCode' => $this->shipment['recipient_country_code']
@@ -290,30 +292,6 @@ class DX
                 'password' => $this->password
             ]
         ];
-    }
-
-
-
-    protected function getPieceReferences()
-    {
-        $items = [];
-
-        if (! empty($this->shipment['contents'])) {
-            foreach ($this->shipment['contents'] as $content) {
-                $items['attributeList'] [] = [
-                    [
-                        'name' => 'valueOfGoods',
-                        'value' => round($content['unit_value'], 2)
-                    ],
-                    [
-                        'name' => 'commodityCode',
-                        'value' => (! empty($content['harmonized_code'])) ? $content['harmonized_code'] : $content['commodity_code']
-                    ]
-                ];
-            }
-        }
-
-        return $items;
     }
 
 }
