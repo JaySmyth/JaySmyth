@@ -87,10 +87,14 @@ class ProcessDXTracking extends Command
 
         $files = Storage::disk('dxTracking')->files();
 
+        dd($files);
+
         foreach ($files as $file) {
             if (stristr($file, '.csv')) {
                 // Read the contents of the csv
                 $contents = Storage::disk('dxTracking')->get($file);
+
+                dd($contents);
 
                 // Save to local directory
                 file_put_contents($this->directory.$file, $contents);
