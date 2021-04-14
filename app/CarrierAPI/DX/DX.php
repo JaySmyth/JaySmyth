@@ -234,8 +234,7 @@ class DX
                                             'type' => 'cdlHeight',
                                             'UOM' => 'CM'
                                         ],
-                                    ],
-                                    'pieceReferences' => $this->getPieceReferences(),
+                                    ]
                                 ]
                             ],
                             'serviceDetails' => [
