@@ -85,7 +85,7 @@ return [
             'port' => 22,
             'username' => env('DX_SFTP_USERNAME'),
             'password' => env('DX_SFTP_PASSWORD'),
-            'privateKey' => 'home/admin/.ssh/id_rsa',
+            'privateKey' => '/home/admin/.ssh/id_rsa',
             'passphrase' => 'IFSglobal997!&',
             'root' => env('DX_SFTP_ROOT')
         ]
