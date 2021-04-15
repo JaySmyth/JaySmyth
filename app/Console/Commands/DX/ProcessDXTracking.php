@@ -68,7 +68,7 @@ class ProcessDXTracking extends Command
             while (false !== ($file = readdir($handle))) {
                 if (! is_dir($file) && $file != 'archive') {
                     $this->processFile($file);
-                    $this->archiveFile($file);
+                    //$this->archiveFile($file);
                 }
             }
 
