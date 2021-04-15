@@ -88,6 +88,9 @@ class ProcessDXTracking extends Command
         $files = Storage::disk('dxTracking')->files('DXOutboundCollect');
 
         foreach ($files as $file) {
+
+            dd(basename($file));
+
             $this->info("Downloading file $file");
 
             // Read the contents of the txt file
