@@ -146,7 +146,7 @@ class ProcessDXTracking extends Command
             // Load the shipment record
             $shipment = \App\Models\Shipment::where('carrier_tracking_number', $row['carrier_tracking_number'])->where('carrier_id', 17)->first();
 
-            if ($shipment && $row['carrier_tracking_number'] == '1566133453') {
+            if ($shipment && $row['carrier_tracking_number'] == '1566133397') {
                 $event = $this->getEvent($row, $shipment);
 
                 if ($event) {
@@ -293,7 +293,7 @@ class ProcessDXTracking extends Command
      */
     protected function ensureShipmentReceived($event, $shipment)
     {
-        $ignore = ['pre_transit', 'cancelled', 'unknown', 'error', 'failure'];
+        $ignore = ['pre_transit', 'cancelled', 'unknown', 'error', 'failure', 'delivered'];
 
         if (! in_array($event['status'], $ignore)) {
             // Set to received
