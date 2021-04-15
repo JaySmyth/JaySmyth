@@ -146,7 +146,7 @@ class ProcessDXTracking extends Command
             // Load the shipment record
             $shipment = \App\Models\Shipment::where('carrier_tracking_number', $row['carrier_tracking_number'])->where('carrier_id', 17)->first();
 
-            if ($shipment && $row['carrier_tracking_number'] == '1566133397') {
+            if ($shipment && $row['carrier_tracking_number'] == '1566132692') {
                 $event = $this->getEvent($row, $shipment);
 
                 if ($event) {
@@ -216,7 +216,7 @@ class ProcessDXTracking extends Command
             return [
                 'status' => $dxStatus->status,
                 'status_detail' => null,
-                'city' => ($dxStatus->status == 'delivered') ? $shipment->recipient_city : null,
+                'city' => ($dxStatus->status == 'delivered') ? $shipment->recipient_city : $shipment->sender_city,
                 'country_code' => 'GB',
                 'postcode' => null,
                 'local_datetime' => $datetime,
@@ -257,7 +257,7 @@ class ProcessDXTracking extends Command
                 break;
 
             case 'return_to_sender':
-                $shipment->alertProblem('Shipment returned to sender', ['s', 'b', 'o', 'd']);
+              //  $shipment->alertProblem('Shipment returned to sender', ['s', 'b', 'o', 'd']);
                 $sentProblem = true;
                 break;
 
@@ -266,13 +266,13 @@ class ProcessDXTracking extends Command
             case 'unknown':
             case 'available_for_pickup':
                 if (strlen($event['message']) > 0) {
-                    $shipment->alertProblem($event['message'], ['s', 'b', 'o', 'd']);
+                   // $shipment->alertProblem($event['message'], ['s', 'b', 'o', 'd']);
                     $sentProblem = true;
                 }
                 break;
 
             case 'delivered':
-                $shipment->setDelivered($event['datetime'], $event['signed_by']);
+                //$shipment->setDelivered($event['datetime'], $event['signed_by']);
                 break;
 
             default:
@@ -281,7 +281,7 @@ class ProcessDXTracking extends Command
         }
 
         if (! $sentProblem) {
-            $this->alertProblem($event['message'], $shipment);
+            //$this->alertProblem($event['message'], $shipment);
         }
     }
 
