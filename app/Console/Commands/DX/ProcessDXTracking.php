@@ -89,18 +89,16 @@ class ProcessDXTracking extends Command
 
         foreach ($files as $file) {
 
-            dd(basename($file));
-
             $this->info("Downloading file $file");
 
             // Read the contents of the txt file
             $contents = Storage::disk('dxTracking')->get($file);
 
             // Save to local directory
-            file_put_contents($this->directory.$file, $contents);
+            file_put_contents($this->directory.basename($file), $contents);
 
             if (! $this->testMode) {
-                if (file_exists($this->directory.$file)) {
+                if (file_exists($this->directory.basename($file))) {
                     $this->line('Attempting to delete file from remote server');
                     Storage::disk('dxTracking')->delete($file);
                 }
