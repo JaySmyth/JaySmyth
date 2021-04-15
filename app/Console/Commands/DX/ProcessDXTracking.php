@@ -87,10 +87,8 @@ class ProcessDXTracking extends Command
 
         $files = Storage::disk('dxTracking')->allFiles();
 
-        dd($files);
-
         foreach ($files as $file) {
-            if (stristr($file, '.csv')) {
+            if (stristr($file, '.txt')) {
                 // Read the contents of the csv
                 $contents = Storage::disk('dxTracking')->get($file);
 
