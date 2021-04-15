@@ -41,7 +41,7 @@ class ProcessDXTracking extends Command
         'shipment_reference', 'carrier_tracking_number', 'code', 'date'
     ];
 
-    protected $testMode = true;
+    protected $testMode = false;
 
     /**
      * Create a new command instance.
@@ -68,7 +68,7 @@ class ProcessDXTracking extends Command
             while (false !== ($file = readdir($handle))) {
                 if (! is_dir($file) && $file != 'archive') {
                     $this->processFile($file);
-                    //$this->archiveFile($file);
+                    $this->archiveFile($file);
                 }
             }
 
@@ -146,7 +146,7 @@ class ProcessDXTracking extends Command
             // Load the shipment record
             $shipment = \App\Models\Shipment::where('carrier_tracking_number', $row['carrier_tracking_number'])->where('carrier_id', 17)->first();
 
-            if ($shipment && $row['carrier_tracking_number'] == '1566134031') {
+            if ($shipment) {
                 $event = $this->getEvent($row, $shipment);
 
                 if ($event) {
