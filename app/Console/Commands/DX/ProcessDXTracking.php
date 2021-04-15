@@ -88,7 +88,6 @@ class ProcessDXTracking extends Command
         $files = Storage::disk('dxTracking')->files('DXOutboundCollect');
 
         foreach ($files as $file) {
-
             $this->info("Downloading file $file");
 
             // Read the contents of the txt file
@@ -147,7 +146,7 @@ class ProcessDXTracking extends Command
             // Load the shipment record
             $shipment = \App\Models\Shipment::where('carrier_tracking_number', $row['carrier_tracking_number'])->where('carrier_id', 17)->first();
 
-            if ($shipment && $row['carrier_tracking_number'] == '1566345465') {
+            if ($shipment && $row['carrier_tracking_number'] == '1566134018') {
                 $event = $this->getEvent($row, $shipment);
 
                 if ($event) {
@@ -207,6 +206,11 @@ class ProcessDXTracking extends Command
     protected function getEvent($row, $shipment)
     {
         $dxStatus = DB::table('dx_statuses')->where('code', $row['code'])->first();
+        $datetime = gmtToCarbonUtc(Carbon::createFromformat('d/m/YH:i:s', $row['date']));
+
+        if ($dxStatus->status == 'delivered') {
+            $datetime->addSecond();
+        }
 
         if ($dxStatus) {
             return [
@@ -215,8 +219,8 @@ class ProcessDXTracking extends Command
                 'city' => ($dxStatus->status == 'delivered') ? $shipment->recipient_city : null,
                 'country_code' => 'GB',
                 'postcode' => null,
-                'local_datetime' => gmtToCarbonUtc(Carbon::createFromformat('d/m/YH:i:s', $row['date'])),
-                'datetime' => gmtToCarbonUtc(Carbon::createFromformat('d/m/YH:i:s', $row['date'])),
+                'local_datetime' => $datetime,
+                'datetime' => $datetime,
                 'carrier' => 'DX',
                 'source' => 'DX',
                 'message' => $dxStatus->description,
