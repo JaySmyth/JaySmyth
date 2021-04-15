@@ -41,7 +41,7 @@ class ProcessDXTracking extends Command
         'shipment_reference', 'carrier_tracking_number', 'code', 'date'
     ];
 
-    protected $testMode = false;
+    protected $testMode = true;
 
     /**
      * Create a new command instance.
@@ -88,25 +88,20 @@ class ProcessDXTracking extends Command
         $files = Storage::disk('dxTracking')->allFiles();
 
         foreach ($files as $file) {
+            $this->info("Downloading file $file");
 
-            $this->info($file);
+            // Read the contents of the txt file
+            $contents = Storage::disk('dxTracking')->get($file);
 
-            //if (stristr($file, '.txt')) {
-                // Read the contents of the csv
-                $contents = Storage::disk('dxTracking')->get($file);
+            // Save to local directory
+            file_put_contents($this->directory.$file, $contents);
 
-                dd($contents);
-
-                // Save to local directory
-                file_put_contents($this->directory.$file, $contents);
-
-                if (! $this->testMode) {
-                    if (file_exists($this->directory.$file)) {
-                        $this->line('Attempting to delete file from remote server');
-                        Storage::disk('dxTracking')->delete($file);
-                    }
+            if (! $this->testMode) {
+                if (file_exists($this->directory.$file)) {
+                    $this->line('Attempting to delete file from remote server');
+                    Storage::disk('dxTracking')->delete($file);
                 }
-           // }
+            }
         }
     }
 
@@ -151,7 +146,7 @@ class ProcessDXTracking extends Command
             // Load the shipment record
             $shipment = \App\Models\Shipment::where('carrier_tracking_number', $row['carrier_tracking_number'])->where('carrier_id', 17)->first();
 
-            if ($shipment) {
+            if ($shipment && $row['carrier_tracking_number'] == '1566345465') {
                 $event = $this->getEvent($row, $shipment);
 
                 if ($event) {
@@ -165,8 +160,6 @@ class ProcessDXTracking extends Command
                         $this->processEvent($event, $shipment);
                     }
                 }
-
-                dd($shipment->consignment_number);
             }
         }
     }
