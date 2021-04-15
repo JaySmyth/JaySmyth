@@ -85,7 +85,7 @@ class ProcessDXTracking extends Command
     {
         $this->info('Attempting to download files from remote SFTP site');
 
-        $files = Storage::disk('dxTracking')->files('DXInboundSend');
+        $files = Storage::disk('dxTracking')->files('/DXInboundSend');
 
         dd($files);
 
