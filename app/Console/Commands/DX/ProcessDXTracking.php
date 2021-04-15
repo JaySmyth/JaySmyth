@@ -272,7 +272,7 @@ class ProcessDXTracking extends Command
                 break;
 
             case 'delivered':
-                //$shipment->setDelivered($event['datetime'], $event['signed_by']);
+                $shipment->setDelivered($event['datetime'], $event['signed_by']);
                 break;
 
             default:
@@ -298,7 +298,7 @@ class ProcessDXTracking extends Command
         if (! in_array($event['status'], $ignore)) {
             // Set to received
             if (! $shipment->received) {
-                $shipment->setReceived($event['datetime'], 0, true);
+                $shipment->setReceived($event['datetime']->subSecond(), 0, true);
             }
 
             // Ensure hold flag is removed
