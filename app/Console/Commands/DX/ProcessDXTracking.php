@@ -257,7 +257,7 @@ class ProcessDXTracking extends Command
                 break;
 
             case 'return_to_sender':
-              //  $shipment->alertProblem('Shipment returned to sender', ['s', 'b', 'o', 'd']);
+                $shipment->alertProblem('Shipment returned to sender', ['s', 'b', 'o', 'd']);
                 $sentProblem = true;
                 break;
 
@@ -266,7 +266,7 @@ class ProcessDXTracking extends Command
             case 'unknown':
             case 'available_for_pickup':
                 if (strlen($event['message']) > 0) {
-                   // $shipment->alertProblem($event['message'], ['s', 'b', 'o', 'd']);
+                    $shipment->alertProblem($event['message'], ['s', 'b', 'o', 'd']);
                     $sentProblem = true;
                 }
                 break;
@@ -281,7 +281,7 @@ class ProcessDXTracking extends Command
         }
 
         if (! $sentProblem) {
-            //$this->alertProblem($event['message'], $shipment);
+            $this->alertProblem($event['message'], $shipment);
         }
     }
 
