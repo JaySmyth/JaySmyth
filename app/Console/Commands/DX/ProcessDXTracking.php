@@ -146,7 +146,7 @@ class ProcessDXTracking extends Command
             // Load the shipment record
             $shipment = \App\Models\Shipment::where('carrier_tracking_number', $row['carrier_tracking_number'])->where('carrier_id', 17)->first();
 
-            if ($shipment && $row['carrier_tracking_number'] == '1566134166') {
+            if ($shipment && $row['carrier_tracking_number'] == '1566134031') {
                 $event = $this->getEvent($row, $shipment);
 
                 if ($event) {

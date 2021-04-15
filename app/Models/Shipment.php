@@ -961,7 +961,7 @@ class Shipment extends Model
     public function setDelivered($deliveryDate = null, $podSignature = 'Unknown', $userId = 0, $withTrackingEvent = false, $podImage = null)
     {
         // If the shipment has not been received, mark as received.
-        if (! $this->received) {
+        if (! $this->received && $this->carrier_id != 17) {
             $this->setReceived($this->ship_date, $userId);
         }
 
