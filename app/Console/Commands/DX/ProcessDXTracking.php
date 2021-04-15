@@ -146,7 +146,7 @@ class ProcessDXTracking extends Command
             // Load the shipment record
             $shipment = \App\Models\Shipment::where('carrier_tracking_number', $row['carrier_tracking_number'])->where('carrier_id', 17)->first();
 
-            if ($shipment && $row['carrier_tracking_number'] == '1566134018') {
+            if ($shipment && $row['carrier_tracking_number'] == '1566133550') {
                 $event = $this->getEvent($row, $shipment);
 
                 if ($event) {
@@ -241,9 +241,6 @@ class ProcessDXTracking extends Command
     {
         $sentProblem = false;
 
-        // Set shipment to received - catches scans missed by IFS
-        $this->ensureShipmentReceived($event, $shipment);
-
         // Update the shipment status (ignore pre-transit and delivered)
         if (! in_array($event['status'], ['pre_transit', 'delivered', 'failure'])) {
             $shipment->setStatus($event['status'], 0, false, false);
@@ -279,6 +276,9 @@ class ProcessDXTracking extends Command
                 // unknown status
                 break;
         }
+
+        // Set shipment to received - catches scans missed by IFS
+        $this->ensureShipmentReceived($event, $shipment);
 
         if (! $sentProblem) {
             $this->alertProblem($event['message'], $shipment);
