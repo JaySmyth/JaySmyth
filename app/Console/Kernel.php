@@ -162,7 +162,7 @@ class Kernel extends ConsoleKernel
         /*
           * DX
           */
-        //$schedule->command('ifs:process-dx-tracking')->hourly();
+        $schedule->command('ifs:process-dx-tracking')->hourly();
 
         /*
          * Multifreight
