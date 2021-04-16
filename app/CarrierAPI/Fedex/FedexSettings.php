@@ -321,15 +321,12 @@ class FedexSettings
             $mult = $this->mult[$uom][$this->fldno[$key]];
         }
 
-        // Catch non numeric values
-        //$value = (is_numeric($value)) ? $value : 0;
-
         if ($mult > 0 && ! is_numeric($value)) {
-            $msg = "uom: $uom, key: $key, value: $value, mode: $mode";
+            $msg = "uom: $uom, key: $key, value: $value, mode: $mode, mult: $mult";
             mail('it@antrim.ifsgroup.com', "Error in CarrierAPI\FedexSettings - multiplier", $msg);
         }
 
-        if ($mult > 0) {
+        if ($mult > 0 && is_numeric($value)) {
             if ($mode == 'enable') {
                 $value = $value * $mult;
             } else {
