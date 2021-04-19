@@ -682,6 +682,7 @@ class APIShipment
             }
         }
 
+        /*
         // If Fedex IE service check not billed to IFS account 914974712
         if (isset($shipment['service_id']) && $shipment['service_id'] == '9') {
             if (isset($shipment['bill_shipping_account']) && ($shipment['bill_shipping_account'] == '914974712')) {
@@ -691,6 +692,7 @@ class APIShipment
                 $errors[] = 'Bill Tax/ Duty Acct No: cannot be "914974712"';
             }
         }
+        */
 
         return $errors;
     }
