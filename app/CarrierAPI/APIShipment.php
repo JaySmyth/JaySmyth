@@ -672,13 +672,23 @@ class APIShipment
             }
         }
 
-        // Check Bill shipping to Other or Recipient is not using an IFS account
+        // Check Bill tax/ duty to Other or Recipient is not using an IFS account
         if (isset($shipment['bill_tax_duty_account']) && $shipment['bill_tax_duty_account'] > '') {
             if (isset($shipment['bill_tax_duty']) && in_array($shipment['bill_tax_duty'], ['recipient', 'other'])) {
                 $service = Service::where('account', $shipment['bill_tax_duty_account'])->first();
                 if ($service) {
                     $errors[] = '"Bill Tax And Duty To:" must be "Sender" if using an IFS Account number on Billing Tab';
                 }
+            }
+        }
+
+        // If Fedex IE service check not billed to IFS account 914974712
+        if (isset($shipment['service_id']) && $shipment['service_id'] == '9') {
+            if (isset($shipment['bill_shipping_account']) && ($shipment['bill_shipping_account'] == '914974712')) {
+                $errors[] = 'Bill Shipping Acct No: cannot be "914974712"';
+            }
+            if (isset($shipment['bill_tax_duty_account']) && ($shipment['bill_tax_duty_account'] == '914974712')) {
+                $errors[] = 'Bill Tax/ Duty Acct No: cannot be "914974712"';
             }
         }
 
