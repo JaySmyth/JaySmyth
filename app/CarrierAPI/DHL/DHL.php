@@ -67,7 +67,7 @@ class DHL
         $this->serviceType = (isset($productCodes[0])) ? $productCodes[0] : null;
 
         // Sending from the mainland, change the product code
-        if (! isBtPostcode($this->shipment['sender_postcode']) && isUkDomestic($this->shipment['sender_country_code'])) {
+        if (! isBtPostcode($this->shipment['sender_postcode']) && isUkDomestic($this->shipment['sender_country_code']) || !isEu($this->shipment['recipient_country_code'])) {
             if ($this->serviceType == 'U' && strtolower($this->shipment['ship_reason']) == 'documents') {
                 $this->serviceType = 'D';
             }
