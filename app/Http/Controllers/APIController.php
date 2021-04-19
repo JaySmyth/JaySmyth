@@ -76,7 +76,7 @@ class APIController extends Controller
 
         if ($this->input['data']['user_id'] == 'UnAuthorized' || $this->input['data']['company_id'] == 'UnAuthorized') {
             // Authentication Failed
-            return APIResponse::respondUnauthorized();
+            return APIResponse::respondUnauthorized($this->input['data']['errors']);
         }
 
         if ($this->input['data']['user_id'] == 'NotAvailable') {
@@ -197,7 +197,7 @@ class APIController extends Controller
         if (empty($data)) {
 
             // Missing data - Return error
-            $this->returnUnauthorized('Invalid Data or Characterset incorrect');
+            $this->returnUnauthorized('Invalid JSON Data or Characterset incorrect');
         } else {
 
             // log Transaction
