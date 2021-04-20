@@ -7,7 +7,6 @@ use App\Models\PurchaseInvoiceCharge;
 use App\Models\PurchaseInvoiceLine;
 use App\Models\Shipment;
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 
 class ImportDxPurchaseInvoices extends Command
 {
@@ -88,7 +87,7 @@ class ImportDxPurchaseInvoices extends Command
             while (false !== ($file = readdir($handle))) {
                 if (! is_dir($file) && $file != $this->archiveDirectory) {
                     $this->processFile($file);
-                    // $this->archiveFile($file);
+                    $this->archiveFile($file);
                 }
             }
 
@@ -131,12 +130,34 @@ class ImportDxPurchaseInvoices extends Command
                         continue;
                     }
 
+                    $totalTaxable += $row['Consignment Price'];
+                }
+                $rowNumber++;
+            }
+
+            // Calc FSC rate per shipment
+            $fsc = $totalFuelSurcharge / $totalTaxable;
+
+            $rowNumber = 1;
+        }
+
+
+        if (($handle = fopen($this->sftpDirectory.$file, 'r')) !== false) {
+            while (($data = fgetcsv($handle, 2000, ',')) !== false) {
+                if ($rowNumber >= 2) {
+                    $row = $this->assignFieldNames($data);
+
+                    // Ignore these rows
+                    if (in_array($row['Service Description'], ['VAT', 'TRACKER FUEL SURCHARGE'])) {
+                        continue;
+                    }
+
                     // Lookup shipment
                     $shipment = $this->getShipment($row['Tracking Numbers'], $row['Customer Reference']);
 
                     $purchaseInvoiceLine = PurchaseInvoiceLine::firstOrcreate([
-                        'carrier_consignment_number' => ($shipment) ? $shipment->carrier_consignment_number : strtoupper(Str::random(12)),
-                        'carrier_tracking_number' => ($shipment) ? $shipment->carrier_consignment_number : strtoupper(Str::random(12)),
+                        'carrier_consignment_number' => ($shipment) ? $shipment->carrier_consignment_number : $row['Consignment Number'],
+                        'carrier_tracking_number' => ($shipment) ? $shipment->carrier_consignment_number : $row['Tracking Numbers'],
                         'purchase_invoice_id' => $this->purchaseInvoice->id,
                     ]);
 
@@ -175,10 +196,8 @@ class ImportDxPurchaseInvoices extends Command
                         $this->applyCharge($row['Consignment Price'], 'ADH', 'OUT OF GUAGE', $purchaseInvoiceLine->id);
                     } else {
                         $this->applyCharge($row['Consignment Price'], 'FRT', 'FREIGHT CHARGE', $purchaseInvoiceLine->id);
-                        $this->applyCharge($row['Consignment Price'] * 0.05174917, 'FSC', 'FUEL SURCHARGE', $purchaseInvoiceLine->id);
+                        $this->applyCharge($row['Consignment Price'] * $fsc, 'FSC', 'FUEL SURCHARGE', $purchaseInvoiceLine->id);
                     }
-
-                    $totalTaxable += $row['Consignment Price'];
                 }
 
                 $rowNumber++;
