@@ -663,6 +663,7 @@ class APIShipment
         }
 
         // Check Bill shipping to Other or Recipient is not using an IFS account
+        /*
         if (isset($shipment['bill_shipping_account']) && $shipment['bill_shipping_account'] > '') {
             if (isset($shipment['bill_shipping']) && in_array($shipment['bill_shipping'], ['recipient', 'other'])) {
                 $service = Service::where('account', $shipment['bill_shipping_account'])->first();
@@ -681,6 +682,7 @@ class APIShipment
                 }
             }
         }
+        */
 
         // If Fedex IE service check not billed to IFS account 914974712
         if (isset($shipment['service_id']) && $shipment['service_id'] == '9') {
