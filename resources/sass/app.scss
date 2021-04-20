@@ -128,6 +128,11 @@ body .container-fluid a .fas:hover, body .container-fluid a .far:hover{
     background-color: $bright-green;
 }
 
+.badge-partial_delivery, .badge-enabled, .badge-completed, .badge-no_goods, .badge-rts_complete {
+    color: $white;
+    background-color: $dark-green;
+}
+
 .badge-cancelled, .badge-disabled, .badge-failure, .badge-unknown {
     color: $white;
     background-color: $red;

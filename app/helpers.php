@@ -396,7 +396,7 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
         case 'statusCodes':
             $result = [
                 'pre_transit' => 'Pre-Transit', 'no_goods' => 'No Goods Received', 'cancelled' => 'Shipment Cancelled', 'received' => 'Goods Received', 'in_transit' => 'In Transit',
-                'out_for_delivery' => 'Out For Delivery', 'delivered' => 'Delivered', 'on_hold' => 'On Hold',
+                'out_for_delivery' => 'Out For Delivery', 'partial_delivery' => 'Partial Delivery', 'delivered' => 'Delivered', 'on_hold' => 'On Hold',
                 'failure' => 'Failure', 'return_to_sender' => 'Return To Sender',
                 'rts_complete' => 'RTS Complete'
             ];
@@ -1229,16 +1229,16 @@ function identifyDirection($shipment)
     // Shipper and Recipient in UK
     if ($shipment['sender_country_code'] == $shipment['recipient_country_code'] && $shipment['sender_country_code'] == 'GB') {
         if ((substr($shipment['sender_postcode'], 0, 2) == 'BT') && (substr(
-                    $shipment['recipient_postcode'],
-                    0,
-                    2
-                ) == 'BT')) {
+            $shipment['recipient_postcode'],
+            0,
+            2
+        ) == 'BT')) {
             $direction = 'internal';
         } elseif ((substr($shipment['sender_postcode'], 0, 2) == 'BT') && (substr(
-                    $shipment['recipient_postcode'],
-                    0,
-                    2
-                ) != 'BT')) {
+            $shipment['recipient_postcode'],
+            0,
+            2
+        ) != 'BT')) {
             $direction = 'export';
         } else {
             $direction = 'import';

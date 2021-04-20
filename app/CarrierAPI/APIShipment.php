@@ -422,8 +422,8 @@ class APIShipment
         $rules['carrier_pickup_required'] = 'nullable|in:0,1';
         $rules['service_code'] = 'required|exists:services,code';
         $rules['pieces'] = 'required|integer|min:1|max:99';
-        $rules['weight'] = 'required|numeric|min:0.1|max:19999';
-        // $rules['volumetric_weight'] = 'nullable|numeric|min:0.1|max:19999';
+        $rules['weight'] = 'required|numeric|greater_than_value:0|max:19999';
+        // $rules['volumetric_weight'] = 'nullable|numeric|greater_than_value:0|max:19999';
         $rules['weight_uom'] = 'required|in:kg,lb';
         $rules['dims_uom'] = 'required|in:cm,in';
         $rules['country_of_destination'] = 'required|exists:countries,country_code';
@@ -475,7 +475,7 @@ class APIShipment
 
         $rules = $this->addPackagingRules($shipment['company_id'], $shipment['mode_id'], $rules);
 
-        $rules['packages.*.weight'] = 'required|numeric|min:.1|max:9999';
+        $rules['packages.*.weight'] = 'required|numeric|greater_than_value:0|max:9999';
         $rules['packages.*.length'] = 'required|integer|min:1|max:999';
         $rules['packages.*.width'] = 'required|integer|min:1|max:999';
         $rules['packages.*.height'] = 'required|integer|min:1|max:999';
@@ -672,13 +672,23 @@ class APIShipment
             }
         }
 
-        // Check Bill shipping to Other or Recipient is not using an IFS account
+        // Check Bill tax/ duty to Other or Recipient is not using an IFS account
         if (isset($shipment['bill_tax_duty_account']) && $shipment['bill_tax_duty_account'] > '') {
             if (isset($shipment['bill_tax_duty']) && in_array($shipment['bill_tax_duty'], ['recipient', 'other'])) {
                 $service = Service::where('account', $shipment['bill_tax_duty_account'])->first();
                 if ($service) {
                     $errors[] = '"Bill Tax And Duty To:" must be "Sender" if using an IFS Account number on Billing Tab';
                 }
+            }
+        }
+
+        // If Fedex IE service check not billed to IFS account 914974712
+        if (isset($shipment['service_id']) && $shipment['service_id'] == '9') {
+            if (isset($shipment['bill_shipping_account']) && ($shipment['bill_shipping_account'] == '914974712')) {
+                $errors[] = 'Bill Shipping Acct No: cannot be "914974712"';
+            }
+            if (isset($shipment['bill_tax_duty_account']) && ($shipment['bill_tax_duty_account'] == '914974712')) {
+                $errors[] = 'Bill Tax/ Duty Acct No: cannot be "914974712"';
             }
         }
 
