@@ -422,8 +422,8 @@ class APIShipment
         $rules['carrier_pickup_required'] = 'nullable|in:0,1';
         $rules['service_code'] = 'required|exists:services,code';
         $rules['pieces'] = 'required|integer|min:1|max:99';
-        $rules['weight'] = 'required|numeric|min:0.1|max:19999';
-        // $rules['volumetric_weight'] = 'nullable|numeric|min:0.1|max:19999';
+        $rules['weight'] = 'required|numeric|greater_than_value:0|max:19999';
+        // $rules['volumetric_weight'] = 'nullable|numeric|greater_than_value:0|max:19999';
         $rules['weight_uom'] = 'required|in:kg,lb';
         $rules['dims_uom'] = 'required|in:cm,in';
         $rules['country_of_destination'] = 'required|exists:countries,country_code';
