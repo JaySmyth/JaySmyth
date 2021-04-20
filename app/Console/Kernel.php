@@ -31,6 +31,7 @@ class Kernel extends ConsoleKernel
         Commands\PurchaseInvoices\ImportTntPurchaseInvoices::class,
         Commands\PurchaseInvoices\ImportExpressFreightPurchaseInvoices::class,
         Commands\PurchaseInvoices\ImportXdpPurchaseInvoices::class,
+        Commands\PurchaseInvoices\ImportDxPurchaseInvoices::class,
         Commands\Transend\SendJobs::class,
         Commands\Transend\CancelJobs::class,
         Commands\Transend\ProcessFiles::class,
@@ -97,6 +98,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:import-tnt-purchase-invoices')->weekdays()->hourly()->between('8:00', '18:00');
         $schedule->command('ifs:import-express-freight-purchase-invoices')->weekdays()->hourly()->between('8:00', '18:00');
         $schedule->command('ifs:import-xdp-purchase-invoices')->weekdays()->hourly()->between('8:00', '18:00');
+        $schedule->command('ifs:import-dx-purchase-invoices')->weekdays()->hourly()->between('8:00', '18:00');
         $schedule->command('ifs:update-scs-job-numbers-on-purchase-invoice-lines')->weekdays()->everyThreeHours();
 
         /*
