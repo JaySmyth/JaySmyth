@@ -431,11 +431,9 @@ class APIController extends Controller
             );
         }
 
-        // If no errors Set Account details
+        // If no errors check for hazardous goods
         if ($this->input['data']['errors'] == []) {
-            // Set accounts
-            // $this->setShippingAcct();
-            // $this->setDutyTaxAcct();
+
             // If hazard flag defined then overide hazard_code
             if (isset($this->input['data']['hazard_flag']) && $this->input['data']['hazard_flag'] > '') {
                 switch ($this->input['data']['hazard_flag']) {
