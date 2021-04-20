@@ -475,7 +475,7 @@ class APIShipment
 
         $rules = $this->addPackagingRules($shipment['company_id'], $shipment['mode_id'], $rules);
 
-        $rules['packages.*.weight'] = 'required|numeric|min:.1|max:9999';
+        $rules['packages.*.weight'] = 'required|numeric|greater_than_value:0|max:9999';
         $rules['packages.*.length'] = 'required|integer|min:1|max:999';
         $rules['packages.*.width'] = 'required|integer|min:1|max:999';
         $rules['packages.*.height'] = 'required|integer|min:1|max:999';
@@ -682,7 +682,6 @@ class APIShipment
             }
         }
 
-        /*
         // If Fedex IE service check not billed to IFS account 914974712
         if (isset($shipment['service_id']) && $shipment['service_id'] == '9') {
             if (isset($shipment['bill_shipping_account']) && ($shipment['bill_shipping_account'] == '914974712')) {
@@ -692,7 +691,6 @@ class APIShipment
                 $errors[] = 'Bill Tax/ Duty Acct No: cannot be "914974712"';
             }
         }
-        */
 
         return $errors;
     }
