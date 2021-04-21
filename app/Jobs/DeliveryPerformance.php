@@ -36,7 +36,7 @@ class DeliveryPerformance implements ShouldQueue
     public function handle()
     {
         // Get Data
-        $recipient = 'gmcbroom@antrim.ifsgroup.com';
+        $recipient = 'aplatt@antrim.ifsgroup.com';
         $startDate = Carbon::now()->subMonths(1)->startOfDay()->format('Y-m-d H:i:s');
         $endDate = Carbon::now()->endOfDay()->format('Y-m-d H:i:s');
         $data = DB::select(DB::raw("
