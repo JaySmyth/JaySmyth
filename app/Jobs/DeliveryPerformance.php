@@ -5,6 +5,7 @@ namespace App\Jobs;
 use \App\Models\Carrier;
 
 use DB;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -36,8 +37,8 @@ class DeliveryPerformance implements ShouldQueue
     {
         // Get Data
         $recipient = 'gmcbroom@antrim.ifsgroup.com';
-        $startDate = date("Y-m-d", strtotime("-1 months + 1 day"));
-        $endDate = date("Y-m-d");
+        $startDate = Carbon::now()->subMonths(1)->startOfDay()->format('Y-m-d H:i:s');
+        $endDate = Carbon::now()->endOfDay()->format('Y-m-d H:i:s');
         $data = DB::select(DB::raw("
           SELECT carrier_id, carriers.code, status_id, statuses.code, COUNT(shipments.id) AS COUNT FROM shipments
           JOIN statuses ON statuses.id = status_id
