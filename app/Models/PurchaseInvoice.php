@@ -157,6 +157,8 @@ class PurchaseInvoice extends Model
                 return '0171994'; // Express Freight
             case 16:
                 return '0198859'; // XDP
+            case 17:
+                return '0200076'; // DX
             default:
                 return 'UNKNOWN';
         }
