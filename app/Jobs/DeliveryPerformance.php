@@ -37,7 +37,7 @@ class DeliveryPerformance implements ShouldQueue
     {
         // Get Data
         $recipient = 'aplatt@antrim.ifsgroup.com';
-        $startDate = Carbon::now()->subMonths(1)->startOfDay()->format('Y-m-d H:i:s');
+        $startDate = Carbon::now()->subMonths(1)->addDays(1)->startOfDay()->format('Y-m-d H:i:s');
         $endDate = Carbon::now()->endOfDay()->format('Y-m-d H:i:s');
         $data = DB::select(DB::raw("
           SELECT carrier_id, carriers.code, status_id, statuses.code, COUNT(shipments.id) AS COUNT FROM shipments
