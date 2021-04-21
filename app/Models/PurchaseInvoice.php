@@ -158,8 +158,7 @@ class PurchaseInvoice extends Model
             case 16:
                 return '0198859'; // XDP
             case 17:
-                //return '0200076'; // DX
-                return null; // DX
+                return '0200076'; // DX
             default:
                 return 'UNKNOWN';
         }
