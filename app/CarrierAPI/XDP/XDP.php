@@ -166,7 +166,7 @@ class XDP
         $consignmentNode->addChild('deliverycounty', $prefix.$this->shipment['recipient_state'].$postfix);
         $consignmentNode->addChild('deliverypostcode', $prefix.$this->shipment['recipient_postcode'].$postfix);
         $consignmentNode->addChild('deliveryphone', $prefix.$this->shipment['recipient_telephone'].$postfix);
-        $consignmentNode->addChild('deliveryemail', $prefix.$this->shipment['recipient_email'].$postfix);
+        $consignmentNode->addChild('deliveryemail', $prefix.'courier@antrim.ifsgroup.com'.$postfix);
         $consignmentNode->addChild('deliverynotes', $prefix.$this->shipment['special_instructions'].$postfix);
 
         $consignmentNode->addChild('servicelevel', $prefix.$this->shipment['service'].$postfix);
