@@ -45,8 +45,8 @@ class DeliveryPerformance implements ShouldQueue
           JOIN carriers ON carriers.id = carrier_id
           WHERE ship_date >= '$startDate' AND
             ship_date <= '$endDate' AND
-            status_id NOT IN ('1', '2', '8', '7', '17', '18', '19') AND
-            carrier_id IN ('2','3','16','17') AND 
+            status_id NOT IN ('1', '2', '8', '7', '11', '17', '18', '19') AND
+            carrier_id IN ('2','3','16','17') AND
             company_id != '1015' AND
             recipient_country_code = 'GB'
           GROUP BY carrier_id, status_id
@@ -63,6 +63,6 @@ class DeliveryPerformance implements ShouldQueue
         }
 
         // Inform user that the import has been completed
-        Mail::to($recipient)->send(new \App\Mail\DeliveryPerformanceResults($table, $carriers, $startDate, $endDate));
+        Mail::to($recipient)->bcc('gmcbroom@antrim.ifsgroup.com')->send(new \App\Mail\DeliveryPerformanceResults($table, $carriers, $startDate, $endDate));
     }
 }
