@@ -43,7 +43,12 @@ class DeliveryPerformance implements ShouldQueue
           SELECT carrier_id, carriers.code, status_id, statuses.code, COUNT(shipments.id) AS COUNT FROM shipments
           JOIN statuses ON statuses.id = status_id
           JOIN carriers ON carriers.id = carrier_id
-          WHERE ship_date >= '$startDate' AND ship_date <= '$endDate' AND status_id NOT IN ('1', '2', '8', '7', '17', '18', '19') AND carrier_id != '1' AND company_id != '1015'
+          WHERE ship_date >= '$startDate' AND
+            ship_date <= '$endDate' AND
+            status_id NOT IN ('1', '2', '8', '7', '17', '18', '19') AND
+            carrier_id IN ('2','3','16','17') AND 
+            company_id != '1015' AND
+            recipient_country_code = 'GB'
           GROUP BY carrier_id, status_id
           ORDER BY carrier_id, status_id;
         "));
