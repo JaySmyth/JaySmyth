@@ -19,6 +19,8 @@ class DeliveryPerformance implements ShouldQueue
         Queueable,
         SerializesModels;
 
+    public $timeout = 600;
+
     /**
      * Create a new job instance.
      *
