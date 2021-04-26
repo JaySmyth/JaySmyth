@@ -769,6 +769,15 @@ class APIShipment
                 if ($girth > $this->maxAllowedGirth) {
                     $errors[] = "Package $pkg - Girth exceeds Max allowed ($this->maxAllowedGirth cms)";
                 }
+
+                // Only Fedex/ DHL Intl allowed to use Carrier Envelope
+                if ($shipment['packages'][$i]['packaging_code'] == 'ENV') {
+                    if (in_array($shipment['carrier_id'], ['2', '4']) && ! in_array($shipment['recipient_country_code'], ['GB','IE'])) {
+                        // All Ok
+                    } else {
+                        $errors[] = "Package $pkg - Carrier Envelope not applicable - Select Package instead";
+                    }
+                }
             }
         } else {
             $errors[] = 'Piece count incorrect';

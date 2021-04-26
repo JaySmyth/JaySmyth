@@ -69,6 +69,7 @@ class Kernel extends ConsoleKernel
         Commands\DispatchEasypostTrackers::class,
         Commands\UploadFedExCommercialInvoices::class,
         Commands\RepriceShipments::class,
+        Commands\DispatchDeliveryPerformance::class,
     ];
 
     /**
@@ -119,6 +120,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:process-shipment-uploads')->withoutOverlapping(2);
         $schedule->command('ifs:check-for-duplicate-shipments')->twiceDaily(12, 14);
         $schedule->command('ifs:dispatch-easypost-trackers')->dailyAt('20:40');
+        $schedule->command('ifs:dispatch-delivery-performance')->dailyAt('08:15');
         $schedule->command('ifs:upload-fedex-commercial-invoices')->weekdays()->everyFiveMinutes()->between('16:20', '17:45');
 
         /*
