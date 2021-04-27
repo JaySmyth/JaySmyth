@@ -345,7 +345,7 @@ class ImportShipments implements ShouldQueue
         $this->row['dims_uom'] = $this->company->localisation->dims_uom;
         $this->row['weight_uom'] = $this->company->localisation->weight_uom;
         $this->row['date_format'] = $this->company->localisation->date_format;
-        $this->row['customs_value_currency_code'] = $this->company->localisation->currency_code;
+        $this->row['customs_value_currency_code'] = (empty($this->row['customs_value_currency_code'])) ? $this->company->localisation->currency_code : $this->row['customs_value_currency_code'];
         $this->row['label_size'] = $this->company->localisation->document_size;
         $this->row['ship_reason'] = 'sold';
         $this->row['terms_of_sale'] = (empty($this->row['terms_of_sale'])) ? $this->importConfig->default_terms : $this->row['terms_of_sale'];
@@ -646,7 +646,7 @@ class ImportShipments implements ShouldQueue
             $this->row['contents'][0]['quantity'] = $this->row['product_quantity'];
             $this->row['contents'][0]['uom'] = $commodity->uom;
             $this->row['contents'][0]['unit_value'] = round($this->row['customs_value'] / $this->row['product_quantity'], 2);
-            $this->row['contents'][0]['currency_code'] = $commodity->currency_code;
+            $this->row['contents'][0]['currency_code'] = empty($this->row['customs_value_currency_code']) ? $commodity->currency_code : $this->row['customs_value_currency_code'];
             $this->row['contents'][0]['unit_weight'] = round($this->row['weight'] / $this->row['product_quantity'], 2);
             $this->row['contents'][0]['weight_uom'] = $commodity->weight_uom;
         }
