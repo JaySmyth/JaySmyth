@@ -85,7 +85,7 @@ class ShipmentsController extends Controller
 
         // Non IFS default to a month ago
         if (!$request->user()->hasIfsRole() && strlen($request->filter) < 5 && ! $request->date_from && ! $request->date_to && ! $request->company && ! $request->user && ! $request->scs_job_number) {
-            $request->date_from = now()->subMonth();
+            $request->date_from = now()->subMonths(3);
         }
 
         $query = Shipment::select('shipments.*')

@@ -521,7 +521,7 @@ trait ShipmentScopes
             })
             ->whereNotIn('companies.id', $excludedCompanies)
             ->where(function ($query) {
-                return $query->whereIn('status_id', ["4", "5", "6"])
+                return $query->whereIn('status_id', ["4", "5", "6", "9", "19"])
                     ->orWhere('manifest_id', '>', 1);
             });
     }
