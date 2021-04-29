@@ -772,7 +772,7 @@ class APIShipment
 
                 // Only Fedex/ DHL Intl allowed to use Carrier Envelope
                 if ($shipment['packages'][$i]['packaging_code'] == 'ENV') {
-                    if (in_array($shipment['carrier_id'], ['2', '4']) && ! in_array($shipment['recipient_country_code'], ['GB','IE'])) {
+                    if (in_array($shipment['carrier_id'], ['2', '5']) && ! in_array($shipment['recipient_country_code'], ['GB','IE'])) {
                         // All Ok
                     } else {
                         $errors[] = "Package $pkg - Carrier Envelope not applicable - Select Package instead";
