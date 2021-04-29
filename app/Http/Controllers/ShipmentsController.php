@@ -728,7 +728,7 @@ class ShipmentsController extends Controller
      */
     public function storeStatusUpload(Request $request)
     {
-        $this->authorize('upload', new Shipment);
+        $this->authorize('statusUpload', new Shipment);
 
         // Validate the request
         $this->validate($request, [
