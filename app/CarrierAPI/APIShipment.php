@@ -710,6 +710,12 @@ class APIShipment
             $errors[] = 'Invalid Recipient postcode';
         }
 
+        // Check that postcode matches country for shipments to NI
+        if ($shipment['recipient_country_code'] == 'IE' && substr($shipment['recipient_postcode'], 0, 2) == 'BT') {
+            $errors[] = 'Destination should be UK';
+        }
+
+
         return $errors;
     }
 
