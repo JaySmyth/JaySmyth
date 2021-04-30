@@ -710,9 +710,29 @@ class APIShipment
             $errors[] = 'Invalid Recipient postcode';
         }
 
-        // Check that postcode matches country for shipments to NI
-        if ($shipment['recipient_country_code'] == 'IE' && substr($shipment['recipient_postcode'], 0, 2) == 'BT') {
-            $errors[] = 'Destination should be UK';
+        // Check that postcode matches country
+        if ($shipment['recipient_country_code'] == 'IE') {
+            $areaCode = substr($shipment['recipient_postcode'], 0, 2);
+
+            // NI, Shetlands, Orkney
+            if (in_array($areaCode, ['BT','ZE','KW'])) {
+                $errors[] = 'Destination should be UK';
+            }
+
+            // Jersey
+            if (in_array($areaCode, ['JE'])) {
+                $errors[] = 'Destination should be Jersey';
+            }
+
+            // Isle of Man
+            if (in_array($areaCode, ['IM'])) {
+                $errors[] = 'Destination should be Isle of Man';
+            }
+
+            // Guernsey
+            if (in_array($areaCode, ['GY'])) {
+                $errors[] = 'Destination should be Guernsey';
+            }
         }
 
 
