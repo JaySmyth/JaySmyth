@@ -817,6 +817,10 @@ class APIShipment
 
     public function checkCommodityDetails($shipment, $errors)
     {
+        if (isUkDomestic(strtoupper($shipment['recipient_country_code']))) {
+            return $errors;
+        }
+
         if (isset($shipment['contents'])) {
             $calcCustomsVal = 0;
             foreach ($shipment['contents'] as $commodity) {
