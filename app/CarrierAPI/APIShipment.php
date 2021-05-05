@@ -400,7 +400,7 @@ class APIShipment
             $errors = $this->checkPackageLimits($shipment, $errors);
 
             // Validate Commodity details
-            $errors = $this->checkCommodityDetails($shipment, $errors);
+            // $errors = $this->checkCommodityDetails($shipment, $errors);
 
             // Validate based on Country Restrictions
             $errors = $this->checkCountryRestrictions($shipment, $errors);
