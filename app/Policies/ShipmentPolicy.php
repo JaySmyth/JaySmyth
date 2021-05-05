@@ -23,6 +23,18 @@ class ShipmentPolicy
     }
 
     /**
+     * Index policy.
+     *
+     * @return bool
+     */
+    public function statusUpload(User $user)
+    {
+        if ($user->hasPermission('status_upload') || in_array($user->id, ['183', '2541'])) {
+            return true;
+        }
+    }
+
+    /**
      * Show policy.
      *
      * @return bool

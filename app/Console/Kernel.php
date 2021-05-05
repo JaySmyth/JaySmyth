@@ -70,6 +70,7 @@ class Kernel extends ConsoleKernel
         Commands\UploadFedExCommercialInvoices::class,
         Commands\RepriceShipments::class,
         Commands\DispatchDeliveryPerformance::class,
+        Commands\DispatchExtendedTransitReport::class,
     ];
 
     /**
@@ -121,6 +122,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:check-for-duplicate-shipments')->twiceDaily(12, 14);
         $schedule->command('ifs:dispatch-easypost-trackers')->dailyAt('20:40');
         $schedule->command('ifs:dispatch-delivery-performance')->dailyAt('08:15');
+        $schedule->command('ifs:dispatch-extended-transit-report')->dailyAt('08:15');
         $schedule->command('ifs:upload-fedex-commercial-invoices')->weekdays()->everyFiveMinutes()->between('16:20', '17:45');
 
         /*

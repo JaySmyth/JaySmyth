@@ -399,6 +399,9 @@ class APIShipment
             // Validate based on Service limits
             $errors = $this->checkPackageLimits($shipment, $errors);
 
+            // Validate Commodity details
+            $errors = $this->checkCommodityDetails($shipment, $errors);
+
             // Validate based on Country Restrictions
             $errors = $this->checkCountryRestrictions($shipment, $errors);
 
@@ -710,6 +713,32 @@ class APIShipment
             $errors[] = 'Invalid Recipient postcode';
         }
 
+        // Check that postcode matches country
+        if ($shipment['recipient_country_code'] == 'IE') {
+            $areaCode = substr($shipment['recipient_postcode'], 0, 2);
+
+            // NI, Shetlands, Orkney
+            if (in_array($areaCode, ['BT','ZE','KW'])) {
+                $errors[] = 'Destination should be UK';
+            }
+
+            // Jersey
+            if (in_array($areaCode, ['JE'])) {
+                $errors[] = 'Destination should be Jersey';
+            }
+
+            // Isle of Man
+            if (in_array($areaCode, ['IM'])) {
+                $errors[] = 'Destination should be Isle of Man';
+            }
+
+            // Guernsey
+            if (in_array($areaCode, ['GY'])) {
+                $errors[] = 'Destination should be Guernsey';
+            }
+        }
+
+
         return $errors;
     }
 
@@ -772,7 +801,7 @@ class APIShipment
 
                 // Only Fedex/ DHL Intl allowed to use Carrier Envelope
                 if ($shipment['packages'][$i]['packaging_code'] == 'ENV') {
-                    if (in_array($shipment['carrier_id'], ['2', '4']) && ! in_array($shipment['recipient_country_code'], ['GB','IE'])) {
+                    if (in_array($shipment['carrier_id'], ['2', '5']) && ! in_array($shipment['recipient_country_code'], ['GB','IE'])) {
                         // All Ok
                     } else {
                         $errors[] = "Package $pkg - Carrier Envelope not applicable - Select Package instead";
@@ -781,6 +810,22 @@ class APIShipment
             }
         } else {
             $errors[] = 'Piece count incorrect';
+        }
+
+        return $errors;
+    }
+
+    public function checkCommodityDetails($shipment, $errors)
+    {
+        if (isset($shipment['contents'])) {
+            $calcCustomsVal = 0;
+            foreach ($shipment['contents'] as $commodity) {
+                $calcCustomsVal+=$commodity['quantity']*$commodity['unit_value'];
+            }
+
+            if ($shipment['customs_value']<>$calcCustomsVal) {
+                $errors[] = 'Individual Commodity values not equal to Shipment Customs Value';
+            }
         }
 
         return $errors;

@@ -171,7 +171,9 @@ class StatusUpload implements ShouldQueue
         $this->completeEmptyFields();
 
         // Some validation
-        $this->shipment = Shipment::where('consignment_number', $this->row['consignment_number'])->first();
+        $this->shipment = Shipment::where('consignment_number', $this->row['consignment_number'])
+                                    ->orWhere('carrier_consignment_number', $this->row['consignment_number'])
+                                    ->first();
         if (empty($this->shipment)) {
             $this->errors[] = 'Shipment not found';
         }
