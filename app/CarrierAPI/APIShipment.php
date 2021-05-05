@@ -399,6 +399,9 @@ class APIShipment
             // Validate based on Service limits
             $errors = $this->checkPackageLimits($shipment, $errors);
 
+            // Validate Commodity details
+            $errors = $this->checkCommodityDetails($shipment, $errors);
+
             // Validate based on Country Restrictions
             $errors = $this->checkCountryRestrictions($shipment, $errors);
 
@@ -807,6 +810,20 @@ class APIShipment
             }
         } else {
             $errors[] = 'Piece count incorrect';
+        }
+
+        return $errors;
+    }
+
+    public function checkCommodityDetails($shipment, $errors)
+    {
+        $calcCustomsVal = 0;
+        foreach ($shipment['contents'] as $commodity) {
+            $calcCustomsVal+=$commodity['quantity']*$commodity['unit_value'];
+        }
+
+        if ($shipment['customs_value']<>$calcCustomsVal) {
+            $errors[] = 'Individual Commodity values not equal to Shipment Customs Value';
         }
 
         return $errors;
