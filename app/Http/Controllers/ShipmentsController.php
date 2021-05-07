@@ -714,7 +714,7 @@ class ShipmentsController extends Controller
      */
     public function statusUpload()
     {
-        $this->authorize(new Shipment);
+        $this->authorize('statusUpload', new Shipment);
 
         return view('shipments.status_upload');
     }

@@ -8,7 +8,6 @@
 
 <div class="row mt-3">
     <div class="col-sm-5">
-        @if(Auth::user()->hasRole('ifsa'))
         <div class="form-group row{{ $errors->has('status_code') ? ' has-danger' : '' }}">
 
             <label class="col-sm-3  col-form-label">
@@ -26,10 +25,6 @@
 
             </div>
         </div>
-
-        @else
-        {!! Form::hidden('status_code', Auth::user()->status_code, array('id' => 'status_code')) !!}
-        @endif
 
         <div class="form-group row{{ $errors->has('file') ? ' has-danger' : '' }}">
             <label class="col-sm-3  col-form-label">
