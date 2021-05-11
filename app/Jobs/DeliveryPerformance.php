@@ -47,7 +47,7 @@ class DeliveryPerformance implements ShouldQueue
             JOIN carriers ON carriers.id = carrier_id
             WHERE ship_date >= '$startDate'
                 AND ship_date <= '$endDate'
-                AND status_id NOT IN ('1', '2', '8', '7', '11', '17', '18', '19')
+                AND status_id NOT IN ('1', '2', '8', '7', '17', '18', '19')
                 AND carrier_id IN ('2','3','16','17')
                 AND depot_id = '1'
                 AND recipient_country_code = 'GB'

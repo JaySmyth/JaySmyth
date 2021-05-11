@@ -1566,7 +1566,8 @@ class Shipment extends Model
      */
     public function formViewAvailable()
     {
-        if (! $this->legacy && $this->status->code != 'saved' && $this->form_values) {
+        $statusCode = (isset($this->status->code)) ? $this->status->code : 'saved';
+        if (! $this->legacy && $statusCode != 'saved' && $this->form_values) {
             return true;
         }
 

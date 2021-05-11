@@ -305,7 +305,13 @@ class XDP
      */
     private function setLabelDataArray($result)
     {
-        return base64_encode(file_get_contents($this->xdp_label_url));
+        // Retrieve Label data. Retry every 300ms max 20 times if unsuccessful
+        $url = $this->xdp_label_url;
+        return retry(20, function ($result) use ($url) {
+            return base64_encode(file_get_contents($url));
+        }, 300);
+
+        // return base64_encode(file_get_contents($this->xdp_label_url));
     }
 
     /**

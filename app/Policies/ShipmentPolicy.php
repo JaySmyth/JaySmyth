@@ -29,7 +29,7 @@ class ShipmentPolicy
      */
     public function statusUpload(User $user)
     {
-        if ($user->hasPermission('status_upload') || in_array($user->id, ['183', '2541'])) {
+        if ($user->hasRole('ifsa')  || in_array($user->id, ['85','183','2527','2541'])) {
             return true;
         }
     }
