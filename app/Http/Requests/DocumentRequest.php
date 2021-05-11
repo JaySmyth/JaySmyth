@@ -2,8 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Http\Requests\Request;
-
 class DocumentRequest extends Request
 {
     /**
@@ -24,7 +22,7 @@ class DocumentRequest extends Request
     public function rules()
     {
         return [
-            'file'       => 'required|mimes:pdf',
+            'file' => 'required|mimes:pdf,jpg,jpeg,png',
             'document_type' => 'required|min:3|max:80',
             'description' => 'required|min:3|max:80',
             'parent' => 'required',
