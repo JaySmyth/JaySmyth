@@ -1044,7 +1044,7 @@ class Shipment extends Model
         if ($status && $this->status_id != $status->id) {
 
             // If not yet shipped and requested status is "no goods received"
-            if ($this->status_id == '18' && in_array($this->status_id, ['1', '2'])) {
+            if ($status->id == '18' && in_array($this->status_id, ['1', '2'])) {
                 $this->status_id = $status->id;
                 $this->save();
             } else {
@@ -1053,10 +1053,16 @@ class Shipment extends Model
                     $this->status_id = $status->id;
                     $this->save();
                 } else {
-                    // If not Delivered or RTS change the status on the shipment record
-                    if (! in_array($this->status_id, ['6', '9', '19'])) {
+                    // If Claim then update status
+                    if ($status->id == '21') {
                         $this->status_id = $status->id;
                         $this->save();
+                    } else {
+                        // If not Delivered or RTS change the status on the shipment record
+                        if (! in_array($this->status_id, ['6', '9', '19'])) {
+                            $this->status_id = $status->id;
+                            $this->save();
+                        }
                     }
                 }
             }
