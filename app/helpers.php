@@ -390,15 +390,14 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             break;
         case 'statuses':
             $result = App\Models\Status::select('name', 'id')->where('id', '>', 0)
-                ->where('id', '<', 13)->orWhere('id', 19)->pluck('name', 'id')->toArray();
+                ->where('id', '<', 13)->orWhereIn('id', [19,20,21])->pluck('name', 'id')->toArray();
             $result = Arr::add($result, 'S', 'Shipped (All except cancelled)');
             break;
         case 'statusCodes':
             $result = [
                 'pre_transit' => 'Pre-Transit', 'no_goods' => 'No Goods Received', 'cancelled' => 'Shipment Cancelled', 'received' => 'Goods Received', 'in_transit' => 'In Transit',
                 'out_for_delivery' => 'Out For Delivery', 'partial_delivery' => 'Partial Delivery', 'delivered' => 'Delivered', 'on_hold' => 'On Hold',
-                'failure' => 'Failure', 'return_to_sender' => 'Return To Sender',
-                'rts_complete' => 'RTS Complete'
+                'failure' => 'Failure', 'return_to_sender' => 'Return To Sender', 'rts_complete' => 'RTS Complete', 'claim' => 'Claim',
             ];
             break;
         case 'uoms':
@@ -1379,6 +1378,7 @@ function getProgressBarColour($statusCode)
 {
     switch ($statusCode) {
         case 'cancelled':
+        case 'claim':
         case 'failure':
         case 'unknown':
             return 'red';
