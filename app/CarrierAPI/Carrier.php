@@ -5,6 +5,7 @@ namespace App\CarrierAPI;
 use App\CarrierAPI\CWide\CWideAPI;
 use App\CarrierAPI\DHL\DHLAPI;
 use App\CarrierAPI\DX\DXAPI;
+use App\CarrierAPI\Express\ExpressAPI;
 use App\CarrierAPI\ExpressFreight\ExpressFreightAPI;
 use App\CarrierAPI\ExpressFreightNI\ExpressFreightNIAPI;
 use App\CarrierAPI\Fedex\FedexAPI;
@@ -65,6 +66,10 @@ class Carrier
 
             case 'dx':
                 return new DXAPI($mode);
+                break;
+
+            case 'express':
+                return new ExpressAPI($mode);
                 break;
 
             default:

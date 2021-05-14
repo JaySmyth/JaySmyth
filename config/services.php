@@ -61,6 +61,14 @@ return [
         'user' => env('DX_API_USER'),
         'password' => env('DX_API_PASSWORD'),
         'url' => env('DX_API_URL'),
+    ],
+
+    'express' => [
+        'url' => env('EXPRESS_API_URL'),
+        'id' => env('EXPRESS_API_ID'),
+        'secret' => env('EXPRESS_API_SECRET'),
+        'username' => env('EXPRESS_API_USERNAME'),
+        'password' => env('EXPRESS_API_PASSWORD'),
     ]
 
 ];
