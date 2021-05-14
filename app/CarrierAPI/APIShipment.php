@@ -827,7 +827,8 @@ class APIShipment
                 $calcCustomsVal+=$commodity['quantity']*$commodity['unit_value'];
             }
 
-            if ($shipment['customs_value']<>$calcCustomsVal) {
+            // Rounding necessary or comparison can break for some values
+            if (round($shipment['customs_value'], 2) <> round($calcCustomsVal, 2)) {
                 $errors[] = 'Individual Commodity values not equal to Shipment Customs Value';
             }
         }
