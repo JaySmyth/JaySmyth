@@ -37,6 +37,7 @@ class DeliveryPerformance implements ShouldQueue
      */
     public function handle()
     {
+        "3","4","5","6","9","10","11","12","13","14","15","16","20","21"
         // Get Data
         $recipient = 'aplatt@antrim.ifsgroup.com';
         $startDate = Carbon::now()->startOfYear()->format('Y-m-d H:i:s');
@@ -47,7 +48,7 @@ class DeliveryPerformance implements ShouldQueue
             JOIN carriers ON carriers.id = carrier_id
             WHERE ship_date >= '$startDate'
                 AND ship_date <= '$endDate'
-                AND status_id NOT IN ('1', '2', '8', '7', '17', '18', '19')
+                AND status_id IN ('3', '4', '5', '6','9', '10', '11', '20', '21')
                 AND carrier_id IN ('2','3','16','17')
                 AND depot_id = '1'
                 AND recipient_country_code = 'GB'
