@@ -48,9 +48,21 @@
           @endforeach
       </tr>
       <tr>
+        <td>Partial Delivery</td>
+          @foreach($carriers as $key => $carrier)
+            <td>{{$data['20'][$key] ?? '0'}}</td>
+          @endforeach
+      </tr>
+      <tr>
         <td>RTS</td>
           @foreach($carriers as $key => $carrier)
             <td>{{$data['9'][$key] ?? '0'}}</td>
+          @endforeach
+      </tr>
+      <tr>
+        <td>Claim</td>
+          @foreach($carriers as $key => $carrier)
+            <td>{{$data['21'][$key] ?? '0'}}</td>
           @endforeach
       </tr>
       <tr>
