@@ -69,7 +69,7 @@ class UploadNIShipmentsToExpressFreight extends Command
             // Create the file to upload
             $this->createFile();
 
-            Mail::to('ASteenson@expressfreight.co.uk')->cc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight NI Manifest ('.$this->shipments->count().' shipments)', 'Please see attached file', $this->filePath));
+            Mail::to('ASteenson@expressfreight.co.uk')->cc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight NI/JMC Manifest ('.$this->shipments->count().' shipments)', 'Please see attached file', $this->filePath));
         }
     }
 
@@ -121,7 +121,7 @@ class UploadNIShipmentsToExpressFreight extends Command
                 $shipment->recipient_city,
                 $shipment->recipient_state,
                 $shipment->recipient_postcode,
-                'North Ireland',
+                (strtoupper($shipment->recipient_country_code == 'IE')) ? 'Rest of Ireland' : 'North Ireland',
                 str_replace('"', '', $shipment->special_instructions),
                 $shipment->recipient_telephone,
                 $shipment->pieces,
