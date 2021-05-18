@@ -14,7 +14,6 @@
                        value="@if(!Request::get('date_from') && !Request::get('date_to')){{date(Auth::user()->date_format)}}@else{{Request::get('date_from')}}@endif"
                        class="form-control datepicker" placeholder="Date from">
             </div>
-
             <div class="form-group">
                 <label for="month">Date To</label>
                 <input type="text" name="date_to"
@@ -35,6 +34,16 @@
             <div class="form-group">
                 <label for="month">Shipper</label>
                 {!! Form::select('company', dropDown('enabledSites', 'All Shippers'), Request::get('company'), array('class' => 'form-control')) !!}
+            </div>
+
+            <div class="form-group">
+                <label for="month">Depot</label>
+                {!! Form::select('depot', dropDown('associatedDepots', 'All Depots'), Request::get('depot'), array('class' => 'form-control')) !!}
+            </div>
+
+            <div class="form-group">
+                <label for="destination">Destination</label>
+                {!! Form::select('destination', dropDown('countries', 'All Countries'), Request::get('destination'), array('class' => 'form-control')) !!}
             </div>
 
             <button type="submit" class="btn btn-primary mt-3">Update Report</button>

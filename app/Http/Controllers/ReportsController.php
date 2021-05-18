@@ -330,8 +330,11 @@ class ReportsController extends Controller
 
         $this->authorize(new Report);
 
-        $dateFrom = new Carbon($request->date_from);
-        $dateTo = new Carbon($request->date_to);
+        $dateFrom = new Carbon('2021-04-01');
+        $dateTo = new Carbon('2021-04-30');
+        $dateFrom = $dateFrom->startOfDay()->format('Y-m-d H:i:s');
+        $dateTo = $dateTo->endOfDay()->format('Y-m-d H:i:s');
+
         $services = [];
         if (isset($request->service) && $request->service > '') {
             $services = \App\Models\Service::where('code', $request->service)->pluck('id');
@@ -344,6 +347,8 @@ class ReportsController extends Controller
             ->hasCompany($request->company)
             ->hasCarrier($request->carrier)
             ->hasServiceIn($services)
+            ->hasDepot($request->depot)
+            ->hasRecipientCountryCode($request->destination)
             ->shipDateBetween($dateFrom, $dateTo)
             ->whereDelivered(1)
             ->chunk(500, function ($shipments) use (&$total, &$results) {
