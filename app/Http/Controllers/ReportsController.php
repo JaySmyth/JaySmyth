@@ -330,8 +330,8 @@ class ReportsController extends Controller
 
         $this->authorize(new Report);
 
-        $dateFrom = new Carbon('2021-04-01');
-        $dateTo = new Carbon('2021-04-30');
+        $dateFrom = new Carbon($request->date_from);
+        $dateTo = new Carbon($request->date_to);
         $dateFrom = $dateFrom->startOfDay()->format('Y-m-d H:i:s');
         $dateTo = $dateTo->endOfDay()->format('Y-m-d H:i:s');
 
