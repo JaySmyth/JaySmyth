@@ -62,8 +62,8 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
             }
 
             // Depot number
-            $this->pdf->SetFont($this->font, 'B', 20);
-            $this->pdf->Text(84, 26, $this->getDepotNumber($this->shipment['recipient_postcode'], $this->shipment['recipient_state']));
+            $this->pdf->SetFont($this->font, 'B', 18);
+            $this->pdf->Text(81, 34, $this->getDepotNumber($this->shipment['recipient_postcode'], $this->shipment['recipient_state']));
 
             // Consignment number
             $x = 6;
