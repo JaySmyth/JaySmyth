@@ -2,11 +2,8 @@
 
 namespace App\CarrierAPI\ExpressFreightNI;
 
-use App\CarrierAPI\ExpressFreightNI\ExpressFreightNILabel;
 use App\Models\Shipment;
 use App\Models\TransactionLog;
-use Illuminate\Support\Facades\Validator;
-use TCPDI;
 
 /**
  * Description of IFSWebAPI.
@@ -32,7 +29,6 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
         $errors = $this->validateShipment($shipment);
 
         if (empty($errors)) {
-
             // Set IFS specific settings
             $this->initCarrier($shipment);
 
@@ -44,13 +40,11 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
 
             // Check for errors
             if (isset($reply['errors']) && $reply['errors'] > '') {
-
                 // Request unsuccessful - return errors
                 $errorMsg = 'Carrier Error : '.((string) $reply['errors']);
 
                 return $this->generateErrorResponse($response, $errorMsg);
             } else {
-
                 // Request successful -  Calc Routing
                 $route_id = $this->calc_routing($shipment);
 
@@ -67,7 +61,7 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
         $rules['dry_ice'] = 'not_supported';
         $rules['insurance_value'] = 'not_supported';
         $rules['sender_country_code'] = 'in:GB,gb';
-        $rules['recipient_country_code'] = 'in:GB,gb';
+        $rules['recipient_country_code'] = 'in:GB,gb,IE,ie';
 
         return $this->applyRules($rules, $shipment);
     }
@@ -105,12 +99,13 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
      * Accepts Shipment and adds any additional info
      * required eg. ifs_consignment_number, package nos etc.
      *
-     * @param array $shipment
+     * @param  array  $shipment
+     *
      * @return array $data - Additional data - tracking nos, barcodes etc.
      */
     public function addAdditionalInfo($shipment)
     {
-        if(!empty($shipment['shipment_id'])){
+        if (! empty($shipment['shipment_id'])) {
             $data['consignment_number'] = Shipment::find($shipment['shipment_id'])->consignment_number;
         } else {
             $data['consignment_number'] = nextAvailable('CONSIGNMENT');                     // Generate an IFS Consignment Number
@@ -182,7 +177,7 @@ class ExpressFreightNIAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     * @param type $reply
+     * @param  type  $reply
      */
     private function generatePdf($shipment, $serviceCode, $labelData)
     {

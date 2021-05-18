@@ -34,16 +34,6 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->Cell(96, 123, '', 1);
 
             $this->pdf->Image(storage_path('app/images/ifs_logo_bw.png'), 4, 14, 24, 18, 'png');
-            // Express Freight logo
-            /*
-            $this->pdf->Image(storage_path('app/images/express_freight_logo.png'), 4, 14, 24, 18, 'png');
-            $this->pdf->SetFont($this->font, 'B', 14);
-            $this->pdf->Text(28, 14, 'Express Freight');
-            $this->pdf->SetFont($this->font, 'B', 27);
-            $this->pdf->Text(22, 14, '.................');
-            $this->pdf->SetFont($this->font, 'BI', 10);
-            $this->pdf->Text(20, 27, 'Quality in distribution');
-            */
 
             // Verticle text
             $x = 66;
@@ -51,7 +41,7 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->SetFont($this->font, 'B', 28);
             $this->pdf->StartTransform();
             $this->pdf->Rotate(90, $x, $y);
-            $this->pdf->Text($x, $y, 'EXP');
+            $this->pdf->Text($x, $y, (strtoupper($this->shipment['recipient_country_code']) == 'IE') ? 'JMC' : 'EXP');
             $this->pdf->StopTransform();
 
             // Create Box with Heading
@@ -61,7 +51,7 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->SetLineWidth(0.3);
             $this->pdf->Cell(22, 22, '', 1);
 
-            $bay = $this->getBayNumber($this->shipment['recipient_postcode']);
+            $bay = $this->getBayNumber($this->shipment['recipient_postcode'], $this->shipment['recipient_country_code']);
 
             if (strlen($bay) > 2) {
                 $this->pdf->SetFont($this->font, 'B', 28);
@@ -70,6 +60,10 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
                 $this->pdf->SetFont($this->font, 'B', 40);
                 $this->pdf->Text(78, 14, $bay);
             }
+
+            // Depot number
+            $this->pdf->SetFont($this->font, 'B', 18);
+            $this->pdf->Text(81, 34, $this->getDepotNumber($this->shipment['recipient_postcode'], $this->shipment['recipient_state']));
 
             // Consignment number
             $x = 6;
@@ -133,7 +127,7 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
                 $this->pdf->Text($x, $y += 4.1, strtoupper(getCountry($this->shipment['recipient_country_code'])));
             }
 
-            $this->pdf->Text($x, $y += 4.1, 'Tel: ' . $this->shipment['recipient_telephone']);
+            $this->pdf->Text($x, $y += 4.1, 'Tel: '.$this->shipment['recipient_telephone']);
 
             $this->pdf->SetLineWidth(0.3);
             $this->pdf->Line(65, 90, 65, 130); //vertical
@@ -173,21 +167,28 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
             $this->pdf->SetFont($this->font, 'B', 12);
             $this->pdf->Text($x, $y, 'IFS CONSIGNMENT#: '.$this->data['ifs_consignment_number']);
             $this->pdf->SetFont($this->font, 'B', 9);
-            $this->pdf->Text($x, $y+7, 'REFERENCE: '.$this->shipment['shipment_reference']);
+            $this->pdf->Text($x, $y + 7, 'REFERENCE: '.$this->shipment['shipment_reference']);
             $pkg++;
         }
 
         return $this->output();
     }
 
+
     /**
      * Lookup the bay number from the EF gazetteer.
      *
      * @param $postcode
-     * @return int
+     * @param $countryCode
+     *
+     * @return int|string
      */
-    protected function getBayNumber($postcode)
+    protected function getBayNumber($postcode, $countryCode)
     {
+        if (strtoupper($countryCode) == 'IE') {
+            return 19;
+        }
+
         $postcode = trim(str_replace(' ', '', $postcode));
 
         $gaz = ExpressFreightGazetteer::where('postcode', $postcode)->first();
@@ -195,5 +196,46 @@ class ExpressFreightNILabel extends \App\CarrierAPI\CarrierLabel
         if ($gaz) {
             return strtoupper($gaz->bay);
         }
+    }
+
+
+    protected function getDepotNumber($recipientPostcode, $recipientState)
+    {
+        $depots = [
+            'CARLOW' => 'CW',
+            'CAVAN' => '90',
+            'CLARE' => 'CE',
+            'CORK' => '132',
+            'DONEGAL' => 'DL',
+            'GALWAY' => '95',
+            'KERRY' => '114',
+            'KILDARE' => 'KE',
+            'KILKENNY' => '270',
+            'LAOIS' => 'CW',
+            'LEITRIM' => 'RN',
+            'LIMERICK' => '115',
+            'LONGFORD' => '90',
+            'LOUTH' => '181',
+            'MAYO' => '246',
+            'MEATH' => 'MH',
+            'MONAGHAN' => '181',
+            'OFFALY' => 'OY',
+            'ROSCOMMON' => '90',
+            'SLIGO' => 'SO',
+            'TIPPERARY' => '116',
+            'WATERFORD' => '178',
+            'WESTMEATH' => 'MG',
+            'WEXFORD' => '179',
+            'WICKLOW' => 'WW',
+            'DUBLIN' => 'DUB'
+        ];
+
+        foreach ($depots as $county => $depot) {
+            if (stristr($recipientPostcode, $county) || stristr($recipientState, $county)) {
+                return $depot;
+            }
+        }
+
+        return null;
     }
 }
