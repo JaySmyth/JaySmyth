@@ -157,7 +157,6 @@ class ManifestProfile extends Model
     /*
      * Get the shipments available for manifesting.
      */
-
     public function getShipments($onHold = 0, $companyId = false)
     {
         $query = Shipment::OrderBy('ship_date', 'desc')
@@ -176,6 +175,14 @@ class ManifestProfile extends Model
 
         if ($this->exclude_collect_shipments && $this->carrier_id == 2) {
             $query->isNotFedexCollect($query);
+        }
+
+        if ($this->collect_shipments_only && $this->carrier_id == 5) {
+            $query->isDhlCollect($query);
+        }
+
+        if ($this->exclude_collect_shipments && $this->carrier_id == 5) {
+            $query->isNotDhlCollect($query);
         }
 
         if ($this->services->count() > 0) {

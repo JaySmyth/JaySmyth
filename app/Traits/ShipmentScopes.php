@@ -540,9 +540,7 @@ trait ShipmentScopes
 
     /*
      * Scope FedEx intl collect.
-     *
      */
-
     public function scopeIsFedexCollect($query)
     {
         return $query->where('bill_shipping', '!=', 'sender')
@@ -555,13 +553,37 @@ trait ShipmentScopes
 
     /*
      * Scope NOT FedEx intl collect.
-     *
      */
     public function scopeIsNotFedexCollect($query)
     {
         return $query->where('bill_shipping', '!=', 'recipient')
-            //->where('bill_shipping_account', 205691588)
             ->where('carrier_id', 2)
+            ->whereIn('sender_country_code', getUkDomesticCountries())
+            ->whereNotIn('recipient_country_code', getUkDomesticCountries());
+    }
+
+
+    /*
+     * Scope DHL intl collect.
+     */
+    public function scopeIsDhlCollect($query)
+    {
+        return $query->where('bill_shipping', '!=', 'sender')
+            ->where('bill_shipping_account', '!=', 418289240)
+            ->where('bill_shipping_account', '!=', '')
+            ->where('carrier_id', 5)
+            ->whereIn('sender_country_code', getUkDomesticCountries())
+            ->whereNotIn('recipient_country_code', getUkDomesticCountries());
+    }
+
+
+    /*
+     * Scope NOT DHL intl collect.
+     */
+    public function scopeIsNotDhlCollect($query)
+    {
+        return $query->where('bill_shipping', '!=', 'recipient')
+            ->where('carrier_id', 5)
             ->whereIn('sender_country_code', getUkDomesticCountries())
             ->whereNotIn('recipient_country_code', getUkDomesticCountries());
     }
