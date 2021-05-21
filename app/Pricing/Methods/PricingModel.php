@@ -789,6 +789,7 @@ class PricingModel
         if (isset($package['length']) && isset($package['width']) && isset($package['height'])) {
             $girth = $package['length'] + ($package['width'] + $package['height']) * 2;
 
+            $this->log("Girth: ".$girth."LPS Girth: ".$this->lowerMaxGirth);
             if ($girth > $this->lowerMaxGirth && $girth <= $this->upperMaxGirth) {
                 return true;
             }
