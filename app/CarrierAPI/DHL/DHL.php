@@ -7,6 +7,7 @@ use App\Models\Service;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Mail;
 
 class DHL
 {
@@ -67,7 +68,7 @@ class DHL
         $this->serviceType = (isset($productCodes[0])) ? $productCodes[0] : null;
 
         // Sending from the mainland, change the product code
-        if (! isBtPostcode($this->shipment['sender_postcode']) && isUkDomestic($this->shipment['sender_country_code']) || !isEu($this->shipment['recipient_country_code'])) {
+        if (! isBtPostcode($this->shipment['sender_postcode']) && isUkDomestic($this->shipment['sender_country_code']) || ! isEu($this->shipment['recipient_country_code'])) {
             if ($this->serviceType == 'U' && strtolower($this->shipment['ship_reason']) == 'documents') {
                 $this->serviceType = 'D';
             }
@@ -87,7 +88,7 @@ class DHL
      */
     public function sendRequest()
     {
-        // Send rate request first
+        // Send rate request first to determine PLT availability
         if ($this->company->plt_enabled) {
             $this->sendRateRequest();
         }
@@ -108,7 +109,15 @@ class DHL
             // Log the response body
             $this->log('REPLY-2', 'I', $response);
 
-            return json_decode($response, true);
+            $decodedResponse = json_decode($response, true);
+
+            // Notify operations that PLT not possible to destination
+            if ($this->company->plt_enabled && $this->getContent() == 'NON_DOCUMENTS' && ! $this->pltAvailable) {
+                $message = 'PLT not available for DHL shipment '.$decodedResponse['ShipmentResponse']['ShipmentIdentificationNumber'].'. Upload customs documentation manually and send to carrier.';
+                Mail::to('courier@antrim.ifsgroup.com')->bcc('it@antrim.ifsgroup.com')->queue(new \App\Mail\GenericError('Upload customs documentation - '.$decodedResponse['ShipmentResponse']['ShipmentIdentificationNumber'], $message));
+            }
+
+            return $decodedResponse;
         } catch (GuzzleException $exception) {
             $error['ShipmentResponse']['Notification'][0]['Message'] = 'Problem processing shipment details. Please contact IT';
 
@@ -139,7 +148,7 @@ class DHL
             $this->rateRequest = json_decode($response, true);
 
             // Get the response for "WY" - indicates that PLT is available
-            if (in_array('WY', Arr::flatten($this->rateRequest))) {
+            if (in_array('WY', Arr::flatten($this->rateRequest), true)) {
                 $this->pltAvailable = true;
             }
         } catch (GuzzleException $exception) {
