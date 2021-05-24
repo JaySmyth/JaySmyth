@@ -76,6 +76,20 @@ trait ShipmentScopes
     }
 
     /**
+     * Scope recipient filter.
+     *
+     * @return
+     */
+    public function scopeHasRecipientCountryCode($query, $countryCode)
+    {
+        if ($countryCode) {
+            $countryCode = trim($countryCode);
+
+            return $query->where('recipient_country_code', $countryCode);
+        }
+    }
+
+    /**
      * Scope mode.
      *
      * @return
