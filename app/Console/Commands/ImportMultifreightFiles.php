@@ -56,7 +56,7 @@ class ImportMultifreightFiles extends Command
         'job-del' => ['job_id', 'del_no'],
         'rec-chg' => ['rec_id', 'line_no', 'charge_type'],
         'rec-cost' => ['rec_id', 'line_no', 'charge_type'],
-        'doc-adds' => ['job_id', 'line_no', 'address_type'],
+        // 'doc-adds' => ['job_id', 'line_no', 'address_type'],
     ];
 
     /**
