@@ -4,7 +4,7 @@ namespace App\Multifreight;
 
 use Illuminate\Database\Eloquent\Model;
 
-class DocAdd extends Model
+class DocAdds extends Model
 {
     /**
      * The connection name for the model.
