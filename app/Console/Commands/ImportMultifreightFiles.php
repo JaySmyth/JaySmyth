@@ -42,7 +42,8 @@ class ImportMultifreightFiles extends Command
      *
      * @var array
      */
-    protected $fileTypes = ['job-hdr', 'job-line', 'job-col', 'job-del', 'rec-chg', 'rec-cost', 'doc-adds'];
+    // protected $fileTypes = ['job-hdr', 'job-line', 'job-col', 'job-del', 'rec-chg', 'rec-cost', 'doc-adds'];
+    protected $fileTypes = ['job-hdr', 'job-line', 'job-col', 'job-del', 'rec-chg', 'rec-cost'];
 
     /**
      * Field to insert / update upon.
