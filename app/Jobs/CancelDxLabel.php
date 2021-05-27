@@ -8,7 +8,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Mail;
 
 class CancelDxLabel implements ShouldQueue
 {
@@ -33,7 +32,7 @@ class CancelDxLabel implements ShouldQueue
     {
         // We need to cancel each label created
         foreach ($this->shipment->packages as $package) {
-            $response = Http::post($this->url.'cancelLabel', [
+            Http::post($this->url.'cancelLabel', [
                 'cancelLabel' => [
                     "customerID" => $this->shipment->bill_shipping_account,
                     "trackingNumber" => $package->carrier_tracking_number
@@ -43,8 +42,6 @@ class CancelDxLabel implements ShouldQueue
                     'password' => $this->password
                 ]
             ]);
-
-            Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Cancel DX Label', $response->body()));
         }
     }
 
