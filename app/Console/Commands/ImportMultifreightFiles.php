@@ -42,6 +42,7 @@ class ImportMultifreightFiles extends Command
      *
      * @var array
      */
+    // protected $fileTypes = ['job-hdr', 'job-line', 'job-col', 'job-del', 'rec-chg', 'rec-cost', 'doc-adds'];
     protected $fileTypes = ['job-hdr', 'job-line', 'job-col', 'job-del', 'rec-chg', 'rec-cost'];
 
     /**
@@ -56,6 +57,7 @@ class ImportMultifreightFiles extends Command
         'job-del' => ['job_id', 'del_no'],
         'rec-chg' => ['rec_id', 'line_no', 'charge_type'],
         'rec-cost' => ['rec_id', 'line_no', 'charge_type'],
+        // 'doc-adds' => ['job_id', 'line_no', 'address_type'],
     ];
 
     /**
@@ -205,12 +207,10 @@ class ImportMultifreightFiles extends Command
 
                     case 1:
 
-                        if(!empty($row['job_id'])){
-
+                        if (!empty($row['job_id'])) {
                             $this->table::firstOrCreate([
                                 $this->keyFields[$this->fileType][0] => $row[$this->keyFields[$this->fileType][0]],
                             ])->update($row);
-
                         } else {
                             Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Import Multifreight Files: job_id is null', $this->directory.$file));
                         }

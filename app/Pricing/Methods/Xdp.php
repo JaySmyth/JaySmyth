@@ -55,4 +55,12 @@ class Xdp extends PricingModel
 
         return $eas->isOutOfArea($this->shipment['recipient_postcode']);
     }
+
+    /**
+     * Returns true if this is a large package shipment.
+     */
+    public function isLPSPackage($package)
+    {
+        return false;
+    }
 }
