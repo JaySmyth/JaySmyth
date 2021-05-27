@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 
 class CancelDxLabel implements ShouldQueue
 {
@@ -44,7 +45,7 @@ class CancelDxLabel implements ShouldQueue
                     ]
                 ]);
 
-                dd($response->body());
+                Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Cancel DX Label', $response->body()));
             }
         }
     }
