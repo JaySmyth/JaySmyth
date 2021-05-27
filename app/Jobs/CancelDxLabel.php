@@ -33,7 +33,7 @@ class CancelDxLabel implements ShouldQueue
         if ($this->shipment->carrier_id == 17 && $this->shipment->status_id != 7) {
             // We need to cancel each label created
             foreach ($this->shipment->packages as $package) {
-                Http::post($this->url.'cancelLabel', [
+                $response = Http::post($this->url.'cancelLabel', [
                     'cancelLabel' => [
                         "customerID" => $this->shipment->bill_shipping_account,
                         "trackingNumber" => $package->carrier_tracking_number
@@ -43,6 +43,8 @@ class CancelDxLabel implements ShouldQueue
                         'password' => $this->password
                     ]
                 ]);
+
+                dd($response->body());
             }
         }
     }

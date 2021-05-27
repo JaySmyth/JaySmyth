@@ -186,7 +186,7 @@ abstract class CarrierLabel
         $this->pdf->cell($w - 2, 5, strtoupper($this->serviceCode), 0, 1, 'C', true);
     }
 
-    protected function addLongServiceBox($x, $y, $w, $h, $service)
+    protected function addLongServiceBox($x, $y, $w, $h, $service, $largeFont = false)
     {
         // Create IFS Service Box
         $this->pdf->SetFillColor(255, 255, 255);
@@ -196,13 +196,13 @@ abstract class CarrierLabel
 
         // Display and center Service code
         $this->pdf->SetXY($x - 1, $y + .5);
-        $this->pdf->SetFont('', 'B', 7);
+        $this->pdf->SetFont('', 'B', ($largeFont) ? 9 : 7);
         $this->pdf->cell($w, 3, 'IFS Courier Express', 0, 1, 'C', false);
 
         // Add Contents to box
         // Display and center Service code
-        $this->pdf->SetXY($x - 1, $y + 2);
-        $this->pdf->SetFont('', 'BI', 16);
+        $this->pdf->SetXY($x - 1, $y + ($largeFont) ? 9 : 2);
+        $this->pdf->SetFont('', 'BI', ($largeFont) ? 22 : 16);
         $this->pdf->cell($w, 7, 'IFS - '.strtoupper($this->serviceCode), 0, 1, 'C', false);
     }
 

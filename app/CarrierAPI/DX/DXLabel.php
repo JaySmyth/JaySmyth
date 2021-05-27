@@ -31,7 +31,7 @@ class DXLabel extends \App\CarrierAPI\CarrierLabel
      */
     public function customizeLabel($piece)
     {
-        $this->addLongServiceBox(65, 3, 34, 9, $this->serviceCode);
+        $this->addLongServiceBox(55, 3, 42, 16, $this->serviceCode, true);
 
         $x = 5;
         $y = 3;
