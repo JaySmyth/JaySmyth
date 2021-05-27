@@ -31,22 +31,20 @@ class CancelDxLabel implements ShouldQueue
 
     public function handle()
     {
-        if ($this->shipment->carrier_id == 17 && $this->shipment->status_id != 7) {
-            // We need to cancel each label created
-            foreach ($this->shipment->packages as $package) {
-                $response = Http::post($this->url.'cancelLabel', [
-                    'cancelLabel' => [
-                        "customerID" => $this->shipment->bill_shipping_account,
-                        "trackingNumber" => $package->carrier_tracking_number
-                    ],
-                    'serviceHeader' => [
-                        'userId' => $this->user,
-                        'password' => $this->password
-                    ]
-                ]);
+        // We need to cancel each label created
+        foreach ($this->shipment->packages as $package) {
+            $response = Http::post($this->url.'cancelLabel', [
+                'cancelLabel' => [
+                    "customerID" => $this->shipment->bill_shipping_account,
+                    "trackingNumber" => $package->carrier_tracking_number
+                ],
+                'serviceHeader' => [
+                    'userId' => $this->user,
+                    'password' => $this->password
+                ]
+            ]);
 
-                Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Cancel DX Label', $response->body()));
-            }
+            Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Cancel DX Label', $response->body()));
         }
     }
 
