@@ -715,119 +715,6 @@ class Shipment extends Model
     }
 
     /**
-     * Determine if there is a delay and who is responsible.
-     *
-     * @return string
-     */
-    public function getDelay()
-    {
-        $slaInHours = $this->getSla();
-        $slaInDays = $slaInHours / 24;
-        $cutOff = $this->ship_date->addWeekdays($slaInDays)->endOfDay()->format('Y-m-d H:i:s');
-        $delay = 'carrier';
-
-        if ($this->delivery_date <= $cutOff) {
-            $delay = 'none';
-        } else {
-            $receiverDelays = [
-                'Alternate delivery requested',
-                'Customer premises closed',
-                'Business closed',
-                'Customer not available',
-                'Future delivery requested',
-                'Incorrect address',
-                'Local delivery restriction',
-                'Refused by recipient',
-                'revised delivery address',
-                'Incorrect recipient address',
-            ];
-
-            foreach ($this->tracking as $tracking) {
-                foreach ($receiverDelays as $receiverDelay) {
-                    if (stristr($tracking->message, $receiverDelay)) {
-                        $delay = 'receiver';
-                    }
-                }
-            }
-        }
-
-        $this->delay = $delay;
-    }
-
-    /**
-     * Service level agreement for domestic shipments.
-     *
-     * @return int
-     */
-    public function getSla()
-    {
-        $origin = substr(strtoupper(trim($this->sender_postcode)), 0, 2);
-        $dest = substr(strtoupper(trim($this->recipient_postcode)), 0, 2);
-        $ukDomestic = (isUkDomestic($this->sender_country_code) && isUkDomestic($this->recipient_country_code)) ? true : false;
-
-        // NI to IE deliveries
-        if ($origin == 'BT' && $dest == 'IE') {
-            return 48;
-        }
-
-        // Domestic Shipment
-        if ($ukDomestic) {
-            // XDP
-            if ($this->carrier_id == 16) {
-                return 72;
-            }
-
-            // UPS GB to NI
-            if ($this->carrier_id == 3) {
-                if ($this->service_id == '18') {
-                    return 48;
-                } else {
-                    return 24;
-                }
-            }
-
-            // NI local deliveries
-            if ($origin == 'BT' && $dest == 'BT') {
-                return 48;
-            }
-
-            // Mainland (and islands) - Exception Decora LT (1015)
-            if ($dest != 'BT') {
-                $mainlandSla = $this->getDomesticSla();
-
-                return ($origin == 'BT' && $this->company_id != 1015) ? $mainlandSla + 24 : $mainlandSla;
-            }
-        }
-
-        // International
-        return 120;
-    }
-
-    public function getDomesticSla()
-    {
-        $postcode = trim($this->recipient_postcode);
-        $slice = Str::before($postcode, ' ');
-
-        $domesticZone = \App\Models\DomesticZone::where('postcode', $slice)->where('model', $this->carrier->code)->first();
-        if (! $domesticZone) {
-            $l = strlen($postcode);
-
-            for ($i = $l; $i >= 3; $i--) {
-                $result = \App\Models\DomesticZone::where('postcode', substr($postcode, 0, $i))->where('model', $this->carrier->code)->first();
-                if ($result) {
-                    if (substr(strtoupper($this->sender_postcode), 0, 2) == 'BT') {
-                        return $result->sla + 24;
-                    }
-
-                    return $result->sla;
-                }
-            }
-        }
-
-        return ($domesticZone) ? $domesticZone->sla : 24;
-    }
-
-    /**
      * Determines if a shipment is classified as domestic.
      *
      * @return bool
@@ -1042,7 +929,6 @@ class Shipment extends Model
         // Only update if we have been given a valid status and the shipment is not currently set to this status
         // Also, dont update the status if currently RTS or Delivered - GMcNicholl 25-09-2018 17:54
         if ($status && $this->status_id != $status->id) {
-
             // If not yet shipped and requested status is "no goods received"
             if ($status->id == '18' && in_array($this->status_id, ['1', '2'])) {
                 $this->status_id = $status->id;
@@ -1282,6 +1168,119 @@ class Shipment extends Model
     }
 
     /**
+     * Determine if there is a delay and who is responsible.
+     *
+     * @return string
+     */
+    public function getDelay()
+    {
+        $slaInHours = $this->getSla();
+        $slaInDays = $slaInHours / 24;
+        $cutOff = $this->ship_date->addWeekdays($slaInDays)->endOfDay()->format('Y-m-d H:i:s');
+        $delay = 'carrier';
+
+        if ($this->delivery_date <= $cutOff) {
+            $delay = 'none';
+        } else {
+            $receiverDelays = [
+                'Alternate delivery requested',
+                'Customer premises closed',
+                'Business closed',
+                'Customer not available',
+                'Future delivery requested',
+                'Incorrect address',
+                'Local delivery restriction',
+                'Refused by recipient',
+                'revised delivery address',
+                'Incorrect recipient address',
+            ];
+
+            foreach ($this->tracking as $tracking) {
+                foreach ($receiverDelays as $receiverDelay) {
+                    if (stristr($tracking->message, $receiverDelay)) {
+                        $delay = 'receiver';
+                    }
+                }
+            }
+        }
+
+        $this->delay = $delay;
+    }
+
+    /**
+     * Service level agreement for domestic shipments.
+     *
+     * @return int
+     */
+    public function getSla()
+    {
+        $origin = substr(strtoupper(trim($this->sender_postcode)), 0, 2);
+        $dest = substr(strtoupper(trim($this->recipient_postcode)), 0, 2);
+        $ukDomestic = (isUkDomestic($this->sender_country_code) && isUkDomestic($this->recipient_country_code)) ? true : false;
+
+        // NI to IE deliveries
+        if ($origin == 'BT' && $dest == 'IE') {
+            return 48;
+        }
+
+        // Domestic Shipment
+        if ($ukDomestic) {
+            // XDP
+            if ($this->carrier_id == 16) {
+                return 72;
+            }
+
+            // UPS GB to NI
+            if ($this->carrier_id == 3) {
+                if ($this->service_id == '18') {
+                    return 48;
+                } else {
+                    return 24;
+                }
+            }
+
+            // NI local deliveries
+            if ($origin == 'BT' && $dest == 'BT') {
+                return 48;
+            }
+
+            // Mainland (and islands) - Exception Decora LT (1015)
+            if ($dest != 'BT') {
+                $mainlandSla = $this->getDomesticSla();
+
+                return ($origin == 'BT' && $this->company_id != 1015) ? $mainlandSla + 24 : $mainlandSla;
+            }
+        }
+
+        // International
+        return 120;
+    }
+
+    public function getDomesticSla()
+    {
+        $postcode = trim($this->recipient_postcode);
+        $slice = Str::before($postcode, ' ');
+
+        $domesticZone = \App\Models\DomesticZone::where('postcode', $slice)->where('model', $this->carrier->code)->first();
+        if (! $domesticZone) {
+            $l = strlen($postcode);
+
+            for ($i = $l; $i >= 3; $i--) {
+                $result = \App\Models\DomesticZone::where('postcode', substr($postcode, 0, $i))->where('model', $this->carrier->code)->first();
+                if ($result) {
+                    if (substr(strtoupper($this->sender_postcode), 0, 2) == 'BT') {
+                        return $result->sla + 24;
+                    }
+
+                    return $result->sla;
+                }
+            }
+        }
+
+        return ($domesticZone) ? $domesticZone->sla : 24;
+    }
+
+    /**
      * Reverse out setDelivered actions. We should only ever have to reverse out manual POD against
      * IFS shipments, hence the restriction on the carrier ID.
      */
@@ -1318,6 +1317,10 @@ class Shipment extends Model
      */
     public function setCancelled($userId = 0)
     {
+        if ($this->carrier_id == 17) {
+            dispatch(new \App\Jobs\CancelDxLabel($this->id));
+        }
+
         $this->setStatus('cancelled', $userId);
 
         // If sender postcode not "BT", mainland pickup may need cancelled
@@ -1336,15 +1339,6 @@ class Shipment extends Model
     }
 
     /**
-     * Cancel a shipment. Makes API call, sets status and cancels collection request.
-     *
-     * @param  int  $userId
-     */
-    public function setRtsComplete($userId = 0)
-    {
-        $this->setStatus('rts_complete', $userId);
-    }
-    /**
      * Determine if shipment originates from BT postcode.
      *
      * @return bool
@@ -1358,6 +1352,16 @@ class Shipment extends Model
         }
 
         return false;
+    }
+
+    /**
+     * Cancel a shipment. Makes API call, sets status and cancels collection request.
+     *
+     * @param  int  $userId
+     */
+    public function setRtsComplete($userId = 0)
+    {
+        $this->setStatus('rts_complete', $userId);
     }
 
     /**
