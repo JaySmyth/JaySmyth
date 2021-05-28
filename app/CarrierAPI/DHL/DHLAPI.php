@@ -2,7 +2,6 @@
 
 namespace App\CarrierAPI\DHL;
 
-use App\CarrierAPI\DHL\DHLLabel;
 use App\Models\Service;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
@@ -15,7 +14,8 @@ use Illuminate\Support\Facades\Validator;
 class DHLAPI extends \App\CarrierAPI\CarrierBase
 {
     /**
-     * @param type $shipment
+     * @param  type  $shipment
+     *
      * @return type
      */
     public function createShipment($shipment)
@@ -49,7 +49,8 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     * @param type $shipment
+     * @param  type  $shipment
+     *
      * @return type
      */
     public function preProcess($shipment)
@@ -66,7 +67,8 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     * @param type $shipment
+     * @param  type  $shipment
+     *
      * @return type
      */
     public function validateShipment($shipment)
@@ -100,6 +102,12 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
         $rules['insurance_value'] = 'not_supported';
         $rules['lithium_batteries'] = 'not_supported';
 
+        // Restrict piece weight for US to 30KG
+        if (strtoupper($shipment['recipient_country_code']) == 'US' && $shipment['service_code'] == 'ip') {
+            $rules['packages.*.weight'] = 'required|numeric|greater_than_value:0|max:9999|max:30';
+           //$messages['packages.*.weight'] = 'Max piece weight to US restricted to 30kg.';
+        }
+
         // Validate Shipment using the rules
         $errors = $this->applyRules($rules, $shipment);
 
@@ -110,6 +118,7 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
      * Clean up DHL errors before returning to the user.
      *
      * @param $errors
+     *
      * @return mixed
      */
     protected function cleanErrors($errors)
@@ -128,11 +137,11 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     * @param type $reply
-     * @param type $serviceCode
-     * @param type $route_id
-     * @param type $imageType
-     * @param type $labelSize
+     * @param  type  $reply
+     * @param  type  $serviceCode
+     * @param  type  $route_id
+     * @param  type  $imageType
+     * @param  type  $labelSize
      */
     private function createShipmentResponse($reply, $serviceCode, $route_id, $shipment)
     {
@@ -166,7 +175,7 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
     }
 
     /**
-     * @param type $reply
+     * @param  type  $reply
      */
     private function generatePdf($shipment, $serviceCode, $labelData)
     {
