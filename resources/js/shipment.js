@@ -655,6 +655,14 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
         $('#recipient-panel-validator').val(0);
         $('#invoice-panel-validator').val(0);
 
+        // Ensure "details" panel is showing before proceeeding
+        $('#panel-alerts').hide();
+        $('#panel-billing').hide();
+        $('#panel-broker').hide();
+        $('#panel-invoice').hide();
+        $('#panel-options').hide();
+        $('#panel-details').show();
+
         if ($("#create-shipment").valid() && validateContents() && validateBilling()) {
             setTotals();
             getServices();
