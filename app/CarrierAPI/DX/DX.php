@@ -62,8 +62,13 @@ class DX
     {
         $service = $this->getService();
 
-        if (! $service) {
-            $reply['errors'][] = 'Service unavailable. Please contact Courier.';
+        if (! $service || is_string($service)) {
+
+            if ($service == 'Invalid login details.') {
+                $service = 'Invalid DX account number supplied.';
+            }
+
+            $reply['errors'][] = is_string($service) ? $service : 'Service unavailable. Please contact Courier.';
 
             return $reply;
         }
@@ -149,6 +154,10 @@ class DX
 
         // JSON to array
         $services = json_decode($response, true);
+
+        if (! empty($services['errorDescription'])) {
+            return $services['errorDescription'];
+        }
 
         if (! empty($services['Service'])) {
             foreach ($services['Service'] as $service) {
@@ -245,7 +254,7 @@ class DX
                                             ],
                                             1 => [
                                                 'name' => 'commodityCode',
-                                                'value' => !empty($this->shipment['contents'][0]['harmonized_code']) ? $this->shipment['contents'][0]['harmonized_code'] : 0000000000,
+                                                'value' => ! empty($this->shipment['contents'][0]['harmonized_code']) ? $this->shipment['contents'][0]['harmonized_code'] : 0000000000,
                                             ],
                                         ],
                                     ],
