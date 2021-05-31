@@ -158,7 +158,12 @@ class PurchaseInvoice extends Model
             case 16:
                 return '0198859'; // XDP
             case 17:
-                return '0200076'; // DX
+                // DX - Decoras account
+                if ($this->account_number == '14631619') {
+                    return '0200076';
+                }
+
+                return '0200187'; // DX
             default:
                 return 'UNKNOWN';
         }
