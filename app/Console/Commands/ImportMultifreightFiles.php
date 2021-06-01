@@ -231,7 +231,6 @@ class ImportMultifreightFiles extends Command
                             $this->keyFields[$this->fileType][2] => $row[$this->keyFields[$this->fileType][2]],
                         ])->update($row);
 
-                        dd("Updated");
                         break;
                 }
 
