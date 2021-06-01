@@ -370,7 +370,7 @@ class Shipment extends Model
                 break;
             // DX
             case 17:
-                $url = "https://www.dxdelivery.com/consumer/my-tracking";
+                $url = "https://www.dxdelivery.com/?tn=$this->carrier_tracking_number&tpc=".str_replace(' ', '+', $this->recipient_postcode);
                 break;
             default:
                 break;
