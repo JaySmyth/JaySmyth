@@ -42,8 +42,7 @@ class ImportMultifreightFiles extends Command
      *
      * @var array
      */
-    // protected $fileTypes = ['job-hdr', 'job-line', 'job-col', 'job-del', 'rec-chg', 'rec-cost', 'doc-adds'];
-    protected $fileTypes = ['job-hdr', 'job-line', 'job-col', 'job-del', 'rec-chg', 'rec-cost'];
+    protected $fileTypes = ['job-hdr', 'job-line', 'job-col', 'job-del', 'rec-chg', 'rec-cost', 'doc-adds'];
 
     /**
      * Field to insert / update upon.
@@ -57,7 +56,7 @@ class ImportMultifreightFiles extends Command
         'job-del' => ['job_id', 'del_no'],
         'rec-chg' => ['rec_id', 'line_no', 'charge_type'],
         'rec-cost' => ['rec_id', 'line_no', 'charge_type'],
-        // 'doc-adds' => ['job_id', 'line_no', 'address_type'],
+        'doc-adds' => ['job_id', 'line_no', 'address_type'],
     ];
 
     /**
@@ -226,13 +225,13 @@ class ImportMultifreightFiles extends Command
                         break;
 
                     case 3:
-
                         $this->table::firstOrCreate([
                             $this->keyFields[$this->fileType][0] => $row[$this->keyFields[$this->fileType][0]],
                             $this->keyFields[$this->fileType][1] => $row[$this->keyFields[$this->fileType][1]],
                             $this->keyFields[$this->fileType][2] => $row[$this->keyFields[$this->fileType][2]],
                         ])->update($row);
 
+                        dd("Updated");
                         break;
                 }
 
