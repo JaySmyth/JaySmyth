@@ -109,7 +109,7 @@ class ImportMultifreightFiles extends Command
                         $this->processFile($file);
                         $this->archiveFile($file);
                     } else {
-                        Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Import Multifreight Files: File not found', false, false, $this->directory.$file));
+                        //Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Import Multifreight Files: File not found', false, false, $this->directory.$file));
                     }
                 }
             }
@@ -212,7 +212,7 @@ class ImportMultifreightFiles extends Command
                                 $this->keyFields[$this->fileType][0] => $row[$this->keyFields[$this->fileType][0]],
                             ])->update($row);
                         } else {
-                            Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Import Multifreight Files: job_id is null', $this->directory.$file));
+                          //  Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Import Multifreight Files: job_id is null', $this->directory.$file));
                         }
 
                         break;
