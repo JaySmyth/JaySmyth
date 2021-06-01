@@ -113,8 +113,12 @@ class DHL
 
             // Notify operations that PLT not possible to destination
             if ($this->company->plt_enabled && $this->getContent() == 'NON_DOCUMENTS' && ! $this->pltAvailable) {
-                $message = 'PLT not available for DHL shipment '.$decodedResponse['ShipmentResponse']['ShipmentIdentificationNumber'].'. Upload customs documentation manually and send to carrier.';
-                Mail::to('courier@antrim.ifsgroup.com')->bcc('it@antrim.ifsgroup.com')->queue(new \App\Mail\GenericError('Upload customs documentation - '.$decodedResponse['ShipmentResponse']['ShipmentIdentificationNumber'], $message));
+                if (isset($decodedResponse['ShipmentResponse']['ShipmentIdentificationNumber'])) {
+                    $message = 'PLT not available for DHL shipment '.$decodedResponse['ShipmentResponse']['ShipmentIdentificationNumber'].'. Upload customs documentation manually and send to carrier.';
+                    Mail::to('courier@antrim.ifsgroup.com')->bcc('it@antrim.ifsgroup.com')->queue(new \App\Mail\GenericError('Upload customs documentation - '.$decodedResponse['ShipmentResponse']['ShipmentIdentificationNumber'], $message));
+                } else {
+                    Mail::to('courier@antrim.ifsgroup.com')->bcc('it@antrim.ifsgroup.com')->queue(new \App\Mail\GenericError('DHL Request Failure', json_encode($decodedResponse)));
+                }
             }
 
             return $decodedResponse;
