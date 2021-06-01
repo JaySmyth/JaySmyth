@@ -368,7 +368,10 @@ class Shipment extends Model
             case 16:
                 $url = "https://xdp.co.uk/track.php?c=$this->carrier_tracking_number&code=".str_replace(' ', '+', $this->recipient_postcode);
                 break;
-
+            // DX
+            case 17:
+                $url = "https://www.dxdelivery.com/consumer/my-tracking";
+                break;
             default:
                 break;
         }
