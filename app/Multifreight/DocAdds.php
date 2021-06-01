@@ -26,6 +26,11 @@ class DocAdds extends Model
     protected $guarded = ['id'];
 
     /**
+     * Disable $timestamps
+     */
+    public $timestamps = false;
+
+    /**
      * The attributes that should be mutated to dates.
      *
      * @var array
