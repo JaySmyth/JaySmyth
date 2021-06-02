@@ -167,6 +167,11 @@ class DHL
      */
     protected function rateRequest()
     {
+        if (in_array($this->shipment['recipient_country_code'], ['IM','GG','JE'])) {
+            $recipientCountry = 'GB';
+        } else {
+            $recipientCountry = $this->shipment['recipient_country_code'];
+        }
         $this->request = [
             'RateRequest' => [
                 'ClientDetails' => null,
@@ -196,7 +201,7 @@ class DHL
                         'Recipient' => [
                             'City' => $this->shipment['recipient_city'],
                             'PostalCode' => $this->shipment['recipient_postcode'],
-                            'CountryCode' => $this->shipment['recipient_country_code'],
+                            'CountryCode' => $recipientCountry,
                         ],
                     ],
                     'Packages' => [
