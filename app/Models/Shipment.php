@@ -755,7 +755,7 @@ class Shipment extends Model
      */
     public function hasCommercialInvoice()
     {
-        if ($this->status->code == 'saved' || $this->status->code == 'cancelled') {
+        if (! isset($this->status->code) || $this->status->code == 'saved' || $this->status->code == 'cancelled') {
             return false;
         }
 
