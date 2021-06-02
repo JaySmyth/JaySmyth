@@ -167,7 +167,8 @@ class DHL
      */
     protected function rateRequest()
     {
-        if (in_array($this->shipment['recipient_country_code'], ['IM','GG','JE'])) {
+        // Note only translate IM. JE and GG unaffected
+        if (in_array($this->shipment['recipient_country_code'], ['IM'])) {
             $recipientCountry = 'GB';
         } else {
             $recipientCountry = $this->shipment['recipient_country_code'];
