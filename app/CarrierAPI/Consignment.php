@@ -254,7 +254,7 @@ class Consignment
             $this->data['contents'] = null;
 
             // Countries that require minimum 1 USD customs value for docs shipments
-            if (in_array($this->data['recipient_country_code'], ['NZ', 'AM', 'AU', 'AZ', 'BY', 'CA', 'CN', 'CZ', 'GE', 'JP', 'KG', 'MD', 'PH', 'RU', 'SK', 'UZ', 'VE', 'KR', 'KW', 'RO'])) {
+            if (in_array($this->data['recipient_country_code'], ['NZ', 'AM', 'AU', 'AZ', 'BY', 'CA', 'CN', 'CZ', 'GE', 'JP', 'KG', 'MD', 'PH', 'RU', 'RS', 'SK', 'UZ', 'VE', 'KR', 'KW', 'RO'])) {
                 $this->data['customs_value'] = 1;
                 $this->data['customs_value_currency_code'] = 'USD';
             }
