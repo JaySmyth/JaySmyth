@@ -216,7 +216,14 @@ class ProcessDXTracking extends Command
             return [
                 'status' => $dxStatus->status,
                 'status_detail' => null,
-                'city' => (in_array($dxStatus->status, ['Out For Delivery', 'delivered'])) ? $shipment->recipient_city : 'DX Network',
+                'city' => (in_array($dxStatus->status, [
+                    'Out For Delivery',
+                    'delivered',
+                    'Left with Neighbour',
+                    'Business address closed',
+                    'Calling Card Left at Insecure/Communal Address',
+                    'No Access',
+                    ])) ? $shipment->recipient_city : 'DX Network',
                 'country_code' => 'GB',
                 'postcode' => null,
                 'local_datetime' => $datetime,
