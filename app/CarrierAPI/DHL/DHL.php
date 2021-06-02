@@ -468,7 +468,14 @@ class DHL
             $i = 1;
 
             foreach ($this->shipment['contents'] as $content) {
-                $commodityCode = (! empty($content['harmonized_code'])) ? $content['harmonized_code'] : $content['commodity_code'];
+                $commodityCode = '';
+                if ((! empty($content['harmonized_code']))) {
+                    $commodityCode = $content['harmonized_code'];
+                } else {
+                    if ((! empty($content['commodity_code']))) {
+                        $commodityCode = $content['commodity_code'];
+                    }
+                }
 
                 if (! $this->pltAvailable && strlen($commodityCode) == 0) {
                     $commodityCode = '0000000000';
