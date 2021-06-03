@@ -69,8 +69,10 @@ class Kernel extends ConsoleKernel
         Commands\DispatchEasypostTrackers::class,
         Commands\UploadFedExCommercialInvoices::class,
         Commands\RepriceShipments::class,
+        Commands\DispatchCustomerDomesticRateReport::class,
         Commands\DispatchDeliveryPerformance::class,
         Commands\DispatchExtendedTransitReport::class,
+        Commands\DbSchenker\BuildTestSeaExportTransaction::class,
     ];
 
     /**
