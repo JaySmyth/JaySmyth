@@ -71,6 +71,12 @@
             <td>{{$data['11'][$key] ?? '0'}}</td>
           @endforeach
       </tr>
+      <tr>
+        <td>Query</td>
+          @foreach($carriers as $key => $carrier)
+            <td>{{$data['22'][$key] ?? '0'}}</td>
+          @endforeach
+      </tr>
 
   </tbody>
 
