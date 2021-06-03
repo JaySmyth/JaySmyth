@@ -41,12 +41,12 @@ class DomesticRatesReport implements ShouldQueue
     {
         // Get Data
         $rateView = [];
-        $recipient = 'aplatt@antrim.ifsgroup.com';
+        $recipient = 'sanderton@antrim.ifsgroup.com';
         $service = Service::find("53");
         $shipDate = Carbon::today()->toDateString('Y-m-d');
 
-        // $companies = Company::where('enabled', '1')->where('testing','0')->where('depot_id','1')->orderBy('company_name')->get();
-        $companies = Company::whereIn('id', ['57','774'])->get();
+        $companies = Company::where('enabled', '1')->where('testing', '0')->where('depot_id', '1')->orderBy('company_name')->get();
+        //$companies = Company::whereIn('id', ['57','774'])->get(); // for testing
         foreach ($companies as $company) {
             $rateInfo = $company->salesRateForService($service->id);
             if (isset($rateInfo['id']) && $rateInfo['id'] > 0) {
@@ -62,18 +62,23 @@ class DomesticRatesReport implements ShouldQueue
             }
         }
 
+        $data = '';
         foreach ($rateView as $companyId => $companyView) {
             $company = Company::find($companyId);
-            $data = '';
             foreach ($companyView as $zone) {
-                $data .= $company->company_name.
-                ','.$zone['service'].
-                ','.$zone['packaging_code'].
-                ','.$zone['area'].
-                ','.$zone['first'].
-                ','.$zone['others'].
-                ','.$zone['notional_weight'].
-                ','.$zone['notional']."\n";
+                if (isset($zone['service'])) {
+                    $data .= $company->company_name.
+                        ','.$zone['service'].
+                        ','.$zone['packaging_code'].
+                        ','.$zone['area'].
+                        ','.$zone['first'].
+                        ','.$zone['others'].
+                        ','.$zone['notional_weight'].
+                        ','.$zone['notional']."\n";
+                } else {
+                    // Non Domestic Rate
+                    $data .= $company->company_name.',Non Domestic Rate,,,,,,'."\n";
+                }
             }
         }
 
