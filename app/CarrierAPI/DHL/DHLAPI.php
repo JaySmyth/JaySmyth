@@ -63,6 +63,11 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
             $shipment['bill_shipping_account'] = Service::find($shipment['service_id'])->account;
         }
 
+        // Note only translate IM. JE and GG unaffected
+        if (in_array($shipment['recipient_country_code'], ['IM'])) {
+            $shipment['recipient_country_code'] = 'GB';
+        }
+
         return $shipment;
     }
 
@@ -105,7 +110,7 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
         // Restrict piece weight for US to 30KG
         if (strtoupper($shipment['recipient_country_code']) == 'US' && $shipment['service_code'] == 'ip') {
             $rules['packages.*.weight'] = 'required|numeric|greater_than_value:0|max:9999|max:30';
-           //$messages['packages.*.weight'] = 'Max piece weight to US restricted to 30kg.';
+            //$messages['packages.*.weight'] = 'Max piece weight to US restricted to 30kg.';
         }
 
         // Validate Shipment using the rules
