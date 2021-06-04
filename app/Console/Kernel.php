@@ -102,7 +102,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:import-tnt-purchase-invoices')->weekdays()->hourly()->between('8:00', '18:00');
         $schedule->command('ifs:import-express-freight-purchase-invoices')->weekdays()->hourly()->between('8:00', '18:00');
         $schedule->command('ifs:import-xdp-purchase-invoices')->weekdays()->hourly()->between('8:00', '18:00');
-        $schedule->command('ifs:import-dx-purchase-invoices')->weekdays()->hourly()->between('8:00', '18:00');
+        $schedule->command('ifs:import-dx-purchase-invoices')->twiceDaily(10, 15);
         $schedule->command('ifs:update-scs-job-numbers-on-purchase-invoice-lines')->weekdays()->everyThreeHours();
 
         /*
