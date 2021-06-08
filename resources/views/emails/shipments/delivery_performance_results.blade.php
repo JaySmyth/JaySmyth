@@ -6,6 +6,7 @@
 
 <table border="0" cellspacing="0" width="100%" class="table">
 
+    <h2>{{$depotName}}</h2>
     <thead>
         <tr>
             <th>Status</th>

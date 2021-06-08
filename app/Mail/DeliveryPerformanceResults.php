@@ -22,8 +22,9 @@ class DeliveryPerformanceResults extends Mailable
      *
      * @return void
      */
-    public function __construct($results, $carriers, $startDate, $endDate)
+    public function __construct($depot, $results, $carriers, $startDate, $endDate)
     {
+        $this->depotName = \App\Models\Depot::find($depot)->name;
         $this->results = $results;
         $this->carriers = $carriers;
         $this->startDate = $startDate;
@@ -38,11 +39,12 @@ class DeliveryPerformanceResults extends Mailable
     public function build()
     {
         return $this->view('emails.shipments.delivery_performance_results')
-                        ->subject("Delivery Performance Details: $this->startDate to $this->endDate")
+                        ->subject($this->depotName." Delivery Performance Details: $this->startDate to $this->endDate")
                         ->with([
                           'subject' => 'Delivery Performance',
                           'data' => $this->results,
-                          'carriers' => $this->carriers
+                          'carriers' => $this->carriers,
+                          'depotName' => $this->depotName
                         ]);
     }
 }

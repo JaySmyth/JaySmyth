@@ -20,14 +20,16 @@ class DeliveryPerformance implements ShouldQueue
         SerializesModels;
 
     public $timeout = 999;
+    protected $depot;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($depot)
     {
+        $this->depot = $depot;
     }
 
     /**
@@ -37,7 +39,10 @@ class DeliveryPerformance implements ShouldQueue
      */
     public function handle()
     {
+        // AND carrier_id IN ('2','3','4','5','14','16','17')
+
         // Get Data
+        $depot = $this->depot;
         $recipient = 'aplatt@antrim.ifsgroup.com';
         $startDate = Carbon::now()->startOfYear()->format('Y-m-d H:i:s');
         $endDate = Carbon::now()->subDays(2)->endOfDay()->format('Y-m-d H:i:s');
@@ -48,8 +53,7 @@ class DeliveryPerformance implements ShouldQueue
             WHERE ship_date >= '$startDate'
                 AND ship_date <= '$endDate'
                 AND status_id IN ('3', '4', '5', '6','9', '10', '11', '20', '21')
-                AND carrier_id IN ('2','3','4','5','14','16','17')
-                AND depot_id = '1'
+                AND depot_id = '$depot'
                 AND recipient_country_code = 'GB'
             GROUP BY carrier_id, status_id
             ORDER BY carrier_id, status_id;
@@ -65,6 +69,6 @@ class DeliveryPerformance implements ShouldQueue
         }
 
         // Send report to user
-        Mail::to($recipient)->cc('gmcbroom@antrim.ifsgroup.com')->send(new \App\Mail\DeliveryPerformanceResults($table, $carriers, $startDate, $endDate));
+        Mail::to($recipient)->cc('gmcbroom@antrim.ifsgroup.com')->send(new \App\Mail\DeliveryPerformanceResults($depot, $table, $carriers, $startDate, $endDate));
     }
 }
