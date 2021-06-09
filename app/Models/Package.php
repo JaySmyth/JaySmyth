@@ -118,10 +118,10 @@ class Package extends Model
          * Add a tracking event to the shipment
          */
 
-        $message = 'Package '.$this->index.' received';
-        $message = ($carrierScan) ? $message.' (carrier scan)' : $message;
+        $message = 'Package '.$this->index;
+        $message = ($carrierScan) ? $message.' assumed received (carrier scan)' : $message.' received';
 
-        if($carrierScan){
+        if ($carrierScan) {
             $location = 'sender';
         }
 
