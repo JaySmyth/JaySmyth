@@ -230,7 +230,12 @@ class UPSAPI extends \App\CarrierAPI\CarrierBase
         if (in_array($shipment['recipient_country_code'], ['US', 'CA'])) {
             $address->setStateProvinceCode($shipment['recipient_state_code']);
         }
-        $address->setCountryCode($shipment['recipient_country_code']);
+        if (in_array($shipment['recipient_country_code'], ['IM'])) {
+            $address->setCountryCode('GB');
+        } else {
+            $address->setCountryCode($shipment['recipient_country_code']);
+        }
+
         $shipTo = new \Ups\Entity\ShipTo();
         $shipTo->setAddress($address);
         $shipTo->setCompanyName($shipment['recipient_company_name']);
