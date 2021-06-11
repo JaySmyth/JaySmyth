@@ -54,7 +54,7 @@ class DeliveryPerformance implements ShouldQueue
                 AND ship_date <= '$endDate'
                 AND status_id IN ('3', '4', '5', '6','9', '10', '11', '20', '21')
                 AND depot_id = '$depot'
-                AND recipient_country_code = 'GB'
+                AND recipient_country_code in ('GB','IE')
             GROUP BY carrier_id, status_id
             ORDER BY carrier_id, status_id;
         "));
