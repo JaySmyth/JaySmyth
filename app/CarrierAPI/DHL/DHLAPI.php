@@ -108,10 +108,10 @@ class DHLAPI extends \App\CarrierAPI\CarrierBase
         $rules['lithium_batteries'] = 'not_supported';
 
         // Restrict piece weight for US to 30KG
-        if (strtoupper($shipment['recipient_country_code']) == 'US' && $shipment['service_code'] == 'ip') {
-            $rules['packages.*.weight'] = 'required|numeric|greater_than_value:0|max:9999|max:30';
-            //$messages['packages.*.weight'] = 'Max piece weight to US restricted to 30kg.';
-        }
+        // if (strtoupper($shipment['recipient_country_code']) == 'US' && $shipment['service_code'] == 'ip') {
+        //     $rules['packages.*.weight'] = 'required|numeric|greater_than_value:0|max:9999|max:30';
+        //     $messages['packages.*.weight'] = 'Max piece weight to US restricted to 30kg.';
+        // }
 
         // Validate Shipment using the rules
         $errors = $this->applyRules($rules, $shipment);
