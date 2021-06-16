@@ -226,10 +226,10 @@ class Rate extends Model
         return $this->hasOne(\App\Models\Surcharge::class, 'id', 'surcharge_id');
     }
 
-    public function getSurcharges($serviceId, $code = '', $companyId = '0', $shipDate = '')
+    public function getSurcharges($surchargeId, $code = '', $companyId = '0', $shipDate = '')
     {
         $surcharge = new Surcharge();
 
-        return $surcharge->getCharges($serviceId, $code, $companyId, $shipDate);
+        return $surcharge->getCharges($surchargeId, $code, $companyId, $shipDate);
     }
 }
