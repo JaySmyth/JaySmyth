@@ -170,7 +170,8 @@ class Kernel extends ConsoleKernel
         /*
           * DX
           */
-        $schedule->command('ifs:process-dx-tracking')->everyFifteenMinutes();
+        $schedule->command('ifs:process-dx-tracking')->everyFifteenMinutes()->withoutOverlapping(15);
+        ;
 
         /*
          * Multifreight
