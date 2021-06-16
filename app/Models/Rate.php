@@ -56,7 +56,11 @@ class Rate extends Model
                 default:
 
                     $rate = $this;
-                    $charges = $this->getSurcharges($company->id);
+                    if (strtolower($this->rate_type) == 's') {
+                        $charges = $this->getSurcharges($service->sales_surcharge_id, '', $company->id);
+                    } else {
+                        $charges = $this->getSurcharges($service->costs_surcharge_id, '', $company->id);
+                    }
 
                     return view(
                         'rates.show_'.$tableFormat,
@@ -222,10 +226,10 @@ class Rate extends Model
         return $this->hasOne(\App\Models\Surcharge::class, 'id', 'surcharge_id');
     }
 
-    public function getSurcharges($companyId, $code = '', $shipDate = '')
+    public function getSurcharges($serviceId, $code = '', $companyId = '0', $shipDate = '')
     {
         $surcharge = new Surcharge();
 
-        return $surcharge->getCharges($this->surcharge_id, $code, $companyId, $shipDate);
+        return $surcharge->getCharges($serviceId, $code, $companyId, $shipDate);
     }
 }
