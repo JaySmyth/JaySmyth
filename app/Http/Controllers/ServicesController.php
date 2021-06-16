@@ -31,6 +31,12 @@ class ServicesController extends Controller
      */
     public function index(Request $request)
     {
+        $serviceItems = Service::orderBy('depot_id')->orderBy('carrier_id')->orderBy('code')->get();
+        foreach ($serviceItems as $service) {
+            $services[$service->depot_id][$service->carrier_id][] = $service;
+        }
+
+        return view('services.index', compact('services'));
     }
 
     /**
