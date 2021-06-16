@@ -23,6 +23,7 @@ Route::post('feedback-modal', 'FeedbackController');
 
 Route::get('addresses/autocomplete', 'AddressesController@autocomplete');
 Route::post('services/available', 'ServicesController@available');
+Route::get('services', 'ServicesController@index');
 Route::get('service/message/{id}', 'ServicesController@serviceMessage');
 
 Route::get('preferences', 'PreferencesController@getPreferences');
