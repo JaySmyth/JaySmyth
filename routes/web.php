@@ -171,6 +171,15 @@ Route::get('localisation', 'CompaniesController@getLocalisation');
 
 /*
   |--------------------------------------------------------------------------
+  | Company Service Routes
+  |--------------------------------------------------------------------------
+ */
+ Route::get('company-service/{companies}/{services}/edit', 'CompanyServiceController@edit');
+ Route::patch('company-service/{companies}/{services}', 'CompanyServiceController@update');
+
+
+/*
+  |--------------------------------------------------------------------------
   | Company Service Rate Routes
   |--------------------------------------------------------------------------
  */
