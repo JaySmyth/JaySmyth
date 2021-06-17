@@ -55,6 +55,7 @@ class Rate extends Model
 
                 default:
 
+                    $rate=$this;
                     $charges = [];
                     if (strtolower($this->rate_type) == 's' && isset($service->sales_surcharge_id)) {
                         $charges = $this->getSurcharges($service->sales_surcharge_id, '', $company->id);
