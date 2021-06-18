@@ -1131,8 +1131,7 @@ class ShipmentsController extends Controller
      */
     public function test(Request $request)
     {
-        $shipments = Shipment::needsFedExEtd()->limit(5)->get();
-        dd($shipments);
+
     }
 
 

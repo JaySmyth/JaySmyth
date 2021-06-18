@@ -1108,9 +1108,13 @@ class Shipment extends Model
         $cutOff = new Carbon('today 10:00', 'Europe/London');
 
         if (Carbon::now('Europe/London') > $cutOff) {
-            $dateRequested = Carbon::now()->addWeekday();
+            $dateRequested = now()->addWeekday();
         } else {
-            $dateRequested = Carbon::now();
+            if (now()->isWeekend()) {
+                $dateRequested = now()->addWeekday();
+            } else {
+                $dateRequested = now();
+            }
         }
 
         // Create Transport Job
@@ -1450,6 +1454,12 @@ class Shipment extends Model
             return false;
         }
 
+        $dateRequested = ($this->collection_date) ?: $this->ship_date;
+
+        if ($dateRequested->isWeekend()) {
+            $dateRequested->addWeekday();
+        }
+
         $transportJob = $this->transportJobs()->create([
             'number' => Sequence::whereCode('JOB')->lockForUpdate()->first()->getNextAvailable(),
             'reference' => $this->carrier_consignment_number,
@@ -1489,7 +1499,7 @@ class Shipment extends Model
             'department_id' => $this->department_id,
             'depot_id' => $this->depot_id,
             'visible' => '1',
-            'date_requested' => ($this->collection_date) ? $this->collection_date : $this->ship_date,
+            'date_requested' => $dateRequested,
         ]);
 
         $transportJob->setTransendRoute();
