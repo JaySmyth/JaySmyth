@@ -46,19 +46,21 @@ class BuildTestSeaExportTransaction extends Command
      */
     public function handle()
     {
-        $jobs = ['IFFSXJ00012337'];
-        // $jobs = ['IFFSIJ00028836'];
+        $jobs = ['IFFSXJ00012331'];
 
         foreach ($jobs as $job) {
             $jobHdr = JobHdr::where('job_disp', $job)->first();
             if ($jobHdr) {
-                $jobLine = JobLine::where('job_id', $jobHdr->job_id)->first();
-                if ($jobLine) {
+                $jobLines = JobLine::where('job_id', $jobHdr->job_id)->get();
+                if ($jobLines) {
                     // $jobCol = JobCol::where('job_id', $jobHdr->job_id)->first();
                     // $jobDel = JobDel::where('job_id', $jobHdr->job_id)->first();
+                    $consor = DocAdds::where('job_id', $jobHdr->job_id)->where('address_type', 'CONSOR')->where('line_no', '1')->first();
                     $consee = DocAdds::where('job_id', $jobHdr->job_id)->where('address_type', 'CONSEE')->where('line_no', '1')->first();
+                    $notify = DocAdds::where('job_id', $jobHdr->job_id)->where('address_type', 'NOTIFY')->where('line_no', '1')->first();
+                    $carrier = DocAdds::where('job_id', $jobHdr->job_id)->where('address_type', 'CARRIER')->where('line_no', '1')->first();
 
-                    $msg[] = $this->buildMsg($jobHdr, $jobLine, $consee);
+                    $msg = $this->buildMsg($jobHdr, $jobLines, $consor, $consee, $notify, $carrier);
                 }
             }
             dd(json_encode($msg));
@@ -73,26 +75,26 @@ class BuildTestSeaExportTransaction extends Command
      * @param type $filename
      * @return bool
      */
-    protected function buildMsg($jobHdr, $jobLine, $consee = null)
+    protected function buildMsg($jobHdr, $jobLines, $consor = null, $consee = null, $notify = null, $carrier = null)
     {
         $msg = [];
-        $msg['ADMIN']['ORIGIN-BRANCH-ID'] = 'unknown';
+        $msg['ADMIN']['ORIGIN-BRANCH-ID'] = 'GB9000SSF';
         $msg['ADMIN']['BL-MESSAGE-ID'] = $jobHdr->cust_ref;
-        $msg['ADMIN']['HOUSE-BL-RUNNING-NUMBER'] = $jobHdr->bol_number; // ***
-        $msg['ADMIN']['HOUSE-BL-MESSAGE-ID'] = $jobHdr->bol_number; // ***
+        $msg['ADMIN']['HOUSE-BL-RUNNING-NUMBER'] = $jobHdr->bol_number; // *** - 1
+        $msg['ADMIN']['STT-NUMBER'] = $this->getSTTNumber();
         $msg['ADMIN']['EXPORT / IMPORT'] = 'E';
-        $msg['ADMIN']['ETD-DATE'] = $jobHdr->estimated_dept_date;
+        $msg['ADMIN']['ETD-DATE'] = date('Ymd', strtotime($jobHdr->estimated_dept_date));
         $msg['ADMIN']['ETD-TIME'] = '0000';
         $msg['ADMIN']['TIME-ZONE'] = 'GMT';
-        $msg['ADMIN']['ETA-DATE'] = $jobHdr->delivered_date;
+        $msg['ADMIN']['ETA-DATE'] = date('Ymd', strtotime($jobHdr->delivered_date));
         $msg['ADMIN']['ETA-TIME'] = '0000';
         $msg['ADMIN']['CR-DATE'] = date('Ymd');
         $msg['ADMIN']['CR-TIME'] = date('His');
         $msg['ADMIN']['HOUSE-BL-USING-CODE'] = 'O';
-        $msg['ADMIN']['NATURE-OF-GOODS'] = $this->natureOfGoods($jobLine->haz_pieces);
-        $msg['ADMIN']['FINAL-DESTINATION-BRANCH'] = $jobHdr->final_dest;
+        $msg['ADMIN']['NATURE-OF-GOODS'] = $this->natureOfGoods($jobLines);
+        $msg['ADMIN']['FINAL-DESTINATION-BRANCH'] = $jobHdr->final_dest; // ***
         $msg['ADMIN']['STATUS'] = 'BL1.4.1';
-        $msg['ADMIN']['RECIPIENT-CIRCLE'] = $jobHdr->terms_code;
+        $msg['ADMIN']['LOAD-TYPE'] = $jobHdr->load_type;
 
         // Header Record
         $msg['HEADER']['DOCUMENT-CODE'] = '703';
@@ -104,58 +106,97 @@ class BuildTestSeaExportTransaction extends Command
         $msg['HEADER']['NUMBER-OF-ORIGINALS'] = $jobHdr->bol_orig;
         $msg['HEADER']['BL-NUMBER'] = $jobHdr->bol_number;
 
-        // Reference Record
-        $msg['REFERENCE']['REFERENCE-QUALIFIER'] = 'AEG';
-        $msg['REFERENCE']['REFERENCE-NUMBER'] = $jobHdr->cust_ref;
+        // Reference records
+        $ref = $this->buildReference('AEG', $jobHdr->cust_ref);
+        if ($ref > '') {
+            $msg['REFERENCES']['REFERENCE'][] = $ref;
+        }
+
+        $ref = $this->buildReference('FF', $jobHdr->job_disp);
+        if ($ref > '') {
+            $msg['REFERENCES']['REFERENCE'][] = $ref;
+        }
+
 
         // Transport Header Record
+        $msg['THEADER']['TRANSPORT-STAGE-QUALIFIER'] = '20';
         $msg['THEADER']['CONVEYANCE-REFERENCE'] = $jobHdr->vessel_name;
+        $msg['THEADER']['MODE-OF-TRANSPORT'] = '10';
         $msg['THEADER']['TYPE-OF-TRANSPORT'] = '13';
-        $msg['THEADER']['CARRIER-ID'] = $jobHdr->carrier_code;
-        $msg['THEADER']['CARRIER-NAME'] = $jobHdr->carrier_code;
+        $msg['THEADER']['CARRIER-ID'] = $this->getCarrierSCACCode($carrier);
+        $msg['THEADER']['CARRIER-NAME'] = $carrier->name;
         $msg['THEADER']['TRANSPORT-ID'] = $jobHdr->vessel_name;
 
         // Transport Dates record
-        $msg['TDATES']['TRANSPORT-QUALIFIER'] = '136';
-        $msg['TDATES']['TRANSPORT-DATE'] = $jobHdr->estimated_dept_date;
-        $msg['TDATES']['TRANSPORT-DATE-FORMAT'] = '102';
+        /*
+            132 - Est Date of Arrival
+            133 - Est Date of Departure
+            136 - Departure Date
+        */
+        $rec = $this->buildTransportDate('132', $jobHdr->estimated_arrival_date);
+        if ($rec > '') {
+            $msg['TDATES']['TDATE'][] = $rec;
+        }
+        $rec = $this->buildTransportDate('133', $jobHdr->estimated_dept_date);
+        if ($rec > '') {
+            $msg['TDATES']['TDATE'][] = $rec;
+        }
+        $rec = $this->buildTransportDate('136', $jobHdr->actual_dept_date);
+        if ($rec > '') {
+            $msg['TDATES']['TDATE'][] = $rec;
+        }
 
         // Transport Location record
-        $msg['TLOCN']['PLACE-QUALIFIER'] = '5';
-        $msg['TLOCN']['PLACE-ID'] = $jobHdr->port_of_loading;
+        /*
+            5 = Port of Loading
+            7 = Place of Delivery (Final Destination)
+            9 = Place of Loading
+            12 = Port of Discharge
+        */
+        $rec = $this->buildTransportLocns('5', $jobHdr->port_of_loading);
+        if ($rec != '') {
+            $msg['TLOCATIONS']['TLOCATION'][] = $rec;
+        }
+        $rec = $this->buildTransportLocns('7', $jobHdr->final_dest);
+        if ($rec != '') {
+            $msg['TLOCATIONS']['TLOCATION'][] = $rec;
+        }
+        $rec = $this->buildTransportLocns('9', $jobHdr->port_of_loading);
+        if ($rec != '') {
+            $msg['TLOCATIONS']['TLOCATION'][] = $rec;
+        }
+        $rec = $this->buildTransportLocns('12', $jobHdr->port_of_discharge);
+        if ($rec != '') {
+            $msg['TLOCATIONS']['TLOCATION'][] = $rec;
+        }
 
-        // Address Record
-        $address4 = (empty($consee->county)) ? $consee->town : $consee->town.'/'.$consee->county;
-        $address5 = (empty($consee->country_code)) ? $consee->postcode : $consee->postcode.'/'.$consee->country_code;
-        $msg['CNEEADDR']['ADDRESS-QUALIFIER'] = 'CN';
-        $msg['CNEEADDR']['ADDRESS-STRUCTURE'] = '1';
-        $msg['CNEEADDR']['NAME-AND-ADDRESS-LINE-1'] = $consee->name ?? '';
-        $msg['CNEEADDR']['NAME-AND-ADDRESS-LINE-2'] = $consee->address_1 ?? '';
-        $msg['CNEEADDR']['NAME-AND-ADDRESS-LINE-3'] = $consee->address_2 ?? '';
-        $msg['CNEEADDR']['NAME-AND-ADDRESS-LINE-4'] = $address4;
-        $msg['CNEEADDR']['NAME-AND-ADDRESS-LINE-5'] = $address5;
-
-        // Communication Contact record
-        $msg['CONTACT']['ADDRESS-ID'] = '?';
-        $msg['CONTACT']['CONTACT-FUNCTION'] = 'IC';
-        $msg['CONTACT']['CONTACT-EMPLOYEE'] = '?';
-        $msg['CONTACT']['COMMUNICATION-ID'] = 'TE';
-        $msg['CONTACT']['CONTACT-EMPLOYEE'] = '?';
+        // Address Records
+        $rec = $this->buildAddress('CN', $consee);
+        if ($rec != '') {
+            $msg['TADDRESS']['PARTNERADDR'][] = $rec;
+        }
+        $rec = $this->buildAddress('CZ', $consor);
+        if ($rec != '') {
+            $msg['TADDRESS']['PARTNERADDR'][] = $rec;
+        }
+        $rec = $this->buildAddress('BA', $consee);
+        if ($rec != '') {
+            $msg['TADDRESS']['PARTNERADDR'][] = $rec;
+        }
 
         // Goods Description records
-        $msg['GOODS']['ITEM-NUMBER'] = $jobLine->line_no;
-        $msg['GOODS']['NUMBER-OF-PACKAGES'] = $jobLine->pieces;
-        $msg['GOODS']['GOODS-MEASURE-WEIGHT-UNIT'] = 'KGM';
-        $msg['GOODS']['GOODS-MEASURE-WEIGHT-VALUE'] = $jobLine->entered_wgt;
-        $msg['GOODS']['GOODS-MEASURE-VOLUME-UNIT'] = 'KGM';
-        $msg['GOODS']['GOODS-MEASURE-VOLUME-VALUE'] = $jobLine->vol_wgt;
+        foreach ($jobLines as $jobLine) {
+            $rec = $this->buildLine($jobLine);
+            if ($rec != '') {
+                $msg['GOODSDETAILS']['GOODS'][] = $rec;
+            }
+        }
 
         // Package Details record
-        $msg['PACKAGE']['TOTAL-NUMBER-PACKAGES'] = $jobHdr->pieces;
-        $msg['PACKAGE']['TOTAL-GROSS-WEIGHT'] = $jobHdr->chg_wgt;
-        $msg['PACKAGE']['WEIGHT-MEASURE-QUALIFIER'] = 'KGM';
-        $msg['PACKAGE']['TOTAL-CUBE'] = $jobHdr->cube;
-        $msg['PACKAGE']['CUBE-MEASURE-QUALIFIER'] = 'MTQ';
+        $msg['PACKAGE'] = $this->buildPackage($jobHdr);
+
+        // Equipment Unit record
+        $msg['EQUIPMENTUNIT'] =  $this->buildEquipmentUnit($jobHdr);
 
         // Delivery Terms record
         $msg['DTERMS']['TERMS-OF-DELIVERY-CODE'] = $jobHdr->terms_code;
@@ -166,8 +207,192 @@ class BuildTestSeaExportTransaction extends Command
         return $msg;
     }
 
-    protected function natureOfGoods($qty)
+    protected function natureOfGoods($jobLines)
     {
-        return ($qty>0) ? 'HAZ' : 'GEN';
+        $nature = 'GEN';
+        foreach ($jobLines as $jobLine) {
+            if ($jobLine->haz_pieces > 0) {
+                $nature = 'HAZ';
+            }
+        }
+        return $nature;
+    }
+
+    protected function getSTTNumber()
+    {
+        $countryCode = '826';
+        $partnerId = '6';
+        $sequence = nextAvailable('SCHENKERSTT');
+        $base = $countryCode.$partnerId.sprintf('%9d', $sequence);
+        $sum1 = $base[1]+$base[3]+$base[5]+$base[7]+$base[9]+$base[11];
+        $sum2 = $base[0]+$base[2]+$base[4]+$base[6]+$base[8]+$base[10]+$base[12];
+        $sum = $sum1 + ($sum2*3);
+        $checkDigit = 10 - $sum % 10;
+
+        return $base.$checkDigit;
+    }
+
+    protected function buildReference($qualifier = 'AEG', $custRef = '')
+    {
+        if ($custRef > "") {
+            return [
+                'REFERENCE-QUALIFIER' => $qualifier,
+                'REFERENCE-NUMBER' => $custRef
+            ];
+        }
+
+        return '';
+    }
+
+    protected function getCarrierSCACCode($carrier)
+    {
+        return $carrier->reference;
+    }
+
+    protected function buildTransportDate($qualifier, $date)
+    {
+        if ($date > "") {
+            return [
+                'TRANSPORT-QUALIFIER' => $qualifier,
+                'TRANSPORT-DATE' => date('Ymd', strtotime($date)),
+                'TRANSPORT-DATE-FORMAT' => '102',
+            ];
+        }
+
+        return '';
+    }
+
+    protected function buildTransportLocns($qualifier, $locn)
+    {
+        if ($locn > "") {
+            return [
+                'PLACE-QUALIFIER' => $qualifier,
+                'PLACE-ID' => $locn,
+            ];
+        }
+
+        return '';
+    }
+
+    protected function buildAddress($qualifier, $address = '')
+    {
+        $data = '';
+        if ($address) {
+            switch ($qualifier) {
+                case 'BA':
+                    $data = [
+                        'ADDRESS-QUALIFIER' => 'CN',
+                        'ADDRESS-ID' => $address->id,
+                        'ADDRESS-STRUCTURE' => '2',
+                        'NAME' => $address->name ?? '',
+                        'STREET-AND-NUMBER1' => $address->address_1 ?? '',
+                        'CITY-NAME' => $address->town ?? '',
+                        'POST-CODE' => $address->postcode ?? '',
+                        'COUNTRY-CODE' => $address->country_code ?? '',
+                        'COM-ADDRESS-ID' => $qualifier ?? '',
+                        'CONTACT-FUNCTION' => 'IC',
+                        'CONTACT-EMPLOYEE-NAME' => $address->contact_name ?? '',
+                        'COMMUNICATION-ID' => 'TE',
+                        'COMMUNICATION-DATA' => $address->telephone ?? '',
+                    ];
+                    break;
+
+                case 'CN':
+                case 'CZ':
+                    $data = [
+                        'ADDRESS-QUALIFIER' => $qualifier,
+                        'ADDRESS-ID' => $address->id,
+                        'ADDRESS-STRUCTURE' => '2',
+                        'NAME' => $address->name ?? '',
+                        'STREET-AND-NUMBER1' => $address->address_1 ?? '',
+                        'CITY-NAME' => $address->town ?? '',
+                        'POST-CODE' => $address->postcode ?? '',
+                        'COUNTRY-CODE' => $address->country_code ?? '',
+                        'COM-ADDRESS-ID' => $qualifier ?? '',
+                        'CONTACT-FUNCTION' => 'IC',
+                        'CONTACT-EMPLOYEE-NAME' => $address->contact_name ?? '',
+                        'COMMUNICATION-ID' => 'TE',
+                        'COMMUNICATION-DATA' => $address->telephone ?? '',
+                    ];
+                    break;
+
+                    default:
+                        $data = '';
+                        break;
+            }
+        }
+
+        return $data;
+    }
+
+    protected function buildLine($jobLine)
+    {
+        $line = [
+            'ITEM-NUMBER' => $jobLine->line_no,
+            'NUMBER-OF-PACKAGES' => $jobLine->pieces,
+            'MEASUREMENT' => null,
+        ];
+
+        // Add Actual Weight
+        $measurement[] = [
+                    "MEASURE-QUALIFIER" => "WT",
+                    'MEASURE-UNIT' => 'KGM',
+                    'MEASURE-VALUE' => $jobLine->entered_wgt,
+        ];
+
+        // Add Volumetric Weight
+        $measurement[] = [
+                    "MEASURE-QUALIFIER" => "WT",
+                    'MEASURE-UNIT' => 'MTQ',
+                    'MEASURE-VALUE' => $jobLine->vol_wgt,
+        ];
+
+        $line['MEASUREMENT']['MEASURE'] = $measurement;
+
+        return $line;
+    }
+
+    protected function buildPackage($jobHdr)
+    {
+        return [
+            'TOTAL-NUMBER-PACKAGES' => $jobHdr->pieces,
+            'TOTAL-GROSS-WEIGHT' => $jobHdr->chg_wgt,
+            'WEIGHT-MEASURE-QUALIFIER' => 'KGM',
+            'TOTAL-CUBE' => $jobHdr->cube,
+            'CUBE-MEASURE-QUALIFIER' => 'MTQ',
+        ];
+    }
+
+    protected function buildEquipmentUnit($jobHdr)
+    {
+        $data = [
+            'EQUIPMENT-QUALIFIER' => 'CN',
+            'EQUIPMENT-ID-NUMBER' => $jobHdr->marks ?? '',
+            'SIZE-AND-TYPE-TEXT' => $jobHdr->package_type,
+            'SUPPLIER' => '2',
+            'MOVEMENT-PLAN' => $jobHdr->load_type.'/'.$jobHdr->load_type,
+            'MEASUREMENT' => null
+        ];
+        $data['MEASUREMENT'] = $this->buildContainerMeasurement($jobHdr);
+
+        return $data;
+    }
+
+    protected function buildContainerMeasurement($jobHdr)
+    {
+        $data['MEASURE'][] = [
+            "MEASURE-QUALIFIER" => "WT",
+            "MEASURE-DIMENSION-CODE" => "U",
+            "MEASURE-UNIT" => "KGM",
+            "MEASURE-VALUE" => $jobHdr->kgs_weight,
+        ];
+        $data['MEASURE'][] = [
+            "MEASURE-QUALIFIER" => "VOL",
+            "MEASURE-DIMENSION-CODE" => "U",
+            "MEASURE-UNIT" => "KGM",
+            "MEASURE-VALUE" => $jobHdr->vol_weight,
+        ];
+
+        return $data;
     }
 }
