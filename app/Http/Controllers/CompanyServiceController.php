@@ -63,10 +63,10 @@ class CompanyServiceController extends Controller
      */
     public function edit($companyId, $serviceId)
     {
+        $this->authorize(new CompanyService);
+
         $companyService = CompanyService::where('company_id', $companyId)->where('service_id', $serviceId)->first();
         if (isset($companyService)) {
-            $this->authorize($companyService);
-
             return view('company_service.edit', compact('companyService'));
         }
 

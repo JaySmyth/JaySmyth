@@ -94,6 +94,14 @@
                 {!! Form::select('carrier',  dropDown('carriers', 'All Carriers'), Request::get('carrier'), array('class' => 'form-control')) !!}
             </div>
         </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">
+                Depot:
+            </label>
+            <div class="col-sm-8">
+                {!! Form::select('depot_id',  dropDown('depots', 'All Depots'), Request::get('depot_id'), array('class' => 'form-control')) !!}
+            </div>
+        </div>
     @endif
 
     <div class="form-group row">

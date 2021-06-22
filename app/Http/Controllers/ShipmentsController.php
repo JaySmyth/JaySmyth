@@ -104,6 +104,7 @@ class ShipmentsController extends Controller
             ->hasService($request->service)
             ->traffic($request->traffic)
             ->hasCarrier($request->carrier)
+            ->hasDepot($request->depot_id)
             ->shipDateBetween($request->date_from, $request->date_to)
             ->createdBy($request->user)
             ->recipientFilter($request->recipient_filter)
@@ -1131,7 +1132,6 @@ class ShipmentsController extends Controller
      */
     public function test(Request $request)
     {
-
     }
 
 

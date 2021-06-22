@@ -43,6 +43,7 @@ class AuthServiceProvider extends ServiceProvider
         \App\Models\Surcharge::class => \App\Policies\SurchargePolicy::class,
         \App\Models\Postcode::class => \App\Policies\PostcodePolicy::class,
         \App\Models\Quotation::class => \App\Policies\QuotationPolicy::class,
+        \App\Models\CompanyService::class => \App\Policies\CompanyServicePolicy::class,
         \App\Models\Log::class => \App\Policies\LogPolicy::class,
         \App\Models\SeaFreightTracking::class => \App\Policies\SeaFreightTrackingPolicy::class,
         \App\Models\InvalidCommodityDescription::class => \App\Policies\InvalidCommodityDescriptionPolicy::class,
