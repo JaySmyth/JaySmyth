@@ -1288,6 +1288,24 @@ function identifyDepartment($shipment)
 
     switch ($shipment['mode']) {
         case 'courier':
+
+            /*
+            // IE to IE shipment
+            if (strtoupper($shipment['sender_country_code']) == 'IE' && strtoupper($shipment['recipient_country_code']) == 'IE') {
+                return $direction == 'import' ? 'IFCUK' : 'IFCUK';
+            }
+
+            // IE to UK Domestic Shipment
+            if (strtoupper($shipment['sender_country_code']) == 'IE' && isUkDomestic($shipment['recipient_country_code'])) {
+                return $direction == 'import' ? 'IFCUK' : 'IFCUK';
+            }
+
+            // IE to International
+            if (strtoupper($shipment['sender_country_code']) == 'IE') {
+                return $direction == 'import' ? 'IFCIM' : 'IFCEX';
+            }
+            */
+
             // Is it an NI to IE shipment
             if (isBtPostcode($shipment['sender_postcode']) && strtoupper($shipment['recipient_country_code']) == 'IE') {
                 return $direction == 'import' ? 'IFCUK' : 'IFCUK';
