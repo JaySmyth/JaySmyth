@@ -29,7 +29,7 @@
             <th class="text-right">First</th>
             <th class="text-right">Others</th>
             <th class="text-right">Notional Weight</th>
-            <th class="text-right">Notional</th>
+            <!-- <th class="text-right">Notional</th> -->
             <th>Area</th>
             <th>From</th>
             <th>To</th>
@@ -45,7 +45,7 @@
             <td class='text-right'>{{$line->first}}</td>
             <td class='text-right'>{{$line->others}}</td>
             <td class='text-right'>{{$line->notional_weight}}</td>
-            <td class='text-right'>{{$line->notional}}</td>
+            <!-- <td class='text-right'>{{$line->notional}}</td> -->
             <td>{{$line->area}}</td>
             <td>{{$line->from_date}}</td>
             <td>{{$line->to_date}}</td>

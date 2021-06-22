@@ -58,6 +58,7 @@
         @can('view_fuel_surcharge')<a class="dropdown-item" href="{{url('/fuel-surcharges')}}">Fuel Surcharges</a>@endcan
         @can('create_fuel_surcharge')<a class="dropdown-item" href="{{url('/fuel-surcharges/upload')}}">Fuel Surcharges Upload</a>@endcan
         <a class="dropdown-item" href="{{url('/services')}}">Services</a>
+        <a class="dropdown-item" href="{{url('/company-services')}}">Company Service Overrides</a>
         <div class="dropdown-divider"></div>
         <a class="dropdown-item" href="{{url('/shipments/update-dims')}}">Update DIMs</a>
         <a class="dropdown-item" href="{{url('/dim-check')}}">DIM Check Upload</a>
