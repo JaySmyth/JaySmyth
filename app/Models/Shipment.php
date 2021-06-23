@@ -1409,7 +1409,7 @@ class Shipment extends Model
                 }
 
                 // Notify transport
-                Mail::to('transport@antrim.ifsgroup.com')->cc('it@antrim.ifsgroup.com')->queue(new TransportJobReinstated($collection));
+                Mail::to('transport@antrim.ifsgroup.com')->queue(new TransportJobReinstated($collection));
             }
 
             // Reinstate delivery request if exists
