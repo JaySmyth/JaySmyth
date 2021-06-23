@@ -26,13 +26,27 @@ class CompanyServiceController extends Controller
     }
 
     /**
-     * List company records.
+     * List company service records.
      *
      * @param
      * @return
      */
     public function index(Request $request)
     {
+        $this->authorize(new CompanyService);
+
+        $companyServices = CompanyService::select('name', 'account', 'scs_account', 'country_filter', 'monthly_limit', 'max_weight_limit', 'company_id', 'service_id')
+                ->where('name', '>', '')
+                ->orWhere('account', '>', '')
+                ->orWhere('scs_account', '>', '')
+                ->orWhere('country_filter', '>', '')
+                ->orWhere('monthly_limit', '>', '0')
+                ->orWhere('max_weight_limit', '>', '0')
+                ->orderBy('company_id')
+                ->orderBy('service_id')
+                ->paginate(50);
+
+        return view('company_service.index', compact('companyServices'));
     }
 
     /**
@@ -91,5 +105,9 @@ class CompanyServiceController extends Controller
         flash()->success('Updated!', 'CompanyService updated successfully.');
 
         return redirect('companies/'.$request->company_id);
+    }
+
+    protected function search($request)
+    {
     }
 }

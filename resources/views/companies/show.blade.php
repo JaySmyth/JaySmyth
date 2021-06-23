@@ -198,7 +198,7 @@
                 <a href="{{ url('/company-rate/' . $company->id . '/'.$service->id) . '/upload' }}" title="Upload Rate"><span class="fas fa-cloud-upload-alt ml-sm-2" aria-hidden="true"></span></a>
                 <a href="{{ url('/company-service-rate/' . $company->id . '/'.$service->id) . "/delete" }}" title="Reset to Service Default Rate"><span class="fas fa-fw fa-times ml-sm-2" aria-hidden="true"></span></a>
                 @if($company->uses_defined_services)
-                    <a href="{{ url('/company-service/' . $company->id . '/'.$service->id) . '/edit' }}" title="Edit Country Filter"><span class="fas fa-filter ml-sm-2" aria-hidden="true"></span></a>
+                    <a href="{{ url('/company-services/' . $company->id . '/'.$service->id) . '/edit' }}" title="Edit Country Filter"><span class="fas fa-filter ml-sm-2" aria-hidden="true"></span></a>
                 @endif
             </td>
             @endcan
