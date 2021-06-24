@@ -630,6 +630,7 @@ class ReportsController extends Controller
 
         $shipments = Shipment::orderBy('sender_company_name')
             ->orderBy('ship_date', 'desc')
+            ->where('bill_shipping', 'sender')
             ->traffic($request->traffic)
             ->hasCarrier($request->carrier)
             ->hasDepot($request->depot)
