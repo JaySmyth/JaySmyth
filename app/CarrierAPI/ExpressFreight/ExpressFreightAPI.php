@@ -5,6 +5,7 @@ namespace App\CarrierAPI\ExpressFreight;
 use App\CarrierAPI\ExpressFreight\ExpressFreightLabel;
 use App\Models\Shipment;
 use App\Models\TransactionLog;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * Description of IFSWebAPI.
@@ -62,6 +63,20 @@ class ExpressFreightAPI extends \App\CarrierAPI\CarrierBase
 
     public function validateShipment($shipment)
     {
+        /**
+         * Validate county
+         */
+        $v = Validator::make($shipment, [
+            'recipient_state' => 'required|starts_with:County ,county ',
+        ], [
+            'recipient_state.required' => 'Recipient county required. E.g. "County Cork"',
+            'recipient_state.starts_with' => 'Recipient county required. E.g. "County Cork"',
+        ]);
+
+        if ($v->fails()) {
+            return $this->buildValidationErrors($v->errors());
+        }
+
         $rules['dry_ice'] = 'not_supported';
         $rules['insurance_value'] = 'not_supported';
         $rules['sender_country_code'] = 'in:GB,gb';
