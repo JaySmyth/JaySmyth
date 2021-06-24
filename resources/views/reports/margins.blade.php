@@ -70,6 +70,7 @@
                 </tr>
                 </thead>
                 <tbody>
+                <?php $total_cost = 0; $total_sales = 0; ?>
                 @foreach($shipments as $shipment)
 
                     @if(stristr($shipment->margin_styling_class, 'danger'))
@@ -121,24 +122,50 @@
                                 @endif
                             </td>
 
-                            <td class="text-right" title="Cost">{{number_format($shipment->shipping_cost, 2)}}</td>
-                            <td class="text-right" title="Sales">{{number_format($shipment->shipping_charge, 2)}}</td>
-                            <td class="text-right" title="Profit/Loss">
-                                <span class="{{$shipment->margin_styling_class}}">{{$shipment->profit_formatted}}</span>
+                            @if($shipment->bill_shipping == 'sender')
+                                <td class="text-right" title="Cost">
+                                    {{number_format($shipment->shipping_cost, 2)}}
+                                    <?php $total_cost+=number_format($shipment->shipping_cost, 2); ?>
+                                </td>
+                                <td class="text-right" title="Sales">
+                                    {{number_format($shipment->shipping_charge, 2)}}
+                                        <?php $total_sales+=number_format($shipment->shipping_charge, 2); ?>
+                                </td>
+                                <td class="text-right" title="Profit/Loss">
+                                    <span class="{{$shipment->margin_styling_class}}">{{$shipment->profit_formatted}}</span>
+                                </td>
+                                <td class="text-right" title="Margin">
+                                    <span class="{{$shipment->margin_styling_class}}">{{$shipment->margin}}</span>
+                                </td>
+                            @else
+                            <td class="text-right" title="Cost">&nbsp;</td>
+                            <td class="text-right" title="Sales">&nbsp;</td>
+                            <td class="text-right" title="Profit/Loss"><span class="text-primary">0.00</span></td>
+                            <td class="text-right" title="Margin"><span class="text-primary">n/a</span>
                             </td>
-                            <td class="text-right" title="Margin">
-                                <span class="{{$shipment->margin_styling_class}}">{{$shipment->margin}}</span></td>
+                            @endif
                         </tr>
                         @endforeach
                         <tr class="font-weight-bold">
                             <td colspan="8" class="text-muted text-right">Totals for this page:</td>
-                            <td class="text-right">{{ number_format($shipments->sum('shipping_cost'), 2) }}</td>
-                            <td class="text-right">{{ number_format($shipments->sum('shipping_charge'), 2) }}</td>
-                            <td class="text-right">{{ number_format($shipments->sum('profit'), 2) }}</td>
-                            @if($shipments->sum('shipping_charge') > 0)
-                                <td class="text-right">{{ number_format(($shipments->sum('shipping_charge') - $shipments->sum('shipping_cost')) / $shipments->sum('shipping_charge') * 100, 2) }}%</td>
+                            @if($shipment->bill_shipping == 'sender')
+                                <td class="text-right">{{ number_format($shipments->sum('shipping_cost'), 2) }}</td>
+                                <td class="text-right">{{ number_format($shipments->sum('shipping_charge'), 2) }}</td>
+                                <td class="text-right">{{ number_format($shipments->sum('profit'), 2) }}</td>
+                                @if($shipments->sum('shipping_charge') > 0)
+                                    <td class="text-right">{{ number_format(($shipments->sum('shipping_charge') - $shipments->sum('shipping_cost')) / $shipments->sum('shipping_charge') * 100, 2) }}%</td>
+                                @else
+                                    <td class="text-right">0.00</td>
+                                @endif
                             @else
-                                <td class="text-right">0.00</td>
+                                <td class="text-right">{{ number_format($total_cost, 2) }}</td>
+                                <td class="text-right">{{ number_format($total_sales, 2) }}</td>
+                                <td class="text-right">{{ number_format($total_sales-$total_cost, 2) }}</td>
+                                @if($total_sales > 0)
+                                    <td class="text-right">{{ number_format(($total_sales - $total_cost) / $total_sales * 100, 2) }}%</td>
+                                @else
+                                    <td class="text-right">0.00</td>
+                                @endif
                             @endif
                         </tr>
                 </tbody>
