@@ -305,6 +305,16 @@ function getPickupTime($countryCode, $postcode)
     return $pickupTime->getPickupTime($countryCode, $postcode);
 }
 
+function cleanRegex($regex)
+{
+    $regex = trim($regex, '/^$');
+    $regex = str_replace('?', '', $regex);
+    $regex = str_replace('!', '', $regex);
+    $regex = str_replace('$', '', $regex);
+    $regex = str_replace('[A-Z0-9 ]{3,6}', '', $regex);
+    return $regex;
+}
+
 /**
  * This function will return an array that can be used to populate a select drop down.
  * The function can be called directly from within a blade view.
@@ -480,6 +490,9 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
         case 'labelCopies':
             $result = [0 => 'None', 1 => '1 Extra Copy', 2 => '2 Extra Copies'];
             break;
+        case 'rateTypes':
+            $result = ['all' => 'All Rates', 'domestic' => 'Domestic Rates', 'intl' => 'International Rates'];
+            break;
         case 'weightUom':
             $result = ['kg' => 'kg', 'lb' => 'lb'];
             break;
@@ -512,6 +525,9 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             break;
         case 'datesLong':
             $result = getDates('-4 months', '+ 1 year');
+            break;
+        case 'datesLongFuture':
+            $result = getDates('today', '+ 400 days');
             break;
         case 'datesShort':
             $result = getDates('- 1 day', '+ 14 days');
