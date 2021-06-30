@@ -1128,12 +1128,14 @@ function getTimezone($countryCode, $state = false, $city = false)
 function calcVat($countryCode, $valueOfGoods, $vatExempt)
 {
 
+
     // If Recipient country is GB or in the EU
+    $countryCode = strtoupper($countryCode);
     $eu = Country::where('country_code', $countryCode)->first()->eu;
-    if (strtoupper($countryCode) == 'GB' || $eu) {
+    if (in_array($countryCode, ['GB', 'IM'])) {  // 'GB', 'GG', 'JE', 'IM'
 
         // Recipient is in EU, GB or we are shipping to Channel Islands
-        if ($vatExempt || $countryCode == 'JE' || $countryCode == 'GG') {
+        if ($vatExempt) {
             // Goods are Exempt
             $vatDetails['vat_amount'] = 0;
             $vatDetails['vat_code'] = 'Z';
