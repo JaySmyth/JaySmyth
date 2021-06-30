@@ -309,7 +309,7 @@ function cleanRegex($regex)
 {
     $regex = trim($regex, '/^$');
     $regex = str_replace('?', '', $regex);
-    $regex = str_replace('!', '', $regex);
+    $regex = str_replace('!', ' not ', $regex);
     $regex = str_replace('$', '', $regex);
     $regex = str_replace('[A-Z0-9 ]{3,6}', '', $regex);
     return $regex;
