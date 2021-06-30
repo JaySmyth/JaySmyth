@@ -70,7 +70,7 @@ class ExpressFreightAPI extends \App\CarrierAPI\CarrierBase
             'recipient_state' => 'required|starts_with:County ,county ',
         ], [
             'recipient_state.required' => 'Recipient county required. E.g. "County Cork"',
-            'recipient_state.starts_with' => 'Recipient county required. E.g. "County Cork"',
+            'recipient_state.starts_with' => 'Please prefix recipient county with "County". E.g. "County Cork"',
         ]);
 
         if ($v->fails()) {

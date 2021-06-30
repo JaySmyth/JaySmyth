@@ -68,7 +68,7 @@ class UploadShipmentsToExpressFreight extends Command
             // Create the file to upload
             $this->createFile();
 
-            Mail::to('ASteenson@expressfreight.co.uk')->cc('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Express Freight Manifest ('.$this->shipments->count().' shipments)', 'Please see attached file', $this->filePath));
+            Mail::to('itsupport@expressfreight.co.uk')->send(new \App\Mail\GenericError('Express Freight Manifest ('.$this->shipments->count().' shipments)', 'Please see attached file', $this->filePath));
         }
     }
 
