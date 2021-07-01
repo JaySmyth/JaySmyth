@@ -175,13 +175,8 @@ class ImportMultifreightFiles extends Command
                 $row[$field] = 1;
             }
 
-            // Created Date
+            // Entry Created Date
             if ($field == 'entry_created') {
-                $row[$field] = date_create_from_format('d/m/y', $row[$field]);
-            }
-
-            // Created Date
-            if ($field == 'entry_lodged') {
                 $row[$field] = date_create_from_format('d/m/y', $row[$field]);
             }
 
