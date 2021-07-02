@@ -69,7 +69,7 @@ class ExpressFreightAPI extends \App\CarrierAPI\CarrierBase
         $v = Validator::make($shipment, [
             'recipient_state' => 'required|starts_with:County ,county ',
         ], [
-            'recipient_state.required' => 'Recipient county required. E.g. "County Cork"',
+            'recipient_state.required' => 'Recipient state/ county required. E.g. "County Cork"',
             'recipient_state.starts_with' => 'Please prefix recipient county with "County". E.g. "County Cork"',
         ]);
 
@@ -123,8 +123,7 @@ class ExpressFreightAPI extends \App\CarrierAPI\CarrierBase
      */
     public function addAdditionalInfo($shipment)
     {
-
-        if(!empty($shipment['shipment_id'])){
+        if (!empty($shipment['shipment_id'])) {
             $data['consignment_number'] = Shipment::find($shipment['shipment_id'])->consignment_number;
         } else {
             $data['consignment_number'] = nextAvailable('CONSIGNMENT');                     // Generate an IFS Consignment Number

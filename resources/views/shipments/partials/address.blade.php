@@ -6,7 +6,7 @@
         <div class="card-header font-weight-bold pt-1 pb-1">
             @endif
 
-            {{ ucfirst($type) }}              
+            {{ ucfirst($type) }}
             <span class="fas fa-info-circle" aria-hidden="true" data-placement="bottom" data-toggle="tooltip" data-original-title="Enter the {{ucfirst($type)}}'s details within this panel. Provide accurate information for all fields."></span>
 
             <div class="float-right">
@@ -35,15 +35,15 @@
             <hr class="mt-2 mb-3">
             @endif
 
-            {!! Form::hidden($type . '_id',  old($type . '_id'), array('id' => $type . '_id')) !!} 
+            {!! Form::hidden($type . '_id',  old($type . '_id'), array('id' => $type . '_id')) !!}
 
-            <div class="form-group row">            
+            <div class="form-group row">
                 <label class="col-md-3 col-form-label">
                     Name: <abbr title="This information is required.">*</abbr>
                 </label>
 
                 <div class="col-md-9">
-                    {!! Form::Text($type . '_name', old($type . '_name'), ['id' => $type . '_name', 'class' =>'form-control form-control-sm', 'maxlength' => 35]) !!}                
+                    {!! Form::Text($type . '_name', old($type . '_name'), ['id' => $type . '_name', 'class' =>'form-control form-control-sm', 'maxlength' => 35]) !!}
                 </div>
             </div>
 
@@ -55,7 +55,7 @@
                 </div>
             </div>
 
-            <div class="form-group row">            
+            <div class="form-group row">
                 <label class="col-md-3 col-form-label">
                     Type: <abbr title="This information is required.">*</abbr>
                 </label>
@@ -77,7 +77,7 @@
                 </div>
             </div>
 
-            <div class="form-group row">   
+            <div class="form-group row">
                 <label class="col-md-3 col-form-label">
                     Address 2:
                 </label>
@@ -88,7 +88,7 @@
             </div>
 
             @if($type == 'sender')
-            <div class="form-group row">   
+            <div class="form-group row">
                 <label class="col-md-3 col-form-label">
                     Address 3:
                 </label>
@@ -98,7 +98,7 @@
                 </div>
             </div>
             @else
-            {!! Form::hidden($type . '_address3',  old($type . '_address3'), array('id' => $type . '_address3')) !!} 
+            {!! Form::hidden($type . '_address3',  old($type . '_address3'), array('id' => $type . '_address3')) !!}
             @endif
 
             <div class="form-group row">
@@ -118,16 +118,16 @@
 
                 <div class="col-md-9">
                     @if($type == 'sender')
-                    {!! Form::select($type . '_country_code', dropDown('senderCountries'), old($type . '_country_code'), array('id' => $type . '_country_code', 'class' =>'form-control form-control-sm')) !!}                     
+                    {!! Form::select($type . '_country_code', dropDown('senderCountries'), old($type . '_country_code'), array('id' => $type . '_country_code', 'class' =>'form-control form-control-sm')) !!}
                     @else
-                    {!! Form::select($type . '_country_code', dropDown('countries', 'Please select'), old($type . '_country_code'), array('id' => $type . '_country_code', 'class' =>'form-control form-control-sm')) !!} 
+                    {!! Form::select($type . '_country_code', dropDown('countries', 'Please select'), old($type . '_country_code'), array('id' => $type . '_country_code', 'class' =>'form-control form-control-sm')) !!}
                     @endif
                 </div>
             </div>
 
             <div class="form-group row">
                 <label class="col-md-3 col-form-label">
-                    State:
+                    State/ County:
                 </label>
 
                 <div class="col-md-9" id="{{$type }}-state-placeholder">
@@ -182,10 +182,10 @@
             @endif
 
             @if(!isset($formView))
-            <div class="form-group row">            
+            <div class="form-group row">
                 <div class="col-md-3 col-form-label">&nbsp;</div>
                 <div class="col-md-4">
-                    <button id="save-{{$type }}-address" class="btn btn-outline-secondary btn-sm btn-xs" type="button">Save Address</button>                
+                    <button id="save-{{$type }}-address" class="btn btn-outline-secondary btn-sm btn-xs" type="button">Save Address</button>
                 </div>
                 <div class="col-md-3">
                     <button id="clear-{{$type }}-address" class="btn btn-outline-secondary btn-sm btn-xs" type="button">Clear Address</button>

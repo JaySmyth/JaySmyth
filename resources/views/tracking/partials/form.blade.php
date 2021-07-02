@@ -67,7 +67,7 @@
 
         <div class="form-group row{{ $errors->has('state') ? ' has-danger' : '' }}">
             <label class="col-sm-4  col-form-label">
-                State: <abbr title="This information is required.">*</abbr>
+                State/ County: <abbr title="This information is required.">*</abbr>
             </label>
 
             <div class="col-sm-6">
@@ -153,4 +153,4 @@
         </div>
 
     </div>
-</div> 
+</div>
