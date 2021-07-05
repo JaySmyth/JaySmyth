@@ -42,7 +42,7 @@ class ImportMultifreightFiles extends Command
      *
      * @var array
      */
-    protected $fileTypes = ['job-hdr', 'job-line', 'job-col', 'job-del', 'rec-chg', 'rec-cost', 'doc-adds'];
+    protected $fileTypes = ['job-hdr', 'job-line', 'job-col', 'job-del', 'rec-chg', 'rec-cost', 'doc-adds', 'rec-cont'];
 
     /**
      * Field to insert / update upon.
@@ -56,6 +56,7 @@ class ImportMultifreightFiles extends Command
         'job-del' => ['job_id', 'del_no'],
         'rec-chg' => ['rec_id', 'line_no', 'charge_type'],
         'rec-cost' => ['rec_id', 'line_no', 'charge_type'],
+        'rec-cont' => ['rec_id', 'line_no', 'record_link'],
         'doc-adds' => ['job_id', 'line_no', 'address_type'],
     ];
 
@@ -108,7 +109,7 @@ class ImportMultifreightFiles extends Command
                         $this->processFile($file);
                         $this->archiveFile($file);
                     } else {
-                        //Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Import Multifreight Files: File not found', false, false, $this->directory.$file));
+                        Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Import Multifreight Files: File not found', false, false, $this->directory.$file));
                     }
                 }
             }
@@ -174,6 +175,11 @@ class ImportMultifreightFiles extends Command
                 $row[$field] = 1;
             }
 
+            // Entry Created Date
+            if ($field == 'entry_created') {
+                $row[$field] = date_create_from_format('d/m/y', $row[$field]);
+            }
+
             // Parse date string
             if (! empty($row[$field]) && stristr($field, 'date')) {
                 $row[$field] = date_create_from_format('d/m/y', $row[$field]);
@@ -211,7 +217,7 @@ class ImportMultifreightFiles extends Command
                                 $this->keyFields[$this->fileType][0] => $row[$this->keyFields[$this->fileType][0]],
                             ])->update($row);
                         } else {
-                          //  Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Import Multifreight Files: job_id is null', $this->directory.$file));
+                            //  Mail::to('dshannon@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Import Multifreight Files: job_id is null', $this->directory.$file));
                         }
 
                         break;

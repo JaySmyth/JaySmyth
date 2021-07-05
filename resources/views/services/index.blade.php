@@ -28,6 +28,10 @@
                 <th class="text-center">Max Customs</th>
                 <th class="text-center">Packaging</th>
                 <th class="text-center">Depot</th>
+                <th class="text-center">From Countries</th>
+                <th class="text-center">To Countries</th>
+                <th class="text-center">From PostCodes</th>
+                <th class="text-center">To PostCodes</th>
                 <th class="text-center">Cost Rate</th>
                 <th class="text-center">Cost Surch</th>
                 <th class="text-center">Def Sales</th>
@@ -51,6 +55,10 @@
                 <td class="text-center">{{ $service->max_customs_value }}</td>
                 <td class="text-center">{{ $service->packaging_types }}</td>
                 <td class="text-center">{{ $service->depot_id }}</td>
+                <td class="text-center">{{ cleanRegex($service->sender_country_codes) }}</td>
+                <td class="text-center">{{ cleanRegex($service->recipient_country_codes) }}</td>
+                <td class="text-center">{{ cleanRegex($service->sender_postcode_regex) }}</td>
+                <td class="text-center">{{ cleanRegex($service->recipient_postcode_regex) }}</td>
                 <td class="text-center">
                     @if($service->cost_rate_id==0)
                         None

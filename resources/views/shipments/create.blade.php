@@ -363,7 +363,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        {!! Form::Label('State:', null, array('class' => 'col-md-4 col-form-label')) !!}
+                                        {!! Form::Label('State/ County:', null, array('class' => 'col-md-4 col-form-label')) !!}
                                         <div class="col-md-8">
                                             {!! Form::Text('broker[state]', old('broker[state]'), ['id' => 'broker-state', 'class' =>'form-control form-control-sm', 'maxlength' => '30']) !!}
                                         </div>

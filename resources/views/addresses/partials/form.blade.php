@@ -61,7 +61,7 @@
         </div>
 
 
-        <div class="form-group row{{ $errors->has('type') ? ' has-danger' : '' }}">          
+        <div class="form-group row{{ $errors->has('type') ? ' has-danger' : '' }}">
             <label class="col-sm-3  col-form-label">
                 Address Type: <abbr title="This information is required.">*</abbr>
             </label>
@@ -94,7 +94,7 @@
             </div>
         </div>
 
-        <div class="form-group row{{ $errors->has('address2') ? ' has-danger' : '' }}"> 
+        <div class="form-group row{{ $errors->has('address2') ? ' has-danger' : '' }}">
             <label class="col-sm-3  col-form-label">
                 Address 2:
             </label>
@@ -104,7 +104,7 @@
             </div>
         </div>
 
-        <div class="form-group row{{ $errors->has('address3') ? ' has-danger' : '' }}"> 
+        <div class="form-group row{{ $errors->has('address3') ? ' has-danger' : '' }}">
             <label class="col-sm-3  col-form-label">
                 Address 3:
             </label>
@@ -133,7 +133,7 @@
 
         <div class="form-group row{{ $errors->has('state') ? ' has-danger' : '' }}">
             <label class="col-sm-3  col-form-label">
-                State:
+                State/ County:
             </label>
 
             <div class="col-sm-7">
