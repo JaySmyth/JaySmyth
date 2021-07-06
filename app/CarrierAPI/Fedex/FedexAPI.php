@@ -747,6 +747,11 @@ class FedexAPI extends CarrierBase
                                         $msgData[$this->fedex->fldno['insurance_currency']] = 'UKL';
                                         break;
 
+                                    case 'SGD':
+                                        $msgData[$this->fedex->fldno[$key]] = 'SID';
+                                        $msgData[$this->fedex->fldno['insurance_currency']] = 'SID';
+                                        break;
+
                                     default:
                                         $msgData[$this->fedex->fldno[$key]] = $value;
                                         $msgData[$this->fedex->fldno['insurance_currency']] = $value;
