@@ -307,6 +307,8 @@ function getPickupTime($countryCode, $postcode)
 
 function cleanRegex($regex)
 {
+    return $regex;
+
     $regex = trim($regex, '/^$');
     $regex = str_replace('?', '', $regex);
     $regex = str_replace('!', ' not ', $regex);
@@ -2004,7 +2006,7 @@ function whoPaysDuty($terms)
         'CIP' => 'recipient',
     ];
 
-    if (array_key_exists($terms, $whoPaysDuty)) {
+    if (isset($whoPaysDuty[$terms])) {
         return $whoPaysDuty[$terms];
     }
 }

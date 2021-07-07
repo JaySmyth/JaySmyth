@@ -43,7 +43,7 @@ class SCSTable
 
     public function setAttribute($attribute, $value = '')
     {
-        if (array_key_exists($attribute, $this->attributes)) {
+        if (isset($this->attributes[$attribute])) {
             if ($value > '') {
 
                 // Remove any characters not allowed
