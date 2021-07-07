@@ -10,6 +10,10 @@ use App\Multifreight\DocAdds;
 use App\Multifreight\RecCont;
 use App\Models\Unlocode;
 
+use Opis\JsonSchema\Validator;
+use Opis\JsonSchema\ValidationResult;
+use Opis\JsonSchema\Errors\ErrorFormatter;
+
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -55,7 +59,6 @@ class BuildTestSeaExportTransaction extends Command
         foreach ($bols as $bol) {
             $msg = $this->buildMsg($bol);
         }
-        dd(json_encode($msg));
 
         $this->info('Finished');
     }
@@ -204,7 +207,54 @@ class BuildTestSeaExportTransaction extends Command
         // Delivery Terms record
         $msg['DTERMS'] = $this->buildDterms($jobHdr->terms_code, $jobHdr->terms_location);
 
-        return $msg;
+        $errors = $this->validateMsg($msg);
+        if ($errors == []) {
+            $errors = $this->sendMsg($msg);
+            if ($errors == []) {
+                $this->markAsSent($jobHdr->id);
+            } else {
+                $this->sendAlert($errors);
+            }
+            return true;
+        } else {
+            print_r($errors);
+            return false;
+        }
+
+        return $errors;
+    }
+
+    protected function sendMsg($msg)
+    {
+    }
+
+    protected function markAsSent($jobId)
+    {
+    }
+
+    protected function sendAlert($errors)
+    {
+    }
+
+    protected function validateMsg($msg)
+    {
+        $errors = [];
+        $schemaId = 'http://shipg1.ifsgroup.com/dbs_ocean.json';
+
+        // Convert to an object - cannot accept json string
+        $msg = json_decode(json_encode($msg));
+
+        // Create a new validator
+        $validator = new Validator();
+        $validator->resolver()->registerFile('http://shipg1.ifsgroup.com/schema/dbs_ocean.json', '/var/www/production/public/schema/dbs_ocean.json');
+
+        // Uri validation
+        $result = $validator->validate($msg, 'http://shipg1.ifsgroup.com/schema/dbs_ocean.json');
+        if (! $result->isValid()) {
+            $errors = (new ErrorFormatter())->format($result->error());
+        }
+
+        return $errors;
     }
 
     protected function natureOfGoods($jobLines)
