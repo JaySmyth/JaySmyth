@@ -486,6 +486,8 @@ Route::resource('transport-jobs', 'TransportJobsController');
  */
 Route::get('rates/revert', 'RateController@revertCompanyRatesView');
 Route::post('rates/revert', 'RateController@revertCompanyRates');
+Route::get('rates/increase', 'RateController@rateIncrease');
+Route::post('rates/increase', 'RateController@storeRateIncrease');
 Route::get('rates/{rate}/{rateDate?}', 'RateController@showRate');
 Route::get('rates/', 'RateController@index');
 

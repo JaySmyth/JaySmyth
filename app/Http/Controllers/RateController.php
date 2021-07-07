@@ -20,6 +20,7 @@ use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class RateController extends Controller
@@ -82,156 +83,6 @@ class RateController extends Controller
                 }
             }
         }
-    }
-
-    /**
-     * Get a list of all Live companies and
-     * Migrate all legacy rates to the new
-     * system.
-     */
-    public function migrateAllCompanyRates()
-    {
-
-        // $requiredCompanies = ["55","59","65","78","84","87","90","92","94","99","109","110","130","133","145","150","158","160","162","187","190","231","243","259","272","277","304","313","314","324","326","358","371","396","399","416","424","425","429","436","453","470","472","474","482","484","492","498","503","512","518","529","538","550","554","558","580","582","585","591","595","610","620","668","675","685","689","703","706","707","721","740","741","744","750","758","760","761","768","775","777","779","784","785","789","794","801","806","810","815","818","819","820","832","836","837","838","850","854"];
-        $requiredCompanies = ['296', '302', '305', '308', '309', '312', '318', '320', '327', '332', '333', '354', '357', '364', '366', '382', '383', '391', '395', '397', '405', '408', '410', '411', '413', '417', '418', '422', '430', '434', '435', '443', '446', '451', '463', '467', '475', '493', '497', '501', '509', '510', '522', '525', '526', '556', '564', '569', '570', '578', '589', '598', '600', '603', '604', '623', '671', '683', '687', '690', '696', '697', '698', '700', '715', '723', '724', '730', '733', '735', '736', '742', '746', '748', '754', '755', '756', '757', '763', '764', '772', '778', '782', '790', '791', '792', '795', '812', '814', '816', '817', '822', '826', '829', '833', '834', '839', '840', '844', '846', '848', '851', '853', '856', '857'];
-
-        $companies = new Company();
-        $companyList = $companies::whereIn('id', $requiredCompanies)->where('legacy', '1')->get();
-
-        //$companyList = $companies::where('legacy', '1')->orderBy('id')->get();
-        foreach ($companyList as $company) {
-            echo '********************************<br>';
-            echo '* Migrating Company : '.$company->id.'<br>';
-            echo '********************************<br>';
-            $this->migrateAllRates($company);
-        }
-    }
-
-    /**
-     * **********************************************
-     * Gets all rates defined on the old system for
-     * a company and Migrates them to the new system
-     * as a table of discounts on a standard rate.
-     * **********************************************.
-     *
-     * @param type $Company
-     */
-    public function migrateAllRates(Company $company)
-    {
-        ini_set('memory_limit', '384M');
-        set_time_limit(300);
-        if ($company) {
-
-            // Read Old Company Details
-            $oldCompany = OldCompany::find($company->id);
-
-            if ($oldCompany) {
-                // Get Services defined for the Company
-                $services = new FukCustService();
-                $customerServices = $services->getCompanyServices($oldCompany);
-                if (! $customerServices->isEmpty()) {
-
-                    // Delete any existing Company Services
-                    // $company->syncServices([], true);
-                    // Delete any existing Rates or Rate Discounts
-                    // $rate = CompanyRate::where('company_id', $company->id)->delete();
-                    // $rate = DomesticRateDiscount::where('company_id', $company->id)->delete();
-                    // $rate = RateDiscount::where('company_id', $company->id)->delete();
-                    // Cycle through each service and migrate it.
-                    foreach ($customerServices as $service) {
-                        $this->doMigration($oldCompany, $service);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Given the service, create the appropriate objects
-     * to allow migration of the legacy rate to the
-     * new system and then initiate the migration.
-     *
-     * @param type $company
-     * @param type $service
-     */
-    public function doMigration($company, $service)
-    {
-        if ($service->app == 'courierUK') {
-
-            // Domestic Services
-            switch (strtolower($service->service)) {
-
-                case 'uk24':
-                case 'uk48r':
-
-                    // UPS Domestic Services
-                    $this->migrateRate($company, $service, new Fuk_RateH());
-                    break;
-
-                default:
-
-                    // Standard Domestic Services - Fedex/ IFS etc.
-                    $this->migrateRate($company, $service, new FukRate());
-                    break;
-            }
-        } else {
-
-            // International Services
-            $this->migrateRate($company, $service, new FxRateH());
-        }
-    }
-
-    /**
-     * Get all information necessary to start the
-     * migration. Migrate the rate, and enable the
-     * service for the Company.
-     *
-     * @param type $company
-     * @param type $legacyService
-     * @param type $rate
-     * @return bool
-     */
-    public function migrateRate($company, $legacyService, $rate)
-    {
-        $carrierId = $legacyService->getCarrierId();
-        $currentRate = $rate->readLegacyRate($company, $legacyService);
-
-        if (! $currentRate->isEmpty()) {
-
-            // Get Carrier and Service objects for this service code
-            $carrier = Carrier::find($carrierId);                                           // Get Carrier
-            $newService = Service::where('code', strtolower($legacyService->service))       // Get Service
-                    ->where('carrier_id', $carrierId)
-                    ->first();
-
-            if ($newService) {
-
-                // Get rateId of service on new system
-                $newRateId = $this->getRateId($company, $legacyService, $newService);
-
-                // Migrate the rate and enable the service for the company
-                if ($rate->migrate($company, $currentRate, $newRateId, $newService)) {
-                    $this->displayStatus('Migrated', $company, $legacyService);
-
-                    if (strtoupper($legacyService->service) == 'UK48') {
-
-                        // Enable all standard Domestic services
-                        $service = new Service();
-                        $service->find(2)->enableForCompany($company->company, $newRateId);
-                        $service->find(3)->enableForCompany($company->company, $newRateId);
-                        $service->find(19)->enableForCompany($company->company, $newRateId);
-                    } else {
-                        return $newService->enableForCompany($company->company, $newRateId);
-                    }
-                } else {
-                    $this->displayStatus('Failed', $company, $legacyService);
-
-                    return false;
-                }
-            }
-        }
-
-        return true;
     }
 
     /**
@@ -451,6 +302,149 @@ class RateController extends Controller
         } else {
             return [];
         }
+    }
+
+    public function rateIncrease(Request $request)
+    {
+        $user = Auth::User();
+        if (! in_array($user->id, ['85','3378'])) {
+            return view('errors.404');
+        }
+
+        return view('rates.increase');
+    }
+
+    public function storeRateIncrease(Request $request)
+    {
+        $this->validate($request, [
+            'type_id' => 'required|in:all,domestic,intl', 'effective_from' => 'required|date', 'effective_to' => 'required|date|after:effective_from', 'increase' =>'required|numeric|min:0.5|max:10'
+        ]);
+
+        $logs = [];
+        $mode = $request->type_id;
+        $dateFrom = Carbon::createFromFormat('d-m-Y', $request->effective_from, 'Europe/London');
+        $dateTo = Carbon::createFromFormat('d-m-Y', $request->effective_to, 'Europe/London');
+        $increase = $request->increase;
+        switch ($mode) {
+            case 'all':
+                $logs = $this->increaseDomestic($mode, $dateFrom->format('Y-m-d'), $dateTo->format('Y-m-d'), $increase, $logs);
+                $logs = $this->increaseIntl($mode, $dateFrom->format('Y-m-d'), $dateTo->format('Y-m-d'), $increase, $logs);
+                break;
+            case 'domestic':
+                $logs = $this->increaseDomestic($mode, $dateFrom->format('Y-m-d'), $dateTo->format('Y-m-d'), $increase, $logs);
+                dd($logs);
+                break;
+            case 'intl':
+                $logs = $this->increaseIntl($mode, $dateFrom->format('Y-m-d'), $dateTo->format('Y-m-d'), $increase, $logs);
+                break;
+            default:
+            break;
+        }
+
+        // Inform user that the import has been completed
+        Mail::to(Auth::User()->email)->bcc('it@antrim.ifsgroup.com')->send(new \App\Mail\RateIncreaseResults($logs));
+
+
+        return view('rates/increase');
+    }
+
+    private function increaseDomestic($mode, $fromDate, $toDate, $increase, $logs = [])
+    {
+        $errors = $this->checkAbleToIncrease($mode, $fromDate, $toDate);
+        if ($errors == []) {
+            $multiplier = 1 + $increase / 100;
+            $rates = DomesticRate::where('rate_id', '>=', '500')
+                    ->where('to_date', '>', date('Y-m-d'))
+                    ->get();
+
+            // Cycle through rates selected and increase values
+            foreach ($rates as $rate) {
+                DomesticRate::create([
+                    'rate_id' => $rate->rate_id,
+                    'service' => $rate->service,
+                    'packaging_code' => $rate->packaging_code,
+                    'first' => round($rate->first * $multiplier, 4),
+                    'others' => round($rate->others * $multiplier, 4),
+                    'notional_weight' => $rate->notional_weight,
+                    'notional' => round($rate->notional * $multiplier, 4),
+                    'area' => $rate->area,
+                    'from_date' => $fromDate,
+                    'to_date' => $toDate,
+                ]);
+            }
+
+            $logs[] = 'Live Domestic Rates Updated '.date('Y-m-d H:i:s');
+        } else {
+            foreach ($errors as $error) {
+                $logs[] = $error;
+            }
+        }
+
+        return $logs;
+    }
+
+    private function increaseIntl($mode, $fromDate, $toDate, $increase, $logs = [])
+    {
+        $errors = $this->checkAbleToIncrease($mode, $fromDate, $toDate);
+        if ($errors==[]) {
+            $multiplier = 1 + $increase / 100;
+            $rates = RateDetail::where('rate_id', '>=', '500')->where('to_date', '>', date('Y-m-d'))->get();
+
+            // Cycle through rates selected and increase values
+            foreach ($rates as $rate) {
+                RateDetail::create([
+                    'rate_id' => $rate->rate_id,
+                    'residential' => $rate->residential,
+                    'piece_limit' => $rate->piece_limit,
+                    'package_type' => $rate->package_type,
+                    'zone' => $rate->zone,
+                    'break_point' => $rate->break_point,
+                    'weight_rate' => round($rate->weight_rate * $multiplier, 4),
+                    'weight_increment' => $rate->weight_increment,
+                    'package_rate' => round($rate->package_rate * $multiplier, 4),
+                    'consignment_rate' => round($rate->consignment_rate * $multiplier, 4),
+                    'weight_units' => $rate->weight_units,
+                    'from_date' => $fromDate,
+                    'to_date' => $toDate,
+                ]);
+
+                $logs[] = 'Live Domestic Rates Updated '.date('Y-m-d H:i:s');
+            }
+        } else {
+            foreach ($errors as $error) {
+                $logs[] = $error;
+            }
+        }
+
+        return $logs;
+    }
+
+    /**
+     * Check there are no conflicting rates already in place.
+     */
+    protected function checkAbleToIncrease($mode, $fromDate, $toDate, $logs = [])
+    {
+        if (in_array($mode, ["all","domestic"])) {
+            $rates = DomesticRate::where('rate_id', '>=', '500')->where('to_date', '>', $fromDate)->first();
+            if ($rates) {
+                $logs = $this->unableToApplyIncrease('domestic_rates', $fromDate, $toDate, $logs);
+            }
+        }
+
+        if (in_array($mode, ["all","intl"])) {
+            $rates = RateDetail::where('rate_id', '>=', '500')->where('to_date', '>', $fromDate)->first();
+            if ($rates) {
+                $logs = $this->unableToApplyIncrease('rate_details', $fromDate, $toDate, $logs);
+            }
+        }
+
+        return $logs;
+    }
+
+    protected function unableToApplyIncrease($table, $fromDate, $toDate, $logs = [])
+    {
+        $logs[] = "Table : $table already contains rates for the period ".$fromDate.' to '.$toDate."\bPlease remove rate(s) and try again.";
+        return $logs;
     }
 
     public function revertCompanyRatesView()
