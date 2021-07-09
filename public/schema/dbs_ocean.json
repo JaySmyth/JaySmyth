@@ -7,466 +7,469 @@
   "default": {},
   "examples": [
     {
-      "ADMIN": {
-        "ORIGIN-BRANCH-ID": "SJCBFS",
-        "BL-MESSAGE-ID": "IFFSXJ00012331",
-        "HOUSE-BL-RUNNING-NUMBER": "1",
-        "STT-NUMBER": "82661000000304",
-        "EXPORT / IMPORT": "E",
-        "ETD-DATE": "20210603",
-        "ETD-TIME": "0000",
-        "TIME-ZONE": "GMT",
-        "ETA-DATE": "20210617",
-        "ETA-TIME": "0000",
-        "CR-DATE": "20210702",
-        "CR-TIME": "140947",
-        "HOUSE-BL-USING-CODE": "O",
-        "NATURE-OF-GOODS": "GEN",
-        "FINAL-DESTINATION-BRANCH": "SCHCAN",
-        "STATUS": "BL1.4.1",
-        "LOAD-TYPE": "LCL"
+      "admin": {
+        "originBranchId": "SJCBFS",
+        "blMessageId": "IFFSXJ00012331",
+        "houseBlRunningNumber": "1",
+        "sttNumber": "82661000000304",
+        "termsOfDeliveryText1": "E",
+        "etdDate": "20210603",
+        "etdTime": "0000",
+        "timeZone": "GMT",
+        "etaDate": "20210617",
+        "etaTime": "0000",
+        "creationDate": "20210702",
+        "creationTime": "140947",
+        "houseBlUsingCode": "O",
+        "natureOfGoods": "GEN",
+        "finalDestinationBranch": "SCHCAN",
+        "status": "BL1.4.1",
+        "loadType": "LCL"
       },
-      "HEADER": {
-        "DOCUMENT-CODE": "703",
-        "MESSAGE-ID": null,
-        "MESSAGE-FUNCTION": "9",
-        "DOCUMENT-PLACE": "GBANT",
-        "DOCUMENT-DATE": "20210702",
-        "DOCUMENT-DATE-FORMAT": "102",
-        "NUMBER-OF-ORIGINALS": "3",
-        "BL-NUMBER": null
+      "header": {
+        "documentCode": "703",
+        "messageId": null,
+        "messageFunction": "9",
+        "documentPlace": "GBANT",
+        "documentDate": "20210702",
+        "documentDateFormat": "102",
+        "numberOfOriginals": "3",
+        "blNumber": null
       },
-      "REFERENCE": {
-        "REFERENCE": [
+      "reference": {
+        "reference": [
           {
-            "REFERENCE-QUALIFIER": "AEG",
-            "REFERENCE-NUMBER": "SS2 55139 // 3275056"
+            "referenceQualifier": "AEG",
+            "referenceNumber": "SS2 55139 // 3275056"
           },
           {
-            "REFERENCE-QUALIFIER": "FF",
-            "REFERENCE-NUMBER": "IFFSXJ00012331"
+            "referenceQualifier": "FF",
+            "referenceNumber": "IFFSXJ00012331"
           }
         ]
       },
-      "THEADER": {
-        "TRANSPORT-STAGE-QUALIFIER": "20",
-        "CONVEYANCE-REFERENCE": "ATLANTIC SKY ATK7021",
-        "MODE-OF-TRANSPORT": "10",
-        "TYPE-OF-TRANSPORT": "13",
-        "CARRIER-ID": "MAEU",
-        "CARRIER-NAME": "ATLANTIC CONTAINER LINE AB",
-        "TRANSPORT-ID": "ATLANTIC SKY ATK7021"
+      "theader": {
+        "transportStageQualifier": "20",
+        "conveyanceReference": "ATLANTIC SKY ATK7021",
+        "modeOfTransport": "10",
+        "typeOfTransport": "13",
+        "carrierId": "MAEU",
+        "carrierName": "ATLANTIC CONTAINER LINE AB",
+        "transportId": "ATLANTIC SKY ATK7021"
       },
-      "TDATES": {
-        "TDATE": [
+      "tdates": {
+        "tdate": [
           {
-            "TRANSPORT-QUALIFIER": "133",
-            "TRANSPORT-DATE": "20210603",
-            "TRANSPORT-DATE-FORMAT": "102"
+            "transportQualifier": "133",
+            "transportDate": "20210603",
+            "transportDateFormat": "102"
           }
         ]
       },
-      "TLOCATIONS": {
-        "TLOCATION": [
+      "tlocations": {
+        "tlocation": [
           {
-            "PLACE-QUALIFIER": "5",
-            "PLACE-ID": "BEL"
+            "placeQualifier": "5",
+            "placeId": "BEL"
           },
           {
-            "PLACE-QUALIFIER": "9",
-            "PLACE-ID": "BEL"
+            "placeQualifier": "9",
+            "placeId": "BEL"
           }
         ]
       },
-      "TADDRESS": {
-        "PARTNERADDR": [
+      "taddress": {
+        "partnerAddr": [
           {
-            "ADDRESS-QUALIFIER": "CN",
-            "ADDRESS-ID": 15928,
-            "ADDRESS-STRUCTURE": "2",
-            "NAME": "SCHENKER OF CANADA LIMITED",
-            "STREET-AND-NUMBER1": "3210 AIRWAY DRIVE",
-            "CITY-NAME": "MISSISSAUGA",
-            "POST-CODE": "L4V 1Y6",
-            "COUNTRY-CODE": "CA",
-            "COM-ADDRESS-ID": "CN",
-            "CONTACT-FUNCTION": "IC",
-            "CONTACT-EMPLOYEE-NAME": "",
-            "COMMUNICATION-ID": "TE",
-            "COMMUNICATION-DATA": "001 905 676 0676"
+            "addressQualifier": "CN",
+            "addressId": 15928,
+            "addressStructure": "2",
+            "name": "SCHENKER OF CANADA LIMITED",
+            "streetAndNumber1": "3210 AIRWAY DRIVE",
+            "cityName": "MISSISSAUGA",
+            "postCode": "L4V 1Y6",
+            "countryCode": "CA",
+            "comAddressId": "CN",
+            "contactFunction": "IC",
+            "contactEmployeeName": "",
+            "communicationId": "TE",
+            "communicationData": "001 905 676 0676"
           },
           {
-            "ADDRESS-QUALIFIER": "CZ",
-            "ADDRESS-ID": 15929,
-            "ADDRESS-STRUCTURE": "2",
-            "NAME": "COLLINS AEROSPACE",
-            "STREET-AND-NUMBER1": "MEGAN MCCULLA",
-            "CITY-NAME": "KILKEEL",
-            "POST-CODE": "BT34 4NG",
-            "COUNTRY-CODE": "GB",
-            "COM-ADDRESS-ID": "CZ",
-            "CONTACT-FUNCTION": "IC",
-            "CONTACT-EMPLOYEE-NAME": "",
-            "COMMUNICATION-ID": "TE",
-            "COMMUNICATION-DATA": "02841761562"
+            "addressQualifier": "CZ",
+            "addressId": 15929,
+            "addressStructure": "2",
+            "name": "COLLINS AEROSPACE",
+            "streetAndNumber1": "MEGAN MCCULLA",
+            "cityName": "KILKEEL",
+            "postCode": "BT34 4NG",
+            "countryCode": "GB",
+            "comAddressId": "CZ",
+            "contactFunction": "IC",
+            "contactEmployeeName": "",
+            "communicationId": "TE",
+            "communicationData": "02841761562"
           },
           {
-            "ADDRESS-QUALIFIER": "CN",
-            "ADDRESS-ID": 15928,
-            "ADDRESS-STRUCTURE": "2",
-            "NAME": "SCHENKER OF CANADA LIMITED",
-            "STREET-AND-NUMBER1": "3210 AIRWAY DRIVE",
-            "CITY-NAME": "MISSISSAUGA",
-            "POST-CODE": "L4V 1Y6",
-            "COUNTRY-CODE": "CA",
-            "COM-ADDRESS-ID": "BA",
-            "CONTACT-FUNCTION": "IC",
-            "CONTACT-EMPLOYEE-NAME": "",
-            "COMMUNICATION-ID": "TE",
-            "COMMUNICATION-DATA": "001 905 676 0676"
+            "addressQualifier": "CN",
+            "addressId": 15928,
+            "addressStructure": "2",
+            "name": "SCHENKER OF CANADA LIMITED",
+            "streetAndNumber1": "3210 AIRWAY DRIVE",
+            "cityName": "MISSISSAUGA",
+            "postCode": "L4V 1Y6",
+            "countryCode": "CA",
+            "comAddressId": "BA",
+            "contactFunction": "IC",
+            "contactEmployeeName": "",
+            "communicationId": "TE",
+            "communicationData": "001 905 676 0676"
           }
         ]
       },
-      "GOODSDETAILS": {
-        "GOODS": [
+      "goodsDetails": {
+        "goods": [
           {
-            "ITEM-NUMBER": 1,
-            "NUMBER-OF-PACKAGES": 2,
-            "MEASUREMENT": {
-              "MEASURE": [
+            "itemNumber": 1,
+            "numberOfPackages": 2,
+            "measurement": {
+              "measure": [
                 {
-                  "MEASURE-QUALIFIER": "WT",
-                  "MEASURE-UNIT": "KGM",
-                  "MEASURE-VALUE": 10800
+                  "measureQualifier": "WT",
+                  "measureUnit": "KGM",
+                  "measureValue": 10800
                 },
                 {
-                  "MEASURE-QUALIFIER": "WT",
-                  "MEASURE-UNIT": "MTQ",
-                  "MEASURE-VALUE": 7500
+                  "measureQualifier": "WT",
+                  "measureUnit": "MTQ",
+                  "measureValue": 7500
                 }
               ]
             }
           }
         ]
       },
-      "PACKAGE": {
-        "TOTAL-NUMBER-PACKAGES": 2,
-        "TOTAL-GROSS-WEIGHT": null,
-        "WEIGHT-MEASURE-QUALIFIER": "KGM",
-        "TOTAL-CUBE": 45,
-        "CUBE-MEASURE-QUALIFIER": "MTQ"
+      "package": {
+        "totalNumberPackages": 2,
+        "totalGrossWeight": null,
+        "weightMeasureQualifier": "KGM",
+        "totalCube": 45,
+        "cubeMeasureQualifier": "MTQ"
       },
-      "EQUIPMENTUNIT": [
+      "equipmentUnit": [
         {
-          "EQUIPMENT-QUALIFIER": "CN",
-          "EQUIPMENT-ID-NUMBER": "TLNU4253124",
-          "SIZE-AND-TYPE-TEXT": "40' Container",
-          "SUPPLIER": "2",
-          "MOVEMENT-PLAN": "LCL/LCL",
-          "MEASUREMENT": {
-            "MEASURE": [
+          "equipmentQualifier": "CN",
+          "equipmentIdNumber": "TLNU4253124",
+          "sizeAndTypeText": "40' Container",
+          "supplier": "2",
+          "movementPlan": "LCL/LCL",
+          "measurement": {
+            "measure": [
               {
-                "MEASURE-QUALIFIER": "WT",
-                "MEASURE-DIMENSION-CODE": "U",
-                "MEASURE-UNIT": "KGM",
-                "MEASURE-VALUE": 10800
+                "measureQualifier": "WT",
+                "movementDimensionCode": "U",
+                "measureUnit": "KGM",
+                "measureValue": 10800
               },
               {
-                "MEASURE-QUALIFIER": "VOL",
-                "MEASURE-DIMENSION-CODE": "U",
-                "MEASURE-UNIT": "MTQ",
-                "MEASURE-VALUE": 45
+                "measureQualifier": "VOL",
+                "movementDimensionCode": "U",
+                "measureUnit": "MTQ",
+                "measureValue": 45
               }
             ]
           },
-          "SEAL": "1063127"
+          "seal": "1063127"
         },
         {
-          "EQUIPMENT-QUALIFIER": "CN",
-          "EQUIPMENT-ID-NUMBER": "ACLU9697549",
-          "SIZE-AND-TYPE-TEXT": "40' Container",
-          "SUPPLIER": "2",
-          "MOVEMENT-PLAN": "LCL/LCL",
-          "MEASUREMENT": {
-            "MEASURE": [
+          "equipmentQualifier": "CN",
+          "equipmentIdNumber": "ACLU9697549",
+          "sizeAndTypeText": "40' Container",
+          "supplier": "2",
+          "movementPlan": "LCL/LCL",
+          "measurement": {
+            "measure": [
               {
-                "MEASURE-QUALIFIER": "WT",
-                "MEASURE-DIMENSION-CODE": "U",
-                "MEASURE-UNIT": "KGM",
-                "MEASURE-VALUE": 10800
+                "measureQualifier": "WT",
+                "movementDimensionCode": "U",
+                "measureUnit": "KGM",
+                "measureValue": 10800
               },
               {
-                "MEASURE-QUALIFIER": "VOL",
-                "MEASURE-DIMENSION-CODE": "U",
-                "MEASURE-UNIT": "MTQ",
-                "MEASURE-VALUE": 45
+                "measureQualifier": "VOL",
+                "movementDimensionCode": "U",
+                "measureUnit": "MTQ",
+                "measureValue": 45
               }
             ]
           },
-          "SEAL": "1063126"
+          "seal": "1063126"
         }
       ],
-      "DTERMS": {
-        "TERMS-OF-DELIVERY-CODE": "EXW",
-        "TERMS-OF-DELIVERY-CODE-LIST": "EXW",
-        "TERMS-OF-DELIVERY-TEXT-1": "EXW ANTRIM"
+      "dterms": {
+        "termsOfDeliveryCode": "EXW",
+        "termsOfDeliveryCodeList": "EXW",
+        "termsOfDeliveryText1": "EXW ANTRIM"
       }
     }
   ],
   "required": [
-    "ADMIN",
-    "HEADER",
-    "REFERENCE",
-    "THEADER",
-    "TDATES",
-    "TLOCATIONS",
-    "TADDRESS",
-    "GOODSDETAILS",
-    "PACKAGE",
-    "DTERMS"
+    "admin",
+    "header",
+    "reference",
+    "theader",
+    "tdates",
+    "tlocations",
+    "taddress",
+    "goodsDetails",
+    "package",
+    "dterms"
   ],
   "properties": {
-    "ADMIN": {
-      "$id": "#/properties/ADMIN",
+    "admin": {
+      "$id": "#/properties/admin",
       "type": "object",
-      "title": "The ADMIN schema",
-      "description": "Administration record.",
+      "title": "The admin schema",
+      "description": "administration record.",
       "default": {},
       "examples": [
         {
-          "ORIGIN-BRANCH-ID": "SJCBFS",
-          "BL-MESSAGE-ID": "IFFSXJ00012331",
-          "HOUSE-BL-RUNNING-NUMBER": "1",
-          "STT-NUMBER": "82661000000304",
-          "EXPORT / IMPORT": "E",
-          "ETD-DATE": "20210603",
-          "ETD-TIME": "0000",
-          "TIME-ZONE": "GMT",
-          "ETA-DATE": "20210617",
-          "ETA-TIME": "0000",
-          "CR-DATE": "20210702",
-          "CR-TIME": "140947",
-          "HOUSE-BL-USING-CODE": "O",
-          "NATURE-OF-GOODS": "GEN",
-          "FINAL-DESTINATION-BRANCH": "SCHCAN",
-          "STATUS": "BL1.4.1",
-          "LOAD-TYPE": "LCL"
+          "originBranchId": "SJCBFS",
+          "blMessageId": "IFFSXJ00012331",
+          "houseBlRunningNumber": "1",
+          "sttNumber": "82661000000304",
+          "exportImport": "E",
+          "etdDate": "20210603",
+          "etdTime": "0000",
+          "timeZone": "GMT",
+          "etaDate": "20210617",
+          "etaTime": "0000",
+          "creationDate": "20210702",
+          "creationTime": "140947",
+          "houseBlUsingCode": "O",
+          "natureOfGoods": "GEN",
+          "finalDestinationBranch": "SCHCAN",
+          "status": "BL1.4.1",
+          "loadType": "LCL"
         }
       ],
       "required": [
-        "ORIGIN-BRANCH-ID",
-        "BL-MESSAGE-ID",
-        "HOUSE-BL-RUNNING-NUMBER",
-        "STT-NUMBER",
-        "EXPORT / IMPORT",
-        "ETD-DATE",
-        "ETD-TIME",
-        "TIME-ZONE",
-        "ETA-DATE",
-        "ETA-TIME",
-        "CR-DATE",
-        "CR-TIME",
-        "HOUSE-BL-USING-CODE",
-        "NATURE-OF-GOODS",
-        "FINAL-DESTINATION-BRANCH",
-        "STATUS",
-        "LOAD-TYPE"
+        "originBranchId",
+        "blMessageId",
+        "houseBlRunningNumber",
+        "sttNumber",
+        "exportImport",
+        "etdDate",
+        "etdTime",
+        "timeZone",
+        "etaDate",
+        "etaTime",
+        "creationDate",
+        "creationTime",
+        "houseBlUsingCode",
+        "natureOfGoods",
+        "finalDestinationBranch",
+        "status",
+        "loadType"
       ],
       "properties": {
-        "ORIGIN-BRANCH-ID": {
-          "$id": "#/properties/ADMIN/properties/ORIGIN-BRANCH-ID",
+        "originBranchId": {
+          "$id": "#/properties/admin/properties/originBranchId",
           "type": "string",
           "maxLength": 20,
-          "title": "The ORIGIN-BRANCH-ID schema",
+          "title": "The originBranchId schema",
           "description": "DBSchenker branch office.",
           "default": "",
           "examples": [
             "SJCBFS"
           ]
         },
-        "BL-MESSAGE-ID": {
-          "$id": "#/properties/ADMIN/properties/BL-MESSAGE-ID",
+        "blMessageId": {
+          "$id": "#/properties/admin/properties/blMessageId",
           "type": "string",
-          "title": "The BL-MESSAGE-ID schema",
+          "title": "The blMessageId schema",
           "description": "Unique Shipment ID has to be put into this field. It should not be the BL Number because in case of changing the carrier the message would not be found in the time-triggered database. For House BLs this field should contain the BL MESSAGE ID (contains Master BL Shipment ID).",
           "default": "",
           "examples": [
             "IFFSXJ00012331"
           ]
         },
-        "HOUSE-BL-RUNNING-NUMBER": {
-          "$id": "#/properties/ADMIN/properties/HOUSE-BL-RUNNING-NUMBER",
+        "houseBlRunningNumber": {
+          "$id": "#/properties/admin/properties/houseBlRunningNumber",
           "type": "integer",
-          "title": "The HOUSE-BL-RUNNING-NUMBER schema",
+          "title": "The houseBlRunningNumber schema",
           "description": "To guarantee the correct sequence of the House BLs for a Master-BL..",
           "default": "",
           "examples": [
             "1"
           ]
         },
-        "STT-NUMBER": {
-          "$id": "#/properties/ADMIN/properties/STT-NUMBER",
+        "sttNumber": {
+          "$id": "#/properties/admin/properties/sttNumber",
           "type": "string",
           "maxLength": 20,
-          "title": "The STT-NUMBER schema",
+          "title": "The sttNumber schema",
           "description": "Shipment unique number.",
           "default": "",
           "examples": [
             "82661000000304"
           ]
         },
-        "EXPORT / IMPORT": {
-          "$id": "#/properties/ADMIN/properties/EXPORT%20/%20IMPORT",
+        "exportImport": {
+          "$id": "#/properties/admin/properties/EXPORT%20/%20IMPORT",
           "type": "string",
           "enum": [
             "I",
             "E"
           ],
-          "title": "The EXPORT / IMPORT schema",
+          "title": "The exportImport schema",
           "description": "E/I Qualifier.",
           "default": "",
           "examples": [
             "E"
           ]
         },
-        "ETD-DATE": {
-          "$id": "#/properties/ADMIN/properties/ETD-DATE",
+        "etdDate": {
+          "$id": "#/properties/admin/properties/etdDate",
           "type": "string",
-          "pattern": "[0-9]{1,4}[0-9]{1,2}[0-9]{1,2}",
-          "title": "The ETD-DATE schema",
+          "minLength": 8,
+          "maxLength": 8,
+          "title": "The etdDate schema",
           "description": "Date expected to depart in YYYYMMDD format. If not available use 00000000.",
           "default": "",
           "examples": [
             "20210603"
           ]
         },
-        "ETD-TIME": {
-          "$id": "#/properties/ADMIN/properties/ETD-TIME",
+        "etdTime": {
+          "$id": "#/properties/admin/properties/etdTime",
           "type": "string",
           "pattern": "[0-9]{1,4}",
-          "title": "The ETD-TIME schema",
+          "title": "The etdTime schema",
           "description": "Time expected to depart in HHMM format. If not available use 0000.",
           "default": "0000",
           "examples": [
             "0000"
           ]
         },
-        "TIME-ZONE": {
-          "$id": "#/properties/ADMIN/properties/TIME-ZONE",
+        "timeZone": {
+          "$id": "#/properties/admin/properties/timeZone",
           "type": "string",
           "maxLength": 3,
-          "title": "The TIME-ZONE schema",
+          "title": "The timeZone schema",
           "description": "Timezone of shipping office eg GMT.",
           "default": "",
           "examples": [
             "GMT"
           ]
         },
-        "ETA-DATE": {
-          "$id": "#/properties/ADMIN/properties/ETA-DATE",
+        "etaDate": {
+          "$id": "#/properties/admin/properties/etaDate",
           "type": "string",
-          "pattern": "[0-9]{1,4}[0-9]{1,2}[0-9]{1,2}",
-          "title": "The ETA-DATE schema",
+          "minLength": 8,
+          "maxLength": 8,
+          "title": "The etaDate schema",
           "description": "Date expected to arrive in YYYYMMDD format. If not available use 00000000.",
           "default": "",
           "examples": [
             "20210617"
           ]
         },
-        "ETA-TIME": {
-          "$id": "#/properties/ADMIN/properties/ETA-TIME",
+        "etaTime": {
+          "$id": "#/properties/admin/properties/etaTime",
           "type": "string",
           "pattern": "[0-9]{1,4}",
-          "title": "The ETA-TIME schema",
+          "title": "The etaTime schema",
           "description": "Time expected to arrive in HHMM format. If not available use 0000.",
           "default": "",
           "examples": [
             "0000"
           ]
         },
-        "CR-DATE": {
-          "$id": "#/properties/ADMIN/properties/CR-DATE",
+        "creationDate": {
+          "$id": "#/properties/admin/properties/creationDate",
           "type": "string",
-          "pattern": "[0-9]{1,4}[0-9]{1,2}[0-9]{1,2}",
-          "title": "The CR-DATE schema",
+          "minLength": 8,
+          "maxLength": 8,
+          "title": "The creationDate schema",
           "description": "Date message was created in YYYYMMDD format.",
           "default": "",
           "examples": [
             "20210702"
           ]
         },
-        "CR-TIME": {
-          "$id": "#/properties/ADMIN/properties/CR-TIME",
+        "creationTime": {
+          "$id": "#/properties/admin/properties/creationTime",
           "type": "string",
           "pattern": "[0-9]{1,4}",
-          "title": "The CR-TIME schema",
+          "title": "The creationTime schema",
           "description": "Time message was created in HHMM format. If not available use 0000",
           "default": "",
           "examples": [
             "140947"
           ]
         },
-        "HOUSE-BL-USING-CODE": {
-          "$id": "#/properties/ADMIN/properties/HOUSE-BL-USING-CODE",
+        "houseBlUsingCode": {
+          "$id": "#/properties/admin/properties/houseBlUsingCode",
           "type": "string",
           "enum": [
             "",
             "O",
             "F"
           ],
-          "title": "The HOUSE-BL-USING-CODE schema",
+          "title": "The houseBlUsingCode schema",
           "description": "O - Data sent by branch owning shipment, F - Data sent by a branch not owning the shipment.",
           "default": "",
           "examples": [
             "O"
           ]
         },
-        "NATURE-OF-GOODS": {
-          "$id": "#/properties/ADMIN/properties/NATURE-OF-GOODS",
+        "natureOfGoods": {
+          "$id": "#/properties/admin/properties/natureOfGoods",
           "type": "string",
           "maxLength": 3,
           "enum": [
             "GEN",
             "HAZ"
           ],
-          "title": "The NATURE-OF-GOODS schema",
+          "title": "The natureOfGoods schema",
           "description": "Nature of goods: GEN - General or HAZ - Hazardous.",
           "default": "",
           "examples": [
             "GEN"
           ]
         },
-        "FINAL-DESTINATION-BRANCH": {
-          "$id": "#/properties/ADMIN/properties/FINAL-DESTINATION-BRANCH",
+        "finalDestinationBranch": {
+          "$id": "#/properties/admin/properties/finalDestinationBranch",
           "type": "string",
           "maxLength": 10,
-          "title": "The FINAL-DESTINATION-BRANCH schema",
+          "title": "The finalDestinationBranch schema",
           "description": "Schenker Code appended by the Code SSF for SeaFreight.",
           "default": "",
           "examples": [
             "DE7020SSF"
           ]
         },
-        "STATUS": {
-          "$id": "#/properties/ADMIN/properties/STATUS",
+        "status": {
+          "$id": "#/properties/admin/properties/status",
           "type": "string",
           "maxLength": 10,
-          "title": "The STATUS schema",
+          "title": "The status schema",
           "description": "BL Version Number - Defaulted by Schenker Mapping.",
           "default": "",
           "examples": [
             "BL1.4.1"
           ]
         },
-        "LOAD-TYPE": {
-          "$id": "#/properties/ADMIN/properties/LOAD-TYPE",
+        "loadType": {
+          "$id": "#/properties/admin/properties/loadType",
           "type": "string",
           "maxLength": 3,
           "enum": [
             "FCL",
             "LCL"
           ],
-          "title": "The LOAD-TYPE schema",
+          "title": "The loadType schema",
           "description": "Load Type: FCL or LCL.",
           "default": "",
           "examples": [
@@ -476,63 +479,63 @@
       },
       "additionalProperties": true
     },
-    "HEADER": {
-      "$id": "#/properties/HEADER",
+    "header": {
+      "$id": "#/properties/header",
       "type": "object",
-      "title": "The HEADER schema",
+      "title": "The header schema",
       "description": "An explanation about the purpose of this instance.",
       "default": {},
       "examples": [
         {
-          "DOCUMENT-CODE": "703",
-          "MESSAGE-ID": null,
-          "MESSAGE-FUNCTION": "9",
-          "DOCUMENT-PLACE": "GBANT",
-          "DOCUMENT-DATE": "20210702",
-          "DOCUMENT-DATE-FORMAT": "102",
-          "NUMBER-OF-ORIGINALS": "3",
-          "BL-NUMBER": null
+          "documentCode": "703",
+          "messageId": null,
+          "messageFunction": "9",
+          "documentPlace": "GBANT",
+          "documentDate": "20210702",
+          "documentDateFormat": "102",
+          "numberOfOriginals": "3",
+          "blNumber": null
         }
       ],
       "required": [
-        "DOCUMENT-CODE",
-        "MESSAGE-ID",
-        "MESSAGE-FUNCTION",
-        "DOCUMENT-PLACE",
-        "DOCUMENT-DATE",
-        "DOCUMENT-DATE-FORMAT",
-        "NUMBER-OF-ORIGINALS",
-        "BL-NUMBER"
+        "documentCode",
+        "messageId",
+        "messageFunction",
+        "documentPlace",
+        "documentDate",
+        "documentDateFormat",
+        "numberOfOriginals",
+        "blNumber"
       ],
       "properties": {
-        "DOCUMENT-CODE": {
-          "$id": "#/properties/HEADER/properties/DOCUMENT-CODE",
+        "documentCode": {
+          "$id": "#/properties/header/properties/documentCode",
           "type": "string",
           "enum": [
             "703",
             "704",
             "705"
           ],
-          "title": "The DOCUMENT-CODE schema",
+          "title": "The documentCode schema",
           "description": "Document Code: 703 - House BL, 704 - Master BL, 705 - Direct BL.",
           "default": "",
           "examples": [
             "703"
           ]
         },
-        "MESSAGE-ID": {
-          "$id": "#/properties/HEADER/properties/MESSAGE-ID",
+        "messageId": {
+          "$id": "#/properties/header/properties/messageId",
           "type": "string",
           "maxLength": 20,
-          "title": "The MESSAGE-ID schema",
+          "title": "The messageId schema",
           "description": "BL Message Identification. Bill of Lading Number.",
           "default": null,
           "examples": [
             "HKHKG1234567890"
           ]
         },
-        "MESSAGE-FUNCTION": {
-          "$id": "#/properties/HEADER/properties/MESSAGE-FUNCTION",
+        "messageFunction": {
+          "$id": "#/properties/header/properties/messageFunction",
           "type": "string",
           "enum": [
             "1",
@@ -540,62 +543,63 @@
             "9"
           ],
           "maxLength": 1,
-          "title": "The MESSAGE-FUNCTION schema",
+          "title": "The messageFunction schema",
           "description": "1 - Delete, 5 - Update/ Replace, 9 - Create.",
           "default": "",
           "examples": [
             "9"
           ]
         },
-        "DOCUMENT-PLACE": {
-          "$id": "#/properties/HEADER/properties/DOCUMENT-PLACE",
+        "documentPlace": {
+          "$id": "#/properties/header/properties/documentPlace",
           "type": "string",
-          "title": "The DOCUMENT-PLACE schema",
+          "title": "The documentPlace schema",
           "description": "UN location code for place of issue of BOL.",
           "default": "",
           "examples": [
             "GBANT"
           ]
         },
-        "DOCUMENT-DATE": {
-          "$id": "#/properties/HEADER/properties/DOCUMENT-DATE",
+        "documentDate": {
+          "$id": "#/properties/header/properties/documentDate",
           "type": "string",
-          "pattern": "[0-9]{1,4}[0-9]{1,2}[0-9]{1,2}",
-          "title": "The DOCUMENT-DATE schema",
+          "minLength": 8,
+          "maxLength": 8,
+          "title": "The documentDate schema",
           "description": "Date the document was issued in format YYYYMMDD.",
           "default": "",
           "examples": [
             "20210702"
           ]
         },
-        "DOCUMENT-DATE-FORMAT": {
-          "$id": "#/properties/HEADER/properties/DOCUMENT-DATE-FORMAT",
+        "documentDateFormat": {
+          "$id": "#/properties/header/properties/documentDateFormat",
           "type": "string",
           "enum": [
             "102"
           ],
-          "title": "The DOCUMENT-DATE-FORMAT schema",
+          "title": "The documentDateFormat schema",
           "description": "Code describing date format: 102 - YYYYMMDD.",
           "default": "",
           "examples": [
             "102"
           ]
         },
-        "NUMBER-OF-ORIGINALS": {
-          "$id": "#/properties/HEADER/properties/NUMBER-OF-ORIGINALS",
+        "numberOfOriginals": {
+          "$id": "#/properties/header/properties/numberOfOriginals",
           "type": "integer",
-          "title": "The NUMBER-OF-ORIGINALS schema",
+          "title": "The numberOfOriginals schema",
           "description": "Number of Originals of document to be issued.",
           "default": "",
           "examples": [
             "3"
           ]
         },
-        "BL-NUMBER": {
-          "$id": "#/properties/HEADER/properties/BL-NUMBER",
+        "blNumber": {
+          "$id": "#/properties/header/properties/blNumber",
           "type": "string",
           "maxLength": 20,
-          "title": "The BL-NUMBER schema",
+          "title": "The blNumber schema",
           "description": "Bill of lading number.",
           "default": null,
           "examples": [
@@ -605,71 +609,71 @@
       },
       "additionalProperties": true
     },
-    "REFERENCE": {
-      "$id": "#/properties/REFERENCE",
+    "reference": {
+      "$id": "#/properties/reference",
       "type": "object",
-      "title": "The REFERENCE schema",
-      "description": "Contains multiple ocurances of REFERENCE.",
+      "title": "The reference schema",
+      "description": "Contains multiple ocurances of reference.",
       "default": {},
       "examples": [
         {
-          "REFERENCE": [
+          "reference": [
             {
-              "REFERENCE-QUALIFIER": "AEG",
-              "REFERENCE-NUMBER": "SS2 55139 // 3275056"
+              "referenceQualifier": "AEG",
+              "referenceNumber": "SS2 55139 // 3275056"
             },
             {
-              "REFERENCE-QUALIFIER": "FF",
-              "REFERENCE-NUMBER": "IFFSXJ00012331"
+              "referenceQualifier": "FF",
+              "referenceNumber": "IFFSXJ00012331"
             }
           ]
         }
       ],
       "required": [
-        "REFERENCE"
+        "reference"
       ],
       "properties": {
-        "REFERENCE": {
-          "$id": "#/properties/REFERENCE/properties/REFERENCE",
+        "reference": {
+          "$id": "#/properties/reference/properties/reference",
           "type": "array",
-          "title": "The REFERENCE schema",
+          "title": "The reference schema",
           "description": "References for Customer etc",
           "default": [],
           "examples": [
             [
               {
-                "REFERENCE-QUALIFIER": "AEG",
-                "REFERENCE-NUMBER": "SS2 55139 // 3275056"
+                "referenceQualifier": "AEG",
+                "referenceNumber": "SS2 55139 // 3275056"
               },
               {
-                "REFERENCE-QUALIFIER": "FF",
-                "REFERENCE-NUMBER": "IFFSXJ00012331"
+                "referenceQualifier": "FF",
+                "referenceNumber": "IFFSXJ00012331"
               }
             ]
           ],
           "additionalItems": true,
           "items": {
-            "$id": "#/properties/REFERENCE/properties/REFERENCE/items",
+            "$id": "#/properties/reference/properties/reference/items",
             "anyOf": [
               {
-                "$id": "#/properties/REFERENCE/properties/REFERENCE/items/anyOf/0",
+                "$id": "#/properties/reference/properties/reference/items/anyOf/0",
                 "type": "object",
                 "title": "The first anyOf schema",
                 "description": "An explanation about the purpose of this instance.",
                 "default": {},
                 "examples": [
                   {
-                    "REFERENCE-QUALIFIER": "AEG",
-                    "REFERENCE-NUMBER": "SS2 55139 // 3275056"
+                    "referenceQualifier": "AEG",
+                    "referenceNumber": "SS2 55139 // 3275056"
                   }
                 ],
                 "required": [
-                  "REFERENCE-QUALIFIER",
-                  "REFERENCE-NUMBER"
+                  "referenceQualifier",
+                  "referenceNumber"
                 ],
                 "properties": {
-                  "REFERENCE-QUALIFIER": {
-                    "$id": "#/properties/REFERENCE/properties/REFERENCE/items/anyOf/0/properties/REFERENCE-QUALIFIER",
+                  "referenceQualifier": {
+                    "$id": "#/properties/reference/properties/reference/items/anyOf/0/properties/referenceQualifier",
                     "type": "string",
                     "emun": [
                       "FF",
@@ -689,18 +693,18 @@
                       "SKY",
                       "BL20"
                     ],
-                    "title": "The REFERENCE-QUALIFIER schema",
+                    "title": "The referenceQualifier schema",
                     "description": "Code identifying the reference type.",
                     "default": "",
                     "examples": [
                       "AEG"
                     ]
                   },
-                  "REFERENCE-NUMBER": {
-                    "$id": "#/properties/REFERENCE/properties/REFERENCE/items/anyOf/0/properties/REFERENCE-NUMBER",
+                  "referenceNumber": {
+                    "$id": "#/properties/reference/properties/reference/items/anyOf/0/properties/referenceNumber",
                     "type": "string",
                     "maxLength": 35,
-                    "title": "The REFERENCE-NUMBER schema",
+                    "title": "The referenceNumber schema",
                     "description": "Reference.",
                     "default": "",
                     "examples": [
@@ -716,112 +720,112 @@
       },
       "additionalProperties": true
     },
-    "THEADER": {
-      "$id": "#/properties/THEADER",
+    "theader": {
+      "$id": "#/properties/theader",
       "type": "object",
-      "title": "The THEADER schema",
+      "title": "The theader schema",
       "description": "An explanation about the purpose of this instance.",
       "default": {},
       "examples": [
         {
-          "TRANSPORT-STAGE-QUALIFIER": "20",
-          "CONVEYANCE-REFERENCE": "ATLANTIC SKY ATK7021",
-          "MODE-OF-TRANSPORT": "10",
-          "TYPE-OF-TRANSPORT": "13",
-          "CARRIER-ID": "",
-          "CARRIER-NAME": "ATLANTIC CONTAINER LINE AB",
-          "TRANSPORT-ID": "ATLANTIC SKY ATK7021"
+          "transportStageQualifier": "20",
+          "conveyanceReference": "ATLANTIC SKY ATK7021",
+          "modeOfTransport": "10",
+          "typeOfTransport": "13",
+          "carrierId": "",
+          "carrierName": "ATLANTIC CONTAINER LINE AB",
+          "transportId": "ATLANTIC SKY ATK7021"
         }
       ],
       "required": [
-        "TRANSPORT-STAGE-QUALIFIER",
-        "CONVEYANCE-REFERENCE",
-        "MODE-OF-TRANSPORT",
-        "TYPE-OF-TRANSPORT",
-        "CARRIER-ID",
-        "CARRIER-NAME",
-        "TRANSPORT-ID"
+        "transportStageQualifier",
+        "conveyanceReference",
+        "modeOfTransport",
+        "typeOfTransport",
+        "carrierId",
+        "carrierName",
+        "transportId"
       ],
       "properties": {
-        "TRANSPORT-STAGE-QUALIFIER": {
-          "$id": "#/properties/THEADER/properties/TRANSPORT-STAGE-QUALIFIER",
+        "transportStageQualifier": {
+          "$id": "#/properties/theader/properties/transportStageQualifier",
           "type": "string",
           "enum": [
             "20"
           ],
-          "title": "The TRANSPORT-STAGE-QUALIFIER schema",
+          "title": "The transportStageQualifier schema",
           "description": "Main carriage transport: 20.",
           "default": "",
           "examples": [
             "20"
           ]
         },
-        "CONVEYANCE-REFERENCE": {
-          "$id": "#/properties/THEADER/properties/CONVEYANCE-REFERENCE",
+        "conveyanceReference": {
+          "$id": "#/properties/theader/properties/conveyanceReference",
           "type": "string",
           "maxLength": 17,
-          "title": "The CONVEYANCE-REFERENCE schema",
+          "title": "The conveyanceReference schema",
           "description": "Voyage number.",
           "default": "",
           "examples": [
             "SNL-HKG-HAM-1234"
           ]
         },
-        "MODE-OF-TRANSPORT": {
-          "$id": "#/properties/THEADER/properties/MODE-OF-TRANSPORT",
+        "modeOfTransport": {
+          "$id": "#/properties/theader/properties/modeOfTransport",
           "type": "string",
           "enum": [
             "10"
           ],
-          "title": "The MODE-OF-TRANSPORT schema",
+          "title": "The modeOfTransport schema",
           "description": "Code identifying the mode of transport: 10 - Maritime Transport.",
           "default": "",
           "examples": [
             "10"
           ]
         },
-        "TYPE-OF-TRANSPORT": {
-          "$id": "#/properties/THEADER/properties/TYPE-OF-TRANSPORT",
+        "typeOfTransport": {
+          "$id": "#/properties/theader/properties/typeOfTransport",
           "type": "string",
           "enum": [
             "11",
             "13"
           ],
-          "title": "The TYPE-OF-TRANSPORT schema",
+          "title": "The typeOfTransport schema",
           "description": "Code identifying the type of transport: 11 - Ship, 13 = Ocean Vessel.",
           "default": "",
           "examples": [
             "13"
           ]
         },
-        "CARRIER-ID": {
-          "$id": "#/properties/THEADER/properties/CARRIER-ID",
+        "carrierId": {
+          "$id": "#/properties/theader/properties/carrierId",
           "type": "string",
           "minLength": 4,
           "maxLength": 4,
-          "title": "The CARRIER-ID schema",
+          "title": "The carrierId schema",
           "description": "Carrier SCAC code.",
           "default": "",
           "examples": [
             "MAEU"
           ]
         },
-        "CARRIER-NAME": {
-          "$id": "#/properties/THEADER/properties/CARRIER-NAME",
+        "carrierName": {
+          "$id": "#/properties/theader/properties/carrierName",
           "type": "string",
           "maxLength": 35,
-          "title": "The CARRIER-NAME schema",
+          "title": "The carrierName schema",
           "description": "Carrier name.",
           "default": "",
           "examples": [
             "ATLANTIC CONTAINER LINE AB"
           ]
         },
-        "TRANSPORT-ID": {
-          "$id": "#/properties/THEADER/properties/TRANSPORT-ID",
+        "transportId": {
+          "$id": "#/properties/theader/properties/transportId",
           "type": "string",
           "maxLength": 35,
-          "title": "The TRANSPORT-ID schema",
+          "title": "The transportId schema",
           "description": "Name of the vessel or ship.",
           "default": "",
           "examples": [
@@ -831,67 +835,67 @@
       },
       "additionalProperties": true
     },
-    "TDATES": {
-      "$id": "#/properties/TDATES",
+    "tdates": {
+      "$id": "#/properties/tdates",
       "type": "object",
-      "title": "The TDATES schema",
+      "title": "The tdates schema",
       "description": "An explanation about the purpose of this instance.",
       "default": {},
       "examples": [
         {
-          "TDATE": [
+          "tdate": [
             {
-              "TRANSPORT-QUALIFIER": "133",
-              "TRANSPORT-DATE": "20210603",
-              "TRANSPORT-DATE-FORMAT": "102"
+              "transportQualifier": "133",
+              "transportDate": "20210603",
+              "transportDateFormat": "102"
             }
           ]
         }
       ],
       "required": [
-        "TDATE"
+        "tdate"
       ],
       "properties": {
-        "TDATE": {
-          "$id": "#/properties/TDATES/properties/TDATE",
+        "tdate": {
+          "$id": "#/properties/tdates/properties/tdate",
           "type": "array",
-          "title": "The TDATE schema",
+          "title": "The tdate schema",
           "description": "An explanation about the purpose of this instance.",
           "default": [],
           "examples": [
             [
               {
-                "TRANSPORT-QUALIFIER": "133",
-                "TRANSPORT-DATE": "20210603",
-                "TRANSPORT-DATE-FORMAT": "102"
+                "transportQualifier": "133",
+                "transportDate": "20210603",
+                "transportDateFormat": "102"
               }
             ]
           ],
           "additionalItems": true,
           "items": {
-            "$id": "#/properties/TDATES/properties/TDATE/items",
+            "$id": "#/properties/tdates/properties/tdate/items",
             "anyOf": [
               {
-                "$id": "#/properties/TDATES/properties/TDATE/items/anyOf/0",
+                "$id": "#/properties/tdates/properties/tdate/items/anyOf/0",
                 "type": "object",
                 "title": "The first anyOf schema",
                 "description": "Transport Dates Record.",
                 "default": {},
                 "examples": [
                   {
-                    "TRANSPORT-QUALIFIER": "133",
-                    "TRANSPORT-DATE": "20210603",
-                    "TRANSPORT-DATE-FORMAT": "102"
+                    "transportQualifier": "133",
+                    "transportDate": "20210603",
+                    "transportDateFormat": "102"
                   }
                 ],
                 "required": [
-                  "TRANSPORT-QUALIFIER",
-                  "TRANSPORT-DATE",
-                  "TRANSPORT-DATE-FORMAT"
+                  "transportQualifier",
+                  "transportDate",
+                  "transportDateFormat"
                 ],
                 "properties": {
-                  "TRANSPORT-QUALIFIER": {
-                    "$id": "#/properties/TDATES/properties/TDATE/items/anyOf/0/properties/TRANSPORT-QUALIFIER",
+                  "transportQualifier": {
+                    "$id": "#/properties/tdates/properties/tdate/items/anyOf/0/properties/transportQualifier",
                     "type": "string",
                     "enum": [
                       "11",
@@ -900,31 +904,32 @@
                       "133",
                       "136"
                     ],
-                    "title": "The TRANSPORT-QUALIFIER schema",
+                    "title": "The transportQualifier schema",
                     "description": "Code identifying type of date: 11 = Shipped on Board Date, 118 = Booked at Date (= Confirmed at) 132 = Estimated Date of Arrival, 133 = Estimated Date of Departure. 136 = Departure Date",
                     "default": "",
                     "examples": [
                       "133"
                     ]
                   },
-                  "TRANSPORT-DATE": {
-                    "$id": "#/properties/TDATES/properties/TDATE/items/anyOf/0/properties/TRANSPORT-DATE",
+                  "transportDate": {
+                    "$id": "#/properties/tdates/properties/tdate/items/anyOf/0/properties/transportDate",
                     "type": "string",
-                    "pattern": "[0-9]{1,4}[0-9]{1,2}[0-9]{1,2}",
-                    "title": "The TRANSPORT-DATE schema",
+                    "minLength": 8,
+                    "maxLength": 8,
+                    "title": "The transportDate schema",
                     "description": "The date the event occured.",
                     "default": "",
                     "examples": [
                       "20210603"
                     ]
                   },
-                  "TRANSPORT-DATE-FORMAT": {
-                    "$id": "#/properties/TDATES/properties/TDATE/items/anyOf/0/properties/TRANSPORT-DATE-FORMAT",
+                  "transportDateFormat": {
+                    "$id": "#/properties/tdates/properties/tdate/items/anyOf/0/properties/transportDateFormat",
                     "type": "string",
                     "enum": [
                       "102"
                     ],
-                    "title": "The TRANSPORT-DATE-FORMAT schema",
+                    "title": "The transportDateFormat schema",
                     "description": "Code identifying the date Format: 102 - YYYYMMDD",
                     "default": "",
                     "examples": [
@@ -940,71 +945,71 @@
       },
       "additionalProperties": true
     },
-    "TLOCATIONS": {
-      "$id": "#/properties/TLOCATIONS",
+    "tlocations": {
+      "$id": "#/properties/tlocations",
       "type": "object",
-      "title": "The TLOCATIONS schema",
+      "title": "The tlocations schema",
       "description": "Transport Location records",
       "default": {},
       "examples": [
         {
-          "TLOCATION": [
+          "tlocation": [
             {
-              "PLACE-QUALIFIER": "5",
-              "PLACE-ID": "BEL"
+              "placeQualifier": "5",
+              "placeId": "BEL"
             },
             {
-              "PLACE-QUALIFIER": "9",
-              "PLACE-ID": "BEL"
+              "placeQualifier": "9",
+              "placeId": "BEL"
             }
           ]
         }
       ],
       "required": [
-        "TLOCATION"
+        "tlocation"
       ],
       "properties": {
-        "TLOCATION": {
-          "$id": "#/properties/TLOCATIONS/properties/TLOCATION",
+        "tlocation": {
+          "$id": "#/properties/tlocations/properties/tlocation",
           "type": "array",
-          "title": "The TLOCATION schema",
+          "title": "The tlocation schema",
           "description": "Transport location record.",
           "default": [],
           "examples": [
             [
               {
-                "PLACE-QUALIFIER": "5",
-                "PLACE-ID": "BEL"
+                "placeQualifier": "5",
+                "placeId": "BEL"
               },
               {
-                "PLACE-QUALIFIER": "9",
-                "PLACE-ID": "BEL"
+                "placeQualifier": "9",
+                "placeId": "BEL"
               }
             ]
           ],
           "additionalItems": true,
           "items": {
-            "$id": "#/properties/TLOCATIONS/properties/TLOCATION/items",
+            "$id": "#/properties/tlocations/properties/tlocation/items",
             "anyOf": [
               {
-                "$id": "#/properties/TLOCATIONS/properties/TLOCATION/items/anyOf/0",
+                "$id": "#/properties/tlocations/properties/tlocation/items/anyOf/0",
                 "type": "object",
                 "title": "The first anyOf schema",
                 "description": "Transport location record.",
                 "default": {},
                 "examples": [
                   {
-                    "PLACE-QUALIFIER": "5",
-                    "PLACE-ID": "BEL"
+                    "placeQualifier": "5",
+                    "placeId": "BEL"
                   }
                 ],
                 "required": [
-                  "PLACE-QUALIFIER",
-                  "PLACE-ID"
+                  "placeQualifier",
+                  "placeId"
                 ],
                 "properties": {
-                  "PLACE-QUALIFIER": {
-                    "$id": "#/properties/TLOCATIONS/properties/TLOCATION/items/anyOf/0/properties/PLACE-QUALIFIER",
+                  "placeQualifier": {
+                    "$id": "#/properties/tlocations/properties/tlocation/items/anyOf/0/properties/placeQualifier",
                     "type": "string",
                     "enum": [
                       "5",
@@ -1013,18 +1018,18 @@
                       "12",
                       "88"
                     ],
-                    "title": "The PLACE-QUALIFIER schema",
+                    "title": "The placeQualifier schema",
                     "description": "Code identifying type of place referred to.",
                     "default": "",
                     "examples": [
                       "5"
                     ]
                   },
-                  "PLACE-ID": {
-                    "$id": "#/properties/TLOCATIONS/properties/TLOCATION/items/anyOf/0/properties/PLACE-ID",
+                  "placeId": {
+                    "$id": "#/properties/tlocations/properties/tlocation/items/anyOf/0/properties/placeId",
                     "type": "string",
                     "maxLength": 25,
-                    "title": "The PLACE-ID schema",
+                    "title": "The placeId schema",
                     "description": "UNLOCODE code for location.",
                     "default": "",
                     "examples": [
@@ -1040,152 +1045,152 @@
       },
       "additionalProperties": true
     },
-    "TADDRESS": {
-      "$id": "#/properties/TADDRESS",
+    "taddress": {
+      "$id": "#/properties/taddress",
       "type": "object",
-      "title": "The TADDRESS schema",
+      "title": "The taddress schema",
       "description": "Address records for various parties.",
       "default": {},
       "examples": [
         {
-          "PARTNERADDR": [
+          "partnerAddr": [
             {
-              "ADDRESS-QUALIFIER": "CN",
-              "ADDRESS-ID": 15928,
-              "ADDRESS-STRUCTURE": "2",
-              "NAME": "SCHENKER OF CANADA LIMITED",
-              "STREET-AND-NUMBER1": "3210 AIRWAY DRIVE",
-              "CITY-NAME": "MISSISSAUGA",
-              "POST-CODE": "L4V 1Y6",
-              "COUNTRY-CODE": "CA",
-              "COM-ADDRESS-ID": "CN",
-              "CONTACT-FUNCTION": "IC",
-              "CONTACT-EMPLOYEE-NAME": "",
-              "COMMUNICATION-ID": "TE",
-              "COMMUNICATION-DATA": "001 905 676 0676"
+              "addressQualifier": "CN",
+              "addressId": 15928,
+              "addressStructure": "2",
+              "name": "SCHENKER OF CANADA LIMITED",
+              "streetAndNumber1": "3210 AIRWAY DRIVE",
+              "cityName": "MISSISSAUGA",
+              "postCode": "L4V 1Y6",
+              "countryCode": "CA",
+              "comAddressId": "CN",
+              "contactFunction": "IC",
+              "contactEmployeeName": "",
+              "communicationId": "TE",
+              "communicationData": "001 905 676 0676"
             },
             {
-              "ADDRESS-QUALIFIER": "CZ",
-              "ADDRESS-ID": 15929,
-              "ADDRESS-STRUCTURE": "2",
-              "NAME": "COLLINS AEROSPACE",
-              "STREET-AND-NUMBER1": "MEGAN MCCULLA",
-              "CITY-NAME": "KILKEEL",
-              "POST-CODE": "BT34 4NG",
-              "COUNTRY-CODE": "GB",
-              "COM-ADDRESS-ID": "CZ",
-              "CONTACT-FUNCTION": "IC",
-              "CONTACT-EMPLOYEE-NAME": "",
-              "COMMUNICATION-ID": "TE",
-              "COMMUNICATION-DATA": "02841761562"
+              "addressQualifier": "CZ",
+              "addressId": 15929,
+              "addressStructure": "2",
+              "name": "COLLINS AEROSPACE",
+              "streetAndNumber1": "MEGAN MCCULLA",
+              "cityName": "KILKEEL",
+              "postCode": "BT34 4NG",
+              "countryCode": "GB",
+              "comAddressId": "CZ",
+              "contactFunction": "IC",
+              "contactEmployeeName": "",
+              "communicationId": "TE",
+              "communicationData": "02841761562"
             },
             {
-              "ADDRESS-QUALIFIER": "CN",
-              "ADDRESS-ID": 15928,
-              "ADDRESS-STRUCTURE": "2",
-              "NAME": "SCHENKER OF CANADA LIMITED",
-              "STREET-AND-NUMBER1": "3210 AIRWAY DRIVE",
-              "CITY-NAME": "MISSISSAUGA",
-              "POST-CODE": "L4V 1Y6",
-              "COUNTRY-CODE": "CA",
-              "COM-ADDRESS-ID": "BA",
-              "CONTACT-FUNCTION": "IC",
-              "CONTACT-EMPLOYEE-NAME": "",
-              "COMMUNICATION-ID": "TE",
-              "COMMUNICATION-DATA": "001 905 676 0676"
+              "addressQualifier": "CN",
+              "addressId": 15928,
+              "addressStructure": "2",
+              "name": "SCHENKER OF CANADA LIMITED",
+              "streetAndNumber1": "3210 AIRWAY DRIVE",
+              "cityName": "MISSISSAUGA",
+              "postCode": "L4V 1Y6",
+              "countryCode": "CA",
+              "comAddressId": "BA",
+              "contactFunction": "IC",
+              "contactEmployeeName": "",
+              "communicationId": "TE",
+              "communicationData": "001 905 676 0676"
             }
           ]
         }
       ],
       "required": [
-        "PARTNERADDR"
+        "partnerAddr"
       ],
       "properties": {
-        "PARTNERADDR": {
-          "$id": "#/properties/TADDRESS/properties/PARTNERADDR",
+        "partnerAddr": {
+          "$id": "#/properties/taddress/properties/partnerAddr",
           "type": "array",
-          "title": "The PARTNERADDR schema",
+          "title": "The partnerAddr schema",
           "description": "An array of interested parties.",
           "default": [],
           "examples": [
             [
               {
-                "ADDRESS-QUALIFIER": "CN",
-                "ADDRESS-ID": 15928,
-                "ADDRESS-STRUCTURE": "2",
-                "NAME": "SCHENKER OF CANADA LIMITED",
-                "STREET-AND-NUMBER1": "3210 AIRWAY DRIVE",
-                "CITY-NAME": "MISSISSAUGA",
-                "POST-CODE": "L4V 1Y6",
-                "COUNTRY-CODE": "CA",
-                "COM-ADDRESS-ID": "CN",
-                "CONTACT-FUNCTION": "IC",
-                "CONTACT-EMPLOYEE-NAME": "",
-                "COMMUNICATION-ID": "TE",
-                "COMMUNICATION-DATA": "001 905 676 0676"
+                "addressQualifier": "CN",
+                "addressId": 15928,
+                "addressStructure": "2",
+                "name": "SCHENKER OF CANADA LIMITED",
+                "streetAndNumber1": "3210 AIRWAY DRIVE",
+                "cityName": "MISSISSAUGA",
+                "postCode": "L4V 1Y6",
+                "countryCode": "CA",
+                "comAddressId": "CN",
+                "contactFunction": "IC",
+                "contactEmployeeName": "",
+                "communicationId": "TE",
+                "communicationData": "001 905 676 0676"
               },
               {
-                "ADDRESS-QUALIFIER": "CZ",
-                "ADDRESS-ID": 15929,
-                "ADDRESS-STRUCTURE": "2",
-                "NAME": "COLLINS AEROSPACE",
-                "STREET-AND-NUMBER1": "MEGAN MCCULLA",
-                "CITY-NAME": "KILKEEL",
-                "POST-CODE": "BT34 4NG",
-                "COUNTRY-CODE": "GB",
-                "COM-ADDRESS-ID": "CZ",
-                "CONTACT-FUNCTION": "IC",
-                "CONTACT-EMPLOYEE-NAME": "",
-                "COMMUNICATION-ID": "TE",
-                "COMMUNICATION-DATA": "02841761562"
+                "addressQualifier": "CZ",
+                "addressId": 15929,
+                "addressStructure": "2",
+                "name": "COLLINS AEROSPACE",
+                "streetAndNumber1": "MEGAN MCCULLA",
+                "cityName": "KILKEEL",
+                "postCode": "BT34 4NG",
+                "countryCode": "GB",
+                "comAddressId": "CZ",
+                "contactFunction": "IC",
+                "contactEmployeeName": "",
+                "communicationId": "TE",
+                "communicationData": "02841761562"
               }
             ]
           ],
           "additionalItems": true,
           "items": {
-            "$id": "#/properties/TADDRESS/properties/PARTNERADDR/items",
+            "$id": "#/properties/taddress/properties/partnerAddr/items",
             "anyOf": [
               {
-                "$id": "#/properties/TADDRESS/properties/PARTNERADDR/items/anyOf/0",
+                "$id": "#/properties/taddress/properties/partnerAddr/items/anyOf/0",
                 "type": "object",
                 "title": "The first anyOf schema",
                 "description": "Interested Party.",
                 "default": {},
                 "examples": [
                   {
-                    "ADDRESS-QUALIFIER": "CN",
-                    "ADDRESS-ID": 15928,
-                    "ADDRESS-STRUCTURE": "2",
-                    "NAME": "SCHENKER OF CANADA LIMITED",
-                    "STREET-AND-NUMBER1": "3210 AIRWAY DRIVE",
-                    "CITY-NAME": "MISSISSAUGA",
-                    "POST-CODE": "L4V 1Y6",
-                    "COUNTRY-CODE": "CA",
-                    "COM-ADDRESS-ID": "CN",
-                    "CONTACT-FUNCTION": "IC",
-                    "CONTACT-EMPLOYEE-NAME": "",
-                    "COMMUNICATION-ID": "TE",
-                    "COMMUNICATION-DATA": "001 905 676 0676"
+                    "addressQualifier": "CN",
+                    "addressId": 15928,
+                    "addressStructure": "2",
+                    "name": "SCHENKER OF CANADA LIMITED",
+                    "streetAndNumber1": "3210 AIRWAY DRIVE",
+                    "cityName": "MISSISSAUGA",
+                    "postCode": "L4V 1Y6",
+                    "countryCode": "CA",
+                    "comAddressId": "CN",
+                    "contactFunction": "IC",
+                    "contactEmployeeName": "",
+                    "communicationId": "TE",
+                    "communicationData": "001 905 676 0676"
                   }
                 ],
                 "required": [
-                  "ADDRESS-QUALIFIER",
-                  "ADDRESS-ID",
-                  "ADDRESS-STRUCTURE",
-                  "NAME",
-                  "STREET-AND-NUMBER1",
-                  "CITY-NAME",
-                  "POST-CODE",
-                  "COUNTRY-CODE",
-                  "COM-ADDRESS-ID",
-                  "CONTACT-FUNCTION",
-                  "CONTACT-EMPLOYEE-NAME",
-                  "COMMUNICATION-ID",
-                  "COMMUNICATION-DATA"
+                  "addressQualifier",
+                  "addressId",
+                  "addressStructure",
+                  "name",
+                  "streetAndNumber1",
+                  "cityName",
+                  "postCode",
+                  "countryCode",
+                  "comAddressId",
+                  "contactFunction",
+                  "contactEmployeeName",
+                  "communicationId",
+                  "communicationData"
                 ],
                 "properties": {
-                  "ADDRESS-QUALIFIER": {
-                    "$id": "#/properties/TADDRESS/properties/PARTNERADDR/items/anyOf/0/properties/ADDRESS-QUALIFIER",
+                  "addressQualifier": {
+                    "$id": "#/properties/taddress/properties/partnerAddr/items/anyOf/0/properties/addressQualifier",
                     "type": "string",
                     "enum": [
                       "CZ",
@@ -1200,87 +1205,87 @@
                       "AP",
                       "RC"
                     ],
-                    "title": "The ADDRESS-QUALIFIER schema",
+                    "title": "The addressQualifier schema",
                     "description": "Code definining the party the address belongs to.",
                     "default": "",
                     "examples": [
                       "CN"
                     ]
                   },
-                  "ADDRESS-ID": {
-                    "$id": "#/properties/TADDRESS/properties/PARTNERADDR/items/anyOf/0/properties/ADDRESS-ID",
+                  "addressId": {
+                    "$id": "#/properties/taddress/properties/partnerAddr/items/anyOf/0/properties/addressId",
                     "type": "integer",
-                    "title": "The ADDRESS-ID schema",
+                    "title": "The addressId schema",
                     "description": "IFS Address id.",
                     "default": 0,
                     "examples": [
                       15928
                     ]
                   },
-                  "ADDRESS-STRUCTURE": {
-                    "$id": "#/properties/TADDRESS/properties/PARTNERADDR/items/anyOf/0/properties/ADDRESS-STRUCTURE",
+                  "addressStructure": {
+                    "$id": "#/properties/taddress/properties/partnerAddr/items/anyOf/0/properties/addressStructure",
                     "type": "string",
                     "enum": [
                       "1",
                       "2"
                     ],
-                    "title": "The ADDRESS-STRUCTURE schema",
+                    "title": "The addressStructure schema",
                     "description": "Code defining structure - 1: Unstructured, 2: Structured.",
                     "default": "",
                     "examples": [
                       "2"
                     ]
                   },
-                  "NAME": {
-                    "$id": "#/properties/TADDRESS/properties/PARTNERADDR/items/anyOf/0/properties/NAME",
+                  "name": {
+                    "$id": "#/properties/taddress/properties/partnerAddr/items/anyOf/0/properties/name",
                     "type": "string",
                     "maxLength": 35,
-                    "title": "The NAME schema",
+                    "title": "The name schema",
                     "description": "Name of Person/ Company.",
                     "default": "",
                     "examples": [
                       "SCHENKER OF CANADA LIMITED"
                     ]
                   },
-                  "STREET-AND-NUMBER1": {
-                    "$id": "#/properties/TADDRESS/properties/PARTNERADDR/items/anyOf/0/properties/STREET-AND-NUMBER1",
+                  "streetAndNumber1": {
+                    "$id": "#/properties/taddress/properties/partnerAddr/items/anyOf/0/properties/streetAndNumber1",
                     "type": "string",
                     "maxLength": 35,
-                    "title": "The STREET-AND-NUMBER1 schema",
+                    "title": "The streetAndNumber1 schema",
                     "description": "Street name and number.",
                     "default": "",
                     "examples": [
                       "3210 AIRWAY DRIVE"
                     ]
                   },
-                  "CITY-NAME": {
-                    "$id": "#/properties/TADDRESS/properties/PARTNERADDR/items/anyOf/0/properties/CITY-NAME",
+                  "cityName": {
+                    "$id": "#/properties/taddress/properties/partnerAddr/items/anyOf/0/properties/cityName",
                     "type": "string",
                     "maxLength": 35,
-                    "title": "The CITY-NAME schema",
+                    "title": "The cityName schema",
                     "description": "City/ Town name.",
                     "default": "",
                     "examples": [
                       "MISSISSAUGA"
                     ]
                   },
-                  "POST-CODE": {
-                    "$id": "#/properties/TADDRESS/properties/PARTNERADDR/items/anyOf/0/properties/POST-CODE",
+                  "postCode": {
+                    "$id": "#/properties/taddress/properties/partnerAddr/items/anyOf/0/properties/postCode",
                     "type": "string",
                     "maxLength": 9,
-                    "title": "The POST-CODE schema",
+                    "title": "The postCode schema",
                     "description": "Address postcode.",
                     "default": "",
                     "examples": [
                       "L4V 1Y6"
                     ]
                   },
-                  "COUNTRY-CODE": {
-                    "$id": "#/properties/TADDRESS/properties/PARTNERADDR/items/anyOf/0/properties/COUNTRY-CODE",
+                  "countryCode": {
+                    "$id": "#/properties/taddress/properties/partnerAddr/items/anyOf/0/properties/countryCode",
                     "type": "string",
                     "minLength": 2,
                     "maxLength": 2,
-                    "title": "The COUNTRY-CODE schema",
+                    "title": "The countryCode schema",
                     "description": "Two letter country code.",
                     "default": "",
                     "examples": [
@@ -1296,29 +1301,29 @@
       },
       "additionalProperties": true
     },
-    "GOODSDETAILS": {
-      "$id": "#/properties/GOODSDETAILS",
+    "goodsDetails": {
+      "$id": "#/properties/goodsDetails",
       "type": "object",
-      "title": "The GOODSDETAILS schema",
+      "title": "The goodsDetails schema",
       "description": "Description of Goods quantity.",
       "default": {},
       "examples": [
         {
-          "GOODS": [
+          "goods": [
             {
-              "ITEM-NUMBER": 1,
-              "NUMBER-OF-PACKAGES": 2,
-              "MEASUREMENT": {
-                "MEASURE": [
+              "itemNumber": 1,
+              "numberOfPackages": 2,
+              "measurement": {
+                "measure": [
                   {
-                    "MEASURE-QUALIFIER": "WT",
-                    "MEASURE-UNIT": "KGM",
-                    "MEASURE-VALUE": 10800
+                    "measureQualifier": "WT",
+                    "measureUnit": "KGM",
+                    "measureValue": 10800
                   },
                   {
-                    "MEASURE-QUALIFIER": "WT",
-                    "MEASURE-UNIT": "MTQ",
-                    "MEASURE-VALUE": 7500
+                    "measureQualifier": "WT",
+                    "measureUnit": "MTQ",
+                    "measureValue": 7500
                   }
                 ]
               }
@@ -1327,31 +1332,31 @@
         }
       ],
       "required": [
-        "GOODS"
+        "goods"
       ],
       "properties": {
-        "GOODS": {
-          "$id": "#/properties/GOODSDETAILS/properties/GOODS",
+        "goods": {
+          "$id": "#/properties/goodsDetails/properties/goods",
           "type": "array",
-          "title": "The GOODS schema",
+          "title": "The goods schema",
           "description": "Description of Goods quantity.",
           "default": [],
           "examples": [
             [
               {
-                "ITEM-NUMBER": 1,
-                "NUMBER-OF-PACKAGES": 2,
-                "MEASUREMENT": {
-                  "MEASURE": [
+                "itemNumber": 1,
+                "numberOfPackages": 2,
+                "measurement": {
+                  "measure": [
                     {
-                      "MEASURE-QUALIFIER": "WT",
-                      "MEASURE-UNIT": "KGM",
-                      "MEASURE-VALUE": 10800
+                      "measureQualifier": "WT",
+                      "measureUnit": "KGM",
+                      "measureValue": 10800
                     },
                     {
-                      "MEASURE-QUALIFIER": "WT",
-                      "MEASURE-UNIT": "MTQ",
-                      "MEASURE-VALUE": 7500
+                      "measureQualifier": "WT",
+                      "measureUnit": "MTQ",
+                      "measureValue": 7500
                     }
                   ]
                 }
@@ -1360,145 +1365,145 @@
           ],
           "additionalItems": true,
           "items": {
-            "$id": "#/properties/GOODSDETAILS/properties/GOODS/items",
+            "$id": "#/properties/goodsDetails/properties/goods/items",
             "anyOf": [
               {
-                "$id": "#/properties/GOODSDETAILS/properties/GOODS/items/anyOf/0",
+                "$id": "#/properties/goodsDetails/properties/goods/items/anyOf/0",
                 "type": "object",
                 "title": "The first anyOf schema",
                 "description": "Description of Goods.",
                 "default": {},
                 "examples": [
                   {
-                    "ITEM-NUMBER": 1,
-                    "NUMBER-OF-PACKAGES": 2,
-                    "MEASUREMENT": {
-                      "MEASURE": [
+                    "itemNumber": 1,
+                    "numberOfPackages": 2,
+                    "measurement": {
+                      "measure": [
                         {
-                          "MEASURE-QUALIFIER": "WT",
-                          "MEASURE-UNIT": "KGM",
-                          "MEASURE-VALUE": 10800
+                          "measureQualifier": "WT",
+                          "measureUnit": "KGM",
+                          "measureValue": 10800
                         },
                         {
-                          "MEASURE-QUALIFIER": "WT",
-                          "MEASURE-UNIT": "MTQ",
-                          "MEASURE-VALUE": 7500
+                          "measureQualifier": "WT",
+                          "measureUnit": "MTQ",
+                          "measureValue": 7500
                         }
                       ]
                     }
                   }
                 ],
                 "required": [
-                  "ITEM-NUMBER",
-                  "NUMBER-OF-PACKAGES",
-                  "MEASUREMENT"
+                  "itemNumber",
+                  "numberOfPackages",
+                  "measurement"
                 ],
                 "properties": {
-                  "ITEM-NUMBER": {
-                    "$id": "#/properties/GOODSDETAILS/properties/GOODS/items/anyOf/0/properties/ITEM-NUMBER",
+                  "itemNumber": {
+                    "$id": "#/properties/goodsDetails/properties/goods/items/anyOf/0/properties/itemNumber",
                     "type": "integer",
-                    "title": "The ITEM-NUMBER schema",
+                    "title": "The itemNumber schema",
                     "description": "Unit item number.",
                     "default": 0,
                     "examples": [
                       1
                     ]
                   },
-                  "NUMBER-OF-PACKAGES": {
-                    "$id": "#/properties/GOODSDETAILS/properties/GOODS/items/anyOf/0/properties/NUMBER-OF-PACKAGES",
+                  "numberOfPackages": {
+                    "$id": "#/properties/goodsDetails/properties/goods/items/anyOf/0/properties/numberOfPackages",
                     "type": "integer",
-                    "title": "The NUMBER-OF-PACKAGES schema",
+                    "title": "The numberOfPackages schema",
                     "description": "The number of packages in this unit.",
                     "default": 0,
                     "examples": [
                       2
                     ]
                   },
-                  "MEASUREMENT": {
-                    "$id": "#/properties/GOODSDETAILS/properties/GOODS/items/anyOf/0/properties/MEASUREMENT",
+                  "measurement": {
+                    "$id": "#/properties/goodsDetails/properties/goods/items/anyOf/0/properties/measurement",
                     "type": "object",
-                    "title": "The MEASUREMENT schema",
+                    "title": "The measurement schema",
                     "description": "Description of the measurements.",
                     "default": {},
                     "examples": [
                       {
-                        "MEASURE": [
+                        "measure": [
                           {
-                            "MEASURE-QUALIFIER": "WT",
-                            "MEASURE-UNIT": "KGM",
-                            "MEASURE-VALUE": 10800
+                            "measureQualifier": "WT",
+                            "measureUnit": "KGM",
+                            "measureValue": 10800
                           },
                           {
-                            "MEASURE-QUALIFIER": "WT",
-                            "MEASURE-UNIT": "MTQ",
-                            "MEASURE-VALUE": 7500
+                            "measureQualifier": "WT",
+                            "measureUnit": "MTQ",
+                            "measureValue": 7500
                           }
                         ]
                       }
                     ],
                     "required": [
-                      "MEASURE"
+                      "measure"
                     ],
                     "properties": {
-                      "MEASURE": {
-                        "$id": "#/properties/GOODSDETAILS/properties/GOODS/items/anyOf/0/properties/MEASUREMENT/properties/MEASURE",
+                      "measure": {
+                        "$id": "#/properties/goodsDetails/properties/goods/items/anyOf/0/properties/measurement/properties/measure",
                         "type": "array",
-                        "title": "The MEASURE schema",
+                        "title": "The measure schema",
                         "description": "Description of the measurements.",
                         "default": [],
                         "examples": [
                           [
                             {
-                              "MEASURE-QUALIFIER": "WT",
-                              "MEASURE-UNIT": "KGM",
-                              "MEASURE-VALUE": 10800
+                              "measureQualifier": "WT",
+                              "measureUnit": "KGM",
+                              "measureValue": 10800
                             },
                             {
-                              "MEASURE-QUALIFIER": "WT",
-                              "MEASURE-UNIT": "MTQ",
-                              "MEASURE-VALUE": 7500
+                              "measureQualifier": "WT",
+                              "measureUnit": "MTQ",
+                              "measureValue": 7500
                             }
                           ]
                         ],
                         "additionalItems": true,
                         "items": {
-                          "$id": "#/properties/GOODSDETAILS/properties/GOODS/items/anyOf/0/properties/MEASUREMENT/properties/MEASURE/items",
+                          "$id": "#/properties/goodsDetails/properties/goods/items/anyOf/0/properties/measurement/properties/measure/items",
                           "anyOf": [
                             {
-                              "$id": "#/properties/GOODSDETAILS/properties/GOODS/items/anyOf/0/properties/MEASUREMENT/properties/MEASURE/items/anyOf/0",
+                              "$id": "#/properties/goodsDetails/properties/goods/items/anyOf/0/properties/measurement/properties/measure/items/anyOf/0",
                               "type": "object",
                               "title": "The first anyOf schema",
                               "description": "Description of the measurements.",
                               "default": {},
                               "examples": [
                                 {
-                                  "MEASURE-QUALIFIER": "WT",
-                                  "MEASURE-UNIT": "KGM",
-                                  "MEASURE-VALUE": 10800
+                                  "measureQualifier": "WT",
+                                  "measureUnit": "KGM",
+                                  "measureValue": 10800
                                 }
                               ],
                               "required": [
-                                "MEASURE-QUALIFIER",
-                                "MEASURE-UNIT",
-                                "MEASURE-VALUE"
+                                "measureQualifier",
+                                "measureUnit",
+                                "measureValue"
                               ],
                               "properties": {
-                                "MEASURE-QUALIFIER": {
-                                  "$id": "#/properties/GOODSDETAILS/properties/GOODS/items/anyOf/0/properties/MEASUREMENT/properties/MEASURE/items/anyOf/0/properties/MEASURE-QUALIFIER",
+                                "measureQualifier": {
+                                  "$id": "#/properties/goodsDetails/properties/goods/items/anyOf/0/properties/measurement/properties/measure/items/anyOf/0/properties/measureQualifier",
                                   "type": "string",
                                   "enum": [
                                     "WT",
                                     "VOL"
                                   ],
-                                  "title": "The MEASURE-QUALIFIER schema",
+                                  "title": "The measureQualifier schema",
                                   "description": "define type of weight being measured - WT/ VOL.",
                                   "default": "",
                                   "examples": [
                                     "WT"
                                   ]
                                 },
-                                "MEASURE-UNIT": {
-                                  "$id": "#/properties/GOODSDETAILS/properties/GOODS/items/anyOf/0/properties/MEASUREMENT/properties/MEASURE/items/anyOf/0/properties/MEASURE-UNIT",
+                                "measureUnit": {
+                                  "$id": "#/properties/goodsDetails/properties/goods/items/anyOf/0/properties/measurement/properties/measure/items/anyOf/0/properties/measureUnit",
                                   "type": "string",
                                   "enum": [
                                     "KGM",
@@ -1511,8 +1516,8 @@
                                     "KGM"
                                   ]
                                 },
-                                "MEASURE-VALUE": {
-                                  "$id": "#/properties/GOODSDETAILS/properties/GOODS/items/anyOf/0/properties/MEASUREMENT/properties/MEASURE/items/anyOf/0/properties/MEASURE-VALUE",
+                                "measureValue": {
+                                  "$id": "#/properties/goodsDetails/properties/goods/items/anyOf/0/properties/measurement/properties/measure/items/anyOf/0/properties/measureValue",
                                   "type": "number",
                                   "title": "Weight value",
                                   "description": "Weight in specified units.",
@@ -1539,79 +1544,79 @@
       },
       "additionalProperties": true
     },
-    "PACKAGE": {
-      "$id": "#/properties/PACKAGE",
+    "package": {
+      "$id": "#/properties/package",
       "type": "object",
-      "title": "The PACKAGE schema",
+      "title": "The package schema",
       "description": "An explanation about the purpose of this instance.",
       "default": {},
       "examples": [
         {
-          "TOTAL-NUMBER-PACKAGES": 2,
-          "TOTAL-GROSS-WEIGHT": null,
-          "WEIGHT-MEASURE-QUALIFIER": "KGM",
-          "TOTAL-CUBE": 45,
-          "CUBE-MEASURE-QUALIFIER": "MTQ"
+          "totalNumberPackages": 2,
+          "totalGrossWeight": null,
+          "weightMeasureQualifier": "KGM",
+          "totalCube": 45,
+          "cubeMeasureQualifier": "MTQ"
         }
       ],
       "required": [
-        "TOTAL-NUMBER-PACKAGES",
-        "TOTAL-GROSS-WEIGHT",
-        "WEIGHT-MEASURE-QUALIFIER",
-        "TOTAL-CUBE",
-        "CUBE-MEASURE-QUALIFIER"
+        "totalNumberPackages",
+        "totalGrossWeight",
+        "weightMeasureQualifier",
+        "totalCube",
+        "cubeMeasureQualifier"
       ],
       "properties": {
-        "TOTAL-NUMBER-PACKAGES": {
-          "$id": "#/properties/PACKAGE/properties/TOTAL-NUMBER-PACKAGES",
+        "totalNumberPackages": {
+          "$id": "#/properties/package/properties/totalNumberPackages",
           "type": "integer",
-          "title": "The TOTAL-NUMBER-PACKAGES schema",
+          "title": "The totalNumberPackages schema",
           "description": "The total number of packages for the shipment.",
           "default": 0,
           "examples": [
             2
           ]
         },
-        "TOTAL-GROSS-WEIGHT": {
-          "$id": "#/properties/PACKAGE/properties/TOTAL-GROSS-WEIGHT",
+        "totalGrossWeight": {
+          "$id": "#/properties/package/properties/totalGrossWeight",
           "type": "number",
-          "title": "The TOTAL-GROSS-WEIGHT schema",
+          "title": "The totalGrossWeight schema",
           "description": "Total Gross weight for the shipment.",
           "default": 0,
           "examples": [
             1000
           ]
         },
-        "WEIGHT-MEASURE-QUALIFIER": {
-          "$id": "#/properties/PACKAGE/properties/WEIGHT-MEASURE-QUALIFIER",
+        "weightMeasureQualifier": {
+          "$id": "#/properties/package/properties/weightMeasureQualifier",
           "type": "string",
           "enum": [
             "KGM"
           ],
-          "title": "The WEIGHT-MEASURE-QUALIFIER schema",
+          "title": "The weightMeasureQualifier schema",
           "description": "The units that the weight is expressed in: KGM - Kilograms.",
           "default": "",
           "examples": [
             "KGM"
           ]
         },
-        "TOTAL-CUBE": {
-          "$id": "#/properties/PACKAGE/properties/TOTAL-CUBE",
+        "totalCube": {
+          "$id": "#/properties/package/properties/totalCube",
           "type": "integer",
-          "title": "The TOTAL-CUBE schema",
+          "title": "The totalCube schema",
           "description": "The number of cubic meters the shipment represents.",
           "default": 0,
           "examples": [
             45
           ]
         },
-        "CUBE-MEASURE-QUALIFIER": {
-          "$id": "#/properties/PACKAGE/properties/CUBE-MEASURE-QUALIFIER",
+        "cubeMeasureQualifier": {
+          "$id": "#/properties/package/properties/cubeMeasureQualifier",
           "type": "string",
           "enum": [
             "MTQ"
           ],
-          "title": "The CUBE-MEASURE-QUALIFIER schema",
+          "title": "The cubeMeasureQualifier schema",
           "description": "The units the cubic weight is expressed in: MTQ - Cubic Meters.",
           "default": "",
           "examples": [
@@ -1621,162 +1626,162 @@
       },
       "additionalProperties": true
     },
-    "EQUIPMENTUNIT": {
-      "$id": "#/properties/EQUIPMENTUNIT",
+    "equipmentUnit": {
+      "$id": "#/properties/equipmentUnit",
       "type": "array",
-      "title": "The EQUIPMENTUNIT schema",
+      "title": "The equipmentUnit schema",
       "description": "Description of the transport equipment.",
       "default": [],
       "examples": [
         [
           {
-            "EQUIPMENT-QUALIFIER": "CN",
-            "EQUIPMENT-ID-NUMBER": "TLNU4253124",
-            "SIZE-AND-TYPE-TEXT": "40' Container",
-            "SUPPLIER": "2",
-            "MOVEMENT-PLAN": "LCL/LCL",
-            "MEASUREMENT": {
-              "MEASURE": [
+            "equipmentQualifier": "CN",
+            "equipmentIdNumber": "TLNU4253124",
+            "sizeAndTypeText": "40' Container",
+            "supplier": "2",
+            "movementPlan": "LCL/LCL",
+            "measurement": {
+              "measure": [
                 {
-                  "MEASURE-QUALIFIER": "WT",
-                  "MEASURE-DIMENSION-CODE": "U",
-                  "MEASURE-UNIT": "KGM",
-                  "MEASURE-VALUE": 10800
+                  "measureQualifier": "WT",
+                  "movementDimensionCode": "U",
+                  "measureUnit": "KGM",
+                  "measureValue": 10800
                 },
                 {
-                  "MEASURE-QUALIFIER": "VOL",
-                  "MEASURE-DIMENSION-CODE": "U",
-                  "MEASURE-UNIT": "MTQ",
-                  "MEASURE-VALUE": 45
+                  "measureQualifier": "VOL",
+                  "movementDimensionCode": "U",
+                  "measureUnit": "MTQ",
+                  "measureValue": 45
                 }
               ]
             },
-            "SEAL": "1063127"
+            "seal": "1063127"
           },
           {
-            "EQUIPMENT-QUALIFIER": "CN",
-            "EQUIPMENT-ID-NUMBER": "ACLU9697549",
-            "SIZE-AND-TYPE-TEXT": "40' Container",
-            "SUPPLIER": "2",
-            "MOVEMENT-PLAN": "LCL/LCL",
-            "MEASUREMENT": {
-              "MEASURE": [
+            "equipmentQualifier": "CN",
+            "equipmentIdNumber": "ACLU9697549",
+            "sizeAndTypeText": "40' Container",
+            "supplier": "2",
+            "movementPlan": "LCL/LCL",
+            "measurement": {
+              "measure": [
                 {
-                  "MEASURE-QUALIFIER": "WT",
-                  "MEASURE-DIMENSION-CODE": "U",
-                  "MEASURE-UNIT": "KGM",
-                  "MEASURE-VALUE": 10800
+                  "measureQualifier": "WT",
+                  "movementDimensionCode": "U",
+                  "measureUnit": "KGM",
+                  "measureValue": 10800
                 },
                 {
-                  "MEASURE-QUALIFIER": "VOL",
-                  "MEASURE-DIMENSION-CODE": "U",
-                  "MEASURE-UNIT": "MTQ",
-                  "MEASURE-VALUE": 45
+                  "measureQualifier": "VOL",
+                  "movementDimensionCode": "U",
+                  "measureUnit": "MTQ",
+                  "measureValue": 45
                 }
               ]
             },
-            "SEAL": "1063126"
+            "seal": "1063126"
           }
         ]
       ],
       "additionalItems": true,
       "items": {
-        "$id": "#/properties/EQUIPMENTUNIT/items",
+        "$id": "#/properties/equipmentUnit/items",
         "anyOf": [
           {
-            "$id": "#/properties/EQUIPMENTUNIT/items/anyOf/0",
+            "$id": "#/properties/equipmentUnit/items/anyOf/0",
             "type": "object",
             "title": "The first anyOf schema",
             "description": "Description of the transport equipment.",
             "default": {},
             "examples": [
               {
-                "EQUIPMENT-QUALIFIER": "CN",
-                "EQUIPMENT-ID-NUMBER": "TLNU4253124",
-                "SIZE-AND-TYPE-TEXT": "40' Container",
-                "SUPPLIER": "2",
-                "MOVEMENT-PLAN": "LCL/LCL",
-                "MEASUREMENT": {
-                  "MEASURE": [
+                "equipmentQualifier": "CN",
+                "equipmentIdNumber": "TLNU4253124",
+                "sizeAndTypeText": "40' Container",
+                "supplier": "2",
+                "movementPlan": "LCL/LCL",
+                "measurement": {
+                  "measure": [
                     {
-                      "MEASURE-QUALIFIER": "WT",
-                      "MEASURE-DIMENSION-CODE": "U",
-                      "MEASURE-UNIT": "KGM",
-                      "MEASURE-VALUE": 10800
+                      "measureQualifier": "WT",
+                      "movementDimensionCode": "U",
+                      "measureUnit": "KGM",
+                      "measureValue": 10800
                     },
                     {
-                      "MEASURE-QUALIFIER": "VOL",
-                      "MEASURE-DIMENSION-CODE": "U",
-                      "MEASURE-UNIT": "MTQ",
-                      "MEASURE-VALUE": 45
+                      "measureQualifier": "VOL",
+                      "movementDimensionCode": "U",
+                      "measureUnit": "MTQ",
+                      "measureValue": 45
                     }
                   ]
                 },
-                "SEAL": "1063127"
+                "seal": "1063127"
               }
             ],
             "required": [
-              "EQUIPMENT-QUALIFIER",
-              "EQUIPMENT-ID-NUMBER",
-              "SIZE-AND-TYPE-TEXT",
-              "SUPPLIER",
-              "MOVEMENT-PLAN",
-              "MEASUREMENT",
-              "SEAL"
+              "equipmentQualifier",
+              "equipmentIdNumber",
+              "sizeAndTypeText",
+              "supplier",
+              "movementPlan",
+              "measurement",
+              "seal"
             ],
             "properties": {
-              "EQUIPMENT-QUALIFIER": {
-                "$id": "#/properties/EQUIPMENTUNIT/items/anyOf/0/properties/EQUIPMENT-QUALIFIER",
+              "equipmentQualifier": {
+                "$id": "#/properties/equipmentUnit/items/anyOf/0/properties/equipmentQualifier",
                 "type": "string",
                 "enum": [
                   "CN",
                   "E"
                 ],
-                "title": "The EQUIPMENT-QUALIFIER schema",
+                "title": "The equipmentQualifier schema",
                 "description": "Code identifying equipment: CN - Container, E - Trailer.",
                 "default": "",
                 "examples": [
                   "CN"
                 ]
               },
-              "EQUIPMENT-ID-NUMBER": {
-                "$id": "#/properties/EQUIPMENTUNIT/items/anyOf/0/properties/EQUIPMENT-ID-NUMBER",
+              "equipmentIdNumber": {
+                "$id": "#/properties/equipmentUnit/items/anyOf/0/properties/equipmentIdNumber",
                 "type": "string",
                 "maxLength": 17,
-                "title": "The EQUIPMENT-ID-NUMBER schema",
+                "title": "The equipmentIdNumber schema",
                 "description": "The Equipment id number eg. container number.",
                 "default": "",
                 "examples": [
                   "TLNU4253124"
                 ]
               },
-              "SIZE-AND-TYPE-TEXT": {
-                "$id": "#/properties/EQUIPMENTUNIT/items/anyOf/0/properties/SIZE-AND-TYPE-TEXT",
+              "sizeAndTypeText": {
+                "$id": "#/properties/equipmentUnit/items/anyOf/0/properties/sizeAndTypeText",
                 "type": "string",
                 "maxLength": 15,
-                "title": "The SIZE-AND-TYPE-TEXT schema",
+                "title": "The sizeAndTypeText schema",
                 "description": "Text describing equipment.",
                 "default": "",
                 "examples": [
                   "40' Container"
                 ]
               },
-              "SUPPLIER": {
-                "$id": "#/properties/EQUIPMENTUNIT/items/anyOf/0/properties/SUPPLIER",
+              "supplier": {
+                "$id": "#/properties/equipmentUnit/items/anyOf/0/properties/supplier",
                 "type": "string",
                 "enum": [
                   "1",
                   "2"
                 ],
-                "title": "The SUPPLIER schema",
+                "title": "The supplier schema",
                 "description": "Code to identify who supplied the equipment: 1 - Shipper, 2 - Carrier.",
                 "default": "1",
                 "examples": [
                   "2"
                 ]
               },
-              "MOVEMENT-PLAN": {
-                "$id": "#/properties/EQUIPMENTUNIT/items/anyOf/0/properties/MOVEMENT-PLAN",
+              "movementPlan": {
+                "$id": "#/properties/equipmentUnit/items/anyOf/0/properties/movementPlan",
                 "type": "string",
                 "enum": [
                   "FCL/FCL",
@@ -1784,130 +1789,130 @@
                   "LCL/FCL",
                   "LCL/LCL"
                 ],
-                "title": "The MOVEMENT-PLAN schema",
+                "title": "The movementPlan schema",
                 "description": "Description of movement plan.",
                 "default": "",
                 "examples": [
                   "LCL/LCL"
                 ]
               },
-              "MEASUREMENT": {
-                "$id": "#/properties/EQUIPMENTUNIT/items/anyOf/0/properties/MEASUREMENT",
+              "measurement": {
+                "$id": "#/properties/equipmentUnit/items/anyOf/0/properties/measurement",
                 "type": "object",
-                "title": "The MEASUREMENT schema",
+                "title": "The measurement schema",
                 "description": "Details of shipment measurement.",
                 "default": {},
                 "examples": [
                   {
-                    "MEASURE": [
+                    "measure": [
                       {
-                        "MEASURE-QUALIFIER": "WT",
-                        "MEASURE-DIMENSION-CODE": "U",
-                        "MEASURE-UNIT": "KGM",
-                        "MEASURE-VALUE": 10800
+                        "measureQualifier": "WT",
+                        "movementDimensionCode": "U",
+                        "measureUnit": "KGM",
+                        "measureValue": 10800
                       },
                       {
-                        "MEASURE-QUALIFIER": "VOL",
-                        "MEASURE-DIMENSION-CODE": "U",
-                        "MEASURE-UNIT": "MTQ",
-                        "MEASURE-VALUE": 45
+                        "measureQualifier": "VOL",
+                        "movementDimensionCode": "U",
+                        "measureUnit": "MTQ",
+                        "measureValue": 45
                       }
                     ]
                   }
                 ],
                 "required": [
-                  "MEASURE"
+                  "measure"
                 ],
                 "properties": {
-                  "MEASURE": {
-                    "$id": "#/properties/EQUIPMENTUNIT/items/anyOf/0/properties/MEASUREMENT/properties/MEASURE",
+                  "measure": {
+                    "$id": "#/properties/equipmentUnit/items/anyOf/0/properties/measurement/properties/measure",
                     "type": "array",
-                    "title": "The MEASURE schema",
+                    "title": "The measure schema",
                     "description": "Details of shipment measurements.",
                     "default": [],
                     "examples": [
                       [
                         {
-                          "MEASURE-QUALIFIER": "WT",
-                          "MEASURE-DIMENSION-CODE": "U",
-                          "MEASURE-UNIT": "KGM",
-                          "MEASURE-VALUE": 10800
+                          "measureQualifier": "WT",
+                          "movementDimensionCode": "U",
+                          "measureUnit": "KGM",
+                          "measureValue": 10800
                         },
                         {
-                          "MEASURE-QUALIFIER": "VOL",
-                          "MEASURE-DIMENSION-CODE": "U",
-                          "MEASURE-UNIT": "MTQ",
-                          "MEASURE-VALUE": 45
+                          "measureQualifier": "VOL",
+                          "movementDimensionCode": "U",
+                          "measureUnit": "MTQ",
+                          "measureValue": 45
                         }
                       ]
                     ],
                     "additionalItems": true,
                     "items": {
-                      "$id": "#/properties/EQUIPMENTUNIT/items/anyOf/0/properties/MEASUREMENT/properties/MEASURE/items",
+                      "$id": "#/properties/equipmentUnit/items/anyOf/0/properties/measurement/properties/measure/items",
                       "anyOf": [
                         {
-                          "$id": "#/properties/EQUIPMENTUNIT/items/anyOf/0/properties/MEASUREMENT/properties/MEASURE/items/anyOf/0",
+                          "$id": "#/properties/equipmentUnit/items/anyOf/0/properties/measurement/properties/measure/items/anyOf/0",
                           "type": "object",
                           "title": "The first anyOf schema",
                           "description": "Details of shipment measurements.",
                           "default": {},
                           "examples": [
                             {
-                              "MEASURE-QUALIFIER": "WT",
-                              "MEASURE-DIMENSION-CODE": "U",
-                              "MEASURE-UNIT": "KGM",
-                              "MEASURE-VALUE": 10800
+                              "measureQualifier": "WT",
+                              "movementDimensionCode": "U",
+                              "measureUnit": "KGM",
+                              "measureValue": 10800
                             }
                           ],
                           "required": [
-                            "MEASURE-QUALIFIER",
-                            "MEASURE-DIMENSION-CODE",
-                            "MEASURE-UNIT",
-                            "MEASURE-VALUE"
+                            "measureQualifier",
+                            "movementDimensionCode",
+                            "measureUnit",
+                            "measureValue"
                           ],
                           "properties": {
-                            "MEASURE-QUALIFIER": {
-                              "$id": "#/properties/EQUIPMENTUNIT/items/anyOf/0/properties/MEASUREMENT/properties/MEASURE/items/anyOf/0/properties/MEASURE-QUALIFIER",
+                            "measureQualifier": {
+                              "$id": "#/properties/equipmentUnit/items/anyOf/0/properties/measurement/properties/measure/items/anyOf/0/properties/measureQualifier",
                               "type": "string",
                               "enum": [
                                 "WT",
                                 "VOL"
                               ],
-                              "title": "The MEASURE-QUALIFIER schema",
+                              "title": "The measureQualifier schema",
                               "description": "Code identifying type of weight being reported on.",
                               "default": "",
                               "examples": [
                                 "WT"
                               ]
                             },
-                            "MEASURE-DIMENSION-CODE": {
-                              "$id": "#/properties/EQUIPMENTUNIT/items/anyOf/0/properties/MEASUREMENT/properties/MEASURE/items/anyOf/0/properties/MEASURE-DIMENSION-CODE",
+                            "movementDimensionCode": {
+                              "$id": "#/properties/equipmentUnit/items/anyOf/0/properties/measurement/properties/measure/items/anyOf/0/properties/movementDimensionCode",
                               "type": "string",
-                              "title": "The MEASURE-DIMENSION-CODE schema",
+                              "title": "The movementDimensionCode schema",
                               "description": "Code identifying what is being measured: T - Tare Weight, U - Unit weight (Container & Content).",
                               "default": "",
                               "examples": [
                                 "U"
                               ]
                             },
-                            "MEASURE-UNIT": {
-                              "$id": "#/properties/EQUIPMENTUNIT/items/anyOf/0/properties/MEASUREMENT/properties/MEASURE/items/anyOf/0/properties/MEASURE-UNIT",
+                            "measureUnit": {
+                              "$id": "#/properties/equipmentUnit/items/anyOf/0/properties/measurement/properties/measure/items/anyOf/0/properties/measureUnit",
                               "type": "string",
                               "enum": [
                                 "KGM",
                                 "MTQ"
                               ],
-                              "title": "The MEASURE-UNIT schema",
+                              "title": "The measureUnit schema",
                               "description": "Unit weight is measured in.",
                               "default": "",
                               "examples": [
                                 "KGM"
                               ]
                             },
-                            "MEASURE-VALUE": {
-                              "$id": "#/properties/EQUIPMENTUNIT/items/anyOf/0/properties/MEASUREMENT/properties/MEASURE/items/anyOf/0/properties/MEASURE-VALUE",
+                            "measureValue": {
+                              "$id": "#/properties/equipmentUnit/items/anyOf/0/properties/measurement/properties/measure/items/anyOf/0/properties/measureValue",
                               "type": "number",
-                              "title": "The MEASURE-VALUE schema",
+                              "title": "The measureValue schema",
                               "description": "The value of the weight.",
                               "default": 0,
                               "examples": [
@@ -1923,11 +1928,11 @@
                 },
                 "additionalProperties": true
               },
-              "SEAL": {
-                "$id": "#/properties/EQUIPMENTUNIT/items/anyOf/0/properties/SEAL",
+              "seal": {
+                "$id": "#/properties/equipmentUnit/items/anyOf/0/properties/seal",
                 "type": "string",
                 "maxLength": 17,
-                "title": "The SEAL schema",
+                "title": "The seal schema",
                 "description": "The Container Seal number.",
                 "default": "",
                 "examples": [
@@ -1940,54 +1945,54 @@
         ]
       }
     },
-    "DTERMS": {
-      "$id": "#/properties/DTERMS",
+    "dterms": {
+      "$id": "#/properties/dterms",
       "type": "object",
-      "title": "The DTERMS schema",
+      "title": "The dterms schema",
       "description": "Description of the delivery terms.",
       "default": {},
       "examples": [
         {
-          "TERMS-OF-DELIVERY-CODE": "EXW",
-          "TERMS-OF-DELIVERY-CODE-LIST": "EXW",
-          "TERMS-OF-DELIVERY-TEXT-1": "EXW ANTRIM"
+          "termsOfDeliveryCode": "EXW",
+          "termsOfDeliveryCodeList": "EXW",
+          "termsLocation": "EXW ANTRIM"
         }
       ],
       "required": [
-        "TERMS-OF-DELIVERY-CODE",
-        "TERMS-OF-DELIVERY-CODE-LIST",
-        "TERMS-OF-DELIVERY-TEXT-1"
+        "termsOfDeliveryCode",
+        "termsOfDeliveryCodeList",
+        "termsLocation"
       ],
       "properties": {
-        "TERMS-OF-DELIVERY-CODE": {
-          "$id": "#/properties/DTERMS/properties/TERMS-OF-DELIVERY-CODE",
+        "termsOfDeliveryCode": {
+          "$id": "#/properties/dterms/properties/termsOfDeliveryCode",
           "type": "string",
           "minLength": 3,
           "maxLength": 3,
-          "title": "The TERMS-OF-DELIVERY-CODE schema",
+          "title": "The termsOfDeliveryCode schema",
           "description": "IncoTerm code identifying the delivery terms.",
           "default": "",
           "examples": [
             "EXW"
           ]
         },
-        "TERMS-OF-DELIVERY-CODE-LIST": {
-          "$id": "#/properties/DTERMS/properties/TERMS-OF-DELIVERY-CODE-LIST",
+        "termsOfDeliveryCodeList": {
+          "$id": "#/properties/dterms/properties/termsOfDeliveryCodeList",
           "type": "string",
           "minLength": 3,
           "maxLength": 3,
-          "title": "The TERMS-OF-DELIVERY-CODE-LIST schema",
+          "title": "The termsOfDeliveryCodeList schema",
           "description": "Delivery terms as text.",
           "default": "",
           "examples": [
             "EXW"
           ]
         },
-        "TERMS-OF-DELIVERY-TEXT-1": {
-          "$id": "#/properties/DTERMS/properties/TERMS-OF-DELIVERY-TEXT-1",
+        "termsLocation": {
+          "$id": "#/properties/dterms/properties/termsLocation",
           "type": "string",
           "maxLength": 70,
-          "title": "The TERMS-OF-DELIVERY-TEXT-1 schema",
+          "title": "The termsLocation schema",
           "description": "Delivery terms incl locn eg EXW ANTRIM.",
           "default": "",
           "examples": [
