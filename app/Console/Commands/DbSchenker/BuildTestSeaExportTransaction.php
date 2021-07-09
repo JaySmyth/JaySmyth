@@ -102,6 +102,7 @@ class BuildTestSeaExportTransaction extends Command
                 }
             }
         }
+        /*
         Mail::to('renglish@antrim.ifsgroup.com')->send(new \App\Mail\GenericError(
             'DBSchenker EDI ('.$jobRef.')',
             $msg,
@@ -109,6 +110,7 @@ class BuildTestSeaExportTransaction extends Command
             $warning,
             $detail
         ));
+        */
 
         $msg[] = $this->msg; // Add json for debugging
         Mail::to('gmcbroom@antrim.ifsgroup.com')->send(new \App\Mail\GenericError(
