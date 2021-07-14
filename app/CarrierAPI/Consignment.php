@@ -121,7 +121,7 @@ class Consignment
         // Add any missing but required indexes
         $requiredKeys = ['sender_address2', 'recipient_address2'];
         foreach ($requiredKeys as $key) {
-            if (! array_key_exists($key, $this->data)) {
+            if (! isset($this->data[$key])) {
                 $this->data[$key] = null;
             }
         }
