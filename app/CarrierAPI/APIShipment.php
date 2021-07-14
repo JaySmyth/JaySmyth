@@ -515,7 +515,13 @@ class APIShipment
 
         // Set Hazardous rules
         $rules['hazard.commodity_count'] = 'nullable|integer';
-        $rules['hazardous'] = 'nullable|exists:hazards,code';
+
+        if (strtoupper($shipment['recipient_country_code']) == 'GB'){
+            $rules['hazardous'] = 'not_supported';
+        } else {
+            $rules['hazardous'] = 'nullable|exists:hazards,code';
+        }
+
 
         if (isset($shipment['alcohol'])) {
             $rules['alcohol.type'] = 'nullable|in:A,B,L,S,W';
