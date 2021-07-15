@@ -109,7 +109,7 @@ class ImportMultifreightFiles extends Command
                         $this->processFile($file);
                         $this->archiveFile($file);
                     } else {
-                        Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Import Multifreight Files: File not found', false, false, $this->directory.$file));
+                        //Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Import Multifreight Files: File not found', false, false, $this->directory.$file));
                     }
                 }
             }
@@ -353,7 +353,7 @@ class ImportMultifreightFiles extends Command
             if ($filecount > 250) {
                 $this->error('Sending warning: large number of files to process');
 
-                Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Import Multifreight Files: WARNING', $filecount.' files detected for processing'));
+                //Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Import Multifreight Files: WARNING', $filecount.' files detected for processing'));
             }
         }
     }
