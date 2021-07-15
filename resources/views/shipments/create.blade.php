@@ -457,6 +457,12 @@
                                         {!! Form::Text('commercial_invoice_comments', old('commercial_invoice_comments'), ['id' => 'commercial_invoice_comments', 'class' =>'form-control form-control-sm', 'maxlength' => '100']) !!}
                                     </div>
                                 </div>
+                                <div class="form-group row">
+                                    {!! Form::Label('Recipient Tax ID:', null, array('class' => 'col-md-5 col-form-label')) !!}
+                                    <div class="col-md-7">
+                                        {!! Form::Text('recipient_tax_id', old('recipient_tax_id'), ['id' => 'recipient_tax_id', 'class' =>'form-control form-control-sm', 'maxlength' => '20']) !!}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

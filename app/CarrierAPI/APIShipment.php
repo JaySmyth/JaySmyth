@@ -101,6 +101,7 @@ class APIShipment
         $this->txlt['recipient.postcode'] = 'postcode';
         $this->txlt['recipient.country_code'] = 'country_code';
         $this->txlt['recipient.email'] = 'email';
+        $this->txlt['recipient.tax_id'] = 'tax_id';
         $this->txlt['recipient.telephone'] = 'telephone';
         $this->txlt['recipient.type'] = 'type';
         $this->txlt['broker.account'] = 'account';
@@ -500,10 +501,6 @@ class APIShipment
 
         // Set Dry Ice rules
         switch ($shipment['weight_uom']) {
-            case 'KG':
-                $rules['dry_ice_weight'] = 'nullable|numeric|min:1|max:200';
-                break;
-
             case 'LB':
                 $rules['dry_ice_weight'] = 'nullable|numeric|min:1|max:440';
                 break;
@@ -516,7 +513,7 @@ class APIShipment
         // Set Hazardous rules
         $rules['hazard.commodity_count'] = 'nullable|integer';
 
-        if (strtoupper($shipment['recipient_country_code']) == 'GB'){
+        if (strtoupper($shipment['recipient_country_code']) == 'GB') {
             $rules['hazardous'] = 'not_supported';
         } else {
             $rules['hazardous'] = 'nullable|exists:hazards,code';
@@ -724,7 +721,7 @@ class APIShipment
             $areaCode = substr($shipment['recipient_postcode'], 0, 2);
 
             // NI, Shetlands, Orkney
-            if (in_array($areaCode, ['BT','ZE','KW'])) {
+            if (in_array($areaCode, ['BT', 'ZE', 'KW'])) {
                 $errors[] = 'Destination should be UK';
             }
 
@@ -807,7 +804,7 @@ class APIShipment
 
                 // Only Fedex/ DHL Intl allowed to use Carrier Envelope
                 if ($shipment['packages'][$i]['packaging_code'] == 'ENV') {
-                    if (in_array($shipment['carrier_id'], ['2', '5']) && ! in_array($shipment['recipient_country_code'], ['GB','IE'])) {
+                    if (in_array($shipment['carrier_id'], ['2', '5']) && ! in_array($shipment['recipient_country_code'], ['GB', 'IE'])) {
                         // All Ok
                     } else {
                         $errors[] = "Package $pkg - Carrier Envelope not applicable - Select Package instead";
@@ -816,27 +813,6 @@ class APIShipment
             }
         } else {
             $errors[] = 'Piece count incorrect';
-        }
-
-        return $errors;
-    }
-
-    public function checkCommodityDetails($shipment, $errors)
-    {
-        if (isUkDomestic(strtoupper($shipment['recipient_country_code']))) {
-            return $errors;
-        }
-
-        if (isset($shipment['contents'])) {
-            $calcCustomsVal = 0;
-            foreach ($shipment['contents'] as $commodity) {
-                $calcCustomsVal+=$commodity['quantity']*$commodity['unit_value'];
-            }
-
-            // Rounding necessary or comparison can break for some values
-            if (round($shipment['customs_value'], 2) <> round($calcCustomsVal, 2)) {
-                $errors[] = 'Individual Commodity values not equal to Shipment Customs Value';
-            }
         }
 
         return $errors;
@@ -876,6 +852,27 @@ class APIShipment
         }
     }
 
+    public function checkCommodityDetails($shipment, $errors)
+    {
+        if (isUkDomestic(strtoupper($shipment['recipient_country_code']))) {
+            return $errors;
+        }
+
+        if (isset($shipment['contents'])) {
+            $calcCustomsVal = 0;
+            foreach ($shipment['contents'] as $commodity) {
+                $calcCustomsVal += $commodity['quantity'] * $commodity['unit_value'];
+            }
+
+            // Rounding necessary or comparison can break for some values
+            if (round($shipment['customs_value'], 2) <> round($calcCustomsVal, 2)) {
+                $errors[] = 'Individual Commodity values not equal to Shipment Customs Value';
+            }
+        }
+
+        return $errors;
+    }
+
     public function checkCountryRestrictions($shipment, $errors = [])
     {
         # If Shipment to Russia
@@ -889,6 +886,16 @@ class APIShipment
                 $errors[] = 'Customs value exceeds 200 euros';
             }
         }
+
+        // Include an Indonesian Tax ID Number which is known as the NPWP
+        //if (strtoupper($shipment['recipient_country_code']) == 'ID' && strlen($shipment['recipient_tax_id']) != 15){
+        //    $errors[] = 'Please supply Indonesian Tax ID (NPWP) of recipient';
+        //}
+
+        // Algeria - All non-document shipments sent to private individuals must include the consignee's National Identification Number (NIN) on the 2nd address line on the AWB
+        //if (strtoupper($shipment['recipient_country_code']) == 'DZ' && strlen($shipment['recipient_tax_id']) < 5 && strtoupper($shipment['recipient_type']) == 'R' && strtoupper($shipment['ship_reason']) != 'DOCUMENTS'){
+        //   $errors[] = 'Please supply Algerian National Identification Number (NIN) of recipient';
+        //}
 
         return $errors;
     }

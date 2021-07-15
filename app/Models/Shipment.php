@@ -90,6 +90,7 @@ class Shipment extends Model
         'recipient_country_code',
         'recipient_telephone',
         'recipient_email',
+        'recipient_tax_id',
         'ship_reason',
         'terms_of_sale',
         'invoice_type',

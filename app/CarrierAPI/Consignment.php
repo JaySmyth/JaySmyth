@@ -107,13 +107,14 @@ class Consignment
                 }
             }
         }
-    }
 
-    private function setEoriNumber()
-    {
-        if (empty($this->data['eori'])) {
-            $this->data['eori'] = (empty($this->company->eori)) ? '000000000000' : $this->company->eori;
+        // Algeria - All non-document shipments sent to private individuals must include the consignee's National Identification Number (NIN) on the 2nd address line on the AWB
+        if (isset($this->data['recipient_tax_id'])) {
+            if (strtoupper($this->data['recipient_country_code']) == 'DZ' && strtoupper($this->data['recipient_type']) == 'R' && strtoupper($this->data['ship_reason']) != 'DOCUMENTS') {
+                $this->data['recipient_address2'] .= ' - '.$this->data['recipient_tax_id'];
+            }
         }
+
     }
 
     private function setMissingIndexes()
@@ -206,7 +207,7 @@ class Consignment
             }
 
             if ($this->data[$account_type] == 'recipient' && ! $accountSpecified) {
-                if (!isset($this->data[$account_type.'_account'])) {
+                if (! isset($this->data[$account_type.'_account'])) {
                     $this->data[$account_type.'_account'] = '';
                 }
             }
@@ -242,6 +243,13 @@ class Consignment
         }
 
         return $service;
+    }
+
+    private function setEoriNumber()
+    {
+        if (empty($this->data['eori'])) {
+            $this->data['eori'] = (empty($this->company->eori)) ? '000000000000' : $this->company->eori;
+        }
     }
 
     private function setDescOfContents()
