@@ -325,6 +325,7 @@ class DHL
                                 // 'EmailAddress' => (! empty($this->shipment['recipient_email'])) ? $this->shipment['recipient_email'] : '',
                             ],
                             'Address' => $this->addAddress('recipient'),
+                            'RegistrationNumbers' => $this->addRecipientRegistrationNumber(),
                         ],
                     ],
                     'Packages' => [
@@ -393,6 +394,40 @@ class DHL
         }
 
         return $address;
+    }
+
+    /**
+     * Add recipient registration number.
+     *
+     * @return array|array[]
+     */
+    protected function addRecipientRegistrationNumber()
+    {
+        switch (strtoupper($this->shipment['recipient_country_code'])) {
+            // Indonesia
+            case 'ID':
+                $numberTypeCode = false;
+                break;
+            // Algerian
+            case 'DZ':
+                $numberTypeCode = false;
+                break;
+            default:
+                $numberTypeCode = false;
+                break;
+        }
+
+        if (! empty($this->shipment['recipient_tax_id']) && $numberTypeCode) {
+            return [
+                'RegistrationNumber' => [
+                    'Number' => $this->shipment['recipient_tax_id'],
+                    'NumberTypeCode' => $numberTypeCode,
+                    'NumberIssuerCountryCode' => $this->shipment['recipient_country_code'],
+                ]
+            ];
+        }
+
+        return [];
     }
 
     /**

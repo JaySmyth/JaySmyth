@@ -888,14 +888,14 @@ class APIShipment
         }
 
         // Include an Indonesian Tax ID Number which is known as the NPWP
-        //if (strtoupper($shipment['recipient_country_code']) == 'ID' && strlen($shipment['recipient_tax_id']) != 15){
-        //    $errors[] = 'Please supply Indonesian Tax ID (NPWP) of recipient';
-        //}
+        if (strtoupper($shipment['recipient_country_code']) == 'ID' && strlen($shipment['recipient_tax_id']) != 15){
+            $errors[] = 'Please supply Indonesian Tax ID (NPWP) of recipient';
+        }
 
         // Algeria - All non-document shipments sent to private individuals must include the consignee's National Identification Number (NIN) on the 2nd address line on the AWB
-        //if (strtoupper($shipment['recipient_country_code']) == 'DZ' && strlen($shipment['recipient_tax_id']) < 5 && strtoupper($shipment['recipient_type']) == 'R' && strtoupper($shipment['ship_reason']) != 'DOCUMENTS'){
-        //   $errors[] = 'Please supply Algerian National Identification Number (NIN) of recipient';
-        //}
+        if (strtoupper($shipment['recipient_country_code']) == 'DZ' && strlen($shipment['recipient_tax_id']) < 5 && strtoupper($shipment['recipient_type']) == 'R' && strtoupper($shipment['ship_reason']) != 'DOCUMENTS'){
+           $errors[] = 'Please supply Algerian National Identification Number (NIN) of recipient';
+        }
 
         return $errors;
     }
