@@ -47,12 +47,14 @@ class Consignment
      */
     private function preProcess()
     {
-        $this->data = fixShipmentCase($this->data);                             // Ensure all fields use correct case and Flags are boolean
+        $this->data = fixShipmentCase($this->data);  // Ensure all fields use correct case and Flags are boolean
+
+        $this->setMissingIndexes();
 
         // Check addresses and perform any necessary Overrides
         $this->checkAddresses();
+
         if (isset($this->data['service_id']) && $this->data['service_id'] > '') {
-            $this->setMissingIndexes();
             $this->data['mode'] = Mode::find($this->data['mode_id'])->name;
             $this->setDepartmentId();
             $this->data['depot_id'] = $this->company->depot_id;
@@ -70,6 +72,17 @@ class Consignment
             $this->setSpecialInstructions();
             $this->setShipmentDates();
             $this->doPackageLevelProcessing();
+        }
+    }
+
+    private function setMissingIndexes()
+    {
+        // Add any missing but required indexes
+        $requiredKeys = ['sender_type', 'sender_address2', 'recipient_address2', 'recipient_postcode', 'recipient_country_code', 'recipient_type', 'recipient_tax_id'];
+        foreach ($requiredKeys as $key) {
+            if (! isset($this->data[$key])) {
+                $this->data[$key] = null;
+            }
         }
     }
 
@@ -92,39 +105,24 @@ class Consignment
          *  Ensure country codes for Jersey and Guernsey are correctly set
          * ***************************************************************
          */
-        if (isset($this->data['recipient_postcode'])) {
-            // If country code has been set to GB incorrectly then change
-            if (isset($this->data['recipient_country_code']) && $this->data['recipient_country_code'] == 'GB') {
-                $countryCodes = ['GY' => 'GG', 'IM' => 'IM', 'JE' => 'JE'];
 
-                // Format UK postcode
-                $this->data['recipient_postcode'] = formatUkPostcode($this->data['recipient_postcode']);
+        // If country code has been set to GB incorrectly then change
+        if ($this->data['recipient_country_code'] == 'GB') {
+            $countryCodes = ['GY' => 'GG', 'IM' => 'IM', 'JE' => 'JE'];
 
-                // Take first 2 chars of the postcode
-                $prefix = strtoupper(substr($this->data['recipient_postcode'], 0, 2));
-                if (isset($countryCodes[$prefix])) {
-                    $this->data['recipient_country_code'] = $countryCodes[$prefix];
-                }
+            // Format UK postcode
+            $this->data['recipient_postcode'] = formatUkPostcode($this->data['recipient_postcode']);
+
+            // Take first 2 chars of the postcode
+            $prefix = strtoupper(substr($this->data['recipient_postcode'], 0, 2));
+            if (isset($countryCodes[$prefix])) {
+                $this->data['recipient_country_code'] = $countryCodes[$prefix];
             }
         }
 
         // Algeria - All non-document shipments sent to private individuals must include the consignee's National Identification Number (NIN) on the 2nd address line on the AWB
-        if (isset($this->data['recipient_tax_id'])) {
-            if (strtoupper($this->data['recipient_country_code']) == 'DZ' && strtoupper($this->data['recipient_type']) == 'R' && strtoupper($this->data['ship_reason']) != 'DOCUMENTS') {
-                $this->data['recipient_address2'] .= ' - '.$this->data['recipient_tax_id'];
-            }
-        }
-
-    }
-
-    private function setMissingIndexes()
-    {
-        // Add any missing but required indexes
-        $requiredKeys = ['sender_address2', 'recipient_address2'];
-        foreach ($requiredKeys as $key) {
-            if (! isset($this->data[$key])) {
-                $this->data[$key] = null;
-            }
+        if (strtoupper($this->data['recipient_country_code']) == 'DZ' && strtoupper($this->data['recipient_type']) == 'R' && strtoupper($this->data['ship_reason']) != 'DOCUMENTS') {
+            $this->data['recipient_address2'] .= ' - '.$this->data['recipient_tax_id'];
         }
     }
 
