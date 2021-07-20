@@ -57,6 +57,16 @@ class JobHdr extends Model
      *
      * @return type
      */
+    public function addresses()
+    {
+        return $this->hasMany(DocAdds::class, 'job_id', 'job_id');
+    }
+
+    /**
+     * A job has many collections.
+     *
+     * @return type
+     */
     public function deliveries()
     {
         return $this->hasMany(JobDel::class, 'job_id', 'job_id');

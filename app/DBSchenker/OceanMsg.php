@@ -295,7 +295,7 @@ class OceanMsg
         foreach ($sections as $section) {
             $validator = Validator::make($section, [
                 'addressQualifier' => 'required|string|in:CN,CZ,N1,N2,OO,BA,FW,CA,DO,AP,RC',
-                'addressId' => 'required|integer|min:1|max:99999',
+                'addressId' => 'required|integer|min:1|max:999999',
                 'addressStructure' => 'required|string|in:1,2',
                 'name' => 'required|string|max:35',
                 'streetAndNumber1' => 'nullable|string|max:35',
@@ -339,11 +339,12 @@ class OceanMsg
     {
         $section = $this->msg['package'];
         $validator = Validator::make($section, [
-            'totalNumberPackages' => 'required|integer|in:'.count($this->msg['goodsDetails']['goods'][0]['measurement']['measure']),
+            'totalNumberPackages' => 'required|integer',
             'totalGrossWeight' => 'required|numeric|min:.01',
             'weightMeasureQualifier' =>'required|string|in:KGM',
             'totalCube' => 'required|numeric|min:0.01',
             'cubeMeasureQualifier' => 'required|string|in:MTQ',
+        ], [
         ]);
 
         if ($validator->fails()) {
@@ -356,19 +357,37 @@ class OceanMsg
         $unitCount = 0;
         foreach ($units as $unit) {
             $unitCount++;
-            $validator = Validator::make($unit, [
-                'equipmentQualifier' => 'required|string|in:CN,E',
-                'equipmentIdNumber' => 'required|string|max:17',
-                'sizeAndTypeText' => 'required|string|max:15',
-                'supplier' => 'required|string|in:1,2',
-                'movementPlan' => 'required|string|in:FCL/FCL,FCL/LCL,LCL/FCL,LCL/LCL',
-                'seal' => 'nullable|string|max:17',
-                'measurement.measure.*.measureQualifier' => 'required|in:WT,VOL',
-                'measurement.measure.*.movementDimensionCode' => 'required|in:T,U',
-                'measurement.measure.*.measureUnit' => 'required|in:KGM,MTQ',
-                'measurement.measure.*.measureValue' => 'required|numeric|min:0.001',
-            ], $message = [
-            ]);
+            $validator = Validator::make(
+                $unit,
+                [
+                    'equipmentQualifier' => 'required|string|in:CN,E',
+                    'equipmentIdNumber' => 'required|string|max:17',
+                    'sizeAndTypeText' => 'required|string|max:15',
+                    'supplier' => 'required|string|in:1,2',
+                    'movementPlan' => 'required|string|in:FCL/FCL,FCL/LCL,LCL/FCL,LCL/LCL',
+                    'seal' => 'nullable|string|max:17',
+                    'measurement.measure.*.measureQualifier' => 'required|in:WT,VOL',
+                    'measurement.measure.*.movementDimensionCode' => 'required|in:T,U',
+                    'measurement.measure.*.measureUnit' => 'required|in:KGM,MTQ',
+                    'measurement.measure.*.measureValue' => 'required|numeric|min:0.001',
+                ],
+                [
+                    'equipmentQualifier.required' => 'Container qualifier for unit '.$unitCount.' is required',
+                    'equipmentQualifier.string' => 'Container qualifier for unit '.$unitCount.' qualifier must be a 1 or 2 character string',
+                    'equipmentQualifier.in' => 'Container qualifier for unit '.$unitCount.' qualifier must be CN or E',
+                    'equipmentIdNumber.required' => 'Container number for unit '.$unitCount.' is required',
+                    'equipmentIdNumber.string' => 'Container number for unit '.$unitCount.' must be a string of characters',
+                    'equipmentIdNumber.max' => 'Container number for unit '.$unitCount.' must max 17 characters',
+                    'sizeAndTypeText.required' => "Size and type text for unit $unitCount required",
+                    'supplier' => "Supplier for unit $unitCount required",
+                    'movementPlan' => "FCL/ LCL for unit $unitCount required",
+                    'seal' => "Seal Number for unit $unitCount required",
+                    'measurement.measure.*.measureQualifier' => "Measurement qualifier for unit $unitCount required",
+                    'measurement.measure.*.movementDimensionCode' => "Dimension qualifier (T/U) for unit $unitCount required",
+                    'measurement.measure.*.measureUnit' => "Weight unit of measure for unit $unitCount required",
+                    'measurement.measure.*.measureValue' => "Weight for unit $unitCount required",
+                ]
+            );
 
             if ($validator->fails()) {
                 $this->mergeErrors('Equipment Unit', 'Unit: '.$unitCount, $validator->errors());
@@ -394,11 +413,7 @@ class OceanMsg
         $errors = $errorBag->toArray();
         foreach ($errors as $key => $messages) {
             foreach ($messages as $message) {
-                // Reformat error due to usin gcapital letters in field names
-                $lead = substr($message, 0, strlen($key)*2);
-                $count = substr_count($lead, '-');
-                $offset = strlen($key)*2 - $count;
-                $this->errors[$heading][$key] = substr($message, $offset, 999);
+                $this->errors[$heading][$key] = $message;
             }
         }
     }
