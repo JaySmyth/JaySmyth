@@ -34,7 +34,7 @@
                         @if($shipment->depot_id == "7")
                             {!! Form::select('service',  [83 =>'DX GB24 (Mainland)', 84 =>'XDP GB24F (Mainland)'], old('service') ?? '84', array('class' => 'form-control')) !!}
                         @else
-                            {!! Form::select('service',  [16 => ' UPS UK24', 27 => 'DHL Worldwide Express (NonDoc)', 81 => 'DHL Worldwide Express EU (NonDoc)', 22 => 'DHL Economy Select (NonDoc)', 76 => 'XDP UK48', 53 => 'DX UK48', 64 => 'IE48 - An Post', 85 => 'IE48 - JMC'], old('service') ?? '76', array('class' => 'form-control')) !!}
+                            {!! Form::select('service',  [16 => ' UPS UK24', 27 => 'DHL Worldwide Express (NonDoc)', 81 => 'DHL Worldwide Express EU (NonDoc)', 22 => 'DHL Economy Select (NonDoc)', 76 => 'XDP UK48', 53 => 'DX UK48', 64 => 'IE48 - An Post', 85 => 'IE48 - JMC', 66 => 'NI48 (Express Freight)'], old('service') ?? '76', array('class' => 'form-control')) !!}
                         @endif
 
                         @if ($errors->has('service'))
