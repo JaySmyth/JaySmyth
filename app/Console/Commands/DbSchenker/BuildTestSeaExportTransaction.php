@@ -111,8 +111,8 @@ class BuildTestSeaExportTransaction extends Command
         $errors = $oceanMsg->buildMsg($jobHdr);
         if ($errors == []) {
             $errors = $oceanMsg->validateMsg();
+            $this->msg = json_encode($oceanMsg->msg);
             if ($errors == []) {
-                $this->msg = json_encode($oceanMsg->msg);
                 $result = $dbSchenker->sendMessage(json_encode($this->msg));
                 $errors = $result['errors'];
             }
