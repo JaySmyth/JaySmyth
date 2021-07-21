@@ -136,7 +136,7 @@
                                     @if(is_numeric($shipment->shipping_cost))
                                         {{number_format($shipment->shipping_cost, 2)}}
                                         @php
-                                            $total_cost += number_format($shipment->shipping_cost, 2);
+                                            $total_cost += $shipment->shipping_cost;
                                         @endphp
                                     @else
                                         0
@@ -146,7 +146,7 @@
                                     @if(is_numeric($shipment->shipping_charge))
                                         {{number_format($shipment->shipping_charge, 2)}}
                                         @php
-                                            $total_sales += number_format($shipment->shipping_charge, 2);
+                                            $total_sales += $shipment->shipping_charge;
                                         @endphp
                                     @else
                                         0
