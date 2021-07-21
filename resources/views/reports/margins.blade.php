@@ -74,6 +74,10 @@
                 </tr>
                 </thead>
                 <tbody>
+                @php
+                    $total_cost = 0;
+                    $total_sales = 0;
+                @endphp
 
                 @foreach($shipments as $shipment)
 
@@ -130,11 +134,19 @@
                             @if($shipment->bill_shipping == 'sender')
                                 <td class="text-right" title="Cost">
                                     {{number_format($shipment->shipping_cost, 2)}}
-
+                                    @php
+                                        if(is_numeric($shipment->shipping_cost)){
+                                            $total_cost += number_format($shipment->shipping_cost, 2);
+                                        }
+                                    @endphp
                                 </td>
                                 <td class="text-right" title="Sales">
                                     {{number_format($shipment->shipping_charge, 2)}}
-
+                                    @php
+                                        if(is_numeric($shipment->shipping_charge)){
+                                        $total_sales += number_format($shipment->shipping_charge, 2);
+                                    }
+                                    @endphp
                                 </td>
                                 <td class="text-right" title="Profit/Loss">
                                     <span class="{{$shipment->margin_styling_class}}">{{$shipment->profit_formatted}}</span>
