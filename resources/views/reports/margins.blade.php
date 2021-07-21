@@ -10,11 +10,15 @@
 
             <div class="form-group">
                 <label for="date_from">Date From</label>
-                <input type="text" name="date_from" value="@if(Auth::user()->hasIfsRole() && !Request::get('date_from') && !Request::get('date_to')){{date(Auth::user()->date_format)}}@else{{Request::get('date_from')}}@endif" class="form-control datepicker" placeholder="Date from">
+                <input type="text" name="date_from"
+                       value="@if(Auth::user()->hasIfsRole() && !Request::get('date_from') && !Request::get('date_to')){{date(Auth::user()->date_format)}}@else{{Request::get('date_from')}}@endif"
+                       class="form-control datepicker" placeholder="Date from">
             </div>
             <div class="form-group">
                 <label for="date_to">Date To</label>
-                <input type="text" name="date_to" value="@if(Auth::user()->hasIfsRole() && !Request::get('date_from') && !Request::get('date_to')){{date(Auth::user()->date_format)}}@else{{Request::get('date_to')}}@endif" class="form-control datepicker" placeholder="Date To">
+                <input type="text" name="date_to"
+                       value="@if(Auth::user()->hasIfsRole() && !Request::get('date_from') && !Request::get('date_to')){{date(Auth::user()->date_format)}}@else{{Request::get('date_to')}}@endif"
+                       class="form-control datepicker" placeholder="Date To">
             </div>
 
             <div class="form-group">
@@ -80,7 +84,8 @@
                             @endif
 
                             <td>
-                                <a href="{{ url('/shipments', $shipment->id) }}" class="consignment-number">{{$shipment->carrier_consignment_number}}</a>
+                                <a href="{{ url('/shipments', $shipment->id) }}"
+                                   class="consignment-number">{{$shipment->carrier_consignment_number}}</a>
                             </td>
                             <td class="text-truncate">{{$shipment->service->carrier_name}}</td>
                             <td class="text-truncate">
@@ -125,11 +130,11 @@
                             @if($shipment->bill_shipping == 'sender')
                                 <td class="text-right" title="Cost">
                                     {{number_format($shipment->shipping_cost, 2)}}
-                                    <?php $total_cost+=number_format($shipment->shipping_cost, 2); ?>
+                                    <?php $total_cost += number_format($shipment->shipping_cost, 2); ?>
                                 </td>
                                 <td class="text-right" title="Sales">
                                     {{number_format($shipment->shipping_charge, 2)}}
-                                        <?php $total_sales+=number_format($shipment->shipping_charge, 2); ?>
+                                    <?php $total_sales += number_format($shipment->shipping_charge, 2); ?>
                                 </td>
                                 <td class="text-right" title="Profit/Loss">
                                     <span class="{{$shipment->margin_styling_class}}">{{$shipment->profit_formatted}}</span>
@@ -138,22 +143,24 @@
                                     <span class="{{$shipment->margin_styling_class}}">{{$shipment->margin}}</span>
                                 </td>
                             @else
-                            <td class="text-right" title="Cost">&nbsp;</td>
-                            <td class="text-right" title="Sales">&nbsp;</td>
-                            <td class="text-right" title="Profit/Loss"><span class="text-primary">0.00</span></td>
-                            <td class="text-right" title="Margin"><span class="text-primary">n/a</span>
-                            </td>
+                                <td class="text-right" title="Cost">&nbsp;</td>
+                                <td class="text-right" title="Sales">&nbsp;</td>
+                                <td class="text-right" title="Profit/Loss"><span class="text-primary">0.00</span></td>
+                                <td class="text-right" title="Margin"><span class="text-primary">n/a</span>
+                                </td>
                             @endif
                         </tr>
                         @endforeach
                         <tr class="font-weight-bold">
                             <td colspan="8" class="text-muted text-right">Totals for this page:</td>
-                            @if($shipment->bill_shipping == 'sender')
+                            @if(false)
                                 <td class="text-right">{{ number_format($shipments->sum('shipping_cost'), 2) }}</td>
                                 <td class="text-right">{{ number_format($shipments->sum('shipping_charge'), 2) }}</td>
                                 <td class="text-right">{{ number_format($shipments->sum('profit'), 2) }}</td>
                                 @if($shipments->sum('shipping_charge') > 0)
-                                    <td class="text-right">{{ number_format(($shipments->sum('shipping_charge') - $shipments->sum('shipping_cost')) / $shipments->sum('shipping_charge') * 100, 2) }}%</td>
+                                    <td class="text-right">{{ number_format(($shipments->sum('shipping_charge') - $shipments->sum('shipping_cost')) / $shipments->sum('shipping_charge') * 100, 2) }}
+                                        %
+                                    </td>
                                 @else
                                     <td class="text-right">0.00</td>
                                 @endif
@@ -162,7 +169,9 @@
                                 <td class="text-right">{{ number_format($total_sales, 2) }}</td>
                                 <td class="text-right">{{ number_format($total_sales-$total_cost, 2) }}</td>
                                 @if($total_sales > 0)
-                                    <td class="text-right">{{ number_format(($total_sales - $total_cost) / $total_sales * 100, 2) }}%</td>
+                                    <td class="text-right">{{ number_format(($total_sales - $total_cost) / $total_sales * 100, 2) }}
+                                        %
+                                    </td>
                                 @else
                                     <td class="text-right">0.00</td>
                                 @endif
