@@ -168,6 +168,33 @@
                         </tr>
                         @endforeach
 
+                        <tr class="font-weight-bold">
+                            <td colspan="8" class="text-muted text-right">Totals for this page:</td>
+                            @if(true)
+                                <td class="text-right">{{ number_format($shipments->sum('shipping_cost'), 2) }}</td>
+                                <td class="text-right">{{ number_format($shipments->sum('shipping_charge'), 2) }}</td>
+                                <td class="text-right">{{ number_format($shipments->sum('profit'), 2) }}</td>
+                                @if($shipments->sum('shipping_charge') > 0)
+                                    <td class="text-right">{{ number_format(($shipments->sum('shipping_charge') - $shipments->sum('shipping_cost')) / $shipments->sum('shipping_charge') * 100, 2) }}
+                                        %
+                                    </td>
+                                @else
+                                    <td class="text-right">0.00</td>
+                                @endif
+                            @else
+                                <td class="text-right">{{ number_format($total_cost, 2) }}</td>
+                                <td class="text-right">{{ number_format($total_sales, 2) }}</td>
+                                <td class="text-right">{{ number_format($total_sales-$total_cost, 2) }}</td>
+                                @if($total_sales > 0)
+                                    <td class="text-right">{{ number_format(($total_sales - $total_cost) / $total_sales * 100, 2) }}
+                                        %
+                                    </td>
+                                @else
+                                    <td class="text-right">0.00</td>
+                                @endif
+                            @endif
+                        </tr>
+
                 </tbody>
             </table>
 
