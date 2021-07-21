@@ -74,7 +74,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <?php $total_cost = 0; $total_sales = 0; ?>
+
                 @foreach($shipments as $shipment)
 
                     @if(stristr($shipment->margin_styling_class, 'danger'))
@@ -130,11 +130,11 @@
                             @if($shipment->bill_shipping == 'sender')
                                 <td class="text-right" title="Cost">
                                     {{number_format($shipment->shipping_cost, 2)}}
-                                    <?php $total_cost += number_format($shipment->shipping_cost, 2); ?>
+
                                 </td>
                                 <td class="text-right" title="Sales">
                                     {{number_format($shipment->shipping_charge, 2)}}
-                                    <?php $total_sales += number_format($shipment->shipping_charge, 2); ?>
+
                                 </td>
                                 <td class="text-right" title="Profit/Loss">
                                     <span class="{{$shipment->margin_styling_class}}">{{$shipment->profit_formatted}}</span>
