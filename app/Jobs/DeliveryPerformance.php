@@ -43,7 +43,7 @@ class DeliveryPerformance implements ShouldQueue
 
         // Get Data
         $depot = $this->depot;
-        $recipients = ['aplatt@antrim.ifsgroup.com', 'sanderton@antrim.ifsgroup.com'];
+        $recipients = ['aplatt@antrim.ifsgroup.com', 'sanderton@antrim.ifsgroup.com', 'epalframan@antrim.ifsgroup.com'];
         $startDate = Carbon::now()->startOfYear()->format('Y-m-d H:i:s');
         $endDate = Carbon::now()->subDays(2)->endOfDay()->format('Y-m-d H:i:s');
         $data = DB::select(DB::raw("
