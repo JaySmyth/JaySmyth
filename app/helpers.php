@@ -1804,7 +1804,7 @@ function convertCurrencies($fromCurrency, $toCurrency, $value)
 
     $base = $currency->where('code', strtoupper($fromCurrency))->first();
     $dest = $currency->where('code', strtoupper($toCurrency))->first();
-    $newValue = number_format(($value * $dest->rate) / $base->rate, 2);
+    $newValue = number_format(($value * $dest->rate) / $base->rate, 2, '.', '');
 
     return $newValue;
 }
