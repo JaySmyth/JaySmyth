@@ -63,7 +63,6 @@ class DX
         $service = $this->getService();
 
         if (! $service || is_string($service)) {
-
             if ($service == 'Invalid login details.') {
                 $service = 'Invalid DX account number supplied.';
             }
@@ -218,7 +217,7 @@ class DX
                     ]
                 ],
                 'sourceSystemReference' => $ifsConsignmentNumber.' - '.$package['index'].'/'.$this->shipment['pieces'],
-                'customerReference' => $this->shipment['shipment_reference'] ?? null,
+                'customerReference' => str_replace(',', '', $this->shipment['shipment_reference']) ?? null,
                 'orderLines' => [
                     [
                         'consignment' => [
@@ -295,7 +294,7 @@ class DX
                                 'attributeList' => [
                                     [
                                         'name' => 'customerReference',
-                                        'value' => $ifsConsignmentNumber.'/'.$this->shipment['shipment_reference'] ?? null
+                                        'value' => $ifsConsignmentNumber.'/'.str_replace(',', '', $this->shipment['shipment_reference']) ?? null
                                     ],
                                     [
                                         'name' => 'contents',
