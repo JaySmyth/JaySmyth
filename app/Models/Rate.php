@@ -152,6 +152,76 @@ class Rate extends Model
      *
      * @return Excel document
      */
+    public function downloadMasterRate($effectiveDate = '', $download = true)
+    {
+        $effectiveDate = ($effectiveDate) ? $effectiveDate : Carbon::today()->toDateString();
+        $rate = $this;
+        if ($rate) {
+            if ($rate->model == 'domestic') {
+                $data = DomesticRate::select('rate_id', 'service', 'packaging_code', 'first', 'others', 'notional_weight', 'notional', 'area', 'from_date', 'to_date')
+                        ->where('rate_id', $rate->id)
+                        ->where('from_date', '<=', $effectiveDate)
+                        ->where('to_date', '>=', $effectiveDate)
+                        ->orderBy('service')
+                        ->orderBy('packaging_code')
+                        ->orderBy('area')
+                        ->get()
+                        ->toArray();
+
+                // Custom formating
+                for ($i=0;$i<count($data);$i++) {
+                    $data[$i]['from_date'] = substr($data[$i]['from_date'], 0, 10);
+                    $data[$i]['to_date'] = substr($data[$i]['to_date'], 0, 10);
+                }
+            } else {
+                $data = RateDetail::select('rate_id', 'residential', 'piece_limit', 'package_type', 'zone', 'break_point', 'weight_rate', 'weight_increment', 'package_rate', 'consignment_rate', 'weight_units', 'from_date', 'to_date')
+                        ->where('rate_id', $rate->id)
+                        ->where('from_date', '<=', $effectiveDate)
+                        ->where('to_date', '>=', $effectiveDate)
+                        ->orderBy('residential')
+                        ->orderBy('piece_limit')
+                        ->orderBy('package_type')
+                        ->orderBy('zone')
+                        ->orderBy('break_point')
+                        ->get()
+                        ->toArray();
+
+                // Custom formating
+                for ($i=0;$i<count($data);$i++) {
+                    $data[$i]['residential'] = ($data[$i]['residential']) ? "1" : "0";
+                    $data[$i]['from_date'] = substr($data[$i]['from_date'], 0, 10);
+                    $data[$i]['to_date'] = substr($data[$i]['to_date'], 0, 10);
+                }
+            }
+        }
+
+        if (! empty($data)) {
+            if ($download) {
+                return Excel::download(
+                    new RatesExport($data),
+                    'Master-'.$rate->id.'.csv'
+                );
+            } else {
+                return $data;
+            }
+        }
+
+        if ($download) {
+            return view('errors.404');
+        } else {
+            return [];
+        }
+    }
+
+    /**
+     * Download rate - excel.
+     *
+     * @param  Company  $company
+     * @param  Service  $service
+     * @param  type  $effectiveDate
+     *
+     * @return Excel document
+     */
     public function downloadCompanyRate($company, $service, $discount = 0, $effectiveDate = '', $download = true)
     {
         if ($service) {
