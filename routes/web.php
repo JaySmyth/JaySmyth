@@ -488,13 +488,18 @@ Route::get('rates/revert', 'RateController@revertCompanyRatesView');
 Route::post('rates/revert', 'RateController@revertCompanyRates');
 Route::get('rates/increase', 'RateController@rateIncrease');
 Route::post('rates/increase', 'RateController@storeRateIncrease');
+Route::get('rates/{rate}/download/{date?}', 'RateController@downloadMasterRate');
+Route::get('rates/{rate}/upload', 'RateController@uploadMasterRate');
+Route::post('rates/{rate}/upload', 'RateController@storeMasterUpload');
 Route::get('rates/{rate}/{rateDate?}', 'RateController@showRate');
 Route::get('rates/', 'RateController@index');
 
+// Customer Sales Rates
 Route::get('company-rate/{company}/{service}/download/{date?}', 'RateController@downloadCompanyRate');
 Route::get('company-rate/{company}/{service}/upload', 'RateController@uploadCompanyRate');
 Route::post('company-rate/{company}/{service}/upload', 'RateController@storeupload');
 Route::get('company-rate/{company}/{service}/{discount?}/{date?}', 'RateController@showCompanyRate');
+
 
 /*
   |--------------------------------------------------------------------------

@@ -488,7 +488,7 @@ class PricingModel
     {
 
         // Universal Surcharge Codes
-        $surchargeCodes = 'ADH,COL,EAS,MAX,RAS,OOA,RES,ESS';
+        $surchargeCodes = 'ADH,COL,EAS,MAX,RAS,OOA,RES,ESS,CON';
 
         // If Intl shipment add additional Intl only Surcharge codes
         if (! isDomestic($this->shipment['sender_country_code'], $this->shipment['recipient_country_code'])) {
@@ -516,6 +516,12 @@ class PricingModel
 
     // Address Correction
     public function isCOR()
+    {
+        return false;
+    }
+
+    // Congestion Surcharge
+    public function isCON()
     {
         return false;
     }
