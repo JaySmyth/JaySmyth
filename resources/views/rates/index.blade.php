@@ -51,6 +51,7 @@
                 <th class="text-center">Currency</th>
                 <th class="text-center">Units</th>
                 <th class="text-center">Divisor</th>
+                <th class="text-center">Rates</th>
             </tr>
         </thead>
         <tbody>
@@ -69,6 +70,10 @@
                 <td class="text-center">{{ $rate->currency_code }}</td>
                 <td class="text-center">{{ $rate->weight_units }}</td>
                 <td class="text-center">{{ $rate->volumetric_divisor }}</td>
+                <td class="text-center">
+                    <a href="{{ url('/rates/' . $rate->id . '/download') }}" title="Download Rate"><span class="fas fa-cloud-download-alt ml-sm-2" aria-hidden="true"></span></a>
+                    <a href="{{ url('/rates/' . $rate->id . '/upload') }}" title="Upload Rate"><span class="fas fa-cloud-upload-alt ml-sm-2" aria-hidden="true"></span></a>
+                </td>
             </tr>
             @endif
             @endforeach

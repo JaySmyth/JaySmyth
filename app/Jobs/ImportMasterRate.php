@@ -81,12 +81,19 @@ class ImportMasterRate implements ShouldQueue
                 rewind($handle);
                 $rowNumber = 1;
                 while (($data = fgetcsv($handle, 1000, ',')) !== false) {
-                    if ($rowNumber==1) {
-                        $closeDate = date('Y-m-d', strtotime('-1 day', strtotime($this->row['from_date'])));
-                        $this->closeExistingRate($closeDate);
-                    } else {
-                        $this->row = $this->assignFieldNames($data);
-                        $this->insertRow($rowNumber);
+                    switch ($rowNumber) {
+                        case '1':
+                            // Header Row do nothing
+                            break;
+                        case '2':
+                            // Remove previous rates then fall through to default
+                            $closeDate = date('Y-m-d', strtotime('-1 day', strtotime($this->row['from_date'])));
+                            $this->closeExistingRate($closeDate);
+                            // no break
+                        default:
+                            $this->row = $this->assignFieldNames($data);
+                            $this->insertRow($rowNumber);
+                            break;
                     }
                     $rowNumber++;
                 }
@@ -228,10 +235,10 @@ class ImportMasterRate implements ShouldQueue
             DomesticRate::where('rate_id', $this->rate->id)->where('to_date', '>=', $closeDate)->update(['to_date' => $closeDate]);
         } else {
             // If user has re-uploaded or there is a future rate - delete it.
-            RateDetail::where('rate_id', '10')->where('from_date', '>=', $this->row['from_date'])->delete();
+            RateDetail::where('rate_id', $this->rate->id)->where('from_date', '>=', $this->row['from_date'])->delete();
 
             // Set the "to_date" of the old rate (if it exists) to the date provided (the day before the new rate starts).
-            RateDetail::where('rate_id', '10')->where('to_date', '>=', $closeDate)->update(['to_date' => $closeDate]);
+            RateDetail::where('rate_id', $this->rate->id)->where('to_date', '>=', $closeDate)->update(['to_date' => $closeDate]);
         }
     }
 }
