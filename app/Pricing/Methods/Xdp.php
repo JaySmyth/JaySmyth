@@ -12,6 +12,7 @@ namespace App\Pricing\Methods;
 
 use App\Models\DomesticZone;
 use App\Models\XdpEas;
+use App\Models\CongestionPostcode;
 
 class Xdp extends PricingModel
 {
@@ -62,5 +63,13 @@ class Xdp extends PricingModel
     public function isLPSPackage($package)
     {
         return false;
+    }
+
+    // Is in a congested postcode
+    public function isCON()
+    {
+        $congestionPostcodes = new CongestionPostcode();
+
+        return $congestionPostcodes->isCongested($this->shipment['recipient_postcode']);
     }
 }
