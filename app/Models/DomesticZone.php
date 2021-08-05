@@ -2,22 +2,27 @@
 
  namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+ use App\Exports\DomesticZonesExport;
+ use Maatwebsite\Excel\Facades\Excel;
 
-class DomesticZone extends Model
-{
-    public function getZone($shipment, $model="1", $isReturn = false)
-    {
-        $models = ['1' => 'fedex', '7' => 'XDP'];
-        $zone = '';
-        $postcode = '';
-        $postCodeFound = false;
+ use Illuminate\Database\Eloquent\Model;
 
-        // Decide which postcode to use to identify zone
-        $zonePostcode = ($isReturn) ? $shipment['sender_postcode'] : $shipment['recipient_postcode'];
-        $postcode = trim($zonePostcode) ?? '';
+ class DomesticZone extends Model
+ {
+     protected $guarded = ['id'];
 
-        // Remove all extraneous chars and compare against FedexUK DB
+     public function getZone($shipment, $model="1", $isReturn = false)
+     {
+         $models = ['1' => 'fedex', '7' => 'XDP'];
+         $zone = '';
+         $postcode = '';
+         $postCodeFound = false;
+
+         // Decide which postcode to use to identify zone
+         $zonePostcode = ($isReturn) ? $shipment['sender_postcode'] : $shipment['recipient_postcode'];
+         $postcode = trim($zonePostcode) ?? '';
+
+         // Remove all extraneous chars and compare against FedexUK DB
         $newPostCode = preg_replace('/\s+/', ' ', $postcode); // Replace multiple spaces
         $newPostCode = trim($newPostCode); // Remove Leading and trailing spaces
         $newPostCode = preg_replace('/[^A-Za-z0-9 ]/', '', $newPostCode); // Replace invalid characters
@@ -41,5 +46,27 @@ class DomesticZone extends Model
                 }
             }
         }
-    }
-}
+     }
+
+     public function download($model, $download = true)
+     {
+         $data = DomesticZone::select('postcode', 'zone', 'model', 'sla')
+                ->where('model', $model)
+                ->orderBy('model')
+                ->orderBy('postcode')
+                ->orderBy('zone')
+                ->get()
+                ->toArray();
+
+         if (! empty($data)) {
+             if ($download) {
+                 return Excel::download(
+                     new DomesticZonesExport($data),
+                     ucfirst($model).'_Zones.csv'
+                 );
+             } else {
+                 return $data;
+             }
+         }
+     }
+ }

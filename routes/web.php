@@ -503,13 +503,13 @@ Route::get('company-rate/{company}/{service}/{discount?}/{date?}', 'RateControll
 // Domestic Pricing Zones
 Route::get('domestic-zones/{rate}/download/{date?}', 'DomesticZoneController@download');
 Route::get('domestic-zones/{rate}/upload', 'DomesticZoneController@upload');
-Route::post('domestic-zones/{rate}/upload', 'DomesticZoneController@store');
+Route::post('domestic-zones/{rate}/upload', 'DomesticZoneController@storeUpload');
 Route::get('domestic-zones/', 'DomesticZoneController@index');
 
 // International Pricing Zones
 Route::get('intl-zones/{rate}/download/{date?}', 'PricingZoneController@download');
 Route::get('intl-zones/{rate}/upload', 'PricingZoneController@upload');
-Route::post('intl-zones/{rate}/upload', 'PricingZoneController@store');
+Route::post('intl-zones/{rate}/upload', 'PricingZoneController@storeUpload');
 Route::get('intl-zones/', 'PricingZoneController@index');
 
 /*
