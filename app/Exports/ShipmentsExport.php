@@ -118,7 +118,7 @@ class ShipmentsExport implements FromCollection, WithHeadings, ShouldAutoSize
                 'Tracking' => url('/tracking/'.$shipment->token),
             ]);
 
-            if ($this->companyId != 1099) {
+            if ($this->companyId && $this->companyId != 1099) {
                 $row->forget('Shipping Charge');
             }
 
