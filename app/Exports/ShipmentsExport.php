@@ -8,6 +8,9 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class ShipmentsExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
+    public $shipments;
+    public $companyId;
+
     public function __construct($shipments)
     {
         $this->shipments = $shipments;
@@ -18,13 +21,14 @@ class ShipmentsExport implements FromCollection, WithHeadings, ShouldAutoSize
      */
     public function headings(): array
     {
-        return [
+        $headings = [
             'Consignment Number',
             'Carrier Consignment Number',
             'Shipment Reference',
             'Pieces',
             'Weight',
             'Volume',
+            'Shipping Charge',
             'Customs Value',
             'Customs Currency',
             'Sender Name',
@@ -58,14 +62,20 @@ class ShipmentsExport implements FromCollection, WithHeadings, ShouldAutoSize
             'Delivery Date',
             'Tracking',
         ];
+
+        $this->companyId = $this->shipments->first()->company_id;
+        if ($this->companyId != 1090) {
+            unset($headings[6]);
+        }
+
+        return $headings;
     }
 
     public function collection()
     {
         $collection = collect();
 
-        foreach ($this->shipments as $shipment) :
-
+        foreach ($this->shipments as $shipment) {
             $row = collect([
                 'Consignment Number' => $shipment->consignment_number,
                 'Carrier Consignment Number' => $shipment->carrier_consignment_number,
@@ -73,6 +83,7 @@ class ShipmentsExport implements FromCollection, WithHeadings, ShouldAutoSize
                 'Pieces' => $shipment->pieces,
                 'Weight' => $shipment->weight.strtoupper($shipment->weight_uom),
                 'Volume' => $shipment->volumetric_weight,
+                'Shipping Charge' => $shipment->shipping_charge,
                 'Customs Value' => $shipment->customs_value,
                 'Customs Currency' => strtoupper($shipment->customs_value_currency_code),
                 'Sender Name' => $shipment->sender_name,
@@ -107,9 +118,12 @@ class ShipmentsExport implements FromCollection, WithHeadings, ShouldAutoSize
                 'Tracking' => url('/tracking/'.$shipment->token),
             ]);
 
-        $collection->push($row);
+            if ($this->companyId != '1099') {
+                $row->forget('Shipping Charge');
+            }
 
-        endforeach;
+            $collection->push($row);
+        }
 
         return $collection;
     }
