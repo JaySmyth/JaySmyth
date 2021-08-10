@@ -14,7 +14,7 @@ class ShipmentsExport implements FromCollection, WithHeadings, ShouldAutoSize
     public function __construct($shipments)
     {
         $this->shipments = $shipments;
-        $this->companyId = ($this->shipments) ? $this->shipments->first()->company_id : false;
+        $this->companyId = ($this->shipments->first()) ? $this->shipments->first()->company_id : false;
     }
 
     /**
