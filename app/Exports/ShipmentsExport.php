@@ -119,6 +119,7 @@ class ShipmentsExport implements FromCollection, WithHeadings, ShouldAutoSize
             ]);
 
             if ($this->companyId && $this->companyId != '1099') {
+                dd($this->companyId);
                 $row->forget('Shipping Charge');
             }
 
