@@ -14,6 +14,7 @@ class ShipmentsExport implements FromCollection, WithHeadings, ShouldAutoSize
     public function __construct($shipments)
     {
         $this->shipments = $shipments;
+        $this->companyId = $this->shipments->first()->company_id;
     }
 
     /**
@@ -63,7 +64,6 @@ class ShipmentsExport implements FromCollection, WithHeadings, ShouldAutoSize
             'Tracking',
         ];
 
-        $this->companyId = $this->shipments->first()->company_id;
         if ($this->companyId != 1090) {
             unset($headings[6]);
         }
