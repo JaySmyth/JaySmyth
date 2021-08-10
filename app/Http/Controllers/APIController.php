@@ -388,7 +388,19 @@ class APIController extends Controller
             if ($carrierChoice == 'cost' || ! isset($this->input['data']['carrier_code']) || empty($this->input['data']['carrier_code'])) {
                 $this->input['data']['carrier_choice'] = 'cost';
             }
-        } else {
+        }
+
+        // Temporary Patch for BPerfect
+        if (in_array($this->input['data']['company_id'], ['1090']) && strtoupper($this->input['data']['recipient_country_code']) != 'GB') {
+            if ($this->input['data']['weight'] <= 2.5) {
+                $pkgCount = count($this->input['data']['packages']);
+                for ($i=0; $i<$pkgCount; $i++) {
+                    if (strtoupper($this->input['data']['packages'][$i]['packaging_code']) == 'CTN') {
+                        $this->input['data']['packages'][$i]['packaging_code']='PAK';
+                        $this->input['data']['carrier_code']='FEDEX';
+                    }
+                }
+            }
         }
 
         // Temporary Patch for Twinings
