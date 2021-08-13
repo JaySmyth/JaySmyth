@@ -167,6 +167,9 @@ class Rate extends Model
                         ->orderBy('area')
                         ->get()
                         ->toArray();
+                if (! $data) {
+                    $data = $this->getSampleDomestic();
+                }
 
                 // Custom formating
                 for ($i=0;$i<count($data);$i++) {
@@ -185,7 +188,9 @@ class Rate extends Model
                         ->orderBy('break_point')
                         ->get()
                         ->toArray();
-
+                if (! $data) {
+                    $data = $this->getSamplePricing();
+                }
                 // Custom formating
                 for ($i=0;$i<count($data);$i++) {
                     $data[$i]['residential'] = ($data[$i]['residential']) ? "1" : "0";
@@ -211,6 +216,25 @@ class Rate extends Model
         } else {
             return [];
         }
+    }
+
+    public function getSampleDomestic()
+    {
+        $sample[] = [
+            'rate_id' => $this->id, 'service' => 'UK48', 'packaging_code' => 'Package - Sample', 'first' => '5.25', 'others' => '5.25', 'notional_weight' => '25', 'notional' => '5.25', 'area' => '2', 'from_date' => date('Y-m-d'), 'to_date' => date('Y-m-d', strtotime('Dec 31')),
+        ];
+
+        return $sample;
+    }
+
+    public function getSamplePricing()
+    {
+        $sample[] = [
+            'rate_id' => $this->id, 'residential' => '0', 'piece_limit' => '99999', 'package_type' => 'Package - Sample', 'zone' => 'A', 'break_point' => '5', 'weight_rate' => '0.00', 'weight_increment' => '1',
+            'package_rate' => '0.00', 'consignment_rate' => '5.25',  'weight_units' => 'kg', 'from_date' => date('Y-m-d'), 'to_date' => date('Y-m-d', strtotime('Dec 31')),
+        ];
+
+        return $sample;
     }
 
     /**

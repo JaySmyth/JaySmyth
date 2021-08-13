@@ -36,7 +36,7 @@ class PricingModel
     public $priceType;
     public $response = [];
     public $models;
-    public $model;
+    public $model;                                                              // Set by Class that extends this class.
     public $surcharge;
     public $surchargeId;
     public $rateDetail;

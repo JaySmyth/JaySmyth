@@ -2,11 +2,16 @@
 
 namespace App\Models;
 
+use App\Exports\PricingZonesExport;
 use DB;
+
 use Illuminate\Database\Eloquent\Model;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PricingZones extends Model
 {
+    protected $guarded = ['id'];
+
     /**
      * @param array containing key/ value pairs of criteria to identify zone
      *
@@ -123,5 +128,41 @@ class PricingZones extends Model
         }
 
         return $query->orderBy('company_id', 'DESC')->orderBy('from_sender_postcode')->orderBy('from_recipient_postcode')->get();
+    }
+
+    public function download($modelId, $serviceCode, $reqDate = '', $download = true)
+    {
+        if ($reqDate=='') {
+            $reqDate = date('Y-m-d');
+        }
+        $data = PricingZones::select('company_id', 'model_id', 'sender_country_code', 'from_sender_postcode', 'to_sender_postcode', 'recipient_country_code', 'recipient_name', 'from_recipient_postcode', 'to_recipient_postcode', 'service_code', 'cost_zone', 'sale_zone', 'from_date', 'to_date')
+                ->where('model_id', $modelId)
+                ->where('service_code', $serviceCode)
+                ->where('from_date', '<=', $reqDate)
+                ->where('to_date', '>=', $reqDate)
+                ->orderBy('model_id')
+                ->orderBy('service_code')
+                ->orderBy('sender_country_code')
+                ->orderBy('recipient_country_code')
+                ->orderBy('from_recipient_postcode')
+                ->get()
+                ->toArray();
+
+        // Custom formating
+        for ($i=0;$i<count($data);$i++) {
+            $data[$i]['company_id'] = ($data[$i]['company_id'] == '') ? '0' : $data[$i]['company_id'];
+            $data[$i]['model_id'] = ($data[$i]['model_id'] == '') ? '0' : $data[$i]['model_id'];
+        }
+
+        if (! empty($data)) {
+            if ($download) {
+                return Excel::download(
+                    new PricingZonesExport($data),
+                    'Pricing_Zones_'.$modelId.'_'.ucfirst($serviceCode).'.csv'
+                );
+            } else {
+                return $data;
+            }
+        }
     }
 }

@@ -2,7 +2,7 @@
 
 @section('content')
 
-@include('partials.title', ['title' => 'Domestic Rate Zones', 'results'=> null, 'create' => 'Create Model'])
+@include('partials.title', ['title' => 'Domestic Pricing Zones', 'results'=> null, 'create' => 'Create Model'])
 
 <div class="table table-striped-responsive">
     <table class="table table-striped">
