@@ -84,7 +84,7 @@ class ShipmentsController extends Controller
         }
 
         // Non IFS default to a month ago
-        if (!$request->user()->hasIfsRole() && strlen($request->filter) < 5 && ! $request->date_from && ! $request->date_to && ! $request->company && ! $request->user && ! $request->scs_job_number) {
+        if (! $request->user()->hasIfsRole() && strlen($request->filter) < 5 && ! $request->date_from && ! $request->date_to && ! $request->company && ! $request->user && ! $request->scs_job_number) {
             $request->date_from = now()->subMonths(3);
         }
 
@@ -733,7 +733,7 @@ class ShipmentsController extends Controller
 
         // Validate the request
         $this->validate($request, [
-            'status_code' => 'required|in:' . implode(',', array_keys(dropdown('statusCodes'))),
+            'status_code' => 'required|in:'.implode(',', array_keys(dropdown('statusCodes'))),
             'file' => 'required'
         ], [
             'status_code.required' => 'Please select an upload profile.',
@@ -1053,6 +1053,10 @@ class ShipmentsController extends Controller
         $shipment = Shipment::whereCompanyId($data['company_id'])->whereShipmentReference($data['shipment_reference'])->first();
 
         if (! $shipment) {
+            if (empty($data['form_values'])) {
+                $data['form_values'] = json_encode($data);
+            }
+
             $shipment = Shipment::create($data);
 
             if ($shipment) {
