@@ -44,7 +44,7 @@
                 <strong>Required CSV Formats</strong><br>
                 <p>Please download this <a href="#">Sample Domestic rate CSV file</a> or <a href="#">Sample International rate CSV file</a>, containing sample data.</p>
                 <strong>Required Information</strong><br>
-                <p>Your Domestic CSV file should contain the following fields in this order</p>
+                <p>Your Domestic CSV file should contain the following fields in this order and include a header line</p>
                 <ol>
                     <li>Rate id *</li>
                     <li>Service *</li>

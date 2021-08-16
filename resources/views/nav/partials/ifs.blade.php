@@ -53,7 +53,7 @@
         @can('view_invoice_run')<a class="dropdown-item" href="{{url('/invoice-runs')}}">Sales Invoice Runs</a>@endcan
         @can('view_invoice_run')<a class="dropdown-item" href="{{url('/rates')}}">Master Rate Sheets</a>@endcan
         @can('view_invoice_run')<a class="dropdown-item" href="{{url('/domestic-zones')}}">Domestic Pricing Zones</a>@endcan
-        @can('view_invoice_run')<a class="dropdown-item" href="{{url('/intl-zones')}}">International Pricing Zones</a>@endcan
+        @can('view_invoice_run')<a class="dropdown-item" href="{{url('/pricing-zones')}}">International Pricing Zones</a>@endcan
         @can('view_surcharges')<a class="dropdown-item" href="{{url('/surcharges')}}">Surcharges</a>@endcan
         @can('currency_admin')<a class="dropdown-item" href="{{url('/currencies')}}">Currencies</a>@endcan
         @can('view_carrier_charge_codes')<a class="dropdown-item" href="{{url('/carrier-charge-codes')}}">Carrier Charge Codes</a>@endcan

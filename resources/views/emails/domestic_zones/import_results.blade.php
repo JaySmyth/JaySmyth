@@ -12,7 +12,6 @@
 @endif
 
 <table border="0" cellspacing="0" width="100%" class="table">
-'rate_id', 'service', 'packaging_code', 'first', 'others', 'notional_weight', 'notional', 'area', 'from_date', 'to_date'
 
     <thead>
         <tr>

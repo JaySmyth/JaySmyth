@@ -507,10 +507,10 @@ Route::post('domestic-zones/{rate}/upload', 'DomesticZoneController@storeUpload'
 Route::get('domestic-zones/', 'DomesticZoneController@index');
 
 // International Pricing Zones
-Route::get('intl-zones/{rate}/download/{date?}', 'PricingZoneController@download');
-Route::get('intl-zones/{rate}/upload', 'PricingZoneController@upload');
-Route::post('intl-zones/{rate}/upload', 'PricingZoneController@storeUpload');
-Route::get('intl-zones/', 'PricingZoneController@index');
+Route::get('pricing-zones/{modelId}/{serviceCode}/download/{date?}', 'PricingZoneController@download');
+Route::get('pricing-zones/{modelId}/{serviceCode}/upload', 'PricingZoneController@upload');
+Route::post('pricing-zones/{modelId}/{serviceCode}/upload', 'PricingZoneController@storeUpload');
+Route::get('pricing-zones/', 'PricingZoneController@index');
 
 /*
   |--------------------------------------------------------------------------

@@ -36,7 +36,7 @@ class PricingModel
     public $priceType;
     public $response = [];
     public $models;
-    public $model;
+    public $model;                                                              // Set by Class that extends this class.
     public $surcharge;
     public $surchargeId;
     public $rateDetail;
@@ -115,7 +115,7 @@ class PricingModel
         $this->response['charges'] = [];
 
         // Calculate Fuel Surcharge on the following charge codes
-        $this->fuelChargeCodes = ['ADH', 'BRO', 'COR', 'DISC', 'DTP', 'EAS', 'ESS','FRT', 'FUEL', 'ICE', 'LIA', 'LPS', 'MIS', 'OOA', 'OSP', 'OWP', 'RAS', 'RES'];
+        $this->fuelChargeCodes = ['ADH', 'BRO', 'CON', 'COR', 'DISC', 'DTP', 'EAS', 'ESS','FRT', 'FUEL', 'ICE', 'LIA', 'LPS', 'MIS', 'OOA', 'OSP', 'OWP', 'RAS', 'RES'];
 
         $this->lowerMaxWeight = 9999;       // ADH & MAX
         $this->upperMaxWeight = 9999;       // ADH & MAX

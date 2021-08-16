@@ -40,6 +40,37 @@ class FedexIntl extends PricingModel
         $this->model = 2;
     }
 
+    /**
+     * Calculate the Freight portion of the price.
+     */
+    public function calcFreight()
+    {
+
+        // Get Package Type
+        $this->getPackagingType();
+        $packagingType = (empty($this->packagingType)) ? 'Unknown' : $this->packagingType.'(s)';
+
+        $currentRateLine = $this->getRateDetails($this->shipment['company_id'], $this->rate['id'], $this->shipment['service_id'], $this->shipment['recipient_type'], $this->packagingType, $this->shipment['pieces'], $this->chargeableWeight, $this->zone, $this->shipment['ship_date']);
+        if ($currentRateLine) {
+            $result = ['charge' => 0, 'break_point' => 0];
+            $charge = [
+                'code' => 'FRT',
+                'description' => $this->shipment['pieces'].' '.$packagingType.' to Area '.strtoupper($this->zone),
+                'value' => 0
+            ];
+
+            /*
+             * *********************************************
+             * Calc Charges for this segment
+             * *********************************************
+             */
+            $charge = $this->calcSegmentCharge($currentRateLine, $this->chargeableWeight, $charge);
+            $this->addSurcharge($charge);
+        } else {
+            $this->log('No Rate found');
+        }
+    }
+
     /*
      * **********************************
      * Carrier Specific Surcharges

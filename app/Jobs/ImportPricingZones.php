@@ -3,11 +3,8 @@
 namespace App\Jobs;
 
 use App\Models\User;
-use App\Models\Rate;
-use App\Models\RateDetail;
-use App\Models\RateDiscount;
-use App\Models\DomesticRate;
-use App\Models\DomesticRateDiscount;
+use App\Models\PricingZones;
+use App\Models\Service;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -15,34 +12,33 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
-class ImportMasterRate implements ShouldQueue
+class ImportPricingZones implements ShouldQueue
 {
     use InteractsWithQueue,
         Queueable,
         SerializesModels;
 
     protected $path;
-    protected $rate;
+    protected $model;
+    protected $serviceCode;
     protected $user;
     protected $fields;
     protected $row;
     protected $results;
+    protected $pricingZone;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($path, Rate $rate, User $user)
+    public function __construct($path, $model, $serviceCode, User $user)
     {
         $this->path = storage_path('app/'.$path);
-        $this->rate = $rate;
+        $this->model = $model;
+        $this->serviceCode = $serviceCode;
         $this->user = $user;
-        if ($rate->model == 'domestic') {
-            $this->fields = ['rate_id', 'service', 'packaging_code', 'first', 'others', 'notional_weight', 'notional', 'area', 'from_date', 'to_date'];
-        } else {
-            $this->fields = ['rate_id', 'residential', 'piece_limit', 'package_type', 'zone', 'break_point', 'weight_rate', 'weight_increment', 'package_rate', 'consignment_rate', 'weight_units', 'from_date', 'to_date'];
-        }
+        $this->fields = ['company_id', 'model_id', 'sender_country_code', 'from_sender_postcode', 'to_sender_postcode', 'recipient_country_code', 'recipient_name', 'from_recipient_postcode', 'to_recipient_postcode', 'service_code', 'cost_zone', 'sale_zone', 'from_date', 'to_date'];
         $this->results['summary']['inserted'] = 0;
         $this->results['summary']['failed'] = 0;
     }
@@ -54,6 +50,8 @@ class ImportMasterRate implements ShouldQueue
      */
     public function handle()
     {
+        $this->pricingZone = new PricingZones();
+
         // Process the CSV
         $this->processCsv();
 
@@ -61,7 +59,7 @@ class ImportMasterRate implements ShouldQueue
         unlink($this->path);
 
         // Inform user that the import has been completed
-        Mail::to($this->user->email)->bcc('it@antrim.ifsgroup.com')->send(new \App\Mail\RateImportResults($this->rate->model, $this->results));
+        Mail::to($this->user->email)->bcc('it@antrim.ifsgroup.com')->send(new \App\Mail\PricingZonesImportResults($this->model, $this->results));
     }
 
     /**
@@ -85,16 +83,17 @@ class ImportMasterRate implements ShouldQueue
                 while (($data = fgetcsv($handle, 1000, ',')) !== false) {
                     switch ($rowNumber) {
                         case '1':
-                            // Header Row do nothing
+                            // Headers - do nothing
                             break;
                         case '2':
-                            // Remove previous rates then fall through to default
-                            $this->closeExistingRate();
+                            // Delete any existing data then fall through to Default
+                            $this->row = $this->assignFieldNames($data);
+                            $this->deleteExistingZones();
                             // no break
                         default:
                             $this->row = $this->assignFieldNames($data);
                             $this->insertRow($rowNumber);
-                            break;
+                        break;
                     }
                     $rowNumber++;
                 }
@@ -152,36 +151,22 @@ class ImportMasterRate implements ShouldQueue
 
     public function buildValidator()
     {
-        if ($this->rate->model == 'domestic') {
-            $validator = Validator::make($this->row, [
-                'rate_id' => 'required|exists:rates,id|in:'.$this->rate->id,
-                'service' => 'required|exists:services,code',
-                'packaging_code' => 'required|string|min:3|max:10',
-                'first' => 'required|numeric',
-                'others' => 'required|numeric',
-                'notional_weight' => 'required|numeric',
-                'notional' => 'required|numeric',
-                'area' => 'required|string|min:1|max:2',
-                'from_date' => 'required|date_format:Y-m-d|after:yesterday',
-                'to_date' => 'required|date_format:Y-m-d|after:from_date',
+        $validator = Validator::make($this->row, [
+            'company_id' => 'required|integer|min:0|max:9999',
+            'model_id' => 'required|string|min:0|max:7|in:'.$this->model,
+            'sender_country_code' => 'required|string|exists:countries,country_code',
+            'from_sender_postcode' => 'nullable|string|min:1|max:10',
+            'to_sender_postcode' => 'nullable|string|min:1|max:10',
+            'recipient_country_code' => 'required|string|exists:countries,country_code',
+            'recipient_name' => 'nullable|string|min:1|max:30',
+            'from_recipient_postcode' => 'nullable|string|min:1|max:10',
+            'to_recipient_postcode' => 'nullable|string|min:1|max:10',
+            'service_code' => 'required|string|in:'.$this->serviceCode,
+            'cost_zone' => 'required|string|min:1|max:5',
+            'sale_zone' => 'required|string|min:1|max:5',
+            'from_date' => 'required|date_format:Y-m-d|after:yesterday',
+            'to_date' => 'required|date_format:Y-m-d|after:from_date',
             ]);
-        } else {
-            $validator = Validator::make($this->row, [
-                'rate_id' => 'required|exists:rates,id|in:'.$this->rate->id,
-                'residential' => 'required|in:0,1',
-                'piece_limit' => 'required|integer|min:1|max:99999',
-                'package_type' => 'required|string|min:3|max:10',
-                'zone' => 'required|string|min:1|max:2',
-                'break_point' => 'required|numeric',
-                'weight_rate' => 'required|numeric',
-                'weight_increment' => 'required|integer',
-                'package_rate' => 'required|numeric',
-                'consignment_rate' => 'required|numeric',
-                'weight_units' => 'required|in:kg,lb',
-                'from_date' => 'required|date_format:Y-m-d|after:yesterday',
-                'to_date' => 'required|date_format:Y-m-d|after:from_date',
-            ]);
-        }
 
         return $validator;
     }
@@ -212,45 +197,56 @@ class ImportMasterRate implements ShouldQueue
     private function insertRow($rowNumber)
     {
         // Add additional field values not present in upload
-        $this->row['rate_id'] = $this->rate->id;
 
         // Add to our results array
         $this->results['rows'][$rowNumber]['data'] = $this->row;
         $this->results['summary']['inserted']++;
 
         // Save the record to the database
-        if ($this->rate->model == 'domestic') {
-            DomesticRate::firstOrCreate($this->row);
-        } else {
-            RateDetail::firstOrCreate($this->row);
-        }
+        $this->pricingZone->firstOrCreate(
+            [
+                'company_id' => $this->row['company_id'],
+                'model_id' => $this->row['model_id'],
+                'sender_country_code' => $this->row['sender_country_code'],
+                'from_sender_postcode' => $this->row['from_sender_postcode'],
+                'to_sender_postcode' => $this->row['to_sender_postcode'],
+                'recipient_country_code' => $this->row['recipient_country_code'],
+                'recipient_name' => $this->row['recipient_name'],
+                'from_recipient_postcode' => $this->row['from_recipient_postcode'],
+                'to_recipient_postcode' => $this->row['to_recipient_postcode'],
+                'service_code' => $this->row['service_code'],
+                'from_date' => $this->row['from_date'],
+                'to_date' => $this->row['to_date'],
+        ],
+            [
+                'cost_zone' => $this->row['cost_zone'],
+                'sale_zone' => $this->row['sale_zone'],
+            ]
+        );
     }
 
-    public function closeExistingRate()
+    public function deleteExistingZones()
     {
         $closeDate = date('Y-m-d', strtotime('-1 day', strtotime($this->row['from_date'])));
         $oneYearAgo = date('Y-m-d', strtotime('1 year ago'));
 
-        if ($this->rate->model == 'domestic') {
-            // Delete any existing records that have expired more than 12 months.
-            DomesticRate::where('to_date', '<=', $oneYearAgo)->delete();
-            DomesticRateDiscount::where('to_date', '<=', $oneYearAgo)->delete();
+        // Delete any existing records that have expired more than 12 months.
+        $this->pricingZone->where('to_date', '<=', $oneYearAgo)->delete();
 
-            // If user has re-uploaded or there is a future rate - delete it.
-            DomesticRate::where('rate_id', $this->rate->id)->where('from_date', '>=', $this->row['from_date'])->delete();
+        // If Future zones exist - delete them.
+        $this->pricingZone
+        ->where('company_id', $this->row['company_id'])
+        ->where('model_id', $this->row['model_id'])
+        ->where('service_code', $this->row['service_code'])
+        ->where('from_date', '>=', $this->row['from_date'])
+        ->delete();
 
-            // Set the "to_date" of the old rate (if it exists) to the date provided (the day before the new rate starts).
-            DomesticRate::where('rate_id', $this->rate->id)->where('to_date', '>=', $closeDate)->update(['to_date' => $closeDate]);
-        } else {
-            // Delete any existing records that have expired more than 12 months.
-            RateDetail::where('to_date', '<=', $oneYearAgo)->delete();
-            RateDiscount::where('to_date', '<=', $oneYearAgo)->delete();
-
-            // If user has re-uploaded or there is a future rate - delete it.
-            RateDetail::where('rate_id', $this->rate->id)->where('from_date', '>=', $this->row['from_date'])->delete();
-
-            // Set the "to_date" of the old rate (if it exists) to the date provided (the day before the new rate starts).
-            RateDetail::where('rate_id', $this->rate->id)->where('to_date', '>=', $closeDate)->update(['to_date' => $closeDate]);
-        }
+        // If existing zones - close them off
+        $this->pricingZone
+        ->where('company_id', $this->row['company_id'])
+        ->where('model_id', $this->row['model_id'])
+        ->where('service_code', $this->row['service_code'])
+        ->where('to_date', '>=', $closeDate)
+        ->update(['to_date' => $closeDate]);
     }
 }

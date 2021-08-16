@@ -6,6 +6,9 @@
     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
         @if($shipment->status->code == 'pre_transit' || Auth::user()->hasIfsRole() && $shipment->status->code != 'saved')
         <a class="dropdown-item" href="{{$shipment->print_url}}" title="Print Label"><span class="fas fa-print mr-sm-2" aria-hidden="true"></span> Print Label</a>
+        @if($shipment->source)
+        <a  class="dropdown-item" href="https://ship.ifsgroup.com/labels/{{$shipment->source}}/{{$shipment->user_id}}" title="Label Batch"><span class="fas fa-clone mr-sm-2" aria-hidden="true"></span> Label Batch</a>
+        @endif
         @else
         <a href="#" class="dropdown-item disabled faded" title="Print Label (unavailable)"><span class="fas fa-print text-secondary mr-sm-2" aria-hidden="true"></span> Print Label</a>
         @endif
@@ -74,7 +77,7 @@
 
         @if(Auth::user()->hasRole('ifsa'))
         <div class="dropdown-divider"></div>
-        <a class="dropdown-item" href="{{ url('/shipments/' . $shipment->id . '/transaction-log') }}" title="View Transaction Log" target="_blank" role="button"><span class="far fa-file-alt mr-sm-2" aria-hidden="true"></span> Transaction Log</a>        
+        <a class="dropdown-item" href="{{ url('/shipments/' . $shipment->id . '/transaction-log') }}" title="View Transaction Log" target="_blank" role="button"><span class="far fa-file-alt mr-sm-2" aria-hidden="true"></span> Transaction Log</a>
         <a class="dropdown-item" href="{{ url('/shipments/' . $shipment->id . '/send-test-email') }}" title="Send Test Email" role="button"><span class="fas fa-envelope mr-sm-2" aria-hidden="true"></span> Send Test Email</a>
         @endif
 
@@ -107,13 +110,13 @@
         @endif
 
         @if(Auth::user()->hasIfsRole())
-        
+
         @if($shipment->status->code == 'cancelled')
         <a class="dropdown-item" href="{{ url('/shipments/' . $shipment->id . '/undo-cancel') }}" title="Undo Cancel"><span class="fas fa-undo mr-sm-2" aria-hidden="true"></span> Undo Cancel</a>
         @else
         <a href="#" class="dropdown-item disabled faded" title="Undo Cancel (unavailable)"><span class="fas fa-undo mr-sm-2" aria-hidden="true"></span> Undo Cancel</a>
         @endif
-        
+
         @endif
 
 
