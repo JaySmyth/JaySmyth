@@ -1053,7 +1053,14 @@ class ShipmentsController extends Controller
         $shipment = Shipment::whereCompanyId($data['company_id'])->whereShipmentReference($data['shipment_reference'])->first();
 
         if (! $shipment) {
-            if (empty($data['form_values'])) {
+            if (empty($data['user_id']) && empty($data['form_values'])) {
+                $data['user_id'] = 2;
+                $data['mode_id'] = 1;
+                $data['status_id'] = 1;
+                $data['route_id'] = 1;
+                $data['department_id'] = 1;
+                $data['carrier_id'] = 1;
+                $data['service_id'] = 1;
                 $data['form_values'] = json_encode($data);
             }
 
