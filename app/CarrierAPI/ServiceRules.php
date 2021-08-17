@@ -574,29 +574,34 @@ class ServiceRules
 
     private function account_number_regex($shipment, $serviceDetails)
     {
+        // If No Account numbers provided
         if (empty($shipment['bill_shipping_account']) || empty($shipment['bill_tax_duty_account'])) {
             return true;
         }
 
+        // If only shipping account number provided
         if (strlen($shipment['bill_shipping_account']) > 0 && strlen($shipment['bill_tax_duty_account']) == 0) {
-            $inTheCorrectFormat = preg_match($serviceDetails['account_number_regex'], $shipment['bill_shipping_account']);
-            if ($inTheCorrectFormat) {
+            $shipAcctOk = preg_match($serviceDetails['account_number_regex'], $shipment['bill_shipping_account']);
+            if ($shipAcctOk) {
+
                 // If Fedex and Sender pays Freight make sure it is one of our account numbers
-                if ($shipment['bill_shipping'] = 'shipper' && $shipment['carrier_id'] == '2') {
+                if ($shipment['bill_shipping'] == 'shipper' && $shipment['carrier_id'] == '2') {
                     $service = Service::where('account', $shipment['bill_shipping_account'])->first();
-                    if (! empty($service)) {
-                        return true;
+                    if (empty($service)) {
+                        $shipAcctOk = false;
                     }
                 }
             }
 
-            return false;
+            return $shipAcctOk;
         }
 
+        // If only Duty/ Vat account number provided
         if (strlen($shipment['bill_tax_duty_account']) > 0 && strlen($shipment['bill_shipping_account']) == 0) {
             return preg_match($serviceDetails['account_number_regex'], $shipment['bill_tax_duty_account']);
         }
 
+        // If Both Shipping and Duty accounts provided
         return preg_match($serviceDetails['account_number_regex'], $shipment['bill_shipping_account']) && preg_match($serviceDetails['account_number_regex'], $shipment['bill_tax_duty_account']);
     }
 
@@ -739,6 +744,9 @@ class ServiceRules
     {
         foreach ($shipment['packages'] as $package) {
             if ($package['weight'] > $serviceDetails['max_weight']) {
+                return false;
+            }
+            if ($package['volumetric_weight'] > $serviceDetails['max_weight']) {
                 return false;
             }
         }
