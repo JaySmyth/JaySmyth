@@ -746,9 +746,11 @@ class ServiceRules
             if ($package['weight'] > $serviceDetails['max_weight']) {
                 return false;
             }
+            /*
             if ($package['volumetric_weight'] > $serviceDetails['max_weight']) {
                 return false;
             }
+            */
         }
 
         return true;
