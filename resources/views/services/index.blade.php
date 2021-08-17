@@ -41,7 +41,14 @@
         <tbody>
             @foreach($carrierServices as $service)
             <tr>
-                <td class="text-center">{{ $service->id }}</td>
+                <td class="text-center">
+                    @if(Auth::user()->hasRole('ifsa'))
+                    <a class="nav-link" href="{{url('/services')}}/{{$service->id.'/edit'}}" class="right-border">{{ $service->id }}</a>
+                    @else
+                    {{ $service->id }}
+                    @endif
+
+                </td>
                 <td>{{ App\Models\Carrier::find($service->carrier_id)->code ?? 'None'}}</td>
                 <td>{{ $service->code }}</td>
                 <td>{{ $service->name }}</td>
