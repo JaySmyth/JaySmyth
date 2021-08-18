@@ -318,6 +318,7 @@ Route::get('reports/shipments-by-carrier/{id}', 'ReportsController@shipmentsByCa
 Route::get('reports/scanning-kpis/{id}', 'ReportsController@scanningKpis');
 Route::get('reports/label-downloads/{id}', 'ReportsController@labelDownloads');
 Route::get('reports/performance/{id}', 'ReportsController@performance');
+Route::get('reports/services/{id}', 'ReportsController@services');
 
 /*
   |--------------------------------------------------------------------------

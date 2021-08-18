@@ -8,6 +8,8 @@ use App\Models\Manifest;
 use App\Models\Report;
 use App\Models\Service;
 use App\Models\Shipment;
+use App\Jobs\CustomerServicesReport;
+
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -367,6 +369,27 @@ class ReportsController extends Controller
         }
 
         return view('reports.performance', compact('report', 'results', 'total'));
+    }
+
+    /**
+     * Services report.
+     *
+     * @param  Request  $request
+     * @param  type  $id
+     *
+     * @return type
+     */
+    public function services(Request $request, $id)
+    {
+        $report = Report::findOrFail($id);
+
+        $this->authorize(new Report);
+
+        dispatch(new CustomerServicesReport());
+
+        flash()->success('Successful!', 'Results will be emailed.');
+
+        return redirect('reports');
     }
 
     /**
