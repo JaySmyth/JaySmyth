@@ -31,9 +31,21 @@
           @endforeach
       </tr>
       <tr>
-        <td>Received/ InTransit</td>
+        <td>Received</td>
           @foreach($carriers as $key => $carrier)
-            <td>{{($data['3'][$key] ?? '0') + ($data['4'][$key] ?? '0') + ($data['10'][$key] ?? '0')}}</td>
+            <td>{{($data['3'][$key] ?? '0') }}</td>
+          @endforeach
+      </tr>
+      <tr>
+        <td>InTransit</td>
+          @foreach($carriers as $key => $carrier)
+            <td>{{($data['4'][$key] ?? '0')}}</td>
+          @endforeach
+      </tr>
+      <tr>
+        <td>Failure</td>
+          @foreach($carriers as $key => $carrier)
+            <td>{{($data['10'][$key] ?? '0')}}</td>
           @endforeach
       </tr>
       <tr>
