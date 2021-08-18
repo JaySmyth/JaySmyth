@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\User;
 use \App\Models\Company;
 use \App\Models\Service;
 
@@ -22,14 +23,16 @@ class CustomerServicesReport implements ShouldQueue
         SerializesModels;
 
     public $timeout = 999;
+    public $user;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($user)
     {
+        $this->user = $user;
     }
 
     /**
@@ -39,7 +42,7 @@ class CustomerServicesReport implements ShouldQueue
      */
     public function handle()
     {
-        $recipient = Auth::user()->email;
+        $recipient = $this->user->email;
         $data = '';
         $testing = false;
         if ($testing) {

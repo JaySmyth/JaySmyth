@@ -10,6 +10,7 @@ use App\Models\Service;
 use App\Models\Shipment;
 use App\Jobs\CustomerServicesReport;
 
+use Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -385,7 +386,9 @@ class ReportsController extends Controller
 
         $this->authorize(new Report);
 
-        dispatch(new CustomerServicesReport());
+        $user = Auth::user();
+
+        dispatch(new CustomerServicesReport($user));
 
         flash()->success('Successful!', 'Results will be emailed.');
 
