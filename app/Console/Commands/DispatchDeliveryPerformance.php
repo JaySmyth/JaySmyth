@@ -40,9 +40,10 @@ class DispatchDeliveryPerformance extends Command
     public function handle()
     {
         // Antrim
-        dispatch(new DeliveryPerformance('1'));
+        dispatch(new DeliveryPerformance('1', 'domestic'));
+        dispatch(new DeliveryPerformance('1', 'intl'));
 
         // Blind Co
-        dispatch(new DeliveryPerformance('7'));
+        dispatch(new DeliveryPerformance('7', 'domestic'));
     }
 }
