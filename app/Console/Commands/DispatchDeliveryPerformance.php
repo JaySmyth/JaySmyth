@@ -41,7 +41,7 @@ class DispatchDeliveryPerformance extends Command
     {
         // Antrim
         dispatch(new DeliveryPerformance('1', 'domestic'));
-        dispatch(new DeliveryPerformance('1', 'intl'));
+        dispatch(new DeliveryPerformance('1', 'Intl'));
 
         // Blind Co
         dispatch(new DeliveryPerformance('7', 'domestic'));
