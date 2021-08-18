@@ -5,6 +5,7 @@ namespace App\Jobs;
 use \App\Models\Company;
 use \App\Models\Service;
 
+use Auth;
 use DB;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
@@ -38,14 +39,12 @@ class CustomerServicesReport implements ShouldQueue
      */
     public function handle()
     {
-        // Get Data
+        $recipient = Auth::user()->email;
         $data = '';
         $testing = false;
         if ($testing) {
-            $recipient = 'gmcbroom@antrim.ifsgroup.com';
             $companies = Company::whereIn('id', ['57','774'])->where('enabled', '1')->where('testing', '0')->where('depot_id', '1')->orderBy('company_name')->get(); // Testing
         } else {
-            $recipient = 'sanderton@antrim.ifsgroup.com';
             $companies = Company::where('enabled', '1')->where('testing', '0')->where('depot_id', '1')->orderBy('company_name')->get(); // Testing
         }
         $data = '"id","Company","IFS Service",IFS Service Name","Carrier Service Name","Carrier"'."\n";
