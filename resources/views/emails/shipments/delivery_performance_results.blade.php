@@ -31,7 +31,7 @@
           @endforeach
       </tr>
       <tr>
-        <td>InTransit</td>
+        <td>Received/ InTransit</td>
           @foreach($carriers as $key => $carrier)
             <td>{{($data['3'][$key] ?? '0') + ($data['4'][$key] ?? '0') + ($data['10'][$key] ?? '0')}}</td>
           @endforeach
