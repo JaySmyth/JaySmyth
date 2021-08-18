@@ -69,7 +69,7 @@ class DeliveryPerformance implements ShouldQueue
         Mail::to($recipients)->send(new \App\Mail\DeliveryPerformanceResults($depot, $table, $carriers, $startDate, $endDate, $type));
     }
 
-    private function getDomestic()
+    private function getDomestic($startDate, $endDate, $depot)
     {
         return DB::select(DB::raw("
             SELECT carrier_id, carriers.code, status_id, statuses.code, COUNT(shipments.id) AS COUNT FROM shipments
@@ -78,14 +78,16 @@ class DeliveryPerformance implements ShouldQueue
             WHERE ship_date >= '$startDate'
             AND ship_date <= '$endDate'
             AND status_id IN ('3', '4', '5', '6','9', '10', '11', '20', '21')
+            AND service_id not in ('4')
             AND depot_id = '$depot'
             AND recipient_country_code in ('GB','IE')
+            AND recipient_country_code IS NOT NULL
             GROUP BY carrier_id, status_id
             ORDER BY carrier_id, status_id;
         "));
     }
 
-    private function getNonDomestic()
+    private function getNonDomestic($startDate, $endDate, $depot)
     {
         return DB::select(DB::raw("
             SELECT carrier_id, carriers.code, status_id, statuses.code, COUNT(shipments.id) AS COUNT FROM shipments
@@ -94,8 +96,9 @@ class DeliveryPerformance implements ShouldQueue
             WHERE ship_date >= '$startDate'
             AND ship_date <= '$endDate'
             AND status_id IN ('3', '4', '5', '6','9', '10', '11', '20', '21')
+            AND service_id not in ('4')
             AND depot_id = '$depot'
-            AND recipient_country_code not in ('GB','IE')
+            AND carrier_id not in ('1')
             GROUP BY carrier_id, status_id
             ORDER BY carrier_id, status_id;
         "));
