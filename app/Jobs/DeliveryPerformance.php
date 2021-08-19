@@ -66,7 +66,7 @@ class DeliveryPerformance implements ShouldQueue
         }
 
         // Send report to user
-        Mail::to($recipients)->send(new \App\Mail\DeliveryPerformanceResults($depot, $table, $carriers, $startDate, $endDate, $type));
+        Mail::to($recipients)->cc('gmcbroom@antrim.ifsgroup.com')->send(new \App\Mail\DeliveryPerformanceResults($depot, $table, $carriers, $startDate, $endDate, $type));
     }
 
     private function getDomestic($startDate, $endDate, $depot)
@@ -98,6 +98,7 @@ class DeliveryPerformance implements ShouldQueue
             AND status_id IN ('3', '4', '5', '6','9', '10', '11', '20', '21')
             AND service_id not in ('4')
             AND depot_id = '$depot'
+            AND recipient_country_code NOT IN ('GB','IE')
             AND carrier_id not in ('1')
             GROUP BY carrier_id, status_id
             ORDER BY carrier_id, status_id;
