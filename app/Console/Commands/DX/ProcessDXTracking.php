@@ -3,6 +3,8 @@
 namespace App\Console\Commands\DX;
 
 use App\Models\ProblemEvent;
+use App\Models\Shipment;
+use App\Models\Tracking;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -144,13 +146,13 @@ class ProcessDXTracking extends Command
         // Row passes validation, continue
         if ($this->validateRow($row)) {
             // Load the shipment record
-            $shipment = \App\Models\Shipment::where('carrier_tracking_number', $row['carrier_tracking_number'])->where('carrier_id', 17)->first();
+            $shipment = Shipment::where('carrier_tracking_number', $row['carrier_tracking_number'])->where('carrier_id', 17)->first();
 
             if ($shipment) {
                 $event = $this->getEvent($row, $shipment);
 
                 if ($event) {
-                    $tracking = \App\Models\Tracking::firstOrCreate([
+                    $tracking = Tracking::firstOrCreate([
                         'message' => $event['message'],
                         'status' => $event['status'],
                         'shipment_id' => $shipment->id
@@ -206,13 +208,14 @@ class ProcessDXTracking extends Command
     protected function getEvent($row, $shipment)
     {
         $dxStatus = DB::table('dx_statuses')->where('code', $row['code'])->first();
-        $datetime = gmtToCarbonUtc(Carbon::createFromformat('d/m/YH:i:s', $row['date']));
-
-        if ($dxStatus->status == 'delivered') {
-            $datetime->addSecond();
-        }
 
         if ($dxStatus) {
+            $datetime = gmtToCarbonUtc(Carbon::createFromformat('d/m/YH:i:s', $row['date']));
+
+            if ($dxStatus->status == 'delivered') {
+                $datetime->addSecond();
+            }
+
             return [
                 'status' => $dxStatus->status,
                 'status_detail' => null,
@@ -223,7 +226,7 @@ class ProcessDXTracking extends Command
                     'Business address closed',
                     'Calling Card Left at Insecure/Communal Address',
                     'No Access',
-                    ])) ? $shipment->recipient_city : 'DX Network',
+                ])) ? $shipment->recipient_city : 'DX Network',
                 'country_code' => 'GB',
                 'postcode' => null,
                 'local_datetime' => $datetime,
@@ -233,6 +236,8 @@ class ProcessDXTracking extends Command
                 'message' => $dxStatus->description,
                 'signed_by' => null,
             ];
+        } else {
+            $this->info('Unknown DX status code: '.$row['code']);
         }
 
         return false;
