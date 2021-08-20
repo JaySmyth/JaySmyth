@@ -143,6 +143,10 @@ class ServiceRules
                     return $this->checkIe48($shipment, $serviceDetails);
                 break;
 
+            case 'uk48':
+                return $this->checkUk48($shipment, $serviceDetails);
+                break;
+
         }
 
         // Lithium battery check
@@ -364,6 +368,15 @@ class ServiceRules
                     return false;
                 }
             }
+        }
+
+        return true;
+    }
+
+    private function checkUk48($shipment, $serviceDetails)
+    {
+        if (stripos($shipment['recipient_company_name'], 'Amazon') !== false) {
+            return false;
         }
 
         return true;
