@@ -20,4 +20,18 @@ class ServicesPolicy
             return false;
         }
     }
+
+    /**
+     * Update policy.
+     *
+     * @return bool
+     */
+    public function update(User $user, Service $service)
+    {
+        if ($user->hasRole('ifsa')) {
+            return true;
+        }
+
+        return false;
+    }
 }

@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\Logable;
+
 use Illuminate\Database\Eloquent\Model;
 
 class Service extends Model
 {
+    use Logable;
+
     public $timestamps = false;
     protected $guarded  = ['id'];
     protected $dates = ['created_at', 'updated_at'];

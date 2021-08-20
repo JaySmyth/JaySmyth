@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="table table-striped-responsive">
+<div class="table table-striped-responsive" style="font-size:small">
     <h2>IFS Web Client Defined Services</h2>
 
     @foreach($services as $depotId =>$depotCarrierServices)
@@ -27,7 +27,6 @@
                 <th class="text-center">Max Girth</th>
                 <th class="text-center">Max Customs</th>
                 <th class="text-center">Packaging</th>
-                <th class="text-center">Depot</th>
                 <th class="text-center">From Countries</th>
                 <th class="text-center">To Countries</th>
                 <th class="text-center">From PostCodes</th>
@@ -36,6 +35,7 @@
                 <th class="text-center">Cost Surch</th>
                 <th class="text-center">Def Sales</th>
                 <th class="text-center">Sales Surch</th>
+                <th class="text-center">&nbsp;</th>
             </tr>
         </thead>
         <tbody>
@@ -54,9 +54,30 @@
                 <td class="text-center">{{ $service->max_girth }}</td>
                 <td class="text-center">{{ $service->max_customs_value }}</td>
                 <td class="text-center">{{ $service->packaging_types }}</td>
-                <td class="text-center">{{ $service->depot_id }}</td>
-                <td class="text-center">{{ cleanRegex($service->sender_country_codes) }}</td>
-                <td class="text-center">{{ cleanRegex($service->recipient_country_codes) }}</td>
+                <td class="text-center">
+                    {{ substr($service->sender_country_codes, 0 ,30) }}
+                    @if (strlen($service->sender_country_codes) > 30)
+                    {{ substr($service->sender_country_codes, 30, 30) }}
+                    @endif
+                    @if (strlen($service->sender_country_codes) > 60)
+                    {{ substr($service->sender_country_codes, 60, 30) }}
+                    @endif
+                    @if (strlen($service->sender_country_codes) > 90)
+                    {{ substr($service->sender_country_codes, 90, 30) }}
+                    @endif
+                </td>
+                <td class="text-center">
+                    {{ substr($service->recipient_country_codes, 0 ,30) }}
+                    @if (strlen($service->recipient_country_codes) > 30)
+                    {{ substr($service->recipient_country_codes, 30, 30) }}
+                    @endif
+                    @if (strlen($service->recipient_country_codes) > 60)
+                    {{ substr($service->recipient_country_codes, 60, 30) }}
+                    @endif
+                    @if (strlen($service->recipient_country_codes) > 90)
+                    {{ substr($service->recipient_country_codes, 90, 30) }}
+                    @endif
+                </td>
                 <td class="text-center">{{ cleanRegex($service->sender_postcode_regex) }}</td>
                 <td class="text-center">{{ cleanRegex($service->recipient_postcode_regex) }}</td>
                 <td class="text-center">
@@ -85,6 +106,13 @@
                         None
                     @else
                         <a class="nav-link" href="{{url('/surchargedetails')}}/{{$service->sales_surcharge_id}}/0/index" class="right-border">{{ $service->sales_surcharge_id }}</a>
+                    @endif
+                </td>
+                <td>
+                    @if(Auth::user()->hasRole('ifsa'))
+                        <a class="nav-link" href="{{url('/services')}}/{{$service->id.'/edit'}}" class="right-border"><span class="fas fa-edit" aria-hidden="true"></span></a>
+                    @else
+                        &nbsp;
                     @endif
                 </td>
             </tr>

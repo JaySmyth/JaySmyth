@@ -363,6 +363,9 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
         case 'terms':
             $result = App\Models\Term::where('mode_id', $modeId)->pluck('description', 'code');
             break;
+        case 'costrates':
+            $result = App\Models\Rate::where('rate_type', 'c')->orderBy('description')->pluck('description', 'id');
+            break;
         case 'salesrates':
             $result = App\Models\Rate::where('rate_type', 's')->orderBy('description')->pluck('description', 'id');
             break;
@@ -390,6 +393,12 @@ function dropDown($dropDown, $prepend = null, $modeId = null)
             break;
         case 'surchargeCategories':
             $result = App\Models\Surcharge::select('name', 'id')->pluck('name', 'id');
+            break;
+        case 'costSurcharges':
+            $result = App\Models\Surcharge::select('name', 'id')->where('type', 'c')->pluck('name', 'id');
+            break;
+        case 'salesSurcharges':
+            $result = App\Models\Surcharge::select('name', 'id')->where('type', 's')->pluck('name', 'id');
             break;
         case 'modes':
             $result = App\Models\Mode::select('label', 'id')->pluck('label', 'id');

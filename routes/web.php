@@ -23,6 +23,8 @@ Route::post('feedback-modal', 'FeedbackController');
 
 Route::get('addresses/autocomplete', 'AddressesController@autocomplete');
 Route::post('services/available', 'ServicesController@available');
+Route::get('services/{service}/edit', 'ServicesController@edit');
+Route::patch('services/{service}', 'ServicesController@update');
 Route::get('services', 'ServicesController@index');
 Route::get('service/message/{id}', 'ServicesController@serviceMessage');
 
@@ -316,6 +318,7 @@ Route::get('reports/shipments-by-carrier/{id}', 'ReportsController@shipmentsByCa
 Route::get('reports/scanning-kpis/{id}', 'ReportsController@scanningKpis');
 Route::get('reports/label-downloads/{id}', 'ReportsController@labelDownloads');
 Route::get('reports/performance/{id}', 'ReportsController@performance');
+Route::get('reports/services/{id}', 'ReportsController@services');
 
 /*
   |--------------------------------------------------------------------------

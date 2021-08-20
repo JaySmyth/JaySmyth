@@ -21,15 +21,17 @@ class DeliveryPerformance implements ShouldQueue
 
     public $timeout = 999;
     protected $depot;
+    protected $type;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($depot)
+    public function __construct($depot, $type = "domestic")
     {
         $this->depot = $depot;
+        $this->type = $type;
     }
 
     /**
@@ -43,21 +45,16 @@ class DeliveryPerformance implements ShouldQueue
 
         // Get Data
         $depot = $this->depot;
+        $type = $this->type;
         $recipients = ['aplatt@antrim.ifsgroup.com', 'sanderton@antrim.ifsgroup.com', 'epalframan@antrim.ifsgroup.com'];
+        // $recipients = ['gmcbroom@antrim.ifsgroup.com'];
         $startDate = Carbon::now()->startOfYear()->format('Y-m-d H:i:s');
         $endDate = Carbon::now()->subDays(2)->endOfDay()->format('Y-m-d H:i:s');
-        $data = DB::select(DB::raw("
-            SELECT carrier_id, carriers.code, status_id, statuses.code, COUNT(shipments.id) AS COUNT FROM shipments
-            JOIN statuses ON statuses.id = status_id
-            JOIN carriers ON carriers.id = carrier_id
-            WHERE ship_date >= '$startDate'
-                AND ship_date <= '$endDate'
-                AND status_id IN ('3', '4', '5', '6','9', '10', '11', '20', '21')
-                AND depot_id = '$depot'
-                AND recipient_country_code in ('GB','IE')
-            GROUP BY carrier_id, status_id
-            ORDER BY carrier_id, status_id;
-        "));
+        if ($this->type == "domestic") {
+            $data = $this->getDomestic($startDate, $endDate, $depot);
+        } else {
+            $data = $this->getNonDomestic($startDate, $endDate, $depot);
+        }
 
         // Format data
         $table = [];
@@ -69,6 +66,42 @@ class DeliveryPerformance implements ShouldQueue
         }
 
         // Send report to user
-        Mail::to($recipients)->cc('gmcbroom@antrim.ifsgroup.com')->send(new \App\Mail\DeliveryPerformanceResults($depot, $table, $carriers, $startDate, $endDate));
+        Mail::to($recipients)->cc('gmcbroom@antrim.ifsgroup.com')->send(new \App\Mail\DeliveryPerformanceResults($depot, $table, $carriers, $startDate, $endDate, $type));
+    }
+
+    private function getDomestic($startDate, $endDate, $depot)
+    {
+        return DB::select(DB::raw("
+            SELECT carrier_id, carriers.code, status_id, statuses.code, COUNT(shipments.id) AS COUNT FROM shipments
+            JOIN statuses ON statuses.id = status_id
+            JOIN carriers ON carriers.id = carrier_id
+            WHERE ship_date >= '$startDate'
+            AND ship_date <= '$endDate'
+            AND status_id IN ('3', '4', '5', '6','9', '10', '11', '20', '21')
+            AND service_id not in ('4')
+            AND depot_id = '$depot'
+            AND recipient_country_code in ('GB','IE')
+            AND recipient_country_code IS NOT NULL
+            GROUP BY carrier_id, status_id
+            ORDER BY carrier_id, status_id;
+        "));
+    }
+
+    private function getNonDomestic($startDate, $endDate, $depot)
+    {
+        return DB::select(DB::raw("
+            SELECT carrier_id, carriers.code, status_id, statuses.code, COUNT(shipments.id) AS COUNT FROM shipments
+            JOIN statuses ON statuses.id = status_id
+            JOIN carriers ON carriers.id = carrier_id
+            WHERE ship_date >= '$startDate'
+            AND ship_date <= '$endDate'
+            AND status_id IN ('3', '4', '5', '6','9', '10', '11', '20', '21')
+            AND service_id not in ('4')
+            AND depot_id = '$depot'
+            AND recipient_country_code NOT IN ('GB','IE')
+            AND carrier_id not in ('1')
+            GROUP BY carrier_id, status_id
+            ORDER BY carrier_id, status_id;
+        "));
     }
 }

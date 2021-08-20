@@ -54,6 +54,30 @@ class ServicesController extends Controller
         return view('service.show', compact('service'));
     }
 
+    public function edit(Service $service, Request $request)
+    {
+        $this->authorize($service);
+
+        return view('services.edit', compact('service'));
+    }
+
+    /**
+     * Update a Service record.
+     *
+     * @param
+     * @return
+     */
+    public function update(ServiceRequest $request, Service $service)
+    {
+        $this->authorize($service);
+
+        $service->updateWithLog($request->all());
+
+        flash()->success('Updated!', 'Service updated successfully.');
+
+        return redirect('services');
+    }
+
     /**
      * @param
      * @return
