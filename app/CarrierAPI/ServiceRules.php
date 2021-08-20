@@ -375,7 +375,7 @@ class ServiceRules
 
     private function checkUk48($shipment, $serviceDetails)
     {
-        if (stripos($shipment['recipient_company_name'], 'Amazon') !== false) {
+        if (isset($shipment['recipient_company_name']) && stripos($shipment['recipient_company_name'], 'Amazon') !== false) {
             return false;
         }
 
