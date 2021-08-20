@@ -351,30 +351,19 @@ class ServiceRules
 
     private function checkIe48($shipment, $serviceDetails)
     {
-
-        /*
-         * **************************************************
-         * Applies to Fastway only
-         * Glen (NI) excluded as delivered by IFS
-         *
-         * Email From: Caroline Gordon Sent: 23-03-2017 11:49
-         * **************************************************
-         */
-        if ($serviceDetails['id'] == 3 && ($shipment['company_id'] != 550)) {
-            $packages = $shipment['packages'];
-            foreach ($packages as $package) {
-                $vol = $package['length'] * $package['width'] * $package['height'];
-                if ($vol > 179641 || $package['weight'] > 30) {
-                    return false;
-                }
-            }
-        }
-
         return true;
     }
 
     private function checkUk48($shipment, $serviceDetails)
     {
+        /*
+         * **************************************************
+         * Applies to DX - UK48 only
+         * Glen (NI) excluded as delivered by IFS
+         *
+         * Email From: Anna Platt Sent: 20-08-2021 11:14
+         * **************************************************
+         */
         if (isset($shipment['recipient_company_name']) && stripos($shipment['recipient_company_name'], 'Amazon') !== false) {
             return false;
         }
