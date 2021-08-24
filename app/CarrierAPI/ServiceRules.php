@@ -748,8 +748,12 @@ class ServiceRules
             if ($package['weight'] > $serviceDetails['max_weight']) {
                 return false;
             }
-            if (isset($package['volumetric_weight']) && $package['volumetric_weight'] > $serviceDetails['max_weight']) {
-                return false;
+
+            // Do not use volumetric weight for XDP
+            if ($serviceDetails['carrier_id'] != 16) {
+                if (isset($package['volumetric_weight']) && $package['volumetric_weight'] > $serviceDetails['max_weight']) {
+                    return false;
+                }
             }
         }
 
