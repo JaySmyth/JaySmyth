@@ -6,7 +6,7 @@
 
 <hr class="mt-1">
 
-{!! Form::model($companyService, ['method' => 'POST', 'url' => ['company-service', $companyService->company_id, $companyService->service_id], 'class' => 'form-compact', 'autocomplete' => 'off']) !!}
+{!! Form::model($companyService, ['method' => 'POST', 'url' => ['company-services', $companyService->company_id, $companyService->service_id], 'class' => 'form-compact', 'autocomplete' => 'off']) !!}
 
 {{ method_field('PATCH') }}
 
