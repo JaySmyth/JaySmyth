@@ -106,7 +106,7 @@ class UsersController extends Controller
         $user->show_search_bar = 1;
 
         // Not an IFS user, default users role to "cust"
-        if (! $request->user()->hasIfsRole()) {
+        if (! $request->user()->hasIfsRole() || ! isset($request->role_id)) {
             $request->role_id = 1;
             $request->roles = [10];
         }
