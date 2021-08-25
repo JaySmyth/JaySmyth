@@ -65,9 +65,11 @@ class Rate extends Model
                         }
                     }
 
+                    $companyService = \App\Models\CompanyService::where('company_id', $company->id)->where('service_id', $service->id)->first();
+
                     return view(
                         'rates.show_'.$tableFormat,
-                        compact('tableFormat', 'rate', 'table', 'zones', 'charges')
+                        compact('tableFormat', 'rate', 'table', 'zones', 'charges', 'companyService')
                     );
                     break;
             }

@@ -13,6 +13,13 @@
         <span>Model : </span>
         <span class="text-uppercase ">{{$rate->model}}/ Volumetric Divisor : {{$rate->volumetric_divisor}}</span>
     </div>
+    <div>
+        <h4>
+            @if (isset($companyService->country_filter) && $companyService->country_filter > '')
+            <span text-uppercase>Country Filter : {{str_replace('!', 'Not - ', $companyService->country_filter)}}<br></span>
+            @endif
+        </h4>
+    </div>
 </h2>
 <div class="clearfix"></div>
 <hr class="mb-4">
@@ -46,7 +53,7 @@
         @foreach($pieceTable as $packageType => $packageTable)
         @foreach($packageTable as $breakPoint => $tableRow)
 
-        <tr>    
+        <tr>
             <td>{{$packageType}}</td>
             <td class='text-right'>{{$breakPoint}}</td>
 
