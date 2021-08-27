@@ -118,6 +118,7 @@ class ImportPricingZones implements ShouldQueue
         // Invalid number of fields, return false
         if ($numberOfFields != count($this->fields)) {
             $this->results['rows'][$rowNumber]['errors'][] = "Invalid number of fields detected. Detected $numberOfFields fields. ".count($this->fields).'required';
+            $this->results['summary']['failed']++;
 
             return false;
         }
@@ -182,7 +183,9 @@ class ImportPricingZones implements ShouldQueue
         $row = [];
         $i = 0;
         foreach ($this->fields as $field) {
-            $row[$field] = trim($data[$i]);
+            if (isset($data[$i])) {
+                $row[$field] = trim($data[$i]);
+            }
             $i++;
         }
 
