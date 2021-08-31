@@ -24,6 +24,7 @@ class ImportDomesticZones implements ShouldQueue
     protected $row;
     protected $results;
     protected $domesticZone;
+    public $timeout = 1200;
 
     /**
      * Create a new job instance.

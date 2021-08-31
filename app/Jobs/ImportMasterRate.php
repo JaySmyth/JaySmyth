@@ -27,6 +27,7 @@ class ImportMasterRate implements ShouldQueue
     protected $fields;
     protected $row;
     protected $results;
+    public $timeout = 1200;
 
     /**
      * Create a new job instance.
