@@ -144,8 +144,8 @@ class CompanyRates extends Model
             }
 
             $rate['weight_units'] = $item->weight_units;
-            $rate['from_date'] = $item->from_date->format('Y-m-d');
-            $rate['to_date'] = $item->to_date->format('Y-m-d');
+            $rate['from_date'] = $item->from_date;
+            $rate['to_date'] = $item->to_date;
 
             $table[$item->residential][$item->piece_limit][$item->package_type][$item->break_point.$suffix][$item->zone] = $rate;
         }
