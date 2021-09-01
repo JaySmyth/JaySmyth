@@ -359,11 +359,15 @@ class ServiceRules
         /*
          * **************************************************
          * Applies to DX - UK48 only
-         * Glen (NI) excluded as delivered by IFS
          *
          * Email From: Anna Platt Sent: 20-08-2021 11:14
+         *       Recipient added 2021-09-01 - Anna Platt
          * **************************************************
          */
+        if (isset($shipment['recipient_name']) && stripos($shipment['recipient_name'], 'Amazon') !== false) {
+            return false;
+        }
+
         if (isset($shipment['recipient_company_name']) && stripos($shipment['recipient_company_name'], 'Amazon') !== false) {
             return false;
         }
