@@ -380,7 +380,6 @@ class APIController extends Controller
     private function preProcessShipment($mode = 'create')
     {
         if ($mode == 'create') {
-
             // Get Company Setting
             $carrierChoice = strtolower(Company::find($this->input['data']['company_id'])->carrier_choice);
 
@@ -391,7 +390,8 @@ class APIController extends Controller
         }
 
         // Temporary Patch for BPerfect
-        if (in_array($this->input['data']['company_id'], ['1090']) && strtoupper($this->input['data']['recipient_country_code']) != 'GB') {
+        $countryCode = strtoupper($this->input['data']['recipient_country_code']);
+        if (in_array($this->input['data']['company_id'], ['1090']) && in_array($countryCode, ["AU","US","CA"])) {
             if ($this->input['data']['weight'] <= 2.5) {
                 $pkgCount = count($this->input['data']['packages']);
                 for ($i=0; $i<$pkgCount; $i++) {
