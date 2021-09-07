@@ -391,7 +391,7 @@ class APIController extends Controller
 
         // Temporary Patch for BPerfect
         $countryCode = strtoupper($this->input['data']['recipient_country_code']);
-        if (in_array($this->input['data']['company_id'], ['1090']) && in_array($countryCode, ["AU","US","CA"])) {
+        if (in_array($this->input['data']['company_id'], ['1090'])) {
             if ($this->input['data']['weight'] <= 2.5) {
                 $pkgCount = count($this->input['data']['packages']);
                 for ($i=0; $i<$pkgCount; $i++) {
