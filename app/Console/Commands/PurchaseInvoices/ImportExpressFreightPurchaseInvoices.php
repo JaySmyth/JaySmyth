@@ -67,7 +67,9 @@ class ImportExpressFreightPurchaseInvoices extends Command
 
         $this->sftpDirectory = '/home/expressfreight/invoices/';
         $this->archiveDirectory = 'archive';
-        $this->fields = ['Invoice Number', 'Invoice Date', 'Consignment Number', 'Return', 'Dispatch Date', 'City', 'Type', 'No.', 'Description', 'Quantity', 'Weight', 'Consignee', 'Unit of Measure Code', 'Fuel Surcharge Amount', 'Line Amount Excl. VAT', 'Deferral Code', 'Consignment2', 'Post Code'];
+        $this->fields = [
+            'Invoice Number', 'Invoice Date', 'Consignment Number', 'Return', 'Dispatch Date', 'City', 'Type', 'No.', 'Description', 'Quantity', 'Weight', 'Consignee', 'Unit of Measure Code', 'Fuel Surcharge Amount', 'Line Amount Excl. VAT', 'Deferral Code', 'Consignment2', 'Post Code'
+        ];
     }
 
     /**
@@ -96,7 +98,7 @@ class ImportExpressFreightPurchaseInvoices extends Command
     /**
      * Read the file contents and insert records.
      *
-     * @param type $file
+     * @param  type  $file
      */
     private function processFile($file)
     {
@@ -107,7 +109,6 @@ class ImportExpressFreightPurchaseInvoices extends Command
 
         if (($handle = fopen($this->sftpDirectory.$file, 'r')) !== false) {
             while (($data = fgetcsv($handle, 2000, ',')) !== false) {
-
                 if ($rowNumber >= 2) {
                     $row = $this->assignFieldNames($data);
 
@@ -116,7 +117,10 @@ class ImportExpressFreightPurchaseInvoices extends Command
                     }
 
                     // Lookup shipment
-                    $shipment = \App\Models\Shipment::whereConsignmentNumber($row['Consignment Number'])->whereIn('carrier_id', [14, 15])->first();
+                    $shipment = \App\Models\Shipment::where(function ($query) use ($row) {
+                        $query->where('consignment_number', $row['Consignment Number'])
+                            ->orWhere('carrier_consignment_number', $row['Consignment Number']);
+                    })->whereIn('carrier_id', [14, 15])->first();
 
                     $purchaseInvoiceLine = new PurchaseInvoiceLine();
                     $purchaseInvoiceLine->purchase_invoice_id = $this->purchaseInvoice->id;
@@ -178,18 +182,36 @@ class ImportExpressFreightPurchaseInvoices extends Command
         }
     }
 
+    /**
+     * Read one line at a time and create an array of field names and values.
+     *
+     * @param  type  $data
+     *
+     * @return void
+     */
+    private function assignFieldNames($data)
+    {
+        $i = 0;
+        foreach ($this->fields as $field) {
+            $row[$field] = (isset($data[$i])) ? trim($data[$i]) : null;
+            $i++;
+        }
+
+        return $row;
+    }
 
     /**
      * Save and set the purchase invoice.
      *
-     * @param type $line
+     * @param  type  $line
      */
     private function createPurchaseInvoice($row)
     {
-        $invoiceNumber = (!empty($row['Invoice Number'])) ? $row['Invoice Number'] : false;
+        $invoiceNumber = (! empty($row['Invoice Number'])) ? $row['Invoice Number'] : false;
 
-        if (!$invoiceNumber) {
+        if (! $invoiceNumber) {
             $this->error("Invoice number not found - check file format.");
+
             return false;
         }
 
@@ -217,24 +239,6 @@ class ImportExpressFreightPurchaseInvoices extends Command
         $this->invoices[] = $invoiceNumber;
 
         return true;
-    }
-
-    /**
-     * Read one line at a time and create an array of field names and values.
-     *
-     * @param type $data
-     *
-     * @return void
-     */
-    private function assignFieldNames($data)
-    {
-        $i = 0;
-        foreach ($this->fields as $field) {
-            $row[$field] = (isset($data[$i])) ? trim($data[$i]) : null;
-            $i++;
-        }
-
-        return $row;
     }
 
     /**
@@ -270,7 +274,8 @@ class ImportExpressFreightPurchaseInvoices extends Command
     /**
      * Move file to archive directory.
      *
-     * @param string $file
+     * @param  string  $file
+     *
      * @return bool
      */
     public function archiveFile($file)
