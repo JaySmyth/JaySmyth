@@ -147,9 +147,12 @@ class ServiceRules
                 return $this->checkUk48($shipment, $serviceDetails);
                 break;
 
+            /*
+                * Reverted as per Anna 2021-09-10 14:30
             case 'uknc':
                 return $this->checkUknc($shipment, $serviceDetails);
                 break;
+            */
 
         }
 
