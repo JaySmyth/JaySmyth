@@ -17,7 +17,7 @@ class DXLabel extends \App\CarrierAPI\CarrierLabel
     public function create()
     {
         foreach ($this->data['packages'] as $key => $package) {
-            $this->importPageFromTemplate($this->pdf->setSourceData(base64_decode($package['label'])), -5, 25, 172, 198);
+            $this->importPageFromTemplate($this->pdf->setSourceData(base64_decode($package['label'])), -5, 22, 195, 220);
             $this->customizeLabel($key + 1);
         }
 
@@ -37,7 +37,7 @@ class DXLabel extends \App\CarrierAPI\CarrierLabel
         $y = 3;
         $this->pdf->SetFont($this->font, '', 6);
         $this->pdf->Text($x, $y, 'Sender:');
-        $this->pdf->SetFont($this->font, 'B', 7);
+        $this->pdf->SetFont($this->font, 'B', 6);
         $this->pdf->Text($x + 10, $y, strtoupper($this->shipment['sender_name']));
         $this->pdf->Text($x + 10, $y += 3, strtoupper($this->shipment['sender_company_name'] ?: $this->shipment['sender_name']));
         $this->pdf->Text($x + 10, $y += 3, strtoupper($this->shipment['sender_address1']));
