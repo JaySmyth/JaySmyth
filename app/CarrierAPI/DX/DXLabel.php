@@ -17,7 +17,7 @@ class DXLabel extends \App\CarrierAPI\CarrierLabel
     public function create()
     {
         foreach ($this->data['packages'] as $key => $package) {
-            $this->importPageFromTemplate($this->pdf->setSourceData(base64_decode($package['label'])), 0, 22, 205, 230);
+            $this->importPageFromTemplate($this->pdf->setSourceData(base64_decode($package['label'])), -5, 25, 172, 198);
             $this->customizeLabel($key + 1);
         }
 
