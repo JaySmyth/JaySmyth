@@ -147,6 +147,13 @@ class ServiceRules
                 return $this->checkUk48($shipment, $serviceDetails);
                 break;
 
+            /*
+                * Reverted as per Anna 2021-09-10 14:30
+            case 'uknc':
+                return $this->checkUknc($shipment, $serviceDetails);
+                break;
+            */
+
         }
 
         // Lithium battery check
@@ -361,6 +368,27 @@ class ServiceRules
          * Applies to DX - UK48 only
          *
          * Email From: Anna Platt Sent: 20-08-2021 11:14
+         *       Recipient added 2021-09-01 - Anna Platt
+         * **************************************************
+         */
+        if (isset($shipment['recipient_name']) && stripos($shipment['recipient_name'], 'Amazon') !== false) {
+            return false;
+        }
+
+        if (isset($shipment['recipient_company_name']) && stripos($shipment['recipient_company_name'], 'Amazon') !== false) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function checkUknc($shipment, $serviceDetails)
+    {
+        /*
+         * **************************************************
+         * Applies to XDP
+         *
+         * Email From: Anna Platt Sent: 10-09-2021 12:59
          *       Recipient added 2021-09-01 - Anna Platt
          * **************************************************
          */
