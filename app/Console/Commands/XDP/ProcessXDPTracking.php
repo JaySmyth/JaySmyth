@@ -346,7 +346,7 @@ class ProcessXDPTracking extends Command
             return $shipment->recipient_city;
         }
 
-        return 'Birmingham';
+        return 'Carrier Hub';
     }
 
     /**

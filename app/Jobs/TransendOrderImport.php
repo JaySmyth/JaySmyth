@@ -139,7 +139,7 @@ class TransendOrderImport implements ShouldQueue
                             'JobTypeCode' => $this->getJobTypeCode(),
                             'JobRef1' => $this->transportJob->number,
                             'JobRef2' => substr($this->transportJob->reference, 0, 40),
-                            'JobRef3' => ($this->shipment) ? $this->shipment->shipment_reference : $this->transportJob->scs_job_number,
+                            'JobRef3' => ($this->shipment) ? preg_replace("/[^A-Za-z0-9 ]/", '', $this->shipment->shipment_reference) : $this->transportJob->scs_job_number,
                             'JobRef4' => $this->getAccountCode(),
                             'Sequence' => 1,
                             'ExpectedPaymentAmount' => $this->transportJob->cash_on_delivery,
