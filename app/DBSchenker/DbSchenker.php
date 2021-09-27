@@ -50,52 +50,53 @@ class DbSchenker
             'errors' => []
         ];
 
+        /*
+                $this->msg = $msg;
+                $service = $this->getService();
 
-        $this->msg = $msg;
-        $service = $this->getService();
+                if (! $service || is_string($service)) {
+                    if ($service == 'Invalid login details.') {
+                        $service = 'Invalid DX account number supplied.';
+                    }
 
-        if (! $service || is_string($service)) {
-            if ($service == 'Invalid login details.') {
-                $service = 'Invalid DX account number supplied.';
-            }
+                    $reply['errors'][] = is_string($service) ? $service : 'Service unavailable. Please contact Courier.';
 
-            $reply['errors'][] = is_string($service) ? $service : 'Service unavailable. Please contact Courier.';
+                    return $reply;
+                }
 
-            return $reply;
-        }
+                // Get an IFS consignment number
+                $reply = ['ifs_consignment_number' => nextAvailable('CONSIGNMENT')];
 
-        // Get an IFS consignment number
-        $reply = ['ifs_consignment_number' => nextAvailable('CONSIGNMENT')];
+                // Make a label request for each package
+                foreach ($this->shipment['packages'] as $package) {
+                    // Build an array to send as json to DX
+                    $request = $this->getLabelRequest($reply['ifs_consignment_number'], $package, $service);
 
-        // Make a label request for each package
-        foreach ($this->shipment['packages'] as $package) {
-            // Build an array to send as json to DX
-            $request = $this->getLabelRequest($reply['ifs_consignment_number'], $package, $service);
+                    dd($request);
 
-            //dd($request);
+                    // Log the request
+                    $this->log('createLabel', 'O', json_encode($request));
 
-            // Log the request
-            $this->log('createLabel', 'O', json_encode($request));
+                    try {
+                        // Send the request and get the response
+                        $response = $this->client->post($this->url.'createLabel', ['json' => $request]);
 
-            try {
-                // Send the request and get the response
-                $response = $this->client->post($this->url.'createLabel', ['json' => $request]);
+                        // Get the response body
+                        $response = $response->getBody()->getContents();
 
-                // Get the response body
-                $response = $response->getBody()->getContents();
+                        $reply['packages'][] = json_decode($response, true);
 
-                $reply['packages'][] = json_decode($response, true);
+                        // Log the response body
+                        $this->log('REPLY', 'I', $response);
+                    } catch (GuzzleException $exception) {
+                        $error['ShipmentResponse']['Notification'][0]['Message'] = 'Problem processing shipment details. Please contact IT';
 
-                // Log the response body
-                $this->log('REPLY', 'I', $response);
-            } catch (GuzzleException $exception) {
-                $error['ShipmentResponse']['Notification'][0]['Message'] = 'Problem processing shipment details. Please contact IT';
+                        return $error;
+                    }
+                }
 
-                return $error;
-            }
-        }
-
-        return $reply;
+                return $reply;
+                */
     }
 
     /**

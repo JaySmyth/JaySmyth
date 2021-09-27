@@ -46,7 +46,7 @@ class BuildTestSeaExportTransaction extends Command
      */
     public function handle()
     {
-        $test = false;
+        $test = true;
         $errors = [];
         $bols = $this->getBols($test);
         foreach ($bols as $bol) {
@@ -112,6 +112,7 @@ class BuildTestSeaExportTransaction extends Command
         if ($errors == []) {
             $errors = $oceanMsg->validateMsg();
             $this->msg = json_encode($oceanMsg->msg);
+            dd(json_encode($this->msg));
             if ($errors == []) {
                 $result = $dbSchenker->sendMessage(json_encode($this->msg));
                 $errors = $result['errors'];
@@ -158,7 +159,7 @@ class BuildTestSeaExportTransaction extends Command
     protected function getBols($test)
     {
         if ($test) {
-            $bols = JobHdr::wherein('bill_of_lading', ['IFFSXJ00012331'])
+            $bols = JobHdr::wherein('bill_of_lading', ['IFFSXJ00012352'])
                 ->groupBy('bill_of_lading')
                 ->pluck('bill_of_lading')
                 ->toArray();
