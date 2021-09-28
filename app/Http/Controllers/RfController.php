@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class RfController extends Controller
 {
     protected $cc;
-    protected $routes = ['ADHOC', 'ROAD', 'AIR', 'SEA', 'DHL', 'EUROR', 'FEDC', 'FEDL', 'FEDF', 'NI', 'RM', 'ROI', 'TNT', 'UK1', 'UK2', 'UK24', 'XDP', 'UPS', 'US', 'EXP', 'DXL', 'XDPL'];
+    protected $routes = ['ADHOC', 'ROAD', 'AIR', 'SEA', 'DHL', 'EUROR', 'FEDC', 'FEDL', 'FEDF', 'NI', 'RM', 'ROI', 'TNT', 'UK1', 'UK2', 'UK24', 'XDP', 'UPS', 'US', 'EXP', 'DXL', 'XDPL', 'UK48RC', 'UK48RD'];
     protected $route;
     protected $data;
 
