@@ -254,8 +254,8 @@ class DomesticRate extends Model
     public function doRateUpload($companyId, $serviceId, $rateId, $stdRate, $uploadedRate, $effectiveDate = '')
     {
         // check old and new rates have same structure
-        $currentKeys = $this->buildCurrentKeys($stdRate, $companyId);
-        $uploadedKeys = $this->buildUploadedKeys($uploadedRate);
+        $currentKeys = $this->buildCurrentKeys($stdRate, $companyId) ?? [];
+        $uploadedKeys = $this->buildUploadedKeys($uploadedRate) ?? [];
         $diff = array_diff(array_keys($currentKeys), array_keys($uploadedKeys));
         if ($diff == []) {
             // Tables Match so build discounts

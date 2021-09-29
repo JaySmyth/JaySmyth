@@ -35,7 +35,7 @@ class CheckPricing extends Command
     /**
      * Shipments to be priced.
      *
-     * @var string
+     * @var object
      */
     protected $shipments;
 
@@ -70,7 +70,7 @@ class CheckPricing extends Command
     /**
      * Array of error messages.
      *
-     * @var string
+     * @var array
      */
     protected $errorMessages = [];
 

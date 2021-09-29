@@ -352,13 +352,13 @@ class RateDetail extends Model
     {
 
         // check old and new rates have same structure
-        $currentKeys = $this->buildCurrentKeys($currentRate);
-        $uploadedKeys = $this->buildUploadedKeys($uploadedRate);
+        $currentKeys = $this->buildCurrentKeys($currentRate) ?? [];
+        $uploadedKeys = $this->buildUploadedKeys($uploadedRate) ?? [];
         $diff = array_diff(array_keys($currentKeys), array_keys($uploadedKeys));
         if ($diff == []) {
 
             // Tables Match so build discounts
-            $discounts = $this->buildDiscounts($currentKeys, $uploadedKeys, $companyId, $serviceId, $effectiveDate);
+            $discounts = $this->buildDiscounts($currentKeys, $uploadedKeys, $companyId, $serviceId, $effectiveDate) ?? [];
             if ($discounts != []) {
 
                 // RateDiscount::insert($discounts);
