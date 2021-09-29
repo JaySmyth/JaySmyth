@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\CarrierAPI\Facades\CarrierAPI;
 use App\CarrierAPI\Pdf;
+use App\CarrierAPI\ServiceRules;
 use App\Exports\DimsExport;
 use App\Exports\ExceptionsExport;
 use App\Exports\ShipmentsExport;
@@ -12,6 +13,7 @@ use App\Jobs\LogScanningKpis;
 use App\Jobs\StatusUpload;
 use App\Models\Company;
 use App\Models\Mode;
+use App\Models\Service;
 use App\Models\Shipment;
 use App\Models\Tracking;
 use App\Models\TransactionLog;
@@ -84,7 +86,7 @@ class ShipmentsController extends Controller
         }
 
         // Non IFS default to a month ago
-        if (! $request->user()->hasIfsRole() && strlen($request->filter) < 5 && ! $request->date_from && ! $request->date_to && ! $request->company && ! $request->user && ! $request->scs_job_number) {
+        if (!$request->user()->hasIfsRole() && strlen($request->filter) < 5 && ! $request->date_from && ! $request->date_to && ! $request->company && ! $request->user && ! $request->scs_job_number) {
             $request->date_from = now()->subMonths(3);
         }
 
@@ -330,6 +332,50 @@ class ShipmentsController extends Controller
             return json_encode(['shipment_id' => $shipment->id, 'consignment_number' => $shipment->consignment_number]);
         }
     }
+
+    /**
+     * Check Shipment for the services available to it */
+    public function checkShipment(Request $request, $shipments) {
+
+        $service = null;
+        $serviceDropdown= [];
+        $messages = [];
+        $shipment = Shipment::find($shipments);
+        
+        if ($shipment) {
+            $companyServices = Company::find($shipment->company_id)->getServicesForMode($shipment->mode_id);
+            foreach ($companyServices as $companyService) {
+                $serviceDropdown[$companyService['id']] = $companyService['carrier_name'];
+                if (isset($request->service_id) && $companyService['id'] == $request->service_id) {
+                    $service = $companyService;
+                } 
+            }
+        } else {
+            dd($shipment);
+        }
+        
+        if ($service) {
+            
+            $serviceRules = new ServiceRules();
+            $serviceRules->returnOnFail = false;
+            
+            $shipArray = $shipment->toArray();
+            $shipArray['service_code'] = $service->code;
+            $shipArray['service_id'] = $service->id;
+            $shipArray['packages'] = $shipment->packages->toArray();
+            
+            $serviceRules->isSuitable($shipArray, $service->toArray());
+            $messages = $serviceRules->checks;
+        }
+        
+        return view("shipments.check",compact("shipment","serviceDropdown", "messages"));
+    }
+
+    public function doShipmentChecks($shipment, $service) {
+        return $messages;
+    }
+
+
 
     /**
      * Ajax call for saved shipment.
@@ -733,7 +779,7 @@ class ShipmentsController extends Controller
 
         // Validate the request
         $this->validate($request, [
-            'status_code' => 'required|in:'.implode(',', array_keys(dropdown('statusCodes'))),
+            'status_code' => 'required|in:' . implode(',', array_keys(dropdown('statusCodes'))),
             'file' => 'required'
         ], [
             'status_code.required' => 'Please select an upload profile.',
@@ -1045,6 +1091,7 @@ class ShipmentsController extends Controller
      * Save a shipment called from Vendorvillage.
      *
      * @param  Request  $request
+     * 
      */
     public function saveShipment(Request $request)
     {
@@ -1053,17 +1100,6 @@ class ShipmentsController extends Controller
         $shipment = Shipment::whereCompanyId($data['company_id'])->whereShipmentReference($data['shipment_reference'])->first();
 
         if (! $shipment) {
-            if (empty($data['user_id']) && empty($data['form_values'])) {
-                $data['user_id'] = 2;
-                $data['mode_id'] = 1;
-                $data['status_id'] = 1;
-                $data['route_id'] = 1;
-                $data['department_id'] = 1;
-                $data['carrier_id'] = 1;
-                $data['service_id'] = 1;
-                $data['form_values'] = json_encode($data);
-            }
-
             $shipment = Shipment::create($data);
 
             if ($shipment) {
