@@ -38,6 +38,7 @@ Route::delete('preferences', 'PreferencesController@resetPreferences');
   |--------------------------------------------------------------------------
  */
 Route::get('/', 'ShipmentsController@create');
+Route::match(['get', 'post'],'shipments/{shipments}/check', 'ShipmentsController@checkShipment');
 Route::get('shipments/{shipments}/cancel', 'ShipmentsController@cancel');
 Route::get('shipments/{shipments}/hold', 'ShipmentsController@hold');
 Route::get('shipments/{shipments}/receive', 'ShipmentsController@receive');
