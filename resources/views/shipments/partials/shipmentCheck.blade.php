@@ -11,7 +11,7 @@
                     
                     <div class="float-right mb-2 buttons-main button">
                         <a class="back btn btn-secondary btn-shadow text-white" role="button">Cancel</a>
-                        <button type="submit" class="ml-md-4 btn btn-primary btn-shadow">Submit</button>
+                        <button type="submit" class="ml-md-4 btn btn-primary btn-shadow">Submit</button><!--test-history-check-->
                     </div>
                     
                 </div>
