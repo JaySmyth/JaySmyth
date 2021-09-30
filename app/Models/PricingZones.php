@@ -59,11 +59,7 @@ class PricingZones extends Model
             $zone = $this->searchForZone($criteria);
         }
 
-        if (isset($zone[0])) {
-            return $zone[0];
-        } else {
-            return $zone;
-        }
+        return $zone;
     }
 
     /**
@@ -84,7 +80,7 @@ class PricingZones extends Model
             unset($parameters['recipient_postcode']);
             $zone = $this->findZones($parameters);
         }
-
+        
         // If zone not found remove sender_postcode and try again
         if ($zone->count() == 0) {
             $parameters = $data;
@@ -100,7 +96,6 @@ class PricingZones extends Model
             $zone = $this->findZones($parameters);
         }
 
-        // Nothing found so return null
         return $zone;
     }
 
@@ -127,7 +122,7 @@ class PricingZones extends Model
             }
         }
 
-        return $query->orderBy('company_id', 'DESC')->orderBy('from_sender_postcode')->orderBy('from_recipient_postcode')->get();
+        return $query->orderBy('company_id', 'DESC')->orderBy('from_sender_postcode')->orderBy('from_recipient_postcode')->first();
     }
 
     public function download($modelId, $serviceCode, $reqDate = '', $download = true)

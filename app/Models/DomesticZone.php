@@ -1,28 +1,27 @@
 <?php
 
- namespace App\Models;
+namespace App\Models;
 
- use App\Exports\DomesticZonesExport;
- use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\DomesticZonesExport;
+use Maatwebsite\Excel\Facades\Excel;
 
- use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model;
 
- class DomesticZone extends Model
- {
-     protected $guarded = ['id'];
+class DomesticZone extends Model
+{
+    protected $guarded = ['id'];
 
-     public function getZone($shipment, $model="1", $isReturn = false)
-     {
-         $models = ['1' => 'fedex', '7' => 'XDP'];
-         $zone = '';
-         $postcode = '';
-         $postCodeFound = false;
+    public function getZone($shipment, $model = "dx", $isReturn = false)
+    {
+        $zone = '';
+        $postcode = '';
+        $postCodeFound = false;
 
-         // Decide which postcode to use to identify zone
-         $zonePostcode = ($isReturn) ? $shipment['sender_postcode'] : $shipment['recipient_postcode'];
-         $postcode = trim($zonePostcode) ?? '';
+        // Decide which postcode to use to identify zone
+        $zonePostcode = ($isReturn) ? $shipment['sender_postcode'] : $shipment['recipient_postcode'];
+        $postcode = trim($zonePostcode) ?? '';
 
-         // Remove all extraneous chars and compare against FedexUK DB
+        // Remove all extraneous chars and compare against FedexUK DB
         $newPostCode = preg_replace('/\s+/', ' ', $postcode); // Replace multiple spaces
         $newPostCode = trim($newPostCode); // Remove Leading and trailing spaces
         $newPostCode = preg_replace('/[^A-Za-z0-9 ]/', '', $newPostCode); // Replace invalid characters
@@ -35,9 +34,9 @@
 
                 // Must have at least 1 Char
                 $zone = self::where('postcode', '=', substr($newPostCode, 0, $l))
-                              ->where('model', $models[$model])
-                              ->first();
-                if (! empty($zone)) {
+                    ->where('model', $model)
+                    ->first();
+                if (!empty($zone)) {
                     $postCodeFound = true;
 
                     return $zone->zone;
@@ -46,27 +45,29 @@
                 }
             }
         }
-     }
 
-     public function download($model, $download = true)
-     {
-         $data = DomesticZone::select('postcode', 'zone', 'model', 'sla')
-                ->where('model', $model)
-                ->orderBy('model')
-                ->orderBy('postcode')
-                ->orderBy('zone')
-                ->get()
-                ->toArray();
+        return 'none';
+    }
 
-         if (! empty($data)) {
-             if ($download) {
-                 return Excel::download(
-                     new DomesticZonesExport($data),
-                     ucfirst($model).'_Zones.csv'
-                 );
-             } else {
-                 return $data;
-             }
-         }
-     }
- }
+    public function download($model, $download = true)
+    {
+        $data = DomesticZone::select('postcode', 'zone', 'model', 'sla')
+            ->where('model', $model)
+            ->orderBy('model')
+            ->orderBy('postcode')
+            ->orderBy('zone')
+            ->get()
+            ->toArray();
+
+        if (!empty($data)) {
+            if ($download) {
+                return Excel::download(
+                    new DomesticZonesExport($data),
+                    ucfirst($model) . '_Zones.csv'
+                );
+            } else {
+                return $data;
+            }
+        }
+    }
+}

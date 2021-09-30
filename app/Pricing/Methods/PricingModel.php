@@ -217,7 +217,7 @@ class PricingModel
         $pricingZones = new PricingZones();
 
         // Get appropriate zone for the rate model
-        $this->log('Find Zone using '.$this->model, [
+        $this->log('Find Zone using model '.$this->model, [
             'sender_country_code'    => $this->shipment['sender_country_code'],
             'sender_country_code'    => $this->shipment['sender_country_code'],
             'sender_postcode'        => $this->shipment['sender_postcode'],
@@ -228,11 +228,13 @@ class PricingModel
 
         $zoneType = ($this->priceType == 'Sales') ? 'sale_zone' : 'cost_zone';
         $zone = $pricingZones->getZone($this->shipment, $this->model);
-        if ($zone) {
+        if (isset($zone->$zoneType)) {
             $this->zone = (isset($zone->$zoneType)) ? $zone->$zoneType : null;
             $this->log('Using '.$this->priceType.' Zone: '.$this->zone);
 
             return;
+        } else {
+            $this->zone = null;
         }
 
         $error = 'Unable to identify '.$this->priceType.' Zone';
@@ -286,6 +288,9 @@ class PricingModel
 
         $this->calcChargeableWeights();
 
+        // Temp change for testing.
+        // $this->chargeableWeight = ($this->service->carrier_id == 16) ? $this->shipment['weight'] : max($this->shipment['weight'], $this->shipment['volumetric_weight']);
+        // $this->chargeableWeight = $this->shipment['weight'];
         $this->chargeableWeight = max($this->shipment['weight'], $this->shipment['volumetric_weight']);
         $this->log('Calc Chargeable Weight', [
             'Act Wgt: ' => $this->shipment['weight'],
@@ -795,7 +800,7 @@ class PricingModel
         if (isset($package['length']) && isset($package['width']) && isset($package['height'])) {
             $girth = $package['length'] + ($package['width'] + $package['height']) * 2;
 
-            $this->log("Girth: ".$girth."LPS Girth: ".$this->lowerMaxGirth);
+            $this->log("Girth: ".$girth." LPS Allowed Girth: ".$this->lowerMaxGirth);
             if ($girth > $this->lowerMaxGirth && $girth <= $this->upperMaxGirth) {
                 return true;
             }
@@ -911,7 +916,7 @@ class PricingModel
             $result = ['charge' => 0, 'break_point' => 0];
             $charge = [
                 'code' => 'FRT',
-                'description' => $this->shipment['pieces'].' '.$packagingType.' to Area '.strtoupper($this->zone),
+                'description' => $this->shipment['pieces'].' '.$packagingType.' to Area '.strtoupper($this->zone ?? 'unknown'),
                 'value' => 0
             ];
 

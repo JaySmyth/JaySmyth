@@ -8,6 +8,7 @@
 
 namespace App\Pricing\Methods;
 
+use App\Models\Carrier;
 use App\Models\CarrierPackagingType;
 use App\Models\Company;
 use App\Models\DomesticRate;
@@ -44,51 +45,40 @@ class Domestic extends PricingModel
         parent::__construct();
         $this->pricingZones = new DomesticZone;
         $this->fedexEas = new \App\Models\FedexEas();
-        $this->model = 1;
+        $this->model = 'dx';
     }
 
     public function getZone()
     {
-        $domesticZones = new DomesticZone();
-        switch (strtolower($this->shipment['service_code'])) {
 
-            case 'uk24':
-            case 'uk24r':
-            case 'uk48':
-            case 'uk48m':
-            case 'uk48s':
-            case 'uk48r':
-            case 'uk48p':
-            case 'uknc':
-            case 'gb24':
-            case 'gb24f':
-                $this->zone = $domesticZones->getZone($this->shipment, $this->model, $this->isReturn());
-                $this->costsRequired = 'Y';
-                break;
+        $this->zone = 0;
+        $this->costsRequired = 'Y';
+        $this->model = Carrier::find($this->shipment['carrier_id'])->code ?? 'dx';
 
-            case 'ni48':
-            case 'ni24':
-            case 'ni48p':
-            case 'ni24p':
-                if (strtoupper(substr($this->shipment['recipient_postcode'], 0, 2)) == 'BT') {
-                    $this->zone = 'ni';
-                    $this->costsRequired = 'N';
-                }
-                break;
-            case 'ie24':
-            case 'ie48':
-            case 'ie48p':
-                if (strtoupper($this->shipment['recipient_country_code']) == 'IE') {
-                    $this->zone = 'ie';
-                    $this->costsRequired = '0';
-                }
-                break;
-
-            default:
-                $this->zone = 0;
-                $requireCosts = 'Y';
-                $this->response['errors'][] = 'Unknown Service';
+        // Check for NI service
+        if (substr(strtoupper($this->shipment['recipient_postcode']), 0, 2) == 'BT') {
+            $this->zone = 'ni';
+            $this->costsRequired = 'N';
+            return;
         }
+        // Check for ROI service
+        if (strtoupper($this->shipment['recipient_country_code']) == 'IE') {
+            $this->zone = 'ie';
+            $this->costsRequired = 'N';
+
+            return;
+        }
+
+        // Get any other zones
+        if ($this->rate['id'] == 1042) {
+            $this->zone = $this->pricingZones->getZone($this->shipment, 'fedex', $this->isReturn());
+        } else {
+            $this->zone = $this->pricingZones->getZone($this->shipment, $this->model, $this->isReturn());
+        }
+
+        // $this->response['errors'][] = 'Unknown Service';
+
+        return;
     }
 
     public function getPackageRate($packageType)
@@ -110,14 +100,14 @@ class Domestic extends PricingModel
             $this->rateDetail = $rateDetail;
         } else {
             // Create error response
-            $this->response['errors'][] = 'No '.$this->priceType.' rate/ current rate found';
-            $this->response['errors'][] = 'Rate Id : '.$this->rate['id']
-                    .' Company Id : '.$this->shipment['company_id']
-                    .' Service Code : '.$this->shipment['service_code']
-                    .' Packaging : '.$packageType
-                    .' Zone : '.$this->zone
-                    .' Pieces : '.$this->shipment['pieces']
-                    .' Weight : '.$this->chargeableWeight;
+            $this->response['errors'][] = 'No ' . $this->priceType . ' rate/ current rate found';
+            $this->response['errors'][] = 'Rate Id : ' . $this->rate['id']
+                . ' Company Id : ' . $this->shipment['company_id']
+                . ' Service Code : ' . $this->shipment['service_code']
+                . ' Packaging : ' . $packageType
+                . ' Zone : ' . $this->zone
+                . ' Pieces : ' . $this->shipment['pieces']
+                . ' Weight : ' . $this->chargeableWeight;
         }
     }
 
@@ -134,51 +124,58 @@ class Domestic extends PricingModel
 
             $this->setPackageType($packageCode);
 
-            $this->log($pieces.' x '.$this->packagingType.' '.$chargeableWeight.' kgs Charged');
+            $this->log($pieces . ' x ' . $this->packagingType . ' ' . $chargeableWeight . ' kgs Charged');
 
             $charge['code'] = 'FRT';
-            $charge['description'] = "$pieces $this->packagingType(s) to Area ".strtoupper($this->zone);
+            $charge['description'] = "$pieces $this->packagingType(s) to Area " . strtoupper($this->zone ?? 'unknown');
             $charge['value'] = 0;
 
             // Get Rate for this package
             $this->getPackageRate($this->packagingType);
-            $this->log('Packaging Type: '.$this->packagingType);
+            $this->log('Packaging Type: ' . $this->packagingType);
+            if ($this->rateDetail) {
+                $this->log('Rate: 1st: ' . $this->rateDetail->first ?? 'undef');
+                $this->log('Rate: Subs: ' . $this->rateDetail->others ?? 'undef');
+                $this->log('Rate: Not: ' . $this->rateDetail->notional_weight ?? 'undef');
+            } else {
+                $this->log('Rate Detail not found');
+            }
 
             if (isset($this->rateDetail->first) && isset($this->rateDetail->others) && isset($this->rateDetail->notional_weight)) {
-                $this->log('Calc Charge for 1st Piece of '.$pieces);
+                $this->log('Calc Charge for 1st Piece of ' . $pieces);
 
                 // Calc Charge for 1st piece
                 if ($this->rateDetail->first > 0) {
                     $charge['value'] = round($this->rateDetail->first, 2);
-                    $this->log('First Piece: '.round($this->rateDetail->first, 2));
+                    $this->log('First Piece: ' . round($this->rateDetail->first, 2));
                 }
 
                 // Calc charge for any additional pieces
                 if ($pieces > 1) {
                     $charge['value'] += round(($pieces - 1) * round($this->rateDetail->others, 2), 2);
-                    $this->log('Subs Pieces: '.round(($pieces - 1) * round($this->rateDetail->others, 2), 2));
+                    $this->log('Subs Pieces: ' . round(($pieces - 1) * round($this->rateDetail->others, 2), 2));
                 }
 
                 // Rate has notional package charge so check to see if it applies
                 if (isset($this->rateDetail->notional_weight) && $this->rateDetail->notional_weight > 0) {
-                    $this->log('Calc Notional Pkg: '.$this->rateDetail->notional_weight);
+                    $this->log('Calc Notional Pkg: ' . $this->rateDetail->notional_weight);
                     // Calculate how many notional packages there are and price accordingly
                     $notionalPackages = ceil($chargeableWeight / round($this->rateDetail->notional_weight, 2)) - $pieces;
-                    $this->log($notionalPackages.' Notional Pkg(s) found ');
+                    $this->log($notionalPackages . ' Notional Pkg(s) found ');
                     if ($notionalPackages > 0) {
-                        $this->log('Rate: '.json_encode($this->rateDetail));
+                        $this->log('Rate: ' . json_encode($this->rateDetail));
                         if ($this->rateDetail->notional > 0) {
 
                             // Price notional packages
                             $charge['value'] += round($notionalPackages * round($this->rateDetail->notional, 2), 2);
-                            $this->log('Notional: '.round($notionalPackages * round($this->rateDetail->notional, 2), 2));
+                            $this->log('Notional: ' . round($notionalPackages * round($this->rateDetail->notional, 2), 2));
                         } // else {
 
-                            // Notional rate missing, so error out unless company_id == 550
-                            // if ($this->shipment['company_id'] != 550) {
-                            //     $okToPrice = false;
-                            //     $this->log("Error - No Notional rate defined");
-                            // }
+                        // Notional rate missing, so error out unless company_id == 550
+                        // if ($this->shipment['company_id'] != 550) {
+                        //     $okToPrice = false;
+                        //     $this->log("Error - No Notional rate defined");
+                        // }
                         // }
                     }
                 }
@@ -257,9 +254,9 @@ class Domestic extends PricingModel
 
         // Get Package Type details
         $packageType = Company::find($this->shipment['company_id'])
-                ->getPackagingTypes($this->shipment['mode_id'])
-                ->where('code', $packageCode)
-                ->first();
+            ->getPackagingTypes($this->shipment['mode_id'])
+            ->where('code', $packageCode)
+            ->first();
 
         if ($packageType) {
 
@@ -276,8 +273,8 @@ class Domestic extends PricingModel
              */
             if ($this->priceType == 'Costs' || $packageType->company_id == 0) {
                 $carrierPackageType = CarrierPackagingType::where('packaging_type_id', $packageType->packaging_type_id)
-                        ->where('carrier_id', $this->shipment['carrier_id'])
-                        ->first();
+                    ->where('carrier_id', $this->shipment['carrier_id'])
+                    ->first();
 
                 if ($carrierPackageType) {
                     $this->packagingType = $carrierPackageType->rate_code;
@@ -322,7 +319,7 @@ class Domestic extends PricingModel
          * *************************************
          */
 
-        if (! in_array($this->shipment['service_code'], ['ni24', 'ni48', 'ie24', 'ie48', 'uk48'])) {
+        if (!in_array($this->shipment['service_code'], ['ni24', 'ni48', 'ie24', 'ie48', 'uk48'])) {
             if ($this->shipment['recipient_type'] == 'r') {
                 return true;
             }
@@ -389,12 +386,12 @@ class Domestic extends PricingModel
         switch ($serviceCode) {
             case 'uk48m':
                 return $this->isReturn();
-            break;
+                break;
 
             case 'uk48r':
                 // UK mainland Returns to UK Mainland Customer
                 return true;
-            break;
+                break;
         }
 
         return false;

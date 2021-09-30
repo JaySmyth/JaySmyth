@@ -36,7 +36,7 @@ use Carbon\Carbon;
  */
 class Pricing
 {
-    private $service = '';
+    private $service;
     private $serviceId;
     private $costs;
     private $sales;
@@ -61,7 +61,7 @@ class Pricing
     public function load($id)
     {
         $shipmentArray = Shipment::find($id)->toArray();
-        if (! empty($shipmentArray)) {
+        if (!empty($shipmentArray)) {
             $shipmentArray['packages'] = Package::where('shipment_id', $id)->get()->toArray();
 
             return $this->price($shipmentArray, $shipmentArray['service_id']);
@@ -207,9 +207,12 @@ class Pricing
         }
         $response['errors'] = $errors;
 
+        // dump($this->log);
+        //dd($errors);
+
         if ($this->debug) {
             $response['Pricinglog'] = $this->log;
-            mail('debug@antrim.ifsgroup.com', 'Pricing Analysis - Errors', json_encode($errors).'/n'.json_encode($this->log));
+            mail('debug@antrim.ifsgroup.com', 'Pricing Analysis - Errors', json_encode($errors) . '/n' . json_encode($this->log));
         }
 
         return $response;
@@ -221,33 +224,33 @@ class Pricing
         // Build appropriate Model
         switch (strtolower($model)) {
 
-            /*
+                /*
              * *********************
              *  Choose Pricing model
              * *********************
              */
+            case 'cwide':
+                $this->model = new \App\Pricing\Methods\CountryWide($this->debug);
+                break;
+
             case 'domestic':
                 $this->model = new \App\Pricing\Methods\Domestic($this->debug);
-                break;
-
-            case 'fedex':
-                $this->model = new \App\Pricing\Methods\FedexIntl($this->debug);
-                break;
-
-            case 'ups':
-                $this->model = new \App\Pricing\Methods\Ups($this->debug);
-                break;
-
-            case 'tnt':
-                $this->model = new \App\Pricing\Methods\Tnt($this->debug);
                 break;
 
             case 'dhl':
                 $this->model = new \App\Pricing\Methods\Dhl($this->debug);
                 break;
 
-            case 'cwide':
-                $this->model = new \App\Pricing\Methods\CountryWide($this->debug);
+            case 'fedex':
+                $this->model = new \App\Pricing\Methods\FedexIntl($this->debug);
+                break;
+
+            case 'tnt':
+                $this->model = new \App\Pricing\Methods\Tnt($this->debug);
+                break;
+
+            case 'ups':
+                $this->model = new \App\Pricing\Methods\Ups($this->debug);
                 break;
 
             case 'xdp':
@@ -268,7 +271,7 @@ class Pricing
         // Get Cost Rate - No Fuel Cap on costs
         $this->costRate = Company::find($this->shipment['company_id'])->costRateForService($this->shipment['service_id']);
         $this->costRate['fuel_cap'] = 999;
-        $this->log('Fuel Cap: '.$this->costRate['fuel_cap']);
+        $this->log('Fuel Cap: ' . $this->costRate['fuel_cap']);
 
         // Price Shipment
         $this->costs = $this->getPrice($this->costRate, 'Costs');
