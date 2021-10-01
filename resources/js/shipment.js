@@ -109,6 +109,7 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
 
     $("#sender_postcode, #recipient_postcode").change(function () {
         isUkDomestic();
+        setDomestic();
     });
 
     $("#bill_shipping").change(function () {
@@ -870,6 +871,11 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
         // Within UK
         if (senderCountryCode == "GB" && recipientCountryCode == "GB") {
 
+            // Shipment to Jersey/Guernsey
+            if (recipientPostcode.startsWith("JE") || recipientPostcode.startsWith("GY")) {
+                return false;
+            }
+
             // NI to NI
             if (senderPostcode.startsWith("BT") && recipientPostcode.startsWith("BT")) {
                 return true;
@@ -894,8 +900,14 @@ if (path.indexOf("/shipments") != -1 || path === '/') {
 
     function isDomestic() {
 
-        var senderCountryCode = $('#sender_country_code').val();
-        var recipientCountryCode = $('#recipient_country_code').val();
+        var senderCountryCode = $('#sender_country_code').val().toUpperCase();
+        var recipientPostcode = $('#recipient_postcode').val().toUpperCase();
+        var recipientCountryCode = $('#recipient_country_code').val().toUpperCase();
+
+        // Shipment to Jersey/Guernsey
+        if (recipientPostcode.startsWith("JE") || recipientPostcode.startsWith("GY")) {
+            return false;
+        }
 
         if (senderCountryCode == recipientCountryCode) {
             return true;
