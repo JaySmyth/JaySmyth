@@ -11,10 +11,8 @@
 namespace App\Pricing\Methods;
 
 use App\Models\DomesticZone;
-use App\Models\XdpEas;
-use App\Models\CongestionPostcode;
 
-class Xdp extends PricingModel
+class Dx extends PricingModel
 {
     /*
      * *************************************
@@ -47,29 +45,6 @@ class Xdp extends PricingModel
     public function getZone()
     {
         $domesticZones = new DomesticZone();
-        $this->zone = $domesticZones->getZone($this->shipment, 'xdp', $this->isReturn());
-    }
-
-    public function isOOA()
-    {
-        $eas = new XdpEas();
-
-        return $eas->isOutOfArea($this->shipment['recipient_postcode']);
-    }
-
-    /**
-     * Returns true if this is a large package shipment.
-     */
-    public function isLPSPackage($package)
-    {
-        return false;
-    }
-
-    // Is in a congested postcode
-    public function isCON()
-    {
-        $congestionPostcodes = new CongestionPostcode();
-
-        return $congestionPostcodes->isCongested($this->shipment['recipient_postcode']);
+        $this->zone = $domesticZones->getZone($this->shipment, 'dx', $this->isReturn());
     }
 }

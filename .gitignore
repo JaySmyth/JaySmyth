@@ -11,3 +11,5 @@ public/css
 public/js
 public/images/vendor
 public/mix-manifest.json
+php.ini
+Dockerfile
