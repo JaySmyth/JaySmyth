@@ -1077,6 +1077,8 @@ class ShipmentsController extends Controller
                 $shipment->save();
 
                 return response()->json($shipment, 201);
+            } else {
+                return response()->json(['error' => ['message' => 'Failed to create shipment']], 404);
             }
         }
 
