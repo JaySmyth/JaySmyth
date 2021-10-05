@@ -58,6 +58,10 @@ class ShipmentWarning extends Mailable
                 $subject = 'Loss Making Shipment';
                 break;
 
+            case 'reset':
+                $subject = 'Shipment Reset';
+                break;
+
             case 'ship_reason':
                 $subject = 'Non standard ship reason detected ('.$this->shipment->ship_reason.')';
                 break;

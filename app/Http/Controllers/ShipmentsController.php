@@ -25,6 +25,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
@@ -1348,6 +1349,7 @@ class ShipmentsController extends Controller
         // Notify user and redirect
         flash()->info('Shipment Reset!');
 
+        Mail::to(['aplatt@antrim.ifsgroup.com', 'courieruk@antrim.ifsgroup.com'])->queue(new \App\Mail\ShipmentWarning($shipment, 'reset'));
 
         if ($request->redirect) {
             return redirect($request->redirect)->with('token', $shipment->token);
