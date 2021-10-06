@@ -7,10 +7,13 @@ use App\Models\Company;
 use App\Models\Service;
 use App\Models\ServiceMessage;
 use Auth;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Illuminate\View\View;
 use Response;
 
@@ -139,5 +142,39 @@ class ServicesController extends Controller
                 return response()->json($reply);
             }
         }
+    }
+
+    /**
+     * Show edit form.
+     *
+     * @param  Service  $service
+     * @param  Request  $request
+     *
+     * @return Factory|Application|View
+     * @throws AuthorizationException
+     */
+    public function edit(Service $service, Request $request)
+    {
+        $this->authorize($service);
+
+        return view('services.edit', compact('service'));
+    }
+
+
+    /**
+     * Update a Service record.
+     *
+     * @return Application|RedirectResponse|Redirector
+     * @throws AuthorizationException
+     */
+    public function update(ServiceRequest $request, Service $service)
+    {
+        $this->authorize($service);
+
+        $service->updateWithLog($request->all());
+
+        flash()->success('Updated!', 'Service updated successfully.');
+
+        return redirect('services');
     }
 }
