@@ -24,10 +24,11 @@ class ServiceRules
 {
     public $debug = false;
     public $eol = "\n";
+    public $checks = [];
+    public $returnOnFail = true;
 
     public function isSuitable($shipment, $serviceDetails)
     {
-
         // Do we need to set the debug flag
         if (isset($shipment['debug']) && $shipment['debug'] == 'true') {
             $this->debug = true;
@@ -35,12 +36,18 @@ class ServiceRules
 
         // Check Sender country code present
         if (! isset($shipment['sender_country_code']) || empty($shipment['sender_country_code'])) {
+            $this->checks[] = "Failed - The Sender country code is not present";
             return false;
+        } else {
+            $this->checks[] = "Success - The Sender country code was provided";
         }
 
         // Check Recipient country code present
         if (! isset($shipment['recipient_country_code']) || empty($shipment['recipient_country_code'])) {
+            $this->checks[] = "Failed - The Recipient country code is not present";
             return false;
+        } else {
+            $this->checks[] = "Success - The Recipient country code was provided";
         }
 
         // Do any PreProcessing Required
@@ -54,7 +61,6 @@ class ServiceRules
             $msg = ($result) ? ' suitable' : ' not suitable';
             echo 'Service '.$serviceDetails['code'].$msg.$this->eol;
         }
-
         return $result;
     }
 
@@ -103,22 +109,34 @@ class ServiceRules
 
         // Check Service valid for this customer to this country
         if (! $this->country_filter($shipment, $serviceDetails)) {
+            $this->checks[] = "Failed - The service selected is not able to ship to this country";
             return false;
+        } else {
+            $this->checks[] = "Success - The service selected is able to ship to this country";
         }
 
         // Check service rules
         if (! $this->checkServiceRules($shipment, $serviceDetails)) {
+            $this->checks[] = "Failed - There is an issue with the service rules";
             return false;
+        }  else {
+            $this->checks[] = "Success - Service rules passed";
         }
 
         // Check Grouped tests
         if (! $this->checkGroupedTests($shipment, $serviceDetails)) {
+            $this->checks[] = "Failed - Check grouped tests";
             return false;
+        }  else {
+            $this->checks[] = "Success - Grouped tests passed";
         }
 
         // Check Service Specific tests
         if (! $this->serviceSpecificChecks($shipment, $serviceDetails)) {
+            $this->checks[] = "Failed - Service specific tests failed";
             return false;
+        }  else {
+            $this->checks[] = "Success - Service specific tests passed";
         }
 
         return true;
@@ -209,6 +227,8 @@ class ServiceRules
 
     private function checkServiceRules($shipment, $serviceDetails)
     {
+        
+        $passed = true;
 
         // Output Debuging info if required
         if ($this->debug) {
@@ -220,7 +240,8 @@ class ServiceRules
         }
 
         // Fields to check
-        $checklist = ['carrier_code', 'code', 'sender_country_codes', 'recipient_country_codes', 'sender_postcode_regex', 'recipient_postcode_regex', 'packaging_types', 'min_weight', 'max_weight', 'max_pieces', 'max_dimension', 'max_girth', 'max_customs_value', 'hazardous',
+        $checklist = ['carrier_code', 'code', 'sender_country_codes', 'recipient_country_codes', 'sender_postcode_regex', 'recipient_postcode_regex', 'packaging_types',
+            'min_weight', 'max_weight', 'max_pieces', 'max_dimension', 'max_girth', 'max_customs_value', 'hazardous',
             'dry_ice', 'alcohol', 'broker', 'eu', 'non_eu', 'account_number_regex'];
 
         foreach ($checklist as $test) {
@@ -239,7 +260,10 @@ class ServiceRules
                         echo 'Not Suitable'.$this->eol;
                     }
 
-                    return false;
+                    $passed  = false;
+                    if ($this->returnOnFail) {
+                        return $passed;
+                    }
                 }
             }
         }
@@ -249,7 +273,7 @@ class ServiceRules
             return false;
         }
 
-        return true;
+        return $passed;
     }
 
     private function isServiceHeld($shipment, $serviceDetails)
@@ -408,12 +432,16 @@ class ServiceRules
         $result = true;
 
         if ($shipment['carrier_code'] > '' && $shipment['carrier_code'] != 'cost' && $shipment['carrier_code'] != 'price') {
+            //dd($shipment['carrier_code']);
             $carrier_id = Carrier::where('code', $shipment['carrier_code'])->first()->id;
+            
             if ($serviceDetails['carrier_id'] != $carrier_id) {
+                $this->checks[] = "Failed - The carrier selected does not match the customers selection!";
                 $result = false;
+            } else {
+                $this->checks[] = "Success - Carrier ID has matched to the customers selection";
             }
         }
-
         return $result;
     }
 
@@ -425,19 +453,25 @@ class ServiceRules
 
     private function code($shipment, $serviceDetails)
     {
+        
         $result = true;
-
         if (isset($shipment['service_code']) && $shipment['service_code'] > '') {
             if ($this->debug) {
                 echo 'Checking Code : |', $shipment['service_code'], '| ServiceDetails Code : |', $serviceDetails['code'].'|'.$this->eol;
-            }
+                }
             $result = false;
             if (strcasecmp($shipment['service_code'], $serviceDetails['code']) == 0) {
                 if ($this->debug) {
                     echo 'Result : True'.$this->eol;
                 }
+                $this->checks[] = "Success - Shipment service code and the Service code provided match";
                 $result = true;
+            } else {
+                $this->checks[] = "Failed - Shipment service code and the service code provided do not match";
+                echo $shipment['service_code'] . $serviceDetails['code'];
             }
+        } else {
+            $this->checks[] = "Failed - Shipment service code is not present";
         }
 
         return $result;
@@ -460,9 +494,10 @@ class ServiceRules
             if ($this->debug) {
                 echo 'Failed'.$this->eol;
             }
-
+            $this->checks[] = "Failed - This shipment has been designated for the EU and further checks should be carried out";
             return false;
         } else {
+            $this->checks[] = "Success - This shipment has been designated for the EU";
             return true;
         }
     }
@@ -487,7 +522,6 @@ class ServiceRules
             if ($this->debug) {
                 echo 'fn isEuShipment - failed'.$this->eol;
             }
-
             return false;
         }
     }
@@ -522,9 +556,10 @@ class ServiceRules
             if ($this->debug) {
                 echo 'fn non_eu - failed'.$this->eol;
             }
-
+            $this->checks[] = "Failed - This Service has been designated Non-EU and should be investigated further"; 
             return false;
         } else {
+            $this->checks[] = "Success - This shipment has passed Non-EU checks"; 
             return true;
         }
     }
@@ -555,7 +590,14 @@ class ServiceRules
 
     private function sender_country_codes($shipment, $serviceDetails)
     {
-        return $this->checkCountry($shipment['sender_country_code'], $serviceDetails['sender_country_codes']);
+        $result = $this->checkCountry($shipment['sender_country_code'], $serviceDetails['sender_country_codes']);
+        if ($result) {
+            $this->checks[] = "Success - Sender country code against Shipment code check is OK";
+            return $result;
+        } else {
+            $this->checks[] = "Failed - Sender country code and service country code do not match";
+            return $result;
+        }
     }
 
     /*
@@ -593,17 +635,38 @@ class ServiceRules
 
     private function recipient_country_codes($shipment, $serviceDetails)
     {
-        return $this->checkCountry($shipment['recipient_country_code'], $serviceDetails['recipient_country_codes']);
+        $result = $this->checkCountry($shipment['recipient_country_code'], $serviceDetails['recipient_country_codes']);
+        if ($result) {
+            $this->checks[] = "Success - The Recipient country code checks returned correct";
+            return $result;
+        } else {
+            $this->checks[] = "Failed - Recipient country code and service country code do not match";
+            return $result;
+        }
     }
 
     private function sender_postcode_regex($shipment, $serviceDetails)
     {
-        return preg_match($serviceDetails['sender_postcode_regex'], $shipment['sender_postcode']);
+        $result = preg_match($serviceDetails['sender_postcode_regex'], $shipment['sender_postcode']);
+        if ($result) {
+            $this->checks[] = "Success - The senders postcode matches to the service provided";
+            return $result;
+        } else {
+            $this->checks[] = "Failed - The senders postcode is not valid for the service provided";
+            return $result;
+        }
     }
 
     private function recipient_postcode_regex($shipment, $serviceDetails)
     {
-        return preg_match($serviceDetails['recipient_postcode_regex'], $shipment['recipient_postcode'] ?? '');
+        $result = preg_match($serviceDetails['recipient_postcode_regex'], $shipment['recipient_postcode'] ?? '');
+        if ($result) {
+            $this->checks[] = "Success - The recipients postcode matches to the service provided";
+            return $result;
+        } else {
+            $this->checks[] = "Failed - The recipients postcode is not valid for the service provided";
+            return $result;
+        }
     }
 
     private function account_number_regex($shipment, $serviceDetails)
@@ -617,11 +680,12 @@ class ServiceRules
         if (strlen($shipment['bill_shipping_account']) > 0 && strlen($shipment['bill_tax_duty_account']) == 0) {
             $shipAcctOk = preg_match($serviceDetails['account_number_regex'], $shipment['bill_shipping_account']);
             if ($shipAcctOk) {
-
+                $this->checks[] = "Success - Bill shipping is a valid format";
                 // If Fedex and Sender pays Freight make sure it is one of our account numbers
                 if ($shipment['bill_shipping'] == 'shipper' && $shipment['carrier_id'] == '2') {
                     $service = Service::where('account', $shipment['bill_shipping_account'])->first();
                     if (empty($service)) {
+                        $this->checks[] = "Failed - Must be a known Fedex account";
                         $shipAcctOk = false;
                     }
                 }
@@ -632,11 +696,23 @@ class ServiceRules
 
         // If only Duty/ Vat account number provided
         if (strlen($shipment['bill_tax_duty_account']) > 0 && strlen($shipment['bill_shipping_account']) == 0) {
-            return preg_match($serviceDetails['account_number_regex'], $shipment['bill_tax_duty_account']);
+            $result = preg_match($serviceDetails['account_number_regex'], $shipment['bill_tax_duty_account']);
+            if ($result){
+                $this->checks[] = "Success - Duty VAT account is correct format";
+            } else {
+                $this->checks[] = "Failed - Duty VAT account is incorrect format";
+            }
+            return $result;
         }
 
         // If Both Shipping and Duty accounts provided
-        return preg_match($serviceDetails['account_number_regex'], $shipment['bill_shipping_account']) && preg_match($serviceDetails['account_number_regex'], $shipment['bill_tax_duty_account']);
+        $result = preg_match($serviceDetails['account_number_regex'], $shipment['bill_shipping_account']) && preg_match($serviceDetails['account_number_regex'], $shipment['bill_tax_duty_account']);
+        if($result){
+            $this->checks[] = "Success - Shipping and Duty account is correct format";
+        } else {
+            $this->checks[] = "Failed - Shipping and Duty account is in an incorrect format";
+        }
+        return $result;
     }
 
     private function accountNumberKnown($shipment, $serviceDetails)
@@ -701,7 +777,7 @@ class ServiceRules
                         if ($this->debug) {
                             echo "$myPackaging = $code - Failed".$this->eol;
                         }
-
+                        $this->checks[] = "Failed - This packaging type is not suitable for this service";
                         $result = false;
                     }
                 }
@@ -710,6 +786,7 @@ class ServiceRules
                     echo 'Positive Condition'.$this->eol;
                 }
                 // Fail if no match
+                $this->checks[] = "Failed - This packaging type is not suitable for this service";
                 $result = false;
                 foreach ($listedCodes as $code) {
 
@@ -751,6 +828,7 @@ class ServiceRules
                 for ($i = 0; $i < $shipment['pieces']; $i++) {
                     $girth = girth($shipment['packages'][$i]['length'], $shipment['packages'][$i]['width'], $shipment['packages'][$i]['height']);
                     if ($girth > 330) {
+                        $this->checks[] = "Success - the minimum weight for this service has been reached";
                         return true;
                     }
                 }
@@ -760,10 +838,11 @@ class ServiceRules
         // If Even one piece is greater than or equal to min, then return true
         foreach ($shipment['packages'] as $package) {
             if ($package['weight'] >= $serviceDetails['min_weight']) {
+                $this->checks[] = "Success - the minimum weight for this service has been reached";
                 return true;
             }
         }
-
+        $this->checks[] = "Failed - the minimum weight for this service has not been reached";
         return false;
     }
 
@@ -776,9 +855,13 @@ class ServiceRules
      */
     private function max_weight($shipment, $serviceDetails)
     {
+
         foreach ($shipment['packages'] as $package) {
             if ($package['weight'] > $serviceDetails['max_weight']) {
+                $this->checks[] = "Failed - The max weight for this service has been exceeded" ;
                 return false;
+            } else {
+                $this->checks[] = "Success - The max weight for this service has not been exceeded";
             }
 
             // Do not use volumetric weight for XDP
@@ -808,6 +891,7 @@ class ServiceRules
                 for ($i = 0; $i < $shipment['pieces']; $i++) {
                     $girth = girth($shipment['packages'][$i]['length'], $shipment['packages'][$i]['width'], $shipment['packages'][$i]['height']);
                     if ($girth > $serviceDetails['max_girth']) {
+                        $this->checks[] = "Failed - The max girth has been exceeded for this service";
                         return false;
                     }
                 }
@@ -826,7 +910,15 @@ class ServiceRules
      */
     private function max_pieces($shipment, $serviceDetails)
     {
-        return (($shipment['pieces'] <= $serviceDetails['max_pieces'])) ? true : false;
+        $result = (($shipment['pieces'] <= $serviceDetails['max_pieces'])) ? true : false;
+        if($result){
+            $this->checks[] = "Success - The maximum number of pieces has not been exceeded";
+            return $result;
+        } else {
+            $this->checks[] = "Failed - The maximum number of pieces has been exceeded";
+            return $result;
+        }
+
     }
 
     /**
@@ -841,6 +933,7 @@ class ServiceRules
         foreach ($shipment['packages'] as $package) {
             $maxDim = max($package['length'], $package['width'], $package['height']);
             if (($maxDim > $serviceDetails['max_dimension'])) {
+                $this->checks[] = " Failed - The max dimension limit of " . $maxDim . " has been exceeded for this service";
                 return false;
             }
         }
@@ -850,18 +943,25 @@ class ServiceRules
 
     private function max_customs_value($shipment, $serviceDetails)
     {
-        return (($shipment['customs_value'] <= $serviceDetails['max_customs_value'])) ? true : false;
+        $result = (($shipment['customs_value'] <= $serviceDetails['max_customs_value'])) ? true : false;
+        if($result){
+            $this->checks[] = "Success - The max customs value has not been exceeded for this service";
+            return $result;
+        } else {
+            $this->checks[] = "Failed - The max customs value has been exceeded for this service";
+            return $result;
+        }
     }
 
     private function hazardous($shipment, $serviceDetails)
     {
         if (! isset($shipment['hazardous']) || empty($shipment['hazardous']) || strcasecmp($shipment['hazardous'], 'n') == 0) {
-
             // Non Hazardous goods so does not matter
+            $this->checks[] = "Success - No hazardous substances supplied with this shipment";
             return true;
         } else {
-
             // Return whether supported
+            $this->checks[] = "Failed - Please note a hazardous substance has been noted and should be checked against the carrier";
             return $serviceDetails['hazardous'];
         }
     }
@@ -869,12 +969,12 @@ class ServiceRules
     private function dry_ice($shipment, $serviceDetails)
     {
         if (! isset($shipment['dry_ice']['flag']) || $shipment['dry_ice']['flag'] == '0') {
-
             // Not dry ice shpment
+            $this->checks[] = "Success - No Dry Ice substances supplied with this shipment";
             return true;
         } else {
-
             // Return whether supported
+            $this->checks[] = "Failed - Please note a Dry Ice content has been noted and should be checked against the carrier";
             return $serviceDetails['dry_ice'];
         }
     }
@@ -882,12 +982,12 @@ class ServiceRules
     private function alcohol($shipment, $serviceDetails)
     {
         if (! isset($shipment['alcohol_type']) || empty($shipment['alcohol_type']) || strcasecmp($shipment['alcohol_type'], 'n') == 0) {
-
             // No alcohol
+            $this->checks[] = "Success - Alcohol substances supplied with this shipment";
             return true;
         } else {
-
             // Return whether supported
+            $this->checks[] = "Failed - Please note a Dry Ice content has been noted and should be checked against the carrier";
             return $serviceDetails['alcohol'];
         }
     }
@@ -895,12 +995,12 @@ class ServiceRules
     private function broker($shipment, $serviceDetails)
     {
         if (! isset($shipment['broker_name']) || empty($shipment['broker_name']) && empty($shipment['broker_company_name'])) {
-
             // Not a Broker select shipment
+            $this->checks[] = "Success - This is not a broker shipment";
             return true;
         } else {
-
             // Return whether supported
+            $this->checks[] = "Failed - Please note this shipment has been flagged with Broker status and should be checked against the carrier";
             return $serviceDetails['broker'];
         }
     }
