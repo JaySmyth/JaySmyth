@@ -3,7 +3,7 @@
 namespace App\CarrierAPI\DX;
 
 use App\Models\Service;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * Description of DXAPI.
@@ -68,11 +68,20 @@ class DXAPI extends \App\CarrierAPI\CarrierBase
      */
     public function validateShipment($shipment)
     {
-        /*
-         * Standard validation resumes
+
+        /**
+         * Validate packaging type.
          */
-        //$rules['bill_shipping_account'] = 'nullable|digits:9';
-        //$rules['bill_tax_duty_account'] = 'nullable|digits:9';
+        $v = Validator::make($shipment, [
+            'packages.*.packaging_code' => 'in:CTN,ctn',
+        ], [
+            'packages.*.packaging_code.in' => 'Invalid packaging type selected for service. Select Carton/Package.',
+        ]);
+
+        if ($v->fails()) {
+            return $this->buildValidationErrors($v->errors());
+        }
+
         $rules['dry_ice'] = 'not_supported';
         $rules['hazardous'] = 'not_supported';
         $rules['insurance_value'] = 'not_supported';
