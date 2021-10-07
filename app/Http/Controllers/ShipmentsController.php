@@ -1360,6 +1360,8 @@ class ShipmentsController extends Controller
 
         // Refresh Shipment
         $shipment = Shipment::find($shipmentId);
+        $shipment->reset = true;
+        $shipment->save();
 
         // Reinstate original if we do not want to reprice the shipment
         if (! $request->reprice) {

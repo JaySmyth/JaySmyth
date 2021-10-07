@@ -751,6 +751,42 @@ class ReportsController extends Controller
         return view('reports.pre_transit', compact('report', 'shipments'));
     }
 
+
+    /**
+     * Display shipment resets report.
+     *
+     * @param  Request  $request
+     * @param $id
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application|\Illuminate\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function shipmentResets(Request $request, $id)
+    {
+        $report = Report::findOrFail($id);
+
+        $this->authorize(new Report);
+
+        // Default results to "today"
+        if (! $request->date_from && ! $request->date_to) {
+            $request->date_from = Carbon::today()->startOfDay();
+            $request->date_to = Carbon::today()->endOfDay();
+        }
+
+        $shipments = Shipment::orderBy('id', 'DESC')
+            ->filter($request->filter)
+            ->hasCompany($request->company)
+            ->shipDateBetween($request->date_from, $request->date_to)
+            ->hasMode($report->mode_id)
+            ->hasService($request->service)
+            ->whereReset(true)
+            ->restrictCompany($request->user()->getAllowedCompanyIds())
+            ->with('service')
+            ->paginate(100);
+
+        return view('reports.shipment_resets', compact('report', 'shipments'));
+    }
+
     /**
      * Hazardous / dry ice report.
      *
