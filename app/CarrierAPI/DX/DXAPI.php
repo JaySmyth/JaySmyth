@@ -73,9 +73,9 @@ class DXAPI extends \App\CarrierAPI\CarrierBase
          * Validate packaging type.
          */
         $v = Validator::make($shipment, [
-            'packages.*.packaging_code' => 'in:CTN,ctn',
+            'packages.*.packaging_code' => 'not_in:HPA,PAL,PAK,BOX,ENV,hpa,pal,pak,box,env',
         ], [
-            'packages.*.packaging_code.in' => 'Invalid packaging type selected for service. Select Carton/Package.',
+            'packages.*.packaging_code.not_in' => 'Invalid packaging type selected for service. Select Carton/Package.',
         ]);
 
         if ($v->fails()) {
