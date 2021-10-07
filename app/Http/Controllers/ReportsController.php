@@ -779,6 +779,7 @@ class ReportsController extends Controller
             ->shipDateBetween($request->date_from, $request->date_to)
             ->hasMode($report->mode_id)
             ->hasService($request->service)
+            ->whereNotIn('status_id', [1, 7])
             ->whereReset(true)
             ->restrictCompany($request->user()->getAllowedCompanyIds())
             ->with('service')
