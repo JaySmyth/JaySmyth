@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Console\Commands\SendShipmentResetsNotification;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -73,6 +74,7 @@ class Kernel extends ConsoleKernel
         Commands\DispatchDeliveryPerformance::class,
         Commands\DispatchExtendedTransitReport::class,
         Commands\DbSchenker\BuildTestSeaExportTransaction::class,
+        Commands\SendShipmentResetsNotification::class,
     ];
 
     /**
@@ -126,6 +128,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('ifs:dispatch-delivery-performance')->dailyAt('08:15');
         // $schedule->command('ifs:dispatch-extended-transit-report')->dailyAt('08:15');
         $schedule->command('ifs:upload-fedex-commercial-invoices')->weekdays()->everyFiveMinutes()->between('16:20', '17:45');
+        $schedule->command('ifs:send-shipment-resets-notification')->weekdays()->dailyAt('09:30');
 
         /*
          * Tracking updates
