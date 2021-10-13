@@ -138,7 +138,7 @@ class BuildTestSeaExportTransaction extends Command
 
             if (empty($errors)) {
                 $result = $dbSchenker->sendRequest($this->msg);
-                $errors = $result['errors'];
+                //$errors = $result['errors'];
             }
         }
 
