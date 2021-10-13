@@ -50,7 +50,6 @@ class BuildTestSeaExportTransaction extends Command
         $test = true;
 
         foreach ($this->getBols($test) as $bol) {
-
             $jobs = JobHdr::where('bill_of_lading', $bol)->get();
 
             if ($jobs->count() == 1) {
@@ -105,25 +104,18 @@ class BuildTestSeaExportTransaction extends Command
             ->toArray();
     }
 
+
     protected function checkIsSchenker($jobHdr)
     {
-        $isSchenker = false;
         $addressTypes = ['CONSEE', 'FOREIGN', 'NOTIFY'];
         $addresses = $jobHdr->addresses;
         foreach ($addresses as $address) {
-            // Only process some addresses
-            if (in_array($address->address_type, $addressTypes)) {
-                $name = $address->name;
-                $branchFound = stripos($name, 'schenker');
-                // Check is this a schenker branch
-                if ($branchFound !== false) {
-                    $isSchenker = true;
-                    continue;
-                }
+            if (in_array($address->address_type, $addressTypes) && stripos($address->name, 'schenker')) {
+                return true;
             }
         }
 
-        return $isSchenker;
+        return false;
     }
 
     protected function processJob($jobHdr)
@@ -145,11 +137,11 @@ class BuildTestSeaExportTransaction extends Command
         return $errors;
     }
 
-    protected function notifyResult($jobRef, $errors = [], $msg = '')
+    protected function notifyResult($jobRef, $errors = [])
     {
         $msg = [];
         $warning = '';
-        if ($errors == []) {
+        if (empty($errors)) {
             $detail = "SCS Job $jobRef successfully sent by EDI to DBSchenker";
         } else {
             $warning = "Error in EDI transmission";
@@ -161,11 +153,9 @@ class BuildTestSeaExportTransaction extends Command
             }
         }
 
-        dd($msg);
-
         //Mail::to('renglish@antrim.ifsgroup.com')->send(new GenericError('DBSchenker EDI ('.$jobRef.')', $msg, false, $warning, $detail));
 
-        $msg[] = $this->msg; // Add json for debugging
-        //Mail::to('dshannon@antrim.ifsgroup.com')->send(new GenericError('DBSchenker EDI ('.$jobRef.')', $msg, false, $warning, $detail));
+        $msg[] = json_encode($this->msg); // Add json for debugging
+        Mail::to('dshannon@antrim.ifsgroup.com')->send(new GenericError('DBSchenker EDI ('.$jobRef.')', $msg, false, $warning, $detail));
     }
 }

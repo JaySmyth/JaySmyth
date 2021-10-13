@@ -127,6 +127,293 @@ class OceanMsg
         $this->msg = $msg;
     }
 
+    protected function buildAdmin($jobHdr, $jobLines, $keyName)
+    {
+        $msg = [];
+        $msg['originBranchId'] = 'SJCBFS';
+        $msg['blMessageId'] = $jobHdr->job_disp;
+        $msg['houseBlRunningNumber'] = 1;
+        $msg['sttNumber'] = $this->getSTTNumber();
+        $msg['exportImport'] = 'E';
+        $msg['etdDate'] = date('Ymd', strtotime($jobHdr->estimated_dept_date));
+        $msg['etdTime'] = '0000';
+        $msg['timeZone'] = 'GMT';
+        $msg['etaDate'] = date('Ymd', strtotime($jobHdr->delivered_date));
+        $msg['etaTime'] = '0000';
+        $msg['creationDate'] = date('Ymd');
+        $msg['creationTime'] = date('His');
+        $msg['houseBlUsingCode'] = 'O';
+        $msg['natureOfGoods'] = $this->natureOfGoods($jobLines);
+        $msg['finalDestinationBranch'] = $keyName.'SSF';
+        $msg['status'] = 'BL1.4.1';
+        $msg['loadType'] = $jobHdr->load_type;
+
+        return $msg;
+    }
+
+    protected function getSTTNumber()
+    {
+        $countryCode = '826';
+        $partnerId = '6';
+        $sequence = nextAvailable('SCHENKERSTT');
+        $base = $countryCode.$partnerId.sprintf('%9d', $sequence);
+        $sum1 = $base[1] + $base[3] + $base[5] + $base[7] + $base[9] + $base[11];
+        $sum2 = $base[0] + $base[2] + $base[4] + $base[6] + $base[8] + $base[10] + $base[12];
+        $sum = $sum1 + ($sum2 * 3);
+        $checkDigit = 10 - $sum % 10;
+
+        return $base.$checkDigit;
+    }
+
+    protected function natureOfGoods($jobLines)
+    {
+        $nature = 'GEN';
+        foreach ($jobLines as $jobLine) {
+            if ($jobLine->haz_pieces > 0) {
+                $nature = 'HAZ';
+            }
+        }
+
+        return $nature;
+    }
+
+    protected function buildHeader($bolNumber, $bolCopies)
+    {
+        $msg['documentCode'] = '703';
+        $msg['messageId'] = $bolNumber;
+        $msg['messageFunction'] = '9';       // 9 -  Create, 5 - Replace (Update)
+        $msg['documentPlace'] = 'GBANT';     //  GBBEL $jobHdr->receipt;
+        $msg['documentDate'] = date('Ymd');
+        $msg['documentDateFormat'] = '102';
+        $msg['numberOfOriginals'] = intval($bolCopies);
+        $msg['blNumber'] = $bolNumber;
+
+        return $msg;
+    }
+
+    protected function buildReferences($jobHdr)
+    {
+        $msg = [];
+        $ref = $this->buildReference('AEG', $jobHdr->cust_ref);
+        if ($ref > '') {
+            $msg['reference'][] = $ref;
+        }
+
+        $ref = $this->buildReference('FF', $jobHdr->job_disp);
+        if ($ref > '') {
+            $msg['reference'][] = $ref;
+        }
+
+        return $msg;
+    }
+
+    protected function buildReference($qualifier = 'AEG', $custRef = '')
+    {
+        if ($custRef > "") {
+            return [
+                'referenceQualifier' => $qualifier,
+                'referenceNumber' => $custRef
+            ];
+        }
+
+        return '';
+    }
+
+    protected function buildTheader($jobHdr, $carrier)
+    {
+        $msg['transportStageQualifier'] = '20';
+        $msg['conveyanceReference'] = $jobHdr->vessel_code;
+        $msg['modeOfTransport'] = '10';
+        $msg['typeOfTransport'] = '13';
+        $msg['carrierId'] = $this->getCarrierSCACCode($carrier);
+        $msg['carrierName'] = $carrier->name;
+        $msg['transportId'] = $jobHdr->vessel_name;
+
+        return $msg;
+    }
+
+    protected function getCarrierSCACCode($carrier)
+    {
+        return $carrier->keyname;
+    }
+
+    protected function buildTransportDate($qualifier, $date)
+    {
+        /*
+            132 - Est Date of Arrival
+            133 - Est Date of Departure
+            136 - Departure Date
+        */
+        if ($date > "") {
+            return [
+                'transportQualifier' => $qualifier,
+                'transportDate' => date('Ymd', strtotime($date)),
+                'transportDateFormat' => '102',
+            ];
+        }
+
+        return '';
+    }
+
+    protected function buildTransportLocns($qualifier, $locn)
+    {
+        // Transport Location record
+        /*
+            5 = Port of Loading
+            7 = Place of Delivery (Final Destination)
+            9 = Place of Loading
+            12 = Port of Discharge
+        */
+        if (! $locn) {
+            return null;
+        }
+
+        return [
+            'placeQualifier' => $qualifier,
+            'placeId' => $locn,
+        ];
+    }
+
+    protected function buildAddress($qualifier, $address = null)
+    {
+        if (! $address) {
+            return null;
+        }
+        switch ($qualifier) {
+            case 'BA':
+            case 'CN':
+            case 'CZ':
+                return [
+                    'addressQualifier' => $qualifier,
+                    'addressId' => $address->id,
+                    'addressStructure' => '2',
+                    'name' => $address->name ?? '',
+                    'streetAndNumber1' => $address->address_1 ?? '',
+                    'cityName' => $address->town ?? '',
+                    'postCode' => $address->postcode ?? '',
+                    'countryCode' => $address->country_code ?? '',
+                    'comAddressId' => $qualifier ?? '',
+                    'contactFunction' => 'IC',
+                    'contactEmployeeName' => empty($address->contact_name) ? 'Not Known' : $address->contact_name,
+                    'communicationId' => 'TE',
+                    'communicationData' => empty($address->telephone) ? 'Not Known' : $address->telephone,
+                ];
+            default:
+                return null;
+        }
+    }
+
+    protected function buildLine($jobLine)
+    {
+        $line = [
+            'itemNumber' => $jobLine->line_no,
+            'numberOfPackages' => $jobLine->pieces,
+            'measurement' => null,
+        ];
+
+        // Add Actual Weight
+        $measurement[] = [
+            'measureQualifier' => "WT",
+            'measureUnit' => 'KGM',
+            'measureValue' => $jobLine->entered_wgt,
+        ];
+
+        // Add Volumetric Weight
+        $measurement[] = [
+            'measureQualifier' => "WT",
+            'measureUnit' => 'MTQ',
+            'measureValue' => $jobLine->vol_wgt,
+        ];
+
+        $line['measurement']['measure'] = $measurement;
+
+        return $line;
+    }
+
+    protected function buildPackage($jobHdr)
+    {
+        return [
+            'totalNumberPackages' => $jobHdr->pieces,
+            'totalGrossWeight' => $jobHdr->chg_weight,
+            'weightMeasureQualifier' => 'KGM',
+            'totalCube' => $jobHdr->cube,
+            'cubeMeasureQualifier' => 'MTQ',
+        ];
+    }
+
+    protected function buildEquipmentUnit($jobHdr, $containers)
+    {
+        $equipUnit = [];
+        foreach ($containers as $container) {
+            $data = [
+                'equipmentQualifier' => 'CN',
+                'equipmentIdNumber' => $container->container_number,
+                'sizeAndTypeText' => $container->container_code."' Container",
+                'supplier' => '2',
+                'movementPlan' => $jobHdr->load_type.'/'.$jobHdr->load_type,
+                'measurement' => null,
+                'seal' => $container->seal_number,
+
+            ];
+            $data['measurement'] = $this->buildContainerMeasurement($jobHdr);
+
+            $equipUnit[] = $data;
+        }
+
+        return $equipUnit;
+    }
+
+    /*
+        protected function validateMsg($msg)
+        {
+            $errors = [];
+            $schemaId = 'http://shipg1.ifsgroup.com/dbs_ocean.json';
+
+            // Convert to an object - cannot accept json string
+            $msg = json_decode(json_encode($msg));
+
+            // Create a new validator
+            $validator = new Validator();
+            $validator->resolver()->registerFile('http://shipg1.ifsgroup.com/schema/dbs_ocean.json', '/var/www/production/public/schema/dbs_ocean.json');
+
+            // Uri validation
+            $result = $validator->validate($msg, 'http://shipg1.ifsgroup.com/schema/dbs_ocean.json');
+            if (! $result->isValid()) {
+                $errors = (new ErrorFormatter())->format($result->error());
+            }
+
+            return $errors;
+        }
+        */
+
+    protected function buildContainerMeasurement($container)
+    {
+        $data['measure'][] = [
+            'measureQualifier' => "WT",
+            'movementDimensionCode' => "U",
+            'measureUnit' => "KGM",
+            'measureValue' => $container->kgs_weight,
+
+        ];
+        $data['measure'][] = [
+            'measureQualifier' => "VOL",
+            'movementDimensionCode' => "U",
+            'measureUnit' => "MTQ",
+            'measureValue' => $container->cube,
+        ];
+
+        return $data;
+    }
+
+    protected function buildDterms($terms, $locn)
+    {
+        $msg['termsOfDeliveryCode'] = $terms;
+        $msg['termsOfDeliveryCodeList'] = $terms;
+        $msg['termsLocation'] = $terms.' '.$locn;
+
+        return $msg;
+    }
+
     public function validateMsg()
     {
         $this->validateAdmin();
@@ -180,6 +467,16 @@ class OceanMsg
 
         if ($validator->fails()) {
             $this->mergeErrors('Admin', $section, $validator->errors());
+        }
+    }
+
+    protected function mergeErrors($heading, $section, $errorBag)
+    {
+        $errors = $errorBag->toArray();
+        foreach ($errors as $key => $messages) {
+            foreach ($messages as $message) {
+                $this->errors[$heading][$key] = $message;
+            }
         }
     }
 
@@ -407,327 +704,4 @@ class OceanMsg
         }
     }
 
-    protected function mergeErrors($heading, $section, $errorBag)
-    {
-        $errors = $errorBag->toArray();
-        foreach ($errors as $key => $messages) {
-            foreach ($messages as $message) {
-                $this->errors[$heading][$key] = $message;
-            }
-        }
-    }
-
-    protected function sendMsg($msg)
-    {
-        return [];
-    }
-
-    /*
-        protected function validateMsg($msg)
-        {
-            $errors = [];
-            $schemaId = 'http://shipg1.ifsgroup.com/dbs_ocean.json';
-
-            // Convert to an object - cannot accept json string
-            $msg = json_decode(json_encode($msg));
-
-            // Create a new validator
-            $validator = new Validator();
-            $validator->resolver()->registerFile('http://shipg1.ifsgroup.com/schema/dbs_ocean.json', '/var/www/production/public/schema/dbs_ocean.json');
-
-            // Uri validation
-            $result = $validator->validate($msg, 'http://shipg1.ifsgroup.com/schema/dbs_ocean.json');
-            if (! $result->isValid()) {
-                $errors = (new ErrorFormatter())->format($result->error());
-            }
-
-            return $errors;
-        }
-        */
-
-    protected function natureOfGoods($jobLines)
-    {
-        $nature = 'GEN';
-        foreach ($jobLines as $jobLine) {
-            if ($jobLine->haz_pieces > 0) {
-                $nature = 'HAZ';
-            }
-        }
-
-        return $nature;
-    }
-
-    protected function getSTTNumber()
-    {
-        $countryCode = '826';
-        $partnerId = '6';
-        $sequence = nextAvailable('SCHENKERSTT');
-        $base = $countryCode.$partnerId.sprintf('%9d', $sequence);
-        $sum1 = $base[1] + $base[3] + $base[5] + $base[7] + $base[9] + $base[11];
-        $sum2 = $base[0] + $base[2] + $base[4] + $base[6] + $base[8] + $base[10] + $base[12];
-        $sum = $sum1 + ($sum2 * 3);
-        $checkDigit = 10 - $sum % 10;
-
-        return $base.$checkDigit;
-    }
-
-    protected function buildReference($qualifier = 'AEG', $custRef = '')
-    {
-        if ($custRef > "") {
-            return [
-                'referenceQualifier' => $qualifier,
-                'referenceNumber' => $custRef
-            ];
-        }
-
-        return '';
-    }
-
-    protected function getCarrierSCACCode($carrier)
-    {
-        return $carrier->keyname;
-    }
-
-    protected function buildTransportDate($qualifier, $date)
-    {
-        /*
-            132 - Est Date of Arrival
-            133 - Est Date of Departure
-            136 - Departure Date
-        */
-        if ($date > "") {
-            return [
-                'transportQualifier' => $qualifier,
-                'transportDate' => date('Ymd', strtotime($date)),
-                'transportDateFormat' => '102',
-            ];
-        }
-
-        return '';
-    }
-
-    protected function buildTransportLocns($qualifier, $locn)
-    {
-        // Transport Location record
-        /*
-            5 = Port of Loading
-            7 = Place of Delivery (Final Destination)
-            9 = Place of Loading
-            12 = Port of Discharge
-        */
-        if ($locn > "") {
-            return [
-                'placeQualifier' => $qualifier,
-                'placeId' => $locn,
-            ];
-        }
-
-        return '';
-    }
-
-    protected function buildAddress($qualifier, $address = '')
-    {
-        $data = '';
-        if ($address) {
-            switch ($qualifier) {
-                case 'BA':
-                    $data = [
-                        'addressQualifier' => $qualifier,
-                        'addressId' => $address->id,
-                        'addressStructure' => '2',
-                        'name' => $address->name ?? '',
-                        'streetAndNumber1' => $address->address_1 ?? '',
-                        'cityName' => $address->town ?? '',
-                        'postCode' => $address->postcode ?? '',
-                        'countryCode' => $address->country_code ?? '',
-                        'comAddressId' => $qualifier ?? '',
-                        'contactFunction' => 'IC',
-                        'contactEmployeeName' => empty($address->contact_name) ? 'Not Known' : $address->contact_name,
-                        'communicationId' => 'TE',
-                        'communicationData' => empty($address->telephone) ? 'Not Known' : $address->telephone,
-                    ];
-                    break;
-
-                case 'CN':
-                case 'CZ':
-                    $data = [
-                        'addressQualifier' => $qualifier,
-                        'addressId' => $address->id,
-                        'addressStructure' => '2',
-                        'name' => $address->name ?? '',
-                        'streetAndNumber1' => $address->address_1 ?? '',
-                        'cityName' => $address->town ?? '',
-                        'postCode' => $address->postcode ?? '',
-                        'countryCode' => $address->country_code ?? '',
-                        'comAddressId' => $qualifier ?? '',
-                        'contactFunction' => 'IC',
-                        'contactEmployeeName' => empty($address->contact_name) ? 'Not Known' : $address->contact_name,
-                        'communicationId' => 'TE',
-                        'communicationData' => empty($address->telephone) ? 'Not Known' : $address->telephone,
-                    ];
-                    break;
-
-                default:
-                    $data = '';
-                    break;
-            }
-        }
-
-        return $data;
-    }
-
-    protected function buildAdmin($jobHdr, $jobLines, $keyName)
-    {
-        $msg = [];
-        $msg['originBranchId'] = 'SJCBFS';
-        $msg['blMessageId'] = $jobHdr->job_disp;
-        $msg['houseBlRunningNumber'] = 1;
-        $msg['sttNumber'] = $this->getSTTNumber();
-        $msg['exportImport'] = 'E';
-        $msg['etdDate'] = date('Ymd', strtotime($jobHdr->estimated_dept_date));
-        $msg['etdTime'] = '0000';
-        $msg['timeZone'] = 'GMT';
-        $msg['etaDate'] = date('Ymd', strtotime($jobHdr->delivered_date));
-        $msg['etaTime'] = '0000';
-        $msg['creationDate'] = date('Ymd');
-        $msg['creationTime'] = date('His');
-        $msg['houseBlUsingCode'] = 'O';
-        $msg['natureOfGoods'] = $this->natureOfGoods($jobLines);
-        $msg['finalDestinationBranch'] = $keyName.'SSF';
-        $msg['status'] = 'BL1.4.1';
-        $msg['loadType'] = $jobHdr->load_type;
-
-        return $msg;
-    }
-
-    protected function buildHeader($bolNumber, $bolCopies)
-    {
-        $msg['documentCode'] = '703';
-        $msg['messageId'] = $bolNumber;
-        $msg['messageFunction'] = '9';       // 9 -  Create, 5 - Replace (Update)
-        $msg['documentPlace'] = 'GBANT';     //  GBBEL $jobHdr->receipt;
-        $msg['documentDate'] = date('Ymd');
-        $msg['documentDateFormat'] = '102';
-        $msg['numberOfOriginals'] = intval($bolCopies);
-        $msg['blNumber'] = $bolNumber;
-
-        return $msg;
-    }
-
-    protected function buildReferences($jobHdr)
-    {
-        $msg = [];
-        $ref = $this->buildReference('AEG', $jobHdr->cust_ref);
-        if ($ref > '') {
-            $msg['reference'][] = $ref;
-        }
-
-        $ref = $this->buildReference('FF', $jobHdr->job_disp);
-        if ($ref > '') {
-            $msg['reference'][] = $ref;
-        }
-
-        return $msg;
-    }
-
-    protected function buildTheader($jobHdr, $carrier)
-    {
-        $msg['transportStageQualifier'] = '20';
-        $msg['conveyanceReference'] = $jobHdr->vessel_code;
-        $msg['modeOfTransport'] = '10';
-        $msg['typeOfTransport'] = '13';
-        $msg['carrierId'] = $this->getCarrierSCACCode($carrier);
-        $msg['carrierName'] = $carrier->name;
-        $msg['transportId'] = $jobHdr->vessel_name;
-
-        return $msg;
-    }
-
-    protected function buildLine($jobLine)
-    {
-        $line = [
-            'itemNumber' => $jobLine->line_no,
-            'numberOfPackages' => $jobLine->pieces,
-            'measurement' => null,
-        ];
-
-        // Add Actual Weight
-        $measurement[] = [
-            'measureQualifier' => "WT",
-            'measureUnit' => 'KGM',
-            'measureValue' => $jobLine->entered_wgt,
-        ];
-
-        // Add Volumetric Weight
-        $measurement[] = [
-            'measureQualifier' => "WT",
-            'measureUnit' => 'MTQ',
-            'measureValue' => $jobLine->vol_wgt,
-        ];
-
-        $line['measurement']['measure'] = $measurement;
-
-        return $line;
-    }
-
-    protected function buildPackage($jobHdr)
-    {
-        return [
-            'totalNumberPackages' => $jobHdr->pieces,
-            'totalGrossWeight' => $jobHdr->chg_weight,
-            'weightMeasureQualifier' => 'KGM',
-            'totalCube' => $jobHdr->cube,
-            'cubeMeasureQualifier' => 'MTQ',
-        ];
-    }
-
-    protected function buildEquipmentUnit($jobHdr, $containers)
-    {
-        $equipUnit = [];
-        foreach ($containers as $container) {
-            $data = [
-                'equipmentQualifier' => 'CN',
-                'equipmentIdNumber' => $container->container_number,
-                'sizeAndTypeText' => $container->container_code."' Container",
-                'supplier' => '2',
-                'movementPlan' => $jobHdr->load_type.'/'.$jobHdr->load_type,
-                'measurement' => null,
-                'seal' => $container->seal_number,
-
-            ];
-            $data['measurement'] = $this->buildContainerMeasurement($jobHdr);
-
-            $equipUnit[] = $data;
-        }
-
-        return $equipUnit;
-    }
-
-    protected function buildContainerMeasurement($container)
-    {
-        $data['measure'][] = [
-            'measureQualifier' => "WT",
-            'movementDimensionCode' => "U",
-            'measureUnit' => "KGM",
-            'measureValue' => $container->kgs_weight,
-
-        ];
-        $data['measure'][] = [
-            'measureQualifier' => "VOL",
-            'movementDimensionCode' => "U",
-            'measureUnit' => "MTQ",
-            'measureValue' => $container->cube,
-        ];
-
-        return $data;
-    }
-
-    protected function buildDterms($terms, $locn)
-    {
-        $msg['termsOfDeliveryCode'] = $terms;
-        $msg['termsOfDeliveryCodeList'] = $terms;
-        $msg['termsLocation'] = $terms.' '.$locn;
-
-        return $msg;
-    }
 }
