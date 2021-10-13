@@ -119,14 +119,10 @@ class BuildTestSeaExportTransaction extends Command
     protected function checkIsSchenker($jobHdr)
     {
         foreach ($jobHdr->addresses as $address) {
-            $this->line('Checking address: '.$address->address_type.'/'.$address->name);
             if (in_array($address->address_type, ['CONSEE', 'FOREIGN', 'NOTIFY']) && preg_match("/schenker/i", $address->name)) {
-                $this->info('Match for "schenker"');
-
                 return true;
             }
         }
-
         return false;
     }
 
