@@ -449,7 +449,7 @@ class OceanMsg
             'creationTime' => 'required|date_format:His',
             'houseBlUsingCode' => 'required|in:O',
             'natureOfGoods' => 'required|in:GEN',
-           // 'finalDestinationBranch' => 'required|string|min:6|max:10|alpha_num',
+            'finalDestinationBranch' => 'required|string|min:6|max:10|alpha_num',
             'status' => 'required|min:5|max:10',
             'loadType' => 'nullable|in:LCL,FCL'
         ]);
@@ -694,9 +694,9 @@ class OceanMsg
     {
         $section = $this->msg['dterms'];
         $validator = Validator::make($section, [
-           // 'termsOfDeliveryCode' => 'required|string|size:3',
-          //  'termsOfDeliveryCodeList' => 'required|string|size:3',
-          //  'termsLocation' => 'required|string|max:70',
+            'termsOfDeliveryCode' => 'required|string|size:3',
+            'termsOfDeliveryCodeList' => 'required|string|size:3',
+            'termsLocation' => 'required|string|max:70',
         ]);
 
         if ($validator->fails()) {

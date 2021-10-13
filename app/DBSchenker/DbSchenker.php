@@ -24,15 +24,12 @@ class DbSchenker
             // New guzzle client
             $client = new Client();
 
-            dd(json_encode($request));
-
             // Send the request and get the response
             $response = $client->post($this->url.'ReceiveShipment', ['auth' => [$this->user, $this->password], 'json' => $request]);
 
             // Get the response body
-            $response = $response->getBody()->getContents();
+            return $response->getBody()->getContents();
 
-            dd(json_decode($response, true));
         } catch (GuzzleException $exception) {
             dd($exception);
         }
