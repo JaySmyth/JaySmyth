@@ -73,7 +73,7 @@ class Kernel extends ConsoleKernel
         Commands\DispatchCustomerDomesticRateReport::class,
         Commands\DispatchDeliveryPerformance::class,
         Commands\DispatchExtendedTransitReport::class,
-        Commands\DbSchenker\BuildTestSeaExportTransaction::class,
+        Commands\DbSchenker\SendDbSchenkerSeaExportTransactions::class,
         Commands\SendShipmentResetsNotification::class,
     ];
 
@@ -188,5 +188,10 @@ class Kernel extends ConsoleKernel
          * Vendorvillage
          */
         $schedule->command('ifs:process-vendorvillage-orders')->everyFiveMinutes()->withoutOverlapping(5);
+
+        /*
+         * DBSchenker
+         */
+        //$schedule->command('ifs:send-dbschenker-sea-export-transactions')->weekdays()->hourly()->between('09:30', '17:45');
     }
 }

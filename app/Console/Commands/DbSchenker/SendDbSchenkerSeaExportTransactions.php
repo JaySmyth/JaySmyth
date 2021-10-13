@@ -9,21 +9,21 @@ use App\Multifreight\JobHdr;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
-class BuildTestSeaExportTransaction extends Command
+class SendDbSchenkerSeaExportTransactions extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'ifs:build-test-sea-export-transaction';
+    protected $signature = 'ifs:send-dbschenker-sea-export-transactions {--test}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Creates a sample SeaFreight Export Transaction for DBSchenker';
+    protected $description = 'Send sea freight export transactions to DBSchenker';
 
     /**
      * @var
@@ -47,7 +47,7 @@ class BuildTestSeaExportTransaction extends Command
      */
     public function handle()
     {
-        $test = true;
+        $test = $this->option('test');
 
         foreach ($this->getBols($test) as $bol) {
             $this->line("Getting job $bol");
@@ -123,6 +123,7 @@ class BuildTestSeaExportTransaction extends Command
                 return true;
             }
         }
+
         return false;
     }
 
