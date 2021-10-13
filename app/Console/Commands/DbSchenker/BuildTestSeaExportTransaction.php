@@ -120,8 +120,8 @@ class BuildTestSeaExportTransaction extends Command
     {
         foreach ($jobHdr->addresses as $address) {
             $this->line('Checking address: '.$address->address_type.'/'.$address->name);
-
             if (in_array($address->address_type, ['CONSEE', 'FOREIGN', 'NOTIFY']) && stripos($address->name, 'schenker')) {
+                $this->info('Match for "schenker"');
                 return true;
             }
         }
