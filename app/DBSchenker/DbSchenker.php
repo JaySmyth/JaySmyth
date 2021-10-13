@@ -27,6 +27,7 @@ class DbSchenker
             // Send the request and get the response
             $response = $client->post($this->url.'ReceiveShipment', ['auth' => [$this->user, $this->password], 'json' => $request]);
 
+            dd($response);
             // Get the response body
             $response = $response->getBody()->getContents();
 
