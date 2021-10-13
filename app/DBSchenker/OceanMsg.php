@@ -1,18 +1,11 @@
 <?php
 
-/*
- * ******************************************
- * Domestic Pricing
- * ******************************************
- */
-
 namespace App\DBSchenker;
 
-use App\Multifreight\JobHdr;
-use App\Multifreight\JobLine;
-use App\Multifreight\DocAdds;
-use App\Multifreight\RecCont;
 use App\Models\Unlocode;
+use App\Multifreight\DocAdds;
+use App\Multifreight\JobLine;
+use App\Multifreight\RecCont;
 use Illuminate\Support\Facades\Validator;
 
 class OceanMsg
@@ -20,14 +13,11 @@ class OceanMsg
     public $msg;
     public $errors = [];
 
-    public function __construct()
-    {
-    }
-
     /**
      * Sets the file type and table.
      *
-     * @param type $filename
+     * @param  type  $filename
+     *
      * @return bool
      */
     public function buildMsg($jobHdr)
@@ -128,7 +118,7 @@ class OceanMsg
 
         // Equipment Unit record
         // if (strtoupper($jobHdr->load_type) == 'FCL') {
-        $msg['equipmentUnit'] =  $this->buildEquipmentUnit($jobHdr, $containers);
+        $msg['equipmentUnit'] = $this->buildEquipmentUnit($jobHdr, $containers);
         //}
 
         // Delivery Terms record
@@ -160,7 +150,7 @@ class OceanMsg
         $validator = Validator::make($section, [
             'originBranchId' => 'required|string|size:6|alpha_num',
             'blMessageId' => 'required|string|max:20|alpha_num',
-            'houseBlRunningNumber' =>'required|integer|min:1|max:999',
+            'houseBlRunningNumber' => 'required|integer|min:1|max:999',
             'sttNumber' => 'required|string|max:20|alpha_num',
             'exportImport' => 'required|in:I,E,',
             'etdDate' => 'required|date_format:Ymd',
@@ -199,7 +189,7 @@ class OceanMsg
         $validator = Validator::make($section, [
             'documentCode' => 'required|string|in:703,704,705',
             'messageId' => 'required|string|max:35|alpha_num',
-            'messageFunction' =>'required|integer|in:1,5,9',
+            'messageFunction' => 'required|integer|in:1,5,9',
             'documentPlace' => 'required|string|size:5',
             'documentDate' => 'required|date_format:Ymd',
             'documentDateFormat' => 'required|in:102',
@@ -211,13 +201,14 @@ class OceanMsg
             $this->mergeErrors('Header', $section, $validator->errors());
         }
     }
+
     public function validateReference()
     {
         $headings = [
-            'FF' => 'Forwarders Ref.','MB' => 'System Internal Ref.','BM' => 'BOL Ref.','BN' => 'Booking Ref.','XRF' => 'Multiple REf.',
-            'ERN' => 'Exporters REf.','AEG' => 'Customer Specification No.','AAC' => 'Accreditive No.','IP' => 'Importer Licence No.',
-            'AER' => 'Project Spec. No','XAO' => 'CIS System Ref. (Orig)','XAR' => 'CIS System Ref. (Cnee)','PSN' => 'Sending Branch Ref.',
-            'RMB' => 'Real Ocean Bill of Lading','OBF' => 'Orig Branch (Finance)','SKY' => 'Skybridge Flag'
+            'FF' => 'Forwarders Ref.', 'MB' => 'System Internal Ref.', 'BM' => 'BOL Ref.', 'BN' => 'Booking Ref.', 'XRF' => 'Multiple REf.',
+            'ERN' => 'Exporters REf.', 'AEG' => 'Customer Specification No.', 'AAC' => 'Accreditive No.', 'IP' => 'Importer Licence No.',
+            'AER' => 'Project Spec. No', 'XAO' => 'CIS System Ref. (Orig)', 'XAR' => 'CIS System Ref. (Cnee)', 'PSN' => 'Sending Branch Ref.',
+            'RMB' => 'Real Ocean Bill of Lading', 'OBF' => 'Orig Branch (Finance)', 'SKY' => 'Skybridge Flag'
         ];
         $sections = $this->msg['reference']['reference'];
 
@@ -232,13 +223,14 @@ class OceanMsg
             }
         }
     }
+
     public function validateTHeader()
     {
         $section = $this->msg['theader'];
         $validator = Validator::make($section, [
             'transportStageQualifier' => 'required|string|in:20',
             'conveyanceReference' => 'nullable|string|max:17|alpha_num',
-            'modeOfTransport' =>'required|string|in:10',
+            'modeOfTransport' => 'required|string|in:10',
             'typeOfTransport' => 'required|string|in:11,13',
             'carrierId' => 'required|string:size:4',
             'carrierName' => 'required|string|max:35',
@@ -250,9 +242,10 @@ class OceanMsg
             $this->mergeErrors('Transport Header', $section, $validator->errors());
         }
     }
+
     public function validateTDates()
     {
-        $headings = ['11' => 'Shipped on board date','118' => 'Booking date','132' => 'Est. date of arrival','133' => 'Est. date of departure','136' => 'Departure date'];
+        $headings = ['11' => 'Shipped on board date', '118' => 'Booking date', '132' => 'Est. date of arrival', '133' => 'Est. date of departure', '136' => 'Departure date'];
         $sections = $this->msg['tdates']['tdate'];
 
         foreach ($sections as $section) {
@@ -267,9 +260,10 @@ class OceanMsg
             }
         }
     }
+
     public function validateTLocations()
     {
-        $headings = ['5' => 'Port of loading','7' => 'Final Destination','9' => 'Place of loading','12' => 'Port of discharge','88' => 'Place of receipt'];
+        $headings = ['5' => 'Port of loading', '7' => 'Final Destination', '9' => 'Place of loading', '12' => 'Port of discharge', '88' => 'Place of receipt'];
         $sections = $this->msg['tlocations']['tlocation'];
 
         foreach ($sections as $section) {
@@ -283,12 +277,13 @@ class OceanMsg
             }
         }
     }
+
     public function validateTAddress()
     {
         $headings = [
-            'CN' => 'Consignee','CZ' => 'Consignor','N1' => 'Notify 1','N2' => 'Notify 2','OO' => 'Order of Shipper',
-            'BA' => 'Booking Agent','FW' => 'Forwarder','CA' => 'Carrier','DO' => 'Document Recipient',
-            'AP' => 'Applied to address','RC' => 'Real Consignee'
+            'CN' => 'Consignee', 'CZ' => 'Consignor', 'N1' => 'Notify 1', 'N2' => 'Notify 2', 'OO' => 'Order of Shipper',
+            'BA' => 'Booking Agent', 'FW' => 'Forwarder', 'CA' => 'Carrier', 'DO' => 'Document Recipient',
+            'AP' => 'Applied to address', 'RC' => 'Real Consignee'
         ];
         $sections = $this->msg['taddress']['partnerAddr'];
 
@@ -316,6 +311,7 @@ class OceanMsg
             }
         }
     }
+
     public function validateGoods()
     {
         $itemNo = $this->msg['goodsDetails']['goods'][0]['itemNumber'] ?? 0;
@@ -335,13 +331,14 @@ class OceanMsg
             }
         }
     }
+
     public function validatePackage()
     {
         $section = $this->msg['package'];
         $validator = Validator::make($section, [
             'totalNumberPackages' => 'required|integer',
             'totalGrossWeight' => 'required|numeric|min:.01',
-            'weightMeasureQualifier' =>'required|string|in:KGM',
+            'weightMeasureQualifier' => 'required|string|in:KGM',
             'totalCube' => 'required|numeric|min:0.01',
             'cubeMeasureQualifier' => 'required|string|in:MTQ',
         ], [
@@ -351,6 +348,7 @@ class OceanMsg
             $this->mergeErrors('Package Totals', $section, $validator->errors());
         }
     }
+
     public function validateEquipmentUnit()
     {
         $units = $this->msg['equipmentUnit'];
@@ -394,13 +392,14 @@ class OceanMsg
             }
         }
     }
+
     public function validateDTerms()
     {
         $section = $this->msg['dterms'];
         $validator = Validator::make($section, [
             'termsOfDeliveryCode' => 'required|string|size:3',
             'termsOfDeliveryCodeList' => 'required|string|size:3',
-            'termsLocation' =>'required|string|max:70',
+            'termsLocation' => 'required|string|max:70',
         ]);
 
         if ($validator->fails()) {
@@ -454,6 +453,7 @@ class OceanMsg
                 $nature = 'HAZ';
             }
         }
+
         return $nature;
     }
 
@@ -463,9 +463,9 @@ class OceanMsg
         $partnerId = '6';
         $sequence = nextAvailable('SCHENKERSTT');
         $base = $countryCode.$partnerId.sprintf('%9d', $sequence);
-        $sum1 = $base[1]+$base[3]+$base[5]+$base[7]+$base[9]+$base[11];
-        $sum2 = $base[0]+$base[2]+$base[4]+$base[6]+$base[8]+$base[10]+$base[12];
-        $sum = $sum1 + ($sum2*3);
+        $sum1 = $base[1] + $base[3] + $base[5] + $base[7] + $base[9] + $base[11];
+        $sum2 = $base[0] + $base[2] + $base[4] + $base[6] + $base[8] + $base[10] + $base[12];
+        $sum = $sum1 + ($sum2 * 3);
         $checkDigit = 10 - $sum % 10;
 
         return $base.$checkDigit;
@@ -567,9 +567,9 @@ class OceanMsg
                     ];
                     break;
 
-                    default:
-                        $data = '';
-                        break;
+                default:
+                    $data = '';
+                    break;
             }
         }
 
@@ -653,16 +653,16 @@ class OceanMsg
 
         // Add Actual Weight
         $measurement[] = [
-                    'measureQualifier' => "WT",
-                    'measureUnit' => 'KGM',
-                    'measureValue' => $jobLine->entered_wgt,
+            'measureQualifier' => "WT",
+            'measureUnit' => 'KGM',
+            'measureValue' => $jobLine->entered_wgt,
         ];
 
         // Add Volumetric Weight
         $measurement[] = [
-                    'measureQualifier' => "WT",
-                    'measureUnit' => 'MTQ',
-                    'measureValue' => $jobLine->vol_wgt,
+            'measureQualifier' => "WT",
+            'measureUnit' => 'MTQ',
+            'measureValue' => $jobLine->vol_wgt,
         ];
 
         $line['measurement']['measure'] = $measurement;

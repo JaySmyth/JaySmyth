@@ -2,15 +2,12 @@
 
 namespace App\Console\Commands\DbSchenker;
 
-use App\Multifreight\JobHdr;
-use App\Multifreight\DocAdds;
-use App\DBSchenker\OceanMsg;
 use App\DBSchenker\DbSchenker;
-
+use App\DBSchenker\OceanMsg;
+use App\Mail\GenericError;
+use App\Multifreight\JobHdr;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 
 class BuildTestSeaExportTransaction extends Command
 {
@@ -27,6 +24,10 @@ class BuildTestSeaExportTransaction extends Command
      * @var string
      */
     protected $description = 'Creates a sample SeaFreight Export Transaction for DBSchenker';
+
+    /**
+     * @var
+     */
     protected $msg;
 
     /**
@@ -47,21 +48,23 @@ class BuildTestSeaExportTransaction extends Command
     public function handle()
     {
         $test = true;
-        $errors = [];
-        $bols = $this->getBols($test);
-        foreach ($bols as $bol) {
+
+        foreach ($this->getBols($test) as $bol) {
+
             $jobs = JobHdr::where('bill_of_lading', $bol)->get();
-            if ($jobs->count()==1) {
+
+            if ($jobs->count() == 1) {
                 $jobHdr = $jobs->first();
                 $isSchenker = $this->checkIsSchenker($jobHdr);
                 if ($isSchenker) {
                     $errors = $this->processJob($jobHdr);
-                    if ($errors == []) {
+
+                    if (empty($errors)) {
                         $jobHdr->update(['edi_sent' => 1]);
                     }
                 } else {
                     // If Non Schenker and entry_date is more than 3 days old mark as sent.
-                    $closeDate = date('Y-m-d', strtotime(date('Y-m-d') . ' +3 days'));
+                    $closeDate = date('Y-m-d', strtotime(date('Y-m-d').' +3 days'));
                     if ($jobHdr->entry_date < $closeDate) {
                         $jobHdr->edi_sent = 1;
                         $jobHdr->save();
@@ -83,6 +86,25 @@ class BuildTestSeaExportTransaction extends Command
         $this->info('Finished');
     }
 
+    protected function getBols($test)
+    {
+        if ($test) {
+            return JobHdr::wherein('bill_of_lading', ['IFFSXJ00012352'])
+                ->groupBy('bill_of_lading')
+                ->pluck('bill_of_lading')
+                ->toArray();
+        }
+
+        // Get all BOLs addressed not yet processed (not just Schenker)
+        return JobHdr::where('job_date', '>=', '2021-06-01')
+            ->where('job_dept', 'IFFSX')
+            ->where('edi_sent', false)
+            ->where('entry_number', '>', '')
+            ->groupBy('bill_of_lading')
+            ->pluck('bill_of_lading')
+            ->toArray();
+    }
+
     protected function checkIsSchenker($jobHdr)
     {
         $isSchenker = false;
@@ -91,7 +113,7 @@ class BuildTestSeaExportTransaction extends Command
         foreach ($addresses as $address) {
             // Only process some addresses
             if (in_array($address->address_type, $addressTypes)) {
-                $name  = $address->name;
+                $name = $address->name;
                 $branchFound = stripos($name, 'schenker');
                 // Check is this a schenker branch
                 if ($branchFound !== false) {
@@ -109,12 +131,13 @@ class BuildTestSeaExportTransaction extends Command
         $oceanMsg = new OceanMsg();
         $dbSchenker = new DbSchenker();
         $errors = $oceanMsg->buildMsg($jobHdr);
-        if ($errors == []) {
+
+        if (empty($errors)) {
             $errors = $oceanMsg->validateMsg();
-            $this->msg = json_encode($oceanMsg->msg);
-            dd(json_encode($this->msg));
-            if ($errors == []) {
-                $result = $dbSchenker->sendMessage(json_encode($this->msg));
+            $this->msg = $oceanMsg->msg;
+
+            if (empty($errors)) {
+                $result = $dbSchenker->sendRequest($this->msg);
                 $errors = $result['errors'];
             }
         }
@@ -138,42 +161,9 @@ class BuildTestSeaExportTransaction extends Command
             }
         }
 
-        Mail::to('renglish@antrim.ifsgroup.com')->send(new \App\Mail\GenericError(
-            'DBSchenker EDI ('.$jobRef.')',
-            $msg,
-            false,
-            $warning,
-            $detail
-        ));
+        //Mail::to('renglish@antrim.ifsgroup.com')->send(new GenericError('DBSchenker EDI ('.$jobRef.')', $msg, false, $warning, $detail));
 
         $msg[] = $this->msg; // Add json for debugging
-        Mail::to('gmcbroom@antrim.ifsgroup.com')->send(new \App\Mail\GenericError(
-            'DBSchenker EDI ('.$jobRef.')',
-            $msg,
-            false,
-            $warning,
-            $detail
-        ));
-    }
-
-    protected function getBols($test)
-    {
-        if ($test) {
-            $bols = JobHdr::wherein('bill_of_lading', ['IFFSXJ00012352'])
-                ->groupBy('bill_of_lading')
-                ->pluck('bill_of_lading')
-                ->toArray();
-        } else {
-            // Get all BOLs addressed not yet processed (not just Schenker)
-            $bols = JobHdr::where('job_date', '>=', '2021-06-01')
-                ->where('job_dept', 'IFFSX')
-                ->where('edi_sent', '0')
-                ->where('entry_number', '>', '')
-                ->groupBy('bill_of_lading')
-                ->pluck('bill_of_lading')
-                ->toArray();
-        }
-
-        return $bols;
+        Mail::to('dshannon@antrim.ifsgroup.com')->send(new GenericError('DBSchenker EDI ('.$jobRef.')', $msg, false, $warning, $detail));
     }
 }
