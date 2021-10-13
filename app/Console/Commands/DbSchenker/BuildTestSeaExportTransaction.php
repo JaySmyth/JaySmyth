@@ -50,18 +50,31 @@ class BuildTestSeaExportTransaction extends Command
         $test = true;
 
         foreach ($this->getBols($test) as $bol) {
+
+            $this->line("Getting job $bol");
+
             $jobs = JobHdr::where('bill_of_lading', $bol)->get();
 
             if ($jobs->count() == 1) {
+
+                $this->info("Found job $bol");
+
                 $jobHdr = $jobs->first();
-                $isSchenker = $this->checkIsSchenker($jobHdr);
-                if ($isSchenker) {
+
+                if ($this->checkIsSchenker($jobHdr)) {
+
+                    $this->info("$bol is a DBschenker job");
+
                     $errors = $this->processJob($jobHdr);
 
                     if (empty($errors)) {
                         $jobHdr->update(['edi_sent' => 1]);
+
+                        $this->info("Transaction successful");
                     }
                 } else {
+
+                    $this->line("$bol is not DBschenker job");
                     // If Non Schenker and entry_date is more than 3 days old mark as sent.
                     $closeDate = date('Y-m-d', strtotime(date('Y-m-d').' +3 days'));
                     if ($jobHdr->entry_date < $closeDate) {
@@ -72,6 +85,9 @@ class BuildTestSeaExportTransaction extends Command
                     continue;
                 }
             } else {
+
+                $this->error("Unable to process multiple jobs on one BOL. Use Procars.");
+
                 return [
                     'errors' => [
                         'billOfLading' => 'Unable to process multiple jobs on one BOL. Use Procars etc.'
@@ -152,7 +168,7 @@ class BuildTestSeaExportTransaction extends Command
                 }
             }
         }
-        dd($msg);
+
         //Mail::to('renglish@antrim.ifsgroup.com')->send(new GenericError('DBSchenker EDI ('.$jobRef.')', $msg, false, $warning, $detail));
 
         $msg[] = json_encode($this->msg); // Add json for debugging
