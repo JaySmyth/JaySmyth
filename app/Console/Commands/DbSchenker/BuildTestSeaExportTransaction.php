@@ -124,8 +124,8 @@ class BuildTestSeaExportTransaction extends Command
     protected function checkIsSchenker($jobHdr)
     {
         $addressTypes = ['CONSEE', 'FOREIGN', 'NOTIFY'];
-        $addresses = $jobHdr->addresses;
-        foreach ($addresses as $address) {
+        dd($jobHdr->addresses);
+        foreach ($jobHdr->addresses as $address) {
             if (in_array($address->address_type, $addressTypes) && stripos($address->name, 'schenker')) {
                 return true;
             }
