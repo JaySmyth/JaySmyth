@@ -50,19 +50,16 @@ class BuildTestSeaExportTransaction extends Command
         $test = true;
 
         foreach ($this->getBols($test) as $bol) {
-
             $this->line("Getting job $bol");
 
             $jobs = JobHdr::where('bill_of_lading', $bol)->get();
 
             if ($jobs->count() == 1) {
-
                 $this->info("Found job $bol");
 
                 $jobHdr = $jobs->first();
 
                 if ($this->checkIsSchenker($jobHdr)) {
-
                     $this->info("$bol is a DBschenker job");
 
                     $errors = $this->processJob($jobHdr);
@@ -73,7 +70,6 @@ class BuildTestSeaExportTransaction extends Command
                         $this->info("Transaction successful");
                     }
                 } else {
-
                     $this->line("$bol is not DBschenker job");
                     // If Non Schenker and entry_date is more than 3 days old mark as sent.
                     $closeDate = date('Y-m-d', strtotime(date('Y-m-d').' +3 days'));
@@ -85,7 +81,6 @@ class BuildTestSeaExportTransaction extends Command
                     continue;
                 }
             } else {
-
                 $this->error("Unable to process multiple jobs on one BOL. Use Procars.");
 
                 return [
@@ -123,10 +118,10 @@ class BuildTestSeaExportTransaction extends Command
 
     protected function checkIsSchenker($jobHdr)
     {
-        $addressTypes = ['CONSEE', 'FOREIGN', 'NOTIFY'];
-        dd($jobHdr->addresses);
         foreach ($jobHdr->addresses as $address) {
-            if (in_array($address->address_type, $addressTypes) && stripos($address->name, 'schenker')) {
+            $this->line('Checking address: '.$address->address_type.'/'.$address->name);
+
+            if (in_array($address->address_type, ['CONSEE', 'FOREIGN', 'NOTIFY']) && stripos($address->name, 'schenker')) {
                 return true;
             }
         }
