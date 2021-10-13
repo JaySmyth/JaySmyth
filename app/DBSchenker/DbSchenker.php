@@ -28,7 +28,7 @@ class DbSchenker
             dd($request);
 
             // Send the request and get the response
-            $response = $client->post($this->url.'createLabel', ['json' => $request]);
+            $response = $client->post($this->url.'ReceiveShipment', ['json' => $request]);
 
             // Get the response body
             $response = $response->getBody()->getContents();

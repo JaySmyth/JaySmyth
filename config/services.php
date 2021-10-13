@@ -65,6 +65,7 @@ return [
     'dbschenker' => [
         'user' => env('DBSCHENKER_API_USER'),
         'password' => env('DBSCHENKER_API_PASSWORD'),
+        'url' => env('DBSCHENKER_API_URL'),
     ],
 
     'dx' => [
