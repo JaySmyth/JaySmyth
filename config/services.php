@@ -57,6 +57,16 @@ return [
         'url' => env('UPS_API_URL'),
     ],
 
+    'tnt' => [
+        'user' => env('TNT_API_USER'),
+        'password' => env('TNT_API_PASSWORD'),
+    ],
+
+    'dbschenker' => [
+        'user' => env('DBSCHENKER_API_USER'),
+        'password' => env('DBSCHENKER_API_PASSWORD'),
+    ],
+
     'dx' => [
         'user' => env('DX_API_USER'),
         'password' => env('DX_API_PASSWORD'),
