@@ -152,7 +152,7 @@ class BuildTestSeaExportTransaction extends Command
                 }
             }
         }
-
+        dd($msg);
         //Mail::to('renglish@antrim.ifsgroup.com')->send(new GenericError('DBSchenker EDI ('.$jobRef.')', $msg, false, $warning, $detail));
 
         $msg[] = json_encode($this->msg); // Add json for debugging
