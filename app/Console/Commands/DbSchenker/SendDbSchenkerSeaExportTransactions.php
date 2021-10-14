@@ -99,8 +99,9 @@ class SendDbSchenkerSeaExportTransactions extends Command
     protected function getBols($test)
     {
         if ($test) {
-            // ['IFFSXJ00012352', 'IFFSXJ00012383', 'IFFSXJ00012363', 'IFFSXJ00012359']
-            return JobHdr::wherein('bill_of_lading', ['IFFSXJ00012383'])
+            // ['IFFSXJ00012352', ]
+            return JobHdr::wherein('bill_of_lading', ['IFFSXJ00012383', 'IFFSXJ00012363', 'IFFSXJ00012359'])
+                ->where('edi_sent', false)
                 ->groupBy('bill_of_lading')
                 ->pluck('bill_of_lading')
                 ->toArray();
