@@ -99,7 +99,8 @@ class SendDbSchenkerSeaExportTransactions extends Command
     protected function getBols($test)
     {
         if ($test) {
-            return JobHdr::wherein('bill_of_lading', ['IFFSXJ00012352'])
+            // ['IFFSXJ00012352', 'IFFSXJ00012383', 'IFFSXJ00012363', 'IFFSXJ00012359']
+            return JobHdr::wherein('bill_of_lading', ['IFFSXJ00012383'])
                 ->groupBy('bill_of_lading')
                 ->pluck('bill_of_lading')
                 ->toArray();
@@ -162,7 +163,7 @@ class SendDbSchenkerSeaExportTransactions extends Command
             }
         }
 
-        //Mail::to('renglish@antrim.ifsgroup.com')->send(new GenericError('DBSchenker EDI ('.$jobRef.')', $msg, false, $warning, $detail));
+        Mail::to('renglish@antrim.ifsgroup.com')->send(new GenericError('DBSchenker EDI ('.$jobRef.')', $msg, false, $warning, $detail));
 
         $msg[] = json_encode($this->msg); // Add json for debugging
         Mail::to('dshannon@antrim.ifsgroup.com')->send(new GenericError('DBSchenker EDI ('.$jobRef.')', $msg, false, $warning, $detail));
