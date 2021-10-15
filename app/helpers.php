@@ -1995,7 +1995,7 @@ function fixShipmentCase($shipment)
 
 function calcVolume($length, $width, $height, $divisor = 5000)
 {
-    if (! is_numeric($divisor)) {
+    if (! is_numeric($divisor) || $divisor <= 0) {
         $divisor = 5000;
     }
 
