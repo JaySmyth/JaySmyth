@@ -13,16 +13,18 @@ class ShipmentWarning extends Mailable
 
     protected $shipment;
     protected $warningSubject;
+    protected $customMessage;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($shipment, $warningSubject)
+    public function __construct($shipment, $warningSubject, $customMessage = null)
     {
         $this->shipment = $shipment;
         $this->warningSubject = $warningSubject;
+        $this->customMessage = $customMessage;
     }
 
     /**
@@ -59,7 +61,7 @@ class ShipmentWarning extends Mailable
                 break;
 
             case 'reset':
-                $subject = 'Shipment Reset';
+                $subject = 'Shipment Reset ('.$this->customMessage.')';
                 break;
 
             case 'ship_reason':
@@ -74,11 +76,12 @@ class ShipmentWarning extends Mailable
         }
 
         return $this->view('emails.shipments.warning')
-                        ->subject($subject.' - '.$this->shipment->consignment_number)
-                        ->with(['shipment' => $this->shipment,
-                            'subject' => $subject,
-                            'valueClass' => $valueClass,
-                            'countryClass' => $countryClass,
-        ]);
+            ->subject($subject.' - '.$this->shipment->consignment_number)
+            ->with([
+                'shipment' => $this->shipment,
+                'subject' => $subject,
+                'valueClass' => $valueClass,
+                'countryClass' => $countryClass,
+            ]);
     }
 }

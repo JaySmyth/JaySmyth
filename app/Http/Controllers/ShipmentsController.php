@@ -1398,7 +1398,7 @@ class ShipmentsController extends Controller
         // Notify user and redirect
         flash()->info('Shipment Reset!');
 
-        Mail::to(['aplatt@antrim.ifsgroup.com', 'courieruk@antrim.ifsgroup.com', 'markj@antrim.ifsgroup.com'])->queue(new \App\Mail\ShipmentWarning($shipment, 'reset'));
+        Mail::to(['aplatt@antrim.ifsgroup.com', 'courieruk@antrim.ifsgroup.com', 'markj@antrim.ifsgroup.com'])->queue(new \App\Mail\ShipmentWarning($shipment, 'reset', $request->reason));
 
         if ($request->redirect) {
             return redirect($request->redirect)->with('token', $shipment->token);
