@@ -1,10 +1,13 @@
 <?php
 
 /*
- * ****************************************************
+ * ******************************************************
  *                        Notes:
- * ****************************************************
+ * ******************************************************
  *
+ * This Method is for Domestic service that uses Domestic
+ * style zones but Intl style pricing.
+ * 
  * To add new Carrier Pricing the minimum required is to
  *
  *  1   Add the Carrier to $this->buildmodel()
@@ -14,7 +17,7 @@
  *      requirements may be added here.
  *  4   Add carriers zones to pricing_zones
  *  5   Add Fuel% to fuel_percentage table
- * ****************************************************
+ * ******************************************************
  */
 
 namespace app\Pricing;
@@ -208,7 +211,7 @@ class Pricing
         $response['errors'] = $errors;
 
         // dump($this->log);
-        //dd($errors);
+        // dd($errors);
 
         if ($this->debug) {
             $response['Pricinglog'] = $this->log;
@@ -235,6 +238,10 @@ class Pricing
 
             case 'domestic':
                 $this->model = new \App\Pricing\Methods\Domestic($this->debug);
+                break;
+
+            case 'domestic2':
+                $this->model = new \App\Pricing\Methods\Domestic2($this->debug);
                 break;
 
             case 'dhl':
