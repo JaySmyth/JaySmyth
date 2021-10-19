@@ -3,7 +3,6 @@
 namespace App\Tracking;
 
 use App\Models\ProblemEvent;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Mail;
 
 abstract class Tracking
@@ -50,6 +49,7 @@ abstract class Tracking
      * Determine if an event should be processed.
      *
      * @param $event
+     *
      * @return bool
      */
     protected function ignoreEvent($event)
@@ -66,7 +66,7 @@ abstract class Tracking
     /**
      * Perform any necessary actions based upon the current event status.
      *
-     * @param type $event
+     * @param  type  $event
      */
     private function processEvent($event)
     {
@@ -81,7 +81,6 @@ abstract class Tracking
         }
 
         switch ($event['status']) {
-
             case 'in_transit':
             case 'pre_transit':
             case 'out_for_delivery':
@@ -119,14 +118,13 @@ abstract class Tracking
     /**
      * Set to received using tracking event.
      *
-     * @param type $event
+     * @param  type  $event
      */
     private function ensureShipmentReceived($event)
     {
         $ignore = ['pre_transit', 'cancelled', 'unknown', 'error', 'failure'];
 
         if (! in_array($event['status'], $ignore)) {
-
             // Set to received
             if (! $this->shipment->received) {
                 $this->shipment->setReceived($event['datetime'], 0, true);
@@ -143,7 +141,7 @@ abstract class Tracking
     /**
      * Check if we have received a "problem" event that we need to send email for.
      *
-     * @param type $message
+     * @param  type  $message
      */
     private function alertProblem($message)
     {

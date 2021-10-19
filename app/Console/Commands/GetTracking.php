@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Models\Shipment;
-use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class GetTracking extends Command
@@ -46,18 +45,16 @@ class GetTracking extends Command
      */
     public function handle()
     {
+        $shipments = Shipment::whereIn('carrier_tracking_number', ['981838468'])->get();
+
+        foreach ($shipments as $shipment) {
+            $this->info('Getting tracking updates for '.$shipment->carrier->name.' shipment: '.$shipment->carrier_consignment_number);
+
+            $shipment->updateTracking();
+        }
+
 
         /*
-                        $shipments = Shipment::whereIn('carrier_tracking_number', ['1Z922E2A0496733575'])->get();
-
-                        foreach ($shipments as $shipment) {
-
-                            $this->info('Getting tracking updates for ' . $shipment->carrier->name . ' shipment: ' . $shipment->carrier_consignment_number);
-
-                            $shipment->updateTracking();
-
-                        }
-        */
 
         $active = $this->option('active');
 
@@ -80,7 +77,7 @@ class GetTracking extends Command
                 $shipment->updateTracking();
             }
         }
-
+*/
         $this->info('Finished');
     }
 }
