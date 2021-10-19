@@ -21,10 +21,10 @@ class TNT extends Tracking
             // Build an array to send as json to ship.ifsgroup.com
             $request = $this->buildRequest();
 
-            dd($request);
-
             // Send the request and get the response
             $response = $this->sendRequest($request);
+
+            dd($response);
 
             // Decode the response to an array
             $response = json_decode($response->getBody()->getContents(), true);
@@ -50,8 +50,8 @@ class TNT extends Tracking
         $searchCriteriaNode->addAttribute('marketType', 'DOMESTIC');
         $searchCriteriaNode->addAttribute('originCountry', 'GB');
         $searchCriteriaNode->addChild('ConsignmentNumber', $this->trackingNumber);
-        $xml->addChild('LevelOfDetail', '<Summary/>');
-
+        $levelOfDetailNode = $xml->addChild('LevelOfDetail');
+        $levelOfDetailNode->addChild('Summary');
         return $xml->asXML();
     }
 
@@ -69,7 +69,8 @@ class TNT extends Tracking
         ];
 
         $ch = curl_init(); // initialize curl handle
-        curl_setopt($ch, CURLOPT_URL, $this->express_connect_url);                // set url to post to
+        curl_setopt($ch, CURLOPT_USERPWD, config('services.tnt.user').':'.config('services.tnt.password'));
+        curl_setopt($ch, CURLOPT_URL, 'https://express.tnt.com/expressconnect/track.do');                // set url to post to
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         if (! empty($header)) {
