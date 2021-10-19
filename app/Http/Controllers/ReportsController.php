@@ -765,10 +765,9 @@ class ReportsController extends Controller
 
         $this->authorize(new Report);
 
-        // Default results to "today"
         if (! $request->date_from && ! $request->date_to) {
-            $request->date_from = Carbon::today()->startOfDay();
-            $request->date_to = Carbon::today()->endOfDay();
+            $request->date_from = now()->startOfMonth();
+            $request->date_to = now()->endOfMonth();
         }
 
         $shipments = Shipment::orderBy('id', 'DESC')
@@ -778,6 +777,8 @@ class ReportsController extends Controller
             ->hasMode($report->mode_id)
             ->hasService($request->service)
             ->whereNull('scs_job_number')
+            ->whereReceived(1)
+            ->whereNotIn('status_id', [1, 7])
             ->restrictCompany($request->user()->getAllowedCompanyIds())
             ->with('service')
             ->paginate(250);

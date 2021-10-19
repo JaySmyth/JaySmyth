@@ -9,10 +9,6 @@
         {!! Form::Open(['url' => Request::path(), 'method' => 'get', 'autocomplete' => 'off']) !!}
 
         <div class="form-group">
-            <label for="filter">Consignment or Reference</label>
-            <input type="text" name="filter" id="filter" value="{{Request::get('filter')}}" class="form-control" placeholder="">
-        </div>
-        <div class="form-group">
             <label for="date_from">Date From</label>
             <input type="text" name="date_from" value="@if(Auth::user()->hasIfsRole() && !Request::get('date_from') && !Request::get('date_to')){{date(Auth::user()->date_format)}}@else{{Request::get('date_from')}}@endif" class="form-control datepicker" placeholder="Date from">
         </div>
@@ -37,16 +33,6 @@
 
     <main class="col-sm-10 ml-sm-auto" role="main">
 
-
-        @section('toolbar')
-            @if(Request::get('date_from'))
-                <a href="/shipments/download?status=2&received=0&{{Request::getQueryString()}}" title="Download Results"><span class="fas fa-cloud-download-alt fa-lg" aria-hidden="true"></span></a>
-            @else
-                <a href="{{url('/shipments/download?status=2&received=0&date_from=' . date(Auth::user()->date_format) . '&date_to=' . date(Auth::user()->date_format))}}" title="Download Results"><span class="fas fa-cloud-download-alt fa-lg" aria-hidden="true"></span></a>
-            @endif
-        @endsection
-
-
         @include('partials.title', ['title' => $report->name, 'results'=> $shipments])
 
         <table class="table table-striped">
@@ -54,7 +40,7 @@
                 <tr>
                     <th>Consignment</th>
                     <th>Carrier Ref</th>
-                    @if(!Request::get('mode'))<th>Mode</th>@endif
+
                     @if(Auth::user()->hasIfsRole() && Auth::user()->hasMultipleDepots())<th class="text-center">Depot</th>@endif
 
                     @if(Auth::user()->hasIfsRole())
@@ -91,7 +77,7 @@
                         {{$shipment->carrier_consignment_number}}
                         @endif
                     </td>
-                    @if(!Request::get('mode'))<td>{{ucfirst($shipment->mode->name)}}</td>@endif
+
                     @if(Auth::user()->hasIfsRole() && Auth::user()->hasMultipleDepots())<td class="text-center"><span class="badge badge-secondary" data-placement="bottom" data-toggle="tooltip" data-original-title="{{$shipment->depot->name ?? 'Unknown'}}">{{$shipment->depot->code ?? ''}}</span></td>@endif
 
                     @if(Auth::user()->hasIfsRole())
