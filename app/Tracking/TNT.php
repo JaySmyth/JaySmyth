@@ -7,8 +7,6 @@ use SimpleXMLElement;
 
 class TNT extends Tracking
 {
-    protected $user;
-    protected $password;
 
     /**
      * Send request to TNT and format the response.
@@ -20,6 +18,8 @@ class TNT extends Tracking
         try {
             // Build an array to send as json to ship.ifsgroup.com
             $request = $this->buildRequest();
+
+            print_r($request);
 
             // Send the request and get the response
             $response = $this->sendRequest($request);
@@ -55,6 +55,13 @@ class TNT extends Tracking
         return $xml->asXML();
     }
 
+    /**
+     * Post the tracking request to carrier.
+     *
+     * @param $string
+     *
+     * @return bool|string
+     */
     private function sendRequest($string)
     {
         $string = 'xml_in='.$string; // Append "xml_in=" to beginning of string
@@ -99,27 +106,6 @@ class TNT extends Tracking
      */
     protected function formatResponse($response)
     {
-        //$response = Arr::dot($response);
-        //dd($response);
-
-        // Return array
-        $events = [];
-
-        if ($this->shipment->pieces > 1) {
-            for ($i = 0; $i <= $this->shipment->pieces; $i++) {
-                if (! empty($response['TrackResponse']['Shipment']['Package'][$i]['Activity'])) {
-                    $activities = array_reverse($response['TrackResponse']['Shipment']['Package'][$i]['Activity']);
-                    $events = $events + $this->processActivities($activities);
-                }
-            }
-        }
-
-        if (empty($events) && ! empty($response['TrackResponse']['Shipment']['Package']['Activity'])) {
-            $activities = array_reverse($response['TrackResponse']['Shipment']['Package']['Activity']);
-            $events = $this->processActivities($activities);
-        }
-
-        return $events;
     }
 
 
