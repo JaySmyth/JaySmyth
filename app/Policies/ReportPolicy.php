@@ -146,6 +146,18 @@ class ReportPolicy
      *
      * @return bool
      */
+    public function unknownScsJobs(User $user)
+    {
+        if ($user->hasPermission('view_unknown_jobs_report')) {
+            return true;
+        }
+    }
+
+    /**
+     * View report.
+     *
+     * @return bool
+     */
     public function dailyStats(User $user)
     {
         if ($user->hasPermission('view_daily_stats_report')) {
