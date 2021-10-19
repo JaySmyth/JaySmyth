@@ -47,7 +47,7 @@ class TNT extends Tracking
     {
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><TrackRequest locale="en_US" version="3.1"></TrackRequest>');
         $searchCriteriaNode = $xml->addChild('SearchCriteria');
-        $searchCriteriaNode->addAttribute('marketType', 'DOMESTIC');
+        $searchCriteriaNode->addAttribute('marketType', 'INTERNATIONAL');
         $searchCriteriaNode->addAttribute('originCountry', 'GB');
         $searchCriteriaNode->addChild('ConsignmentNumber', $this->trackingNumber);
         $levelOfDetailNode = $xml->addChild('LevelOfDetail');
