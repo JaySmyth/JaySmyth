@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\CustomerServicesReport;
 use App\Models\Company;
 use App\Models\Log;
 use App\Models\Manifest;
 use App\Models\Report;
 use App\Models\Service;
 use App\Models\Shipment;
-use App\Jobs\CustomerServicesReport;
-
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -749,6 +748,41 @@ class ReportsController extends Controller
             ->paginate(250);
 
         return view('reports.pre_transit', compact('report', 'shipments'));
+    }
+
+    /**
+     * Shipments where the SCS job number is null.
+     *
+     * @param  Request  $request
+     * @param $id
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application|\Illuminate\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function unknownScsJobs(Request $request, $id)
+    {
+        $report = Report::findOrFail($id);
+
+        $this->authorize(new Report);
+
+        // Default results to "today"
+        if (! $request->date_from && ! $request->date_to) {
+            $request->date_from = Carbon::today()->startOfDay();
+            $request->date_to = Carbon::today()->endOfDay();
+        }
+
+        $shipments = Shipment::orderBy('id', 'DESC')
+            ->filter($request->filter)
+            ->hasCompany($request->company)
+            ->shipDateBetween($request->date_from, $request->date_to)
+            ->hasMode($report->mode_id)
+            ->hasService($request->service)
+            ->whereNull('scs_job_number')
+            ->restrictCompany($request->user()->getAllowedCompanyIds())
+            ->with('service')
+            ->paginate(250);
+
+        return view('reports.unknown_scs_jobs', compact('report', 'shipments'));
     }
 
 
