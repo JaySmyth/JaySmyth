@@ -307,6 +307,7 @@ Route::get('reports/active-shipments/{id}', 'ReportsController@activeShipments')
 Route::get('reports/exceptions/{id}', 'ReportsController@exceptions');
 Route::get('reports/pod/{id}', 'ReportsController@pod');
 Route::get('reports/purchase-invoices/unknown-jobs/{id}', 'ReportsController@unknownJobs');
+Route::get('reports/unknown-jobs/{id}', 'ReportsController@unknownScsJobs');
 Route::get('reports/user-agents/{id}', 'ReportsController@userAgents');
 Route::get('reports/fedex-international-available/{id}', 'ReportsController@fedexInternationalAvailable');
 Route::get('reports/margins/{id}', 'ReportsController@margins');
