@@ -45,10 +45,10 @@ class TNT extends Tracking
      */
     protected function buildRequest()
     {
-        $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><TrackRequest locale="en_US" version="3.1"></TrackRequest>');
+        $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><TrackRequest locale="en_GB" version="3.1"></TrackRequest>');
         $searchCriteriaNode = $xml->addChild('SearchCriteria');
-       // $searchCriteriaNode->addAttribute('marketType', 'INTERNATIONAL');
-      //  $searchCriteriaNode->addAttribute('originCountry', 'GB');
+        $searchCriteriaNode->addAttribute('marketType', 'DOMESTIC');
+        $searchCriteriaNode->addAttribute('originCountry', 'GB');
         $searchCriteriaNode->addChild('ConsignmentNumber', $this->trackingNumber);
         $levelOfDetailNode = $xml->addChild('LevelOfDetail');
         $levelOfDetailNode->addChild('Summary');
