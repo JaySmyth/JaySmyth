@@ -45,6 +45,7 @@ class GetTracking extends Command
      */
     public function handle()
     {
+        /*
         $shipments = Shipment::whereIn('carrier_tracking_number', ['981838468'])->get();
 
         foreach ($shipments as $shipment) {
@@ -52,9 +53,8 @@ class GetTracking extends Command
 
             $shipment->updateTracking();
         }
+*/
 
-
-        /*
 
         $active = $this->option('active');
 
@@ -62,7 +62,10 @@ class GetTracking extends Command
             $this->info('Getting tracking updates for inactive shipments');
 
             // Shipments that have not been marked as received - wait 10 hours before trying to track them
-            foreach (Shipment::whereIn('carrier_id', $this->enabledCarriers)->whereNull('external_tracking_url')->whereDelivered(0)->whereReceived(0)->whereNotIn('status_id', [1, 7])->where('created_at', '>', Carbon::now()->subMonths(2))->where('created_at', '<', Carbon::now()->subHours(10))->orderBy('id', 'asc')->cursor() as $shipment) {
+            foreach (
+                Shipment::whereIn('carrier_id', $this->enabledCarriers)->whereNull('external_tracking_url')->whereDelivered(0)->whereReceived(0)->whereNotIn('status_id', [1, 7])->where('created_at', '>', Carbon::now()->subMonths(2))->where('created_at', '<',
+                    Carbon::now()->subHours(10))->orderBy('id', 'asc')->cursor() as $shipment
+            ) {
                 $this->info('Getting tracking updates for shipment: '.$shipment->carrier_consignment_number);
 
                 $shipment->updateTracking();
@@ -77,7 +80,7 @@ class GetTracking extends Command
                 $shipment->updateTracking();
             }
         }
-*/
+
         $this->info('Finished');
     }
 }
