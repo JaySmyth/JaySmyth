@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Shipment;
 use Illuminate\Console\Command;
+use Carbon\Carbon;
 
 class GetTracking extends Command
 {
