@@ -19,15 +19,17 @@ class TNT extends Tracking
             // Build an array to send as json to ship.ifsgroup.com
             $request = $this->buildRequest();
 
-            print_r($request);
-
             // Send the request and get the response
             $response = $this->sendRequest($request);
 
-            dd($response);
+            dd($response->getBody()->getContents());
+
+            //$xml = simplexml_load_string($xmlstring, "SimpleXMLElement", LIBXML_NOCDATA);
+            //$json = json_encode($xml);
+            //$array = json_decode($json,TRUE);
 
             // Decode the response to an array
-            $response = json_decode($response->getBody()->getContents(), true);
+           // $response = json_decode, true);
 
             // Format and return the response
             return $this->formatResponse($response);
