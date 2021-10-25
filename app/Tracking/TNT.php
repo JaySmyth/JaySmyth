@@ -22,8 +22,6 @@ class TNT extends Tracking
             // Send the request and get the response
             $response = $this->sendRequest($request);
 
-            dd($this->getXmlResult($response));
-
             $xml = simplexml_load_string($this->getXmlResult($response), "SimpleXMLElement", LIBXML_NOCDATA);
 
             // Decode the response to an array
@@ -113,7 +111,7 @@ class TNT extends Tracking
     {
         $start = stripos($response, '<?xml version="1.0" encoding="UTF-8"?>');
         if ($start > 0) {
-            return "<?xml version='1.0' standalone='yes'?>".substr($response, $start);
+            return substr($response, $start);
         }
 
         return false;
