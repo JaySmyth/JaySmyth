@@ -21,38 +21,21 @@ class TNT extends Tracking
 
             // Send the request and get the response
             $response = $this->sendRequest($request);
-dd($response);
 
-            $xml = $this->getXmlResult();
+            $xml = simplexml_load_string($this->getXmlResult($response), "SimpleXMLElement", LIBXML_NOCDATA);
 
             // Decode the response to an array
-            $response = json_decode(json_encode($xml), true);
+            $array = json_decode(json_encode($xml), true);
 
-            dd($response);
+            dd($array);
 
             // Format and return the response
-            return $this->formatResponse($response);
+            return $this->formatResponse($array);
         } catch (GuzzleException $exception) {
             if ($exception->hasResponse()) {
                 //Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Get TNT tracking exception', Psr7\str($exception->getResponse())));
             }
         }
-    }
-
-    /**
-     * Get the result from the TNT Express Connect response.
-     *
-     * @param type $response
-     * @return bool|string
-     */
-    private function getXmlResult($response)
-    {
-        $start = stripos($response, '<document>');
-        if ($start > 0) {
-            return "<?xml version='1.0' standalone='yes'?>".substr($response, $start);
-        }
-
-        return false;
     }
 
     /**
@@ -115,6 +98,23 @@ dd($response);
         curl_close($ch);                                    // close
 
         return $result;
+    }
+
+    /**
+     * Get the result from the TNT Express Connect response.
+     *
+     * @param  type  $response
+     *
+     * @return bool|string
+     */
+    private function getXmlResult($response)
+    {
+        $start = stripos($response, '<?xml version="1.0" encoding="UTF-8"?>');
+        if ($start > 0) {
+            return "<?xml version='1.0' standalone='yes'?>".substr($response, $start);
+        }
+
+        return false;
     }
 
     /**
