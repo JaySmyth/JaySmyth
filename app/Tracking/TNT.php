@@ -21,8 +21,9 @@ class TNT extends Tracking
 
             // Send the request and get the response
             $response = $this->sendRequest($request);
+dd($response);
 
-            $xml = simplexml_load_string($response->xml(), "SimpleXMLElement", LIBXML_NOCDATA);
+            $xml = $this->getXmlResult();
 
             // Decode the response to an array
             $response = json_decode(json_encode($xml), true);
@@ -36,6 +37,22 @@ class TNT extends Tracking
                 //Mail::to('it@antrim.ifsgroup.com')->send(new \App\Mail\GenericError('Get TNT tracking exception', Psr7\str($exception->getResponse())));
             }
         }
+    }
+
+    /**
+     * Get the result from the TNT Express Connect response.
+     *
+     * @param type $response
+     * @return bool|string
+     */
+    private function getXmlResult($response)
+    {
+        $start = stripos($response, '<document>');
+        if ($start > 0) {
+            return "<?xml version='1.0' standalone='yes'?>".substr($response, $start);
+        }
+
+        return false;
     }
 
     /**
