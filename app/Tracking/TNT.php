@@ -22,7 +22,7 @@ class TNT extends Tracking
             // Send the request and get the response
             $response = $this->sendRequest($request);
 
-            $xml = simplexml_load_string($response->getBody(), "SimpleXMLElement", LIBXML_NOCDATA);
+            $xml = simplexml_load_string($response, "SimpleXMLElement", LIBXML_NOCDATA);
 
             // Decode the response to an array
             $response = json_decode(json_encode($xml), true);
