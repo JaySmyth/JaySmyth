@@ -22,14 +22,12 @@ class TNT extends Tracking
             // Send the request and get the response
             $response = $this->sendRequest($request);
 
-            dd($response->getBody()->getContents());
-
-            //$xml = simplexml_load_string($xmlstring, "SimpleXMLElement", LIBXML_NOCDATA);
-            //$json = json_encode($xml);
-            //$array = json_decode($json,TRUE);
+            $xml = simplexml_load_string($response->getBody(), "SimpleXMLElement", LIBXML_NOCDATA);
 
             // Decode the response to an array
-           // $response = json_decode, true);
+            $response = json_decode(json_encode($xml), true);
+
+            dd($response);
 
             // Format and return the response
             return $this->formatResponse($response);
@@ -56,6 +54,7 @@ class TNT extends Tracking
         $levelOfDetailNode->addChild('Complete');
         $levelOfDetailNode->addAttribute('package', 'true');
         $levelOfDetailNode->addAttribute('shipment', 'true');
+
         return $xml->asXML();
     }
 
