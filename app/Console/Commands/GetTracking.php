@@ -46,7 +46,7 @@ class GetTracking extends Command
      */
     public function handle()
     {
-        /*
+
         $shipments = Shipment::whereIn('carrier_tracking_number', ['981838468'])->get();
 
         foreach ($shipments as $shipment) {
@@ -54,8 +54,9 @@ class GetTracking extends Command
 
             $shipment->updateTracking();
         }
-*/
 
+
+        /*
 
         $active = $this->option('active');
 
@@ -83,5 +84,7 @@ class GetTracking extends Command
         }
 
         $this->info('Finished');
+           */
     }
+
 }
